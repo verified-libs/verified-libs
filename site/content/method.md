@@ -1,4 +1,4 @@
-# Method
+# Method: how the embedded ring buffers are measured and tested
 
 ## Hardware
 

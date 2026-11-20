@@ -91,13 +91,16 @@ def page(slug, title, body, nav_on):
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title)} - verified-libs</title><style>{CSS}</style></head>
+<title>{html.escape(title if title.startswith("verified-libs") else title + " - verified-libs")}</title><style>{CSS}</style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a>{links}</nav></header>
 <main>{body}</main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
 </body></html>
 """
 
+
+# The front page's heading is the project's name; its browser title says more.
+INDEX_TITLE = "verified-libs: embedded ring buffer libraries, measured and tested on real hardware"
 
 SITE_PAGES = {"reports.html", "findings.html"}   # pages with no markdown source
 MISSING = []   # (page source, link target): links to files that are not in the tree
@@ -158,7 +161,8 @@ def main():
         nav_on = {"index.html": "index", "method.html": "method", "results.html": "results",
                   "reproduce.html": "reproduce", "repeats.html": "repeats"}.get(
             dst, "reports" if dst.startswith("report-") else "findings")
-        pages[dst] = page(dst, title_of(text, dst), render(text, src, c, pagemap), nav_on)
+        title = INDEX_TITLE if dst == "index.html" else title_of(text, dst)
+        pages[dst] = page(dst, title, render(text, src, c, pagemap), nav_on)
 
     rep = "".join(f'<li><a href="{pagemap["reports/" + r]}">{html.escape(title_of(open(os.path.join(ROOT, "reports", r)).read(), r))}</a> '
                   f'<span style="color:var(--mute)">({r[:10]})</span></li>' for r in reversed(reports))
