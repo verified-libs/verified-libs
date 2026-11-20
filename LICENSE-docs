@@ -1,0 +1,30 @@
+Texts and results of verified-libs: Creative Commons Attribution 4.0
+International (CC BY 4.0)
+
+Copyright (c) 2026 Erik N (pxq.dk), for the verified-libs project
+
+Covered by this licence:
+  - every Markdown document (*.md), among them RESULTS.md, reports/ and the
+    READMEs;
+  - the website's texts (site/content/);
+  - the result data: records/ and site/data/.
+Everything else in this repository (code, scripts, build files, firmware,
+adapters, configuration) is under the MIT licence in LICENSE.
+
+The ring-buffer libraries that are tested are not part of this repository:
+they are fetched at pinned commits and keep their own licences.
+
+You may share and adapt this material for any purpose, also commercially,
+if you give appropriate credit, provide a link to the licence and indicate
+if changes were made. Suggested credit:
+
+    Source: verified-libs, https://verified-libs.org (CC BY 4.0)
+    [, numbers recomputed / table shortened / ... if you changed them]
+
+Licence text (legal code):
+    https://creativecommons.org/licenses/by/4.0/legalcode
+Summary:
+    https://creativecommons.org/licenses/by/4.0/
+
+The licence gives no right to use the name "verified-libs" (see README.md,
+"Licence").

@@ -1,0 +1,1940 @@
+{
+ "board": "Raspberry Pi Pico 2 H",
+ "campaigns": [
+  "overnight-20261119T191737Z-pico2"
+ ],
+ "commits": [
+  "8d8880f4bf78"
+ ],
+ "modes": {
+  "single": {
+   "runs": 7,
+   "transfers": [
+    200000,
+    300000
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "AndersKaloer Ring-Buffer (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "jnk0le Ringbuffer (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_isr (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_atomic (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "QuantumLeaps LFRB (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "EmbeddedArtistry cbuf threadsafe (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "micoring SPSC mode (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "diffstorm cb (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RIOT tsrb (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Contiki-NG ringbuf (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rigtorp SPSCQueue (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "wizard97 as shipped (C++)": {
+     "runs": 7,
+     "runs_with_errors": 7,
+     "errors": 5232,
+     "did_not_finish": 0
+    },
+    "wizard97 + PRIMASK macros (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "polycratia spscring (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rt-spsc (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "DNedic lockfree spsc::RingBuf (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_locked (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "FreeRTOS stream buffer (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Arduino RingBufferN as shipped (C++)": {
+     "runs": 7,
+     "runs_with_errors": 7,
+     "errors": 7025,
+     "did_not_finish": 0
+    },
+    "Arduino SafeRingBufferN (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer, no lock (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer + interrupt lock (C)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Mbed CE CircularBuffer (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "moodycamel ReaderWriterQueue (C++)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "heapless spsc::Queue (Rust)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "embassy-sync Pipe (Rust)": {
+     "runs": 7,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {
+    "mutant: shared count, no lock": {
+     "runs": 7,
+     "isr_to_main": 7,
+     "main_to_isr": 7
+    },
+    "mutant: shared count, pop without lock": {
+     "runs": 7,
+     "isr_to_main": 7,
+     "main_to_isr": 0
+    },
+    "mutant: full test misses the wrap": {
+     "runs": 7,
+     "isr_to_main": 7,
+     "main_to_isr": 7
+    },
+    "mutant: drain re-reads head": {
+     "runs": 7,
+     "isr_to_main": 2,
+     "main_to_isr": 0
+    }
+   }
+  },
+  "block": {
+   "runs": 6,
+   "transfers": [
+    300000
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "AndersKaloer Ring-Buffer (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "jnk0le Ringbuffer (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_isr (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_atomic (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "QuantumLeaps LFRB (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "EmbeddedArtistry cbuf threadsafe (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "micoring SPSC mode (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "diffstorm cb (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RIOT tsrb (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Contiki-NG ringbuf (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rigtorp SPSCQueue (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "wizard97 as shipped (C++)": {
+     "runs": 6,
+     "runs_with_errors": 6,
+     "errors": 69063,
+     "did_not_finish": 0
+    },
+    "wizard97 + PRIMASK macros (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "polycratia spscring (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rt-spsc (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "DNedic lockfree spsc::RingBuf (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_locked (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "FreeRTOS stream buffer (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Arduino RingBufferN as shipped (C++)": {
+     "runs": 6,
+     "runs_with_errors": 6,
+     "errors": 39069,
+     "did_not_finish": 0
+    },
+    "Arduino SafeRingBufferN (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer, no lock (C)": {
+     "runs": 6,
+     "runs_with_errors": 6,
+     "errors": 1284,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer + interrupt lock (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Mbed CE CircularBuffer (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "moodycamel ReaderWriterQueue (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "heapless spsc::Queue (Rust)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "embassy-sync Pipe (Rust)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {
+    "mutant: shared count, no lock": {
+     "runs": 6,
+     "isr_to_main": 6,
+     "main_to_isr": 6
+    },
+    "mutant: shared count, pop without lock": {
+     "runs": 6,
+     "isr_to_main": 6,
+     "main_to_isr": 0
+    },
+    "mutant: full test misses the wrap": {
+     "runs": 6,
+     "isr_to_main": 6,
+     "main_to_isr": 6
+    },
+    "mutant: drain re-reads head": {
+     "runs": 6,
+     "isr_to_main": 6,
+     "main_to_isr": 0
+    }
+   }
+  },
+  "sweep": {
+   "runs": 4,
+   "transfers": [
+    0
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "AndersKaloer Ring-Buffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "jnk0le Ringbuffer (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_isr (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_atomic (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "QuantumLeaps LFRB (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "EmbeddedArtistry cbuf threadsafe (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "micoring SPSC mode (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "diffstorm cb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RIOT tsrb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Contiki-NG ringbuf (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rigtorp SPSCQueue (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "wizard97 as shipped (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 40960,
+     "did_not_finish": 0
+    },
+    "wizard97 + PRIMASK macros (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "polycratia spscring (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rt-spsc (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "DNedic lockfree spsc::RingBuf (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_locked (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "FreeRTOS stream buffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Arduino RingBufferN as shipped (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 19460,
+     "did_not_finish": 0
+    },
+    "Arduino SafeRingBufferN (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer, no lock (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer + interrupt lock (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Mbed CE CircularBuffer (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "moodycamel ReaderWriterQueue (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "heapless spsc::Queue (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "embassy-sync Pipe (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {
+    "mutant: shared count, no lock": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: shared count, pop without lock": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 0
+    },
+    "mutant: full test misses the wrap": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: drain re-reads head": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 0
+    }
+   }
+  },
+  "sweep-block": {
+   "runs": 4,
+   "transfers": [
+    0
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "AndersKaloer Ring-Buffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "jnk0le Ringbuffer (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_isr (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_atomic (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "QuantumLeaps LFRB (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "EmbeddedArtistry cbuf threadsafe (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "micoring SPSC mode (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "diffstorm cb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RIOT tsrb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Contiki-NG ringbuf (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rigtorp SPSCQueue (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "wizard97 as shipped (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 420188,
+     "did_not_finish": 0
+    },
+    "wizard97 + PRIMASK macros (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "polycratia spscring (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rt-spsc (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "DNedic lockfree spsc::RingBuf (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_locked (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "FreeRTOS stream buffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Arduino RingBufferN as shipped (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 510417,
+     "did_not_finish": 0
+    },
+    "Arduino SafeRingBufferN (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer, no lock (C)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 720,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer + interrupt lock (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Mbed CE CircularBuffer (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "moodycamel ReaderWriterQueue (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "heapless spsc::Queue (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "embassy-sync Pipe (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {
+    "mutant: shared count, no lock": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: shared count, pop without lock": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 0
+    },
+    "mutant: full test misses the wrap": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: drain re-reads head": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 0
+    }
+   }
+  },
+  "dma": {
+   "runs": 6,
+   "transfers": [
+    200000,
+    300000
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 6,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {}
+  },
+  "sweep-dma": {
+   "runs": 2,
+   "transfers": [
+    0
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {}
+  },
+  "smp": {
+   "runs": 4,
+   "transfers": [
+    200000,
+    300000
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "AndersKaloer Ring-Buffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "jnk0le Ringbuffer (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_isr (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 696,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_atomic (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "QuantumLeaps LFRB (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "EmbeddedArtistry cbuf threadsafe (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "micoring SPSC mode (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "diffstorm cb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RIOT tsrb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Contiki-NG ringbuf (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rigtorp SPSCQueue (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "wizard97 as shipped (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 4653,
+     "did_not_finish": 0
+    },
+    "wizard97 + PRIMASK macros (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 2641,
+     "did_not_finish": 0
+    },
+    "polycratia spscring (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rt-spsc (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "DNedic lockfree spsc::RingBuf (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_locked (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 990,
+     "did_not_finish": 0
+    },
+    "FreeRTOS stream buffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Arduino RingBufferN as shipped (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 995,
+     "did_not_finish": 0
+    },
+    "Arduino SafeRingBufferN (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 635,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer, no lock (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer + interrupt lock (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Mbed CE CircularBuffer (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "moodycamel ReaderWriterQueue (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "heapless spsc::Queue (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "embassy-sync Pipe (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {
+    "mutant: shared count, no lock": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: shared count, pop without lock": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: full test misses the wrap": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: drain re-reads head": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    }
+   }
+  },
+  "smp-block": {
+   "runs": 4,
+   "transfers": [
+    300000
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "AndersKaloer Ring-Buffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "jnk0le Ringbuffer (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_isr (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 22119,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_atomic (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "QuantumLeaps LFRB (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "EmbeddedArtistry cbuf threadsafe (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "micoring SPSC mode (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "diffstorm cb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RIOT tsrb (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Contiki-NG ringbuf (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rigtorp SPSCQueue (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "wizard97 as shipped (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 205608,
+     "did_not_finish": 0
+    },
+    "wizard97 + PRIMASK macros (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 193377,
+     "did_not_finish": 0
+    },
+    "polycratia spscring (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rt-spsc (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "DNedic lockfree spsc::RingBuf (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_locked (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 20180,
+     "did_not_finish": 0
+    },
+    "FreeRTOS stream buffer (C)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Arduino RingBufferN as shipped (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 21394,
+     "did_not_finish": 0
+    },
+    "Arduino SafeRingBufferN (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 18037,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer, no lock (C)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 1092,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer + interrupt lock (C)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 822,
+     "did_not_finish": 0
+    },
+    "Mbed CE CircularBuffer (C++)": {
+     "runs": 4,
+     "runs_with_errors": 4,
+     "errors": 4993,
+     "did_not_finish": 0
+    },
+    "moodycamel ReaderWriterQueue (C++)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "heapless spsc::Queue (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "embassy-sync Pipe (Rust)": {
+     "runs": 4,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {
+    "mutant: shared count, no lock": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: shared count, pop without lock": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: full test misses the wrap": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    },
+    "mutant: drain re-reads head": {
+     "runs": 4,
+     "isr_to_main": 4,
+     "main_to_isr": 4
+    }
+   }
+  },
+  "sweep-smp": {
+   "runs": 2,
+   "transfers": [
+    0
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "AndersKaloer Ring-Buffer (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "jnk0le Ringbuffer (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_isr (C++)": {
+     "runs": 2,
+     "runs_with_errors": 2,
+     "errors": 6272,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_atomic (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "QuantumLeaps LFRB (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "EmbeddedArtistry cbuf threadsafe (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "micoring SPSC mode (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "diffstorm cb (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RIOT tsrb (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Contiki-NG ringbuf (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rigtorp SPSCQueue (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "wizard97 as shipped (C++)": {
+     "runs": 2,
+     "runs_with_errors": 2,
+     "errors": 35328,
+     "did_not_finish": 0
+    },
+    "wizard97 + PRIMASK macros (C++)": {
+     "runs": 2,
+     "runs_with_errors": 2,
+     "errors": 35008,
+     "did_not_finish": 0
+    },
+    "polycratia spscring (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rt-spsc (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "DNedic lockfree spsc::RingBuf (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_locked (C++)": {
+     "runs": 2,
+     "runs_with_errors": 2,
+     "errors": 9624,
+     "did_not_finish": 0
+    },
+    "FreeRTOS stream buffer (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Arduino RingBufferN as shipped (C++)": {
+     "runs": 2,
+     "runs_with_errors": 2,
+     "errors": 7364,
+     "did_not_finish": 0
+    },
+    "Arduino SafeRingBufferN (C++)": {
+     "runs": 2,
+     "runs_with_errors": 2,
+     "errors": 9662,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer, no lock (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer + interrupt lock (C)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Mbed CE CircularBuffer (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "moodycamel ReaderWriterQueue (C++)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "heapless spsc::Queue (Rust)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "embassy-sync Pipe (Rust)": {
+     "runs": 2,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {
+    "mutant: shared count, no lock": {
+     "runs": 2,
+     "isr_to_main": 2,
+     "main_to_isr": 2
+    },
+    "mutant: shared count, pop without lock": {
+     "runs": 2,
+     "isr_to_main": 2,
+     "main_to_isr": 2
+    },
+    "mutant: full test misses the wrap": {
+     "runs": 2,
+     "isr_to_main": 2,
+     "main_to_isr": 2
+    },
+    "mutant: drain re-reads head": {
+     "runs": 2,
+     "isr_to_main": 2,
+     "main_to_isr": 2
+    }
+   }
+  },
+  "sweep-smp-block": {
+   "runs": 3,
+   "transfers": [
+    0
+   ],
+   "libs": {
+    "pxq RingBuffer_PackedState (C++)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "lwrb (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "AndersKaloer Ring-Buffer (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "jnk0le Ringbuffer (C++)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_isr (C++)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 621076,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_atomic (C++)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "QuantumLeaps LFRB (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "EmbeddedArtistry cbuf threadsafe (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ece-mohammad RingBuffer (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "micoring SPSC mode (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "diffstorm cb (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "RIOT tsrb (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Contiki-NG ringbuf (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rigtorp SPSCQueue (C++)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "wizard97 as shipped (C++)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 1177872,
+     "did_not_finish": 0
+    },
+    "wizard97 + PRIMASK macros (C++)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 1528736,
+     "did_not_finish": 0
+    },
+    "polycratia spscring (C++)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "rt-spsc (C++)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "TinyUSB tu_fifo (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Zephyr ring_buf, CONFIG_SMP (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "DNedic lockfree spsc::RingBuf (C++)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "ETL queue_spsc_locked (C++)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 921491,
+     "did_not_finish": 0
+    },
+    "FreeRTOS stream buffer (C)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "Arduino RingBufferN as shipped (C++)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 717126,
+     "did_not_finish": 0
+    },
+    "Arduino SafeRingBufferN (C++)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 645490,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer, no lock (C)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 678,
+     "did_not_finish": 0
+    },
+    "RT-Thread rt_ringbuffer + interrupt lock (C)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 867,
+     "did_not_finish": 0
+    },
+    "Mbed CE CircularBuffer (C++)": {
+     "runs": 3,
+     "runs_with_errors": 3,
+     "errors": 3072,
+     "did_not_finish": 0
+    },
+    "moodycamel ReaderWriterQueue (C++)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "heapless spsc::Queue (Rust)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "bbqueue (Rust)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    },
+    "embassy-sync Pipe (Rust)": {
+     "runs": 3,
+     "runs_with_errors": 0,
+     "errors": 0,
+     "did_not_finish": 0
+    }
+   },
+   "mutants": {
+    "mutant: shared count, no lock": {
+     "runs": 3,
+     "isr_to_main": 3,
+     "main_to_isr": 3
+    },
+    "mutant: shared count, pop without lock": {
+     "runs": 3,
+     "isr_to_main": 3,
+     "main_to_isr": 3
+    },
+    "mutant: full test misses the wrap": {
+     "runs": 3,
+     "isr_to_main": 3,
+     "main_to_isr": 3
+    },
+    "mutant: drain re-reads head": {
+     "runs": 3,
+     "isr_to_main": 3,
+     "main_to_isr": 3
+    }
+   }
+  }
+ }
+}

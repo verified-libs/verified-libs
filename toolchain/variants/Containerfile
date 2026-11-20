@@ -1,0 +1,28 @@
+# verified-libs/toolchain:2026-11-16 = 2026-11-13 + two more compilers for
+# the libraries under test (firmware/common/compiler.mk COMPILER=atfe and
+# COMPILER=zephyr-gcc). Nothing in the 2026-11-13 image changes; the default
+# image of the run scripts stays 2026-11-13.
+#
+# Build context: a directory with the two release archives, checked against
+# their published SHA-256 here (no download during the build):
+#   ATfE-23.1.0-Linux-x86_64.tar.xz                  github.com/arm/arm-toolchain, release-23.1.0-ATfE
+#   toolchain_gnu_linux-x86_64_arm-zephyr-eabi.tar.xz github.com/zephyrproject-rtos/sdk-ng, v1.0.1
+#   podman build -t verified-libs/toolchain:2026-11-16 -f toolchain/variants/Containerfile DIR
+FROM localhost/verified-libs/toolchain:2026-11-13
+ARG ATFE=ATfE-23.1.0-Linux-x86_64.tar.xz
+ARG ATFE_SHA256=a7be511613af15151c93961ad39c8cf9ae6889a453c8b547f42f4051a416dc8e
+ARG ZSDK=toolchain_gnu_linux-x86_64_arm-zephyr-eabi.tar.xz
+ARG ZSDK_SHA256=21b85981cb5a1818d9bc53d82af80f208946ec038b982ff1907287572ed3a634
+COPY ${ATFE} ${ZSDK} /tmp/
+RUN set -e; cd /tmp \
+ && echo "${ATFE_SHA256}  ${ATFE}" | sha256sum -c - \
+ && echo "${ZSDK_SHA256}  ${ZSDK}" | sha256sum -c - \
+ && mkdir -p /opt/atfe /opt/zephyr-sdk \
+ && tar -xJf ${ATFE} -C /opt/atfe --strip-components=1 \
+ && tar -xJf ${ZSDK} -C /opt/zephyr-sdk \
+ && rm -f /tmp/${ATFE} /tmp/${ZSDK} \
+ && f=/etc/verified-libs/toolchain.json \
+ && jq --arg a "$(/opt/atfe/bin/clang --version | head -1)" \
+       --arg z "$(/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc --version | head -1)" \
+       '. + {atfe_clang: $a, atfe_release: "release-23.1.0-ATfE", zephyr_gcc: $z, zephyr_sdk: "v1.0.1", added_2026_11_16: "ATfE 23.1.0 (/opt/atfe), Zephyr SDK 1.0.1 arm-zephyr-eabi (/opt/zephyr-sdk)"}' \
+       $f > $f.new && mv $f.new $f && cat $f

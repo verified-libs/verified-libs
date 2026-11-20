@@ -1,0 +1,66 @@
+#!/bin/bash
+# probe-rs stand-in for BOARD=samd20, put first in PATH by the run.sh
+# scripts: probe-rs 0.32 has no SAM D20 target and cannot drive its EDBG (a
+# failed attempt wedges the EDBG until it is replugged), so this script does
+# the four things the scripts need with OpenOCD (0.12.0, Ubuntu package):
+# download, reset, read b32, write b32, --version. "read" prints probe-rs' format
+# ("addr: word word ..."), which the scripts parse. PROBE is ignored (see ocd()).
+set -o pipefail
+OCD_BOARD_CFG=board/atmel_samd20_xplained_pro.cfg
+ocd() {
+    # No "adapter serial": with this EDBG it crashes OpenOCD 0.12.0 (buffer
+    # overflow). Selected by VID:PID below instead.
+    # Restrict OpenOCD to the EDBG (03eb:2111, CMSIS-DAP v1 over HID):
+    # otherwise it opens the first CMSIS-DAP probe it finds, which since
+    # 2026-11-11 can be the Pico 2's Debug Probe (seen: the SAM D20 series
+    # read the RP2350 instead).
+    openocd -c "adapter driver cmsis-dap; cmsis_dap_vid_pid 0x03eb 0x2111; cmsis_dap_backend hid" \
+        -f "$OCD_BOARD_CFG" -c "$1" 2>&1
+}
+cmd=${1:-}; shift || true
+{
+    case "$cmd" in
+        --version) echo "openocd $(openocd --version 2>&1 | head -1 | awk '{print $NF}') (probe-rs stand-in, common/samd20/bin/probe-rs)" ;;
+        download)
+            # --preverify (as probe-rs): OpenOCD's own preverify, which skips
+            # the flashing when the image is already there
+            elf=${*: -1}; pv=""
+            case " $* " in *" --preverify "*) pv=" preverify" ;; esac
+            # "reset": run the image afterwards. Without it the core stayed
+            # halted after "program" (also when preverify skipped the flashing)
+            # and the firmware said nothing until a later debug access started
+            # it: about 90 s lost per run, and likely the occasional "no 'VLS
+            # ready'" of the campaigns (2026-11-15: ready after 0.2 s with it,
+            # not within 20 s without).
+            out=$(ocd "program $elf$pv verify reset; shutdown")
+            echo "$out" | grep -E 'Verified OK|Error' | tail -n 1
+            echo "$out" | grep -q 'Verified OK'
+            ;;
+        reset)
+            out=$(ocd "init; reset run; shutdown")
+            echo "$out" | grep -E 'Error'
+            ! echo "$out" | grep -q 'Error' ;;
+        read)
+            # probe-rs read [args] b32 ADDR N
+            n=${*: -1}; addr=${*: -2:1}
+            # OpenOCD 0.12 does not print mdw results for -c commands, so
+            # echo read_memory's list and format it like probe-rs.
+            out=$(ocd "init; echo \"WORDS [read_memory $addr 32 $n]\"; shutdown") || exit 1
+            line=$(echo "$out" | grep -m1 '^WORDS ') || exit 1
+            k=0; base=$((addr))
+            for v in ${line#WORDS }; do
+                [ $((k % 8)) = 0 ] && { [ $k = 0 ] || echo; printf '%08x:' $((base + 4 * k)); }
+                printf ' %08x' $((v)); k=$((k + 1))
+            done
+            echo ;;
+        write)
+            # probe-rs write [args] b32 ADDR VALUE... (RAM only, as probe-rs)
+            while [ $# -gt 0 ] && [ "$1" != b32 ]; do shift; done
+            [ "${1:-}" = b32 ] && [ $# -ge 3 ] || { echo "probe-rs stand-in: write b32 ADDR VALUE..." >&2; exit 2; }
+            addr=$2; shift 2
+            vals=""; for v in "$@"; do vals="$vals $(printf '0x%08x' $((v)))"; done
+            out=$(ocd "init; write_memory $addr 32 {$vals}; shutdown") || exit 1
+            ! echo "$out" | grep -q 'Error' ;;
+        *) echo "probe-rs stand-in: unsupported probe-rs command $cmd" >&2; exit 2 ;;
+    esac
+}

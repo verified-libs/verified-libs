@@ -1,0 +1,79 @@
+# verified-libs pinned toolchain for correctness tests and Cortex-M builds.
+#
+# Every input is pinned so the same file builds the same tools later:
+#   - base image by digest
+#   - Ubuntu packages by archive snapshot date (snapshot.ubuntu.com)
+#   - GenMC by commit, Rust by exact toolchain version/date
+# The resulting versions are written to /etc/verified-libs/toolchain.json.
+#
+# Build:  podman build -t verified-libs/toolchain:2026-11-05 -f Containerfile .
+
+ARG BASE_IMAGE=docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725
+FROM ${BASE_IMAGE}
+
+ARG UBUNTU_SNAPSHOT=20261105T000000Z
+ARG GENMC_COMMIT=fab5bba7d9efaf76990227c2f59d62c11c7ea2a3
+ARG RUST_STABLE=1.99.1
+ARG RUST_NIGHTLY=nightly-2026-11-05
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+# Ubuntu packages, frozen at the snapshot date.
+# The base image has no CA certificates, and snapshot.ubuntu.com is HTTPS only.
+# Bootstrap them from the regular (signed) archive, then switch to the snapshot
+# and pin ca-certificates back to the snapshot version as well.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get -o APT::Snapshot="${UBUNTU_SNAPSHOT}" update \
+ && CA_VER="$(apt-cache -o APT::Snapshot="${UBUNTU_SNAPSHOT}" policy ca-certificates | awk '/Candidate:/{print $2}')" \
+ && apt-get -o APT::Snapshot="${UBUNTU_SNAPSHOT}" install -y --no-install-recommends --allow-downgrades \
+      "ca-certificates=${CA_VER}" \
+      curl git jq bc python3 \
+      build-essential cmake ninja-build \
+      clang llvm llvm-dev libffi-dev zlib1g-dev libedit-dev \
+      gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib \
+      cbmc \
+ && rm -rf /var/lib/apt/lists/*
+
+# GenMC: stateless model checker for C/C++ under RC11/IMM memory models.
+RUN git clone https://github.com/MPI-SWS/genmc.git /tmp/genmc \
+ && git -C /tmp/genmc checkout --detach "${GENMC_COMMIT}" \
+ && cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -B /tmp/genmc/build -S /tmp/genmc \
+ && cmake --build /tmp/genmc/build \
+ && cmake --install /tmp/genmc/build \
+ && rm -rf /tmp/genmc
+
+# Rust: pinned stable with Cortex-M targets, pinned nightly with Miri.
+ENV RUSTUP_HOME=/opt/rustup \
+    CARGO_HOME=/opt/cargo \
+    PATH=/opt/cargo/bin:${PATH}
+RUN curl -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal \
+      --default-toolchain "${RUST_STABLE}" \
+ && rustup target add --toolchain "${RUST_STABLE}" thumbv6m-none-eabi thumbv7em-none-eabihf \
+ && rustup toolchain install "${RUST_NIGHTLY}" --profile minimal --component miri,rust-src \
+ && cargo "+${RUST_NIGHTLY}" miri setup \
+ && chmod -R a+rwX /opt/rustup /opt/cargo
+
+# Record what was actually installed.
+# (An ARG before FROM is not visible after it, so declare it again.)
+ARG BASE_IMAGE
+RUN mkdir -p /etc/verified-libs \
+ && jq -n \
+      --arg base "${BASE_IMAGE}" \
+      --arg snapshot "${UBUNTU_SNAPSHOT}" \
+      --arg clang "$(clang --version | head -1)" \
+      --arg gcc "$(gcc --version | head -1)" \
+      --arg arm_gcc "$(arm-none-eabi-gcc --version | head -1)" \
+      --arg cbmc "$(cbmc --version)" \
+      --arg genmc "$(genmc --version 2>&1 | head -1) (${GENMC_COMMIT})" \
+      --arg rustc "$(rustc --version)" \
+      --arg nightly "$(rustc +${RUST_NIGHTLY} --version)" \
+      --arg miri "$(cargo +${RUST_NIGHTLY} miri --version)" \
+      '{base_image: $base, ubuntu_snapshot: $snapshot, clang: $clang, gcc: $gcc, arm_none_eabi_gcc: $arm_gcc, cbmc: $cbmc, genmc: $genmc, rustc: $rustc, rustc_nightly: $nightly, miri: $miri}' \
+      > /etc/verified-libs/toolchain.json \
+ && cat /etc/verified-libs/toolchain.json
+
+WORKDIR /work

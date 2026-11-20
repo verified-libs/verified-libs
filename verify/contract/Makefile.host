@@ -1,0 +1,31 @@
+# Host build of the benchmark's library objects for the contract check: the
+# hostify.py copy of ../../firmware/nrf5340-rb-bench (PRIMASK -> host flag),
+# its own libs.mk rules, host gcc/g++, host_irq.h included everywhere.
+BENCH    = build/host/nrf5340-rb-bench
+CC_LIB   = gcc
+CXX_LIB  = g++
+HOSTF    = -O2 -g -mno-red-zone -DRB_SLOTS=$(RB_SLOTS) -DBENCH_NO_ALIGN -I. -I$(BENCH) -include host_irq.h
+CFLAGS   = $(HOSTF) -std=c11 -I$(BENCH)/build/libs/lwrb/lwrb/src/include
+CXXFLAGS = $(HOSTF) -std=c++20 -fno-exceptions -fno-rtti -I$(BENCH)/build/libs/pxq-ringbuffer-cortex/RingBuffer_PackedState
+include $(BENCH)/libs.mk
+LWRB   = $(BENCH)/build/libs/lwrb/lwrb/src
+ANDERS = $(BENCH)/build/libs/anders-ringbuffer
+build/adapter_pxq.o: $(BENCH)/adapter_pxq.cpp | build
+	$(CXX_LIB) $(CXXFLAGS) -c $< -o $@
+build/adapter_lwrb.o: $(BENCH)/adapter_lwrb.c | build
+	$(CC_LIB) $(CFLAGS) -c $< -o $@
+build/lwrb.o: $(LWRB)/lwrb/lwrb.c | build
+	$(CC_LIB) $(CFLAGS) -c $< -o $@
+build/adapter_anders.o: $(BENCH)/adapter_anders.c | build
+	$(CC_LIB) $(CFLAGS) -I$(ANDERS) -c $< -o $@
+build/anders_ringbuffer.o: $(ANDERS)/ringbuffer.c | build
+	$(CC_LIB) $(CFLAGS) -I$(ANDERS) -c $< -o $@
+build/adapter_jnk0le.o: $(BENCH)/adapter_jnk0le.cpp | build
+	$(CXX_LIB) $(CXXFLAGS) -I$(BENCH)/build/libs/jnk0le-ringbuffer -c $< -o $@
+build/adapter_etl.o: $(BENCH)/adapter_etl.cpp | build
+	$(CXX_LIB) $(CXXFLAGS) -I$(BENCH)/build/libs/etl/include -c $< -o $@
+LIBOBJS = build/adapter_pxq.o build/adapter_lwrb.o build/lwrb.o build/adapter_anders.o build/anders_ringbuffer.o \
+          build/adapter_jnk0le.o build/adapter_etl.o $(filter-out build/bench_heap.o build/bench_heap_cpp.o,$(WAVE2_OBJS))
+libs: $(LIBOBJS)
+build:
+	mkdir -p build

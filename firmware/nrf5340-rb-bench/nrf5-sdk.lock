@@ -1,0 +1,23 @@
+# Nordic nRF5 SDK: not in a git repository, a zip from nordicsemi.com
+# (nRF5 SDK downloads). Pinned by the zip's SHA-256. Only the files below are
+# taken from it, by nrf5-sdk.sh, into build/libs/nrf5-sdk/; never into this
+# repository. Licence: Nordic 5-clause (use with Nordic chips only), so it is
+# built for the nRF5340 only, in its own benchmark set (SET=nordic).
+zip     nRF5_SDK_17.1.1_8173c8a.zip
+version 17.1.1
+sha256  8c3e6a1b9b70c2fb79180e6d9e05d8cfae35f94bf504f15c5fc1a8a9f1f97e7d
+file    components/libraries/ringbuf/nrf_ringbuf.c
+file    components/libraries/ringbuf/nrf_ringbuf.h
+file    components/libraries/atomic/nrf_atomic.c
+file    components/libraries/atomic/nrf_atomic.h
+file    components/libraries/atomic/nrf_atomic_internal.h
+file    components/libraries/atomic/nrf_atomic_sanity_check.h
+file    components/libraries/util/app_util.h
+file    components/libraries/util/nordic_common.h
+file    components/libraries/util/nrf_assert.h
+file    components/libraries/util/sdk_common.h
+file    components/libraries/util/sdk_errors.h
+file    components/libraries/util/sdk_macros.h
+file    components/libraries/util/sdk_os.h
+file    components/drivers_nrf/nrf_soc_nosd/nrf_error.h
+file    modules/nrfx/mdk/compiler_abstraction.h

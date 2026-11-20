@@ -1,0 +1,121 @@
+<h1>Compare the libraries by what matters to you</h1>
+<p>Pick a board, filter on hard requirements, and set weights for the speeds you care about.
+There is no ranking of ours: without weights the table is alphabetical, and any ranking is the
+result of your weights, which are stored in the address so the view can be linked.
+Correctness is not a weight: in every order the table is in three groups, first the configurations
+with 0 errors in the ISR stress test, then those not tested, then those with errors, whatever
+their speed. The variants meant for a single context (no interrupt on the other side) are hidden
+until you clear that box.
+All numbers and how they were measured: <a href="results.html">Results</a> and <a href="method.html">Method</a>.</p>
+<noscript><p><strong>This page needs JavaScript.</strong> The same numbers are in the tables on the
+<a href="results.html">Results</a> page.</p></noscript>
+<form class="cmp" onsubmit="return false">
+<fieldset><legend>Board and use</legend>
+<label>Numbers from <select id="cmp-board"></select></label>
+<label>Producers and consumers <select id="cmp-topo"><option value="">any</option>
+<option value="SPSC">SPSC: one producer, one consumer</option>
+<option value="MPSC">MPSC: several producers, one consumer</option>
+<option value="SPMC">SPMC: one producer, several consumers</option>
+<option value="MPMC">MPMC: several of both</option></select></label>
+<label>Cores <select id="cmp-cores"><option value="">any</option>
+<option value="1">one core (interrupt and main loop)</option>
+<option value="2">two cores (documented for it)</option></select></label>
+</fieldset>
+<fieldset><legend>Requirements (filters)</legend>
+<label><input type="checkbox" id="f-clean"> 0 errors in the ISR stress test (all boards)</label>
+<label><input type="checkbox" id="f-nounsafe"> hide configurations their own documentation calls not ISR-safe</label>
+<label><input type="checkbox" id="f-nosingle"> hide single-context variants</label>
+<label><input type="checkbox" id="f-permissive"> permissive license (MIT, BSD, Apache-2.0, CC0)</label>
+<label><input type="checkbox" id="f-block"> has a block API</label>
+<label><input type="checkbox" id="f-zc"> has a zero-copy API (for DMA)</label>
+<label><input type="checkbox" id="f-genmc"> model-checked (GenMC pass)</label>
+<label><input type="checkbox" id="f-contract"> passes the one-core contract check (chosen mode)</label>
+<label>Language <select id="cmp-lang" style="display:inline-block"><option value="">any</option><option value="C">C</option><option value="C++">C++</option><option value="Rust">Rust</option></select></label>
+</fieldset>
+<fieldset><legend>Weights (0 = ignore, 10 = most important)</legend>
+<div id="cmp-weights"></div>
+<button type="button" id="cmp-reset">Reset weights and filters</button>
+</fieldset>
+</form>
+<p id="cmp-count" class="mute" aria-live="polite"></p>
+<div class="tw"><table id="cmp-table" class="cmp"></table></div>
+<p id="cmp-src" class="mute"></p>
+<h2>Producers, consumers and cores</h2>
+<p>With "any" or SPSC, every speed in the table is for one producer and one consumer. Choosing
+MPSC, SPMC or MPMC keeps the libraries that document such a mode and whose mode is in our
+<a href="results.html">stress test with two interrupts</a>; the line under the library's name says how
+the library provides it. The speeds and the score are then those of that mode, from a separate
+benchmark run of the same kind (same scenarios, compiler and flags), and the fastest value in the
+score is the fastest among these libraries. The calls are timed one at a time, so the numbers are
+the cost of the mode's protection without contention, not throughput under contention. Zero-copy
+calls are not timed in these modes, and a mode that does not exist on a board's core (a class
+that needs compare-and-swap, on Cortex-M0+) shows no numbers there. The ISR stress columns are
+the SPSC test in every view. "One core" hides nothing: every library here is used on one core. "Two cores"
+keeps the configurations whose documentation covers two cores running at the same time; with
+MPSC, SPMC or MPMC it asks the same of that mode.</p>
+<h2>Rust libraries</h2>
+<p>The Rust libraries are compiled with rustc (same optimisation level, the core's soft-float
+target) into a static library that is linked into the same C firmware. The benchmark and the
+stress tests call them through the same function pointers and time them with the same code as
+the C and C++ libraries, with the C library's memcpy for both. Their speeds come from a separate
+firmware of the same benchmark, because the one with all C and C++ libraries fills the SAM D20's
+RAM. GenMC checks C and C++ only, so the GenMC column is empty for them.</p>
+<h2>The one-core contract column</h2>
+<p>GenMC judges C11 and C++ atomics between free-running threads, so it cannot judge the many
+libraries that rely on one core instead (volatile indices, compiler barriers, interrupt masking).
+The <a href="method.html">contract check</a> executes that contract: the
+library is compiled for the lab host, main's call runs one instruction at a time, and the
+interrupt's call is made at every instruction (and at every pair of instructions), from every start
+position and fill level of an eight-slot buffer, with interrupt masking honoured. A configuration
+passes if every result is one that the calls give one after the other. It is the same for every
+board; it does not check what a compiler for the target makes of the code (the ISR stress test and
+its interrupt sweep do that on the boards) or two cores. With a producer/consumer mode chosen
+above, the column shows that mode's check where one was run, "–" where none was. The negative
+control and four deliberately broken ring buffers must fail in every run, and do.</p>
+<h2>The small numbers under a speed: placement</h2>
+<p>The same machine code can take a different number of cycles depending on where it lies in
+memory (alignment of loops and branch targets to the flash accelerator's or the cache's lines, and
+to the core's fetch). To show how much, the benchmark is built eight times with the libraries'
+code moved by 0, 4, 8 ... 28 bytes, while the timing code stays where it is. The table shows the
+value at 0 and, under it, the lowest and highest mean over the eight placements when they differ
+at the precision shown. Most configurations do not move at all; a few move by 10 to 30 %. Two
+configurations whose ranges overlap are not measurably different on that board: a difference
+smaller than the range comes from the placement, and another firmware would place the code
+differently. The score uses the value at 0. The same experiment was run for the Rust libraries
+and for the MPSC, SPMC and MPMC speeds (each a firmware of its own), so their ranges are shown
+the same way; it is not a property of one language: the largest ranges are in C libraries
+(TinyUSB tu_fifo on the nRF5340, lwrb and the FreeRTOS stream buffer on the NUCLEO-G474RE) and
+in embassy-sync Pipe (Rust) on the NUCLEO-G474RE, all of them long code paths. Where a board
+shows no range, that set has not been measured at more than one placement there yet.</p>
+<h2>Code and RAM</h2>
+<p>"Code / RAM" is what the configuration adds to a firmware on the chosen board, in bytes: flash
+(code, constants and initial values) and RAM (static data). It is measured by linking the
+benchmark firmware with that configuration alone and with no library, and taking the difference;
+the linker drops what is not used. The numbers are for our use of the library: the calls the
+benchmark makes (one-byte, block and, where the library has them, zero-copy calls), our adapter
+around them (a few small functions), a buffer of 127 or 128 bytes, and whatever the library pulls
+in (division or atomic helpers, a critical-section implementation, for the FreeRTOS stream buffer
+our minimal stand-in for the kernel). The C library's memcpy, memmove and memset are in every
+firmware and not counted. The compiler and flags are those of the speeds, except that the
+32-byte alignment the benchmark gives its timed functions is off, so no padding is counted. A library whose API is
+used more widely, or with another element type or size, will differ. For the Rust libraries the
+number includes what their checks pull into a C firmware: bbqueue and embassy-sync Pipe bring
+Rust's panic and formatting code (several kilobytes), which a firmware written in Rust has
+already. "+ heap" marks a
+configuration that allocates its buffer at start-up; that memory is not in its RAM number.
+Sorting by this column sorts by code size.</p>
+<h2>How the score is computed</h2>
+<p>For each speed with a weight above 0, a configuration gets the fastest value on the chosen board
+divided by its own value: 1 for the fastest, 0.5 for one that needs twice the cycles, and 0 if it
+has no such API. The score is the weighted mean of these, times 100. Speeds are mean cycles per
+call with the code in flash and the cache or flash accelerator on; "64-byte block" is cycles per
+byte (mean of write and read); "zero-copy" is the cycles of the library's own calls around a
+64-byte transfer (mean of write and read). Lower cycles are better; a higher score is better.
+The score says nothing about correctness, code size, RAM use, API or license: use the filters and
+the other columns for those.</p>
+<p>⚠ marks the project owner's own library. It is tested with the same suite as every other
+library and more (every documented mode and topology), and like every result its numbers can be
+repeated outside the project (<a href="reproduce.html">Reproduce</a>). A row with no stress result was not in the campaign shown, which is not the same as 0 errors.
+The stress counts are from the newest night campaign on each board, added together with the nights
+before it as long as the test did not change in between (the same stress firmware, libraries and
+compiler flag rotation); the campaigns used are named under the table.</p>

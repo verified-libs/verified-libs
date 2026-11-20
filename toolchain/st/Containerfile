@@ -1,0 +1,27 @@
+# verified-libs toolchain with ST's compilers from STM32CubeCLT, for STM32
+# boards only. Built locally on top of the pinned base image; NEVER pushed or
+# shared: ST's licence (SLA0048) does not allow redistribution of the binaries,
+# and its clause 4 limits use to ST devices (the run scripts refuse ST
+# compilers for non-STM32 boards).
+#
+# Build context: the unpacked CubeCLT tree (not in this repository), see
+# README.md:
+#   podman build -t verified-libs/toolchain-st:cubeclt-1.22.0-base2026-11-13 \
+#       -f Containerfile ~/downloads/st/x/deb/opt/st/stm32cubeclt_1.22.0
+# Base: 2026-11-13 (with the Rust soft-float targets, which the stress
+# firmware links since 2026-11-13). The tag cubeclt-1.22.0 is the same
+# recipe on 2026-11-05 (BASE=localhost/verified-libs/toolchain:2026-11-05),
+# kept for the records made with it.
+ARG BASE=localhost/verified-libs/toolchain:2026-11-13
+FROM ${BASE}
+ARG CUBECLT=1.22.0
+ARG CUBECLT_ZIP_SHA256
+COPY GNU-tools-for-STM32 /opt/st/gnu-tools-for-stm32
+COPY st-arm-clang /opt/st/st-arm-clang
+RUN jq --arg clt "$CUBECLT" --arg sha "$CUBECLT_ZIP_SHA256" \
+       --arg gcc "$(/opt/st/gnu-tools-for-stm32/bin/arm-none-eabi-gcc --version | head -n 1)" \
+       --arg clang "$(/opt/st/st-arm-clang/bin/starm-clang --version | head -n 1)" \
+       '. + {st_cubeclt: $clt, st_cubeclt_zip_sha256: $sha, st_gcc: $gcc, st_clang: $clang}' \
+       /etc/verified-libs/toolchain.json > /tmp/t.json \
+ && mv /tmp/t.json /etc/verified-libs/toolchain.json \
+ && cat /etc/verified-libs/toolchain.json

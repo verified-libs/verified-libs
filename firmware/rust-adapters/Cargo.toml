@@ -1,0 +1,55 @@
+# Rust ring buffers under test, built as one static library that the C
+# benchmark and stress firmware link (see README.md). Every crate comes from
+# the checkouts that ../nrf5340-rb-bench/fetch-libs.sh makes from libs.lock;
+# cargo runs with --offline and never reads crates.io.
+[package]
+name = "vl-rust-adapters"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+path = "src/lib.rs"
+
+[dependencies]
+heapless = { path = "../nrf5340-rb-bench/build/libs/heapless", default-features = false }
+bbqueue = { path = "../nrf5340-rb-bench/build/libs/bbqueue/bbqueue", default-features = false, features = ["critical-section"] }
+embassy-sync = { path = "../nrf5340-rb-bench/build/libs/embassy/embassy-sync" }
+# We supply the critical-section implementation (src/cs.rs), so we choose its restore state.
+critical-section = { path = "../nrf5340-rb-bench/build/libs/rs-critical-section", features = ["restore-state-bool"] }
+
+# Cortex-M0+ has no compare-and-swap: heapless's mpmc::Queue then needs
+# portable-atomic, which heapless documents for such targets.
+[target.thumbv6m-none-eabi.dependencies]
+heapless = { path = "../nrf5340-rb-bench/build/libs/heapless", default-features = false, features = ["portable-atomic-critical-section"] }
+
+# What the C side gets from its flags: panic = abort (no unwinding on the MCU),
+# one codegen unit and debug info as in the usual embedded Rust templates.
+# opt-level is set by the Makefile from the C build's OPT (-O2 -> 2, -Os -> "s").
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(vl_two_cores)", "cfg(vl_host)"] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+debug = true
+lto = false
+
+[patch.crates-io]
+heapless = { path = "../nrf5340-rb-bench/build/libs/heapless" }
+hash32 = { path = "../nrf5340-rb-bench/build/libs/rs-hash32" }
+byteorder = { path = "../nrf5340-rb-bench/build/libs/rs-byteorder" }
+stable_deref_trait = { path = "../nrf5340-rb-bench/build/libs/rs-stable-deref-trait" }
+const-init = { path = "../nrf5340-rb-bench/build/libs/rs-const-init" }
+critical-section = { path = "../nrf5340-rb-bench/build/libs/rs-critical-section" }
+portable-atomic = { path = "../nrf5340-rb-bench/build/libs/rs-portable-atomic" }
+futures-core = { path = "../nrf5340-rb-bench/build/libs/rs-futures/futures-core" }
+futures-sink = { path = "../nrf5340-rb-bench/build/libs/rs-futures/futures-sink" }
+cfg-if = { path = "../nrf5340-rb-bench/build/libs/rs-cfg-if" }
+embedded-io = { path = "../nrf5340-rb-bench/build/libs/rs-embedded-io/embedded-io" }
+embedded-io-async = { path = "../nrf5340-rb-bench/build/libs/rs-embedded-io/embedded-io-async" }
+# Optional dependencies that no feature here enables: cargo still resolves
+# them, so each is a placeholder that fails to compile if it is ever used.
+maitake-sync = { path = "stubs/maitake-sync" }
+loom = { path = "stubs/loom" }

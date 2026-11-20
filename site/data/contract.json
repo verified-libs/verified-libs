@@ -1,0 +1,161 @@
+{
+ "commit": "7ed89e4",
+ "date": "2026-11-16",
+ "source": "full-double.txt",
+ "interrupts_per_call": 2,
+ "configs": {
+  "pxq SPSC": {
+   "verdict": "pass",
+   "trials": 106838
+  },
+  "lwrb": {
+   "verdict": "pass",
+   "trials": 405151
+  },
+  "AndersKaloer Ring-Buffer": {
+   "verdict": "pass",
+   "trials": 104186
+  },
+  "jnk0le Ringbuffer": {
+   "verdict": "pass",
+   "trials": 90188
+  },
+  "ETL queue_spsc_isr": {
+   "verdict": "pass",
+   "trials": 169416
+  },
+  "ETL queue_spsc_atomic": {
+   "verdict": "pass",
+   "trials": 94632
+  },
+  "ETL queue_spsc_locked": {
+   "verdict": "pass",
+   "trials": 201516
+  },
+  "QuantumLeaps LFRB": {
+   "verdict": "pass",
+   "trials": 111510
+  },
+  "EmbeddedArtistry cbuf threadsafe": {
+   "verdict": "pass",
+   "trials": 126298
+  },
+  "ece-mohammad RingBuffer": {
+   "verdict": "pass",
+   "trials": 151169
+  },
+  "micoring SPSC mode": {
+   "verdict": "pass",
+   "trials": 196034
+  },
+  "diffstorm cb": {
+   "verdict": "pass",
+   "trials": 138484
+  },
+  "RIOT tsrb": {
+   "verdict": "pass",
+   "trials": 177836
+  },
+  "Contiki-NG ringbuf": {
+   "verdict": "pass",
+   "trials": 120616
+  },
+  "rigtorp SPSCQueue": {
+   "verdict": "pass",
+   "trials": 106246
+  },
+  "wizard97 as shipped": {
+   "verdict": "fail",
+   "trials": 92600
+  },
+  "wizard97 + PRIMASK macros": {
+   "verdict": "pass",
+   "trials": 175906
+  },
+  "polycratia spscring": {
+   "verdict": "pass",
+   "trials": 90808
+  },
+  "rt-spsc": {
+   "verdict": "pass",
+   "trials": 95596
+  },
+  "TinyUSB tu_fifo": {
+   "verdict": "pass",
+   "trials": 206857
+  },
+  "Zephyr ring_buf": {
+   "verdict": "pass",
+   "trials": 141273
+  },
+  "Zephyr ring_buf, CONFIG_SMP": {
+   "verdict": "pass",
+   "trials": 141763
+  },
+  "DNedic lockfree spsc::RingBuf": {
+   "verdict": "pass",
+   "trials": 180457
+  },
+  "FreeRTOS stream buffer": {
+   "verdict": "pass",
+   "trials": 487438
+  },
+  "Arduino RingBufferN as shipped": {
+   "verdict": "fail",
+   "trials": 111658
+  },
+  "Arduino SafeRingBufferN": {
+   "verdict": "pass",
+   "trials": 186480
+  },
+  "RT-Thread rt_ringbuffer, no lock": {
+   "verdict": "fail",
+   "trials": 139582
+  },
+  "RT-Thread rt_ringbuffer + interrupt lock": {
+   "verdict": "pass",
+   "trials": 213532
+  },
+  "Mbed CE CircularBuffer": {
+   "verdict": "pass",
+   "trials": 198525
+  },
+  "moodycamel ReaderWriterQueue": {
+   "verdict": "pass",
+   "trials": 144484
+  },
+  "heapless spsc::Queue (Rust)": {
+   "verdict": "pass",
+   "trials": 88906
+  },
+  "bbqueue (Rust)": {
+   "verdict": "pass",
+   "trials": 203602
+  },
+  "embassy-sync Pipe (Rust)": {
+   "verdict": "pass",
+   "trials": 412291
+  },
+  "heapless mpmc::Queue (Rust)": {
+   "verdict": "pass",
+   "trials": 225596
+  },
+  "pxq MPSC": {
+   "verdict": "pass",
+   "trials": 187821
+  },
+  "pxq SPMC": {
+   "verdict": "pass",
+   "trials": 197777
+  },
+  "pxq MPMC": {
+   "verdict": "pass",
+   "trials": 298672
+  },
+  "pxq MPSC reserve/commit": {
+   "verdict": "pass",
+   "trials": 517739
+  }
+ },
+ "trials": 7039483
+}

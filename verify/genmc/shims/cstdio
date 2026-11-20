@@ -1,0 +1,76 @@
+// GenMC shim for <cstdio>. libstdc++'s <cstdio> re-exports some 45 glibc
+// stdio names into std::, but GenMC replaces <stdio.h> with a minimal one of
+// its own (6 functions). C++ headers such as <string> (pulled in by
+// <stdexcept>) include <cstdio>, so it would not compile. This shim (found
+// first via verify/genmc/shims) only DECLARES the missing names; the queues
+// under test never call them, so they never reach the model checker.
+#ifndef VL_GENMC_CSTDIO_SHIM
+#define VL_GENMC_CSTDIO_SHIM
+#include <stdio.h>    // GenMC's: FILE, fclose, fflush, fopen, printf, fprintf, fwrite
+#include <stdarg.h>
+#include <stddef.h>
+
+extern "C" {
+typedef struct { long vl_pos; } fpos_t;
+void clearerr(FILE *);
+int feof(FILE *);
+int ferror(FILE *);
+int fgetc(FILE *);
+int fgetpos(FILE *, fpos_t *);
+char *fgets(char *, int, FILE *);
+int fputc(int, FILE *);
+int fputs(const char *, FILE *);
+size_t fread(void *, size_t, size_t, FILE *);
+FILE *freopen(const char *, const char *, FILE *);
+int fscanf(FILE *, const char *, ...);
+int fseek(FILE *, long, int);
+int fsetpos(FILE *, const fpos_t *);
+long ftell(FILE *);
+int getc(FILE *);
+int getchar(void);
+void perror(const char *);
+int putc(int, FILE *);
+int putchar(int);
+int puts(const char *);
+int remove(const char *);
+int rename(const char *, const char *);
+void rewind(FILE *);
+int scanf(const char *, ...);
+void setbuf(FILE *, char *);
+int setvbuf(FILE *, char *, int, size_t);
+int sprintf(char *, const char *, ...);
+int sscanf(const char *, const char *, ...);
+FILE *tmpfile(void);
+char *tmpnam(char *);
+int ungetc(int, FILE *);
+int vfprintf(FILE *, const char *, va_list);
+int vprintf(const char *, va_list);
+int vsprintf(char *, const char *, va_list);
+int snprintf(char *, size_t, const char *, ...);
+int vfscanf(FILE *, const char *, va_list);
+int vscanf(const char *, va_list);
+int vsnprintf(char *, size_t, const char *, va_list);
+int vsscanf(const char *, const char *, va_list);
+}
+
+#ifndef EOF
+#define EOF (-1)
+#endif
+#ifndef SEEK_SET
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
+#endif
+
+namespace std {
+using ::FILE; using ::fpos_t;
+using ::clearerr; using ::fclose; using ::feof; using ::ferror; using ::fflush; using ::fgetc;
+using ::fgetpos; using ::fgets; using ::fopen; using ::fprintf; using ::fputc; using ::fputs;
+using ::fread; using ::freopen; using ::fscanf; using ::fseek; using ::fsetpos; using ::ftell;
+using ::fwrite; using ::getc; using ::getchar; using ::perror; using ::printf; using ::putc;
+using ::putchar; using ::puts; using ::remove; using ::rename; using ::rewind; using ::scanf;
+using ::setbuf; using ::setvbuf; using ::sprintf; using ::sscanf; using ::tmpfile; using ::tmpnam;
+using ::ungetc; using ::vfprintf; using ::vprintf; using ::vsprintf; using ::snprintf;
+using ::vfscanf; using ::vscanf; using ::vsnprintf; using ::vsscanf;
+}
+#endif

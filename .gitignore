@@ -1,0 +1,8 @@
+# Vendor datasheets: copyrighted, kept locally only
+*.pdf
+.aifts.db
+# Firmware build output
+firmware/*/build/
+verify/*/build/
+site/_build/
+__pycache__/

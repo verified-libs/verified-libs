@@ -1,0 +1,35 @@
+# verified-libs toolchain 2026-11-13: the 2026-11-05 image plus the Rust
+# standard library for the soft-float Cortex-M targets that the firmware's
+# C code uses (-mfloat-abi=soft on every board), so Rust code can be linked
+# into the same firmware:
+#   thumbv7em-none-eabi       Cortex-M4 / M7 (NUCLEO-G474RE, NUCLEO-H723ZG)
+#   thumbv8m.main-none-eabi   Cortex-M33 (nRF5340, RP2350)
+# (thumbv6m-none-eabi for Cortex-M0+ is already in the base image.)
+# Nothing else changes: the C and C++ tools are those of the base image.
+#
+# The archives are rust-lang.org's for the image's rustc 1.99.1 (channel
+# 2026-10-15); their SHA-256 are those in that channel's manifest, which the
+# base image keeps in its sysroot (lib/rustlib/multirust-channel-manifest.toml),
+# and are checked here. Build context: a directory with the two archives:
+#   curl -fsSL -o DIR/<name> https://static.rust-lang.org/dist/2026-10-15/<name>
+#   podman build -t verified-libs/toolchain:2026-11-13 -f Containerfile DIR
+FROM localhost/verified-libs/toolchain:2026-11-05
+
+ARG RUST_STD_V7EM=rust-std-1.99.1-thumbv7em-none-eabi.tar.xz
+ARG RUST_STD_V7EM_SHA256=dbe6561e6a655e9866a8502961fe7089bffd438195945d03a190ee59a9568a02
+ARG RUST_STD_V8MM=rust-std-1.99.1-thumbv8m.main-none-eabi.tar.xz
+ARG RUST_STD_V8MM_SHA256=59251d3c7d1804242c4a1ade2a08b0e133ee83537deff860408b08d1a239f938
+
+COPY ${RUST_STD_V7EM} ${RUST_STD_V8MM} /tmp/rust-std/
+RUN cd /tmp/rust-std \
+ && echo "${RUST_STD_V7EM_SHA256}  ${RUST_STD_V7EM}" | sha256sum -c - \
+ && echo "${RUST_STD_V8MM_SHA256}  ${RUST_STD_V8MM}" | sha256sum -c - \
+ && SYSROOT="$(rustc --print sysroot)" \
+ && for f in ${RUST_STD_V7EM} ${RUST_STD_V8MM}; do \
+      d="${f%.tar.xz}"; tar -xJf "$f" && "./$d/install.sh" --prefix="$SYSROOT" --disable-ldconfig >/dev/null && rm -rf "./$d"; \
+    done \
+ && rm -rf /tmp/rust-std \
+ && chmod -R a+rwX /opt/rustup \
+ && jq --arg t "$(ls "$SYSROOT/lib/rustlib" | grep -E '^thumb' | tr '\n' ' ')" '. + {rust_targets: $t, added_2026_11_13: "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"}' \
+      /etc/verified-libs/toolchain.json > /tmp/t.json && mv /tmp/t.json /etc/verified-libs/toolchain.json \
+ && cat /etc/verified-libs/toolchain.json

@@ -1,0 +1,648 @@
+{
+  "schema": "rb-mp-stress/0.1",
+  "mode": "SPMC: main produces, interrupts A (low prio) and B (high prio) consume",
+  "transfers": 1000000,
+  "params": {
+    "board": "SAM D20 Xplained Pro",
+    "clock_hz": 48005120,
+    "timer_prescaler": 1,
+    "main_seed": "0x6552fc2d",
+    "seed_a": "0xbaac4f23",
+    "seed_b": "0x08578ccb",
+    "code_in_sram": false
+  },
+  "smp": false,
+  "libs": [
+    {
+      "name": "pxq RingBuffer_PackedState, Topology::SPMC",
+      "transferred": 1000005,
+      "errors": 0,
+      "first_error_at": 0,
+      "first_error_got": 0,
+      "first_error_want": 0,
+      "full_or_empty_a": 8488059,
+      "full_or_empty_b": 7753822,
+      "irqs_a": 8887280,
+      "irqs_b": 8355895,
+      "moved_a": 399221,
+      "moved_b": 602073,
+      "mismatch": 0,
+      "n/a": false,
+      "absent": false,
+      "starved": false
+    },
+    {
+      "name": "pxq RingBuffer_PackedState, Topology::MPMC",
+      "transferred": 1000001,
+      "errors": 0,
+      "first_error_at": 0,
+      "first_error_got": 0,
+      "first_error_want": 0,
+      "full_or_empty_a": 8568459,
+      "full_or_empty_b": 7824791,
+      "irqs_a": 8964606,
+      "irqs_b": 8429749,
+      "moved_a": 396147,
+      "moved_b": 604958,
+      "mismatch": 0,
+      "n/a": false,
+      "absent": false,
+      "starved": false
+    },
+    {
+      "name": "RIOT tsrb",
+      "transferred": 1000001,
+      "errors": 0,
+      "first_error_at": 0,
+      "first_error_got": 0,
+      "first_error_want": 0,
+      "full_or_empty_a": 9717362,
+      "full_or_empty_b": 8889631,
+      "irqs_a": 10089807,
+      "irqs_b": 9518083,
+      "moved_a": 372445,
+      "moved_b": 628452,
+      "mismatch": 0,
+      "n/a": false,
+      "absent": false,
+      "starved": false
+    },
+    {
+      "name": "wizard97 + PRIMASK macros",
+      "transferred": 1000000,
+      "errors": 0,
+      "first_error_at": 0,
+      "first_error_got": 0,
+      "first_error_want": 0,
+      "full_or_empty_a": 8842542,
+      "full_or_empty_b": 8063134,
+      "irqs_a": 9222672,
+      "irqs_b": 8683756,
+      "moved_a": 380130,
+      "moved_b": 620622,
+      "mismatch": 0,
+      "n/a": false,
+      "absent": false,
+      "starved": false
+    },
+    {
+      "name": "DNedic lockfree mpmc::Queue",
+      "transferred": 4294967295,
+      "errors": 0,
+      "first_error_at": 0,
+      "first_error_got": 0,
+      "first_error_want": 0,
+      "full_or_empty_a": 0,
+      "full_or_empty_b": 0,
+      "irqs_a": 0,
+      "irqs_b": 0,
+      "moved_a": 0,
+      "moved_b": 0,
+      "mismatch": 0,
+      "n/a": true,
+      "absent": false,
+      "starved": false
+    },
+    {
+      "name": "heapless mpmc::Queue (Rust)",
+      "transferred": 1000000,
+      "errors": 0,
+      "first_error_at": 0,
+      "first_error_got": 0,
+      "first_error_want": 0,
+      "full_or_empty_a": 12684963,
+      "full_or_empty_b": 11735468,
+      "irqs_a": 12974963,
+      "irqs_b": 12445733,
+      "moved_a": 290000,
+      "moved_b": 710265,
+      "mismatch": 0,
+      "n/a": false,
+      "absent": false,
+      "starved": false
+    },
+    {
+      "name": "control: jnk0le Ringbuffer (SPSC) with two consumers",
+      "transferred": 1000001,
+      "errors": 0,
+      "first_error_at": 0,
+      "first_error_got": 0,
+      "first_error_want": 0,
+      "full_or_empty_a": 8016109,
+      "full_or_empty_b": 7305290,
+      "irqs_a": 8416398,
+      "irqs_b": 7906408,
+      "moved_a": 400289,
+      "moved_b": 601118,
+      "mismatch": 20540,
+      "n/a": false,
+      "absent": false,
+      "starved": false
+    }
+  ],
+  "time": "2026-11-20T00:29:00Z",
+  "host": "lib-lab1",
+  "board": "SAM D20 Xplained Pro",
+  "core": "Cortex-M0+, 48 MHz (DFLL48M closed loop on XOSC32K)",
+  "build_flags": "-DCOVERAGE=1",
+  "params_at_runtime": true,
+  "run_params": "mode=2 transfers=1000000 prescaler=1 main_seed=0x6552fc2d seed_a=0xbaac4f23 seed_b=0x08578ccb",
+  "code_location": "flash",
+  "opt": "-O2",
+  "lto": false,
+  "compiler_libs": "gcc",
+  "fw_sha256": "455df3957a7842ee0cac3040dcfa2b23e8494b2bdb2a834959a92a03763ce443",
+  "source_commit": "8d8880f4bf78",
+  "probe_rs": "openocd 0.12.0 (probe-rs stand-in, common/samd20/bin/probe-rs)",
+  "with_extra": false,
+  "only_lib": null,
+  "per_lib": {
+    "one_library_per_reset": true,
+    "control": "uart",
+    "results_read": "uart_dump",
+    "images": "combined",
+    "limit_s": 1800,
+    "libs_run": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      7
+    ],
+    "unfinished": []
+  },
+  "images": {
+    "select_addr": "0x20007ff0",
+    "bundles": [
+      {
+        "bundle": 0,
+        "sha256": "7fc84628905116003d560717755f339bc90fe3b43108c290da5c19bb581b4079",
+        "boot_sha256": "caad862917aef2a4435f0fb3be6814f86132d7b0218618c6a81cbaf56d46d57e",
+        "flash_bytes": 260164,
+        "libs": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      },
+      {
+        "bundle": 1,
+        "sha256": "f8b3fe35fd9c8822d76d833de9bc13bd87bbec64d039bb02416706964a43ce38",
+        "boot_sha256": "6c03e8c6ea8e4354b17260ab148414d2e4e6961fd4e401f442e22398cf120f60",
+        "flash_bytes": 260692,
+        "libs": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ]
+      },
+      {
+        "bundle": 2,
+        "sha256": "92342992014cd147f1fd42a82e2ae6160406d955750fef2fec51540f378c3e46",
+        "boot_sha256": "81802c1dcbd4b04afee3db94eaa44c8ecaeae65c4c95cbaf1b3bf2ac48da55f3",
+        "flash_bytes": 85720,
+        "libs": [
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ]
+      }
+    ],
+    "libs": {
+      "0": {
+        "sha256": "9e2f074f903c375e8b55bc965575caa084c62bd48b7586c61dd0cd86179436ea",
+        "base": "0x00001000",
+        "bytes": 10100,
+        "bundle": 0,
+        "dir": null
+      },
+      "1": {
+        "sha256": "bd07326a48c07556269b1cce40ce87a846046b9c55edd7844fb1be3ea4dc87be",
+        "base": "0x00004000",
+        "bytes": 10720,
+        "bundle": 0,
+        "dir": null
+      },
+      "2": {
+        "sha256": "09b52cd946991f78bed2f12256418cc6b683e90054915937f50fff7343f10d13",
+        "base": "0x00007000",
+        "bytes": 9868,
+        "bundle": 0,
+        "dir": null
+      },
+      "3": {
+        "sha256": "cac27aff6c02419f2ebc364419dcd37b1082f57a0c77a539103bbc94d81b0884",
+        "base": "0x0000a000",
+        "bytes": 9816,
+        "bundle": 0,
+        "dir": null
+      },
+      "4": {
+        "sha256": "c4706d1880dfcb21fb7de6c4e35937be40000b8d147e70133559a66ae2fa09ca",
+        "base": "0x0000d000",
+        "bytes": 10544,
+        "bundle": 0,
+        "dir": null
+      },
+      "5": {
+        "sha256": "59464610379e29ab894c056b5c964459d18870890a78915cd33c6401df8f4f6a",
+        "base": "0x00010000",
+        "bytes": 10544,
+        "bundle": 0,
+        "dir": null
+      },
+      "6": {
+        "sha256": "bbb84c4c05afafe0037ed63fd38452097e8c42f05e55f70a4acd06d09a954f7a",
+        "base": "0x00013000",
+        "bytes": 9812,
+        "bundle": 0,
+        "dir": null
+      },
+      "7": {
+        "sha256": "d8d2e5d1e4a2bf82d0d6f6fffd8574d90e8bb65670777510ce5a893760e84f88",
+        "base": "0x00016000",
+        "bytes": 9860,
+        "bundle": 0,
+        "dir": null
+      },
+      "8": {
+        "sha256": "f108d0ca756823c24e919c45c8d52672de91ee9839099f2cdaa27a83394ef1f7",
+        "base": "0x00019000",
+        "bytes": 10524,
+        "bundle": 0,
+        "dir": null
+      },
+      "9": {
+        "sha256": "7a15f3af3eb254d97477bf432146654dcbec99bd7817cb5a30bc1e7d212c2f14",
+        "base": "0x0001c000",
+        "bytes": 10560,
+        "bundle": 0,
+        "dir": null
+      },
+      "10": {
+        "sha256": "44fc0784c330888142bbca4cf9e560c8fc5c3b73111b074ff8df40372559a16d",
+        "base": "0x0001f000",
+        "bytes": 9812,
+        "bundle": 0,
+        "dir": null
+      },
+      "11": {
+        "sha256": "ba511c0e14c83e2d24c19e7161b382fadd97495160b77f5daf09014254cfeeca",
+        "base": "0x00022000",
+        "bytes": 10012,
+        "bundle": 0,
+        "dir": null
+      },
+      "12": {
+        "sha256": "b224c70bb186dcaaf4bd7ec99db3b9f96491d33e06be68d7e0097aebaf6adf94",
+        "base": "0x00025000",
+        "bytes": 9836,
+        "bundle": 0,
+        "dir": null
+      },
+      "13": {
+        "sha256": "c05f227e24fe8d9d8885b5f1a6a391d9d17b1778f7a085b800f90c532b1972d8",
+        "base": "0x00028000",
+        "bytes": 9736,
+        "bundle": 0,
+        "dir": null
+      },
+      "14": {
+        "sha256": "40b90f13b70334a483b51d0db1107b4808901f90d562b3d26d283790eeaef7a5",
+        "base": "0x0002b000",
+        "bytes": 9956,
+        "bundle": 0,
+        "dir": null
+      },
+      "15": {
+        "sha256": "feda21dbb3a16ebbe31878073438d38783353cb1c9a24fbffd794472b0286bd0",
+        "base": "0x0002e000",
+        "bytes": 9740,
+        "bundle": 0,
+        "dir": null
+      },
+      "16": {
+        "sha256": "df0c96c248c0ffbab7399deafac8f57f3cf3280912b3422ef3a9e6118ff7ecda",
+        "base": "0x00031000",
+        "bytes": 9884,
+        "bundle": 0,
+        "dir": null
+      },
+      "17": {
+        "sha256": "1ad87e465e36eb14f36081764c902ce9dd66206c083cbdacbf9300fb620466bf",
+        "base": "0x00034000",
+        "bytes": 9996,
+        "bundle": 0,
+        "dir": null
+      },
+      "18": {
+        "sha256": "dcb9cbcd1db2b224675832b91b6367828be5524f67cb207a5e54ac129931e60a",
+        "base": "0x00037000",
+        "bytes": 9760,
+        "bundle": 0,
+        "dir": null
+      },
+      "19": {
+        "sha256": "2cc47cd37a1e0946b78383f955d37845c971ba4457d1fed92ab7250ae0bc0bd9",
+        "base": "0x0003a000",
+        "bytes": 10844,
+        "bundle": 0,
+        "dir": null
+      },
+      "20": {
+        "sha256": "f007dddd8eddb7059c54d3cbe35e8ef0925b7bbdd7b1d0cf7be53b555a6f4def",
+        "base": "0x0003d000",
+        "bytes": 10308,
+        "bundle": 0,
+        "dir": null
+      },
+      "21": {
+        "sha256": "c8dd397acf7defb7ce6cf2b709a57cf7414c1956330e6ff563c4987c8a9e1456",
+        "base": "0x00001000",
+        "bytes": 10520,
+        "bundle": 1,
+        "dir": null
+      },
+      "22": {
+        "sha256": "b58e537a6e151723fc43d1d85d6f72a4642bd8905c37c4797b884f58092f6474",
+        "base": "0x00004000",
+        "bytes": 10012,
+        "bundle": 1,
+        "dir": null
+      },
+      "23": {
+        "sha256": "178cdd95db8d7b450baeb36cbed157b25f58729b8f03384d2e6811971b276354",
+        "base": "0x00007000",
+        "bytes": 10256,
+        "bundle": 1,
+        "dir": null
+      },
+      "24": {
+        "sha256": "19c2be4b46baf2cdc0b82d0b184e93ef4607bc94a044daa201b8a46530eaf27a",
+        "base": "0x0000a000",
+        "bytes": 11276,
+        "bundle": 1,
+        "dir": null
+      },
+      "25": {
+        "sha256": "bd9549d324641e38b1a7cf19320442c2d78b6cd256991cc14de8e902afbc1c98",
+        "base": "0x0000d000",
+        "bytes": 10196,
+        "bundle": 1,
+        "dir": null
+      },
+      "26": {
+        "sha256": "2fc87a11e512a116191dca4068496fb7e13230331546f52be437d214ec55345a",
+        "base": "0x00010000",
+        "bytes": 9908,
+        "bundle": 1,
+        "dir": null
+      },
+      "27": {
+        "sha256": "5cd283464a8c94b5ac07387d7cdd0428700a34a5ca2deb7e2582c54628275d8d",
+        "base": "0x00013000",
+        "bytes": 10004,
+        "bundle": 1,
+        "dir": null
+      },
+      "28": {
+        "sha256": "7f8d7544db0fb67501de18bafc0dd9c2576b1839d5a1c1fc8d998d384bd8e88d",
+        "base": "0x00016000",
+        "bytes": 10156,
+        "bundle": 1,
+        "dir": null
+      },
+      "29": {
+        "sha256": "1f307c3bf99d0506c305a367c8d364a7a1799c538e5be59b91990677464f4b70",
+        "base": "0x00019000",
+        "bytes": 10156,
+        "bundle": 1,
+        "dir": null
+      },
+      "30": {
+        "sha256": "07a366801604522549ffb8381ace2f887e9a99c8443e9605d519838b5d06f29b",
+        "base": "0x0001c000",
+        "bytes": 11080,
+        "bundle": 1,
+        "dir": null
+      },
+      "31": {
+        "sha256": "4e9e4746258e193ccbaa50ae1982261d84bb88a20fb2b6cd460ff5b942b494bc",
+        "base": "0x0001f000",
+        "bytes": 10036,
+        "bundle": 1,
+        "dir": null
+      },
+      "32": {
+        "sha256": "fafb42006632ef101df964dd90d22e7752bdb4291d475ce9d017540aa3136506",
+        "base": "0x00022000",
+        "bytes": 19892,
+        "bundle": 1,
+        "dir": null
+      },
+      "33": {
+        "sha256": "6c09f7a000af7c8619356264991e6490704ef9863cbb0122cba7a8973d5c8984",
+        "base": "0x00027000",
+        "bytes": 19892,
+        "bundle": 1,
+        "dir": null
+      },
+      "34": {
+        "sha256": "3e098fc8406cecf50b4bd5b50ec28e0d57763ac1715d4cc17e9a92ecef0b97bc",
+        "base": "0x0002c000",
+        "bytes": 19892,
+        "bundle": 1,
+        "dir": null
+      },
+      "35": {
+        "sha256": "0c397e0162862c0e9ba95631af0725dde15e8ba344ba90c6783f135189c66fe8",
+        "base": "0x00031000",
+        "bytes": 10260,
+        "bundle": 1,
+        "dir": null
+      },
+      "36": {
+        "sha256": "348d253a123b7f61806bf4b5ab0a14981cdfcf59c7d228db161cd074f74e94d7",
+        "base": "0x00034000",
+        "bytes": 10836,
+        "bundle": 1,
+        "dir": null
+      },
+      "37": {
+        "sha256": "9c87a0f712d89702ad75cc8156aedca30cddcecc0d8f6d4400409aae7fb5367b",
+        "base": "0x00037000",
+        "bytes": 10836,
+        "bundle": 1,
+        "dir": null
+      },
+      "38": {
+        "sha256": "9ba88729441eb75eb495dc90d8ffa14f1e4c69491c56aac3dd32f67cff9c685c",
+        "base": "0x0003a000",
+        "bytes": 10836,
+        "bundle": 1,
+        "dir": null
+      },
+      "39": {
+        "sha256": "aa2afed60cf51f88d202e48ab9c69cf569679e182199f7c8b1dd16ca8473d549",
+        "base": "0x0003d000",
+        "bytes": 10836,
+        "bundle": 1,
+        "dir": null
+      },
+      "64": {
+        "sha256": "49a9e7fca79608bf99b92c9a5834812fb67fd6c35a788dd2729b99a78ff39338",
+        "base": "0x00001000",
+        "bytes": 8920,
+        "bundle": 2,
+        "dir": "../rb-mp-stress"
+      },
+      "65": {
+        "sha256": "ac3019fcc521ce3b7fd35e3af00962c9023c5ad832eab843e5fc98e48c14e2d4",
+        "base": "0x00004000",
+        "bytes": 8828,
+        "bundle": 2,
+        "dir": "../rb-mp-stress"
+      },
+      "66": {
+        "sha256": "bc2b2211094bff8279ad9c01928084227ad04ba25cd9d056866677ac1b47adfa",
+        "base": "0x00007000",
+        "bytes": 7916,
+        "bundle": 2,
+        "dir": "../rb-mp-stress"
+      },
+      "67": {
+        "sha256": "a1b5aee9340f2ea33174dbe9f6113cac3b6ab4d4e973384dbac3c1f8764d248b",
+        "base": "0x00009000",
+        "bytes": 7964,
+        "bundle": 2,
+        "dir": "../rb-mp-stress"
+      },
+      "68": {
+        "sha256": "98bc3ca4a1ac35828027d9a102755b873c0fbe6c50ba71243b1170fe487f9aa7",
+        "base": "0x0000b000",
+        "bytes": 7512,
+        "bundle": 2,
+        "dir": "../rb-mp-stress"
+      },
+      "69": {
+        "sha256": "80c9a4330439a38f0626217bc408674160667dd1726e246236ac84b7b4486f99",
+        "base": "0x0000d000",
+        "bytes": 9448,
+        "bundle": 2,
+        "dir": "../rb-mp-stress"
+      },
+      "70": {
+        "sha256": "3e2356405ee1def77df5240ef301f9165e3f234dd01b4e4b91bf48eb8e50bead",
+        "base": "0x00010000",
+        "bytes": 8828,
+        "bundle": 2,
+        "dir": "../rb-mp-stress"
+      },
+      "71": {
+        "sha256": "7c89242501ebe7c57174154e2f321a4c161e2feabbcc3c7d96d09b8c3f18f3d0",
+        "base": "0x00013000",
+        "bytes": 7896,
+        "bundle": 2,
+        "dir": "../rb-mp-stress"
+      }
+    }
+  },
+  "toolchain_image": "verified-libs/toolchain:2026-11-13",
+  "toolchain": {
+    "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+    "ubuntu_snapshot": "20261105T000000Z",
+    "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+    "cbmc": "6.6.0 (cbmc-6.6.0)",
+    "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+    "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+    "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+    "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+  },
+  "libs_pinned": [
+    "pxq-ringbuffer-cortex eec68a93fd3e",
+    "lwrb 413b7093dcad",
+    "anders-ringbuffer 8de8fff55a0b",
+    "jnk0le-ringbuffer 9efa07fffc0f",
+    "etl 7d604f2e4f7f",
+    "qp-lfrb 0d6354a10a3c",
+    "rigtorp-spscqueue 59a6a938513e",
+    "wizard97-ringbuf 5cd8410c162a",
+    "embeddedartistry 9733be2eacdc",
+    "ece-ringbuffer 94083a63259e",
+    "micoring a6f91ee2991a",
+    "kostyk-lockfree 38649b8f964e",
+    "polycratia-spscring 9d2445a55970",
+    "rt-spsc 5454de55a2a1",
+    "diffstorm-cb 11e05d60462a",
+    "diffstorm-cb-547d0812 547d0812f30d",
+    "riot 9c9a6abec901",
+    "contiki-ng a3c7119915a5",
+    "tinyusb dae3f9a366bf",
+    "lockfree-dnedic ae6c4df12453",
+    "zephyr-ringbuf 41d10b597304",
+    "freertos-kernel 89592801dd8b",
+    "nuttx-circbuf 2b5c0de5e933",
+    "arduino-api cd91833d90b4",
+    "arduino-renesas 424e86eff92d",
+    "rt-thread 99428a1e7f74",
+    "mbed-ce a4c70564a534",
+    "moodycamel-rwq 8b2176698e9b",
+    "heapless 19188229ac2b",
+    "bbqueue 979abde48a9e",
+    "embassy 84444a19eb57",
+    "rs-hash32 d44eb33a01be",
+    "rs-byteorder ec068eefa042",
+    "rs-stable-deref-trait 66f9d8a15b72",
+    "rs-const-init ea0c87a3a2a4",
+    "rs-critical-section d81c423eeca4",
+    "rs-portable-atomic e4595528211f",
+    "rs-futures 705e6b5c0f06",
+    "rs-cfg-if 8b0a2b0fc1fa",
+    "rs-embedded-io 21e547acd5c8"
+  ]
+}

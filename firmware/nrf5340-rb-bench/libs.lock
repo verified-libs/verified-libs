@@ -1,0 +1,51 @@
+# Libraries under test, pinned by commit.
+# Format: name url commit [path ...]
+# Optional paths: sparse checkout of only these files (large repos).
+# The sources are fetched by fetch-libs.sh into build/libs/ and never copied
+# into this repo.
+pxq-ringbuffer-cortex https://github.com/pxq-dk/RingBuffer-Cortex.git          eec68a93fd3e6aaad6e4dd543e514c4789b1573e
+lwrb                  https://github.com/MaJerle/lwrb.git                       413b7093dcad7a61b17992e19f4de46223b18c18
+anders-ringbuffer     https://github.com/AndersKaloer/Ring-Buffer.git           8de8fff55a0baee4fef2a1c6a82d258a27c3c0ba
+jnk0le-ringbuffer     https://github.com/jnk0le/Ring-Buffer.git                 9efa07fffc0ff282495ed31942f29321730174e4
+etl                   https://github.com/ETLCPP/etl.git                         7d604f2e4f7fa79ff49bf675c089656943f9171b
+# wave 2 (2026-11-06)
+qp-lfrb               https://github.com/QuantumLeaps/lock-free-ring-buffer.git 0d6354a10a3c47edfbaaf129885607a6f181c17d
+rigtorp-spscqueue     https://github.com/rigtorp/SPSCQueue.git                  59a6a938513ea5004817383711ed35d32385d3ee
+wizard97-ringbuf      https://github.com/wizard97/Embedded_RingBuf_CPP.git      5cd8410c162acf2ab377357129db2850b1622007
+embeddedartistry      https://github.com/embeddedartistry/embedded-resources.git 9733be2eacdc3ede53b593dda9580ac21ca2283a /examples/c/circular_buffer/ /LICENSE
+ece-ringbuffer        https://github.com/ece-mohammad/RingBuffer.git            94083a63259e02ed321ef9e764d8a8d527aa2991 /Modules/ring_buffer/ /Modules/utils/ /LICENSE
+micoring              https://github.com/Vanderhell/micoring.git                a6f91ee2991a77f5d7096366ef46f7e8775d3bc7
+kostyk-lockfree       https://github.com/kostyk348/lockfree.git                 38649b8f964eb0a762c19dcac913b9a21b42e187
+polycratia-spscring   https://github.com/polycratia/spscring.git                9d2445a55970f408f1c985b3bd29bec968df7399
+rt-spsc               https://github.com/Saikiran4255/rt-spsc.git               5454de55a2a1ac138a4bb52c21f42be7b2741a87
+diffstorm-cb          https://github.com/diffstorm/cb.git                       11e05d60462ac9b6bc387f7320127d2e70a49a31
+# diffstorm/cb before the fix: kept only to reproduce the findings (verify/findings, verify/genmc)
+diffstorm-cb-547d0812 https://github.com/diffstorm/cb.git                       547d0812f30d91b64faabaadfe3bcda524ac3aea
+riot                  https://github.com/RIOT-OS/RIOT.git                       9c9a6abec901838b1637ef9308427b50ef59ce5c /sys/tsrb/ /sys/include/tsrb.h /sys/include/turb.h /LICENSE
+contiki-ng            https://github.com/contiki-ng/contiki-ng.git              a3c7119915a5d1d137cee9990c0c3ba0a32bfbb7 /os/lib/ringbuf.c /os/lib/ringbuf.h /os/sys/cc.h /LICENSE.md
+tinyusb               https://github.com/hathach/tinyusb.git                    dae3f9a366bfcddbf9dcf1b48d7500286a849539 /src/common/ /src/osal/ /src/tusb_option.h /LICENSE
+lockfree-dnedic       https://github.com/DNedic/lockfree.git                    ae6c4df124536218b0b1adfc21ab4921810a00a5 /lockfree/ /LICENSE
+zephyr-ringbuf        https://github.com/zephyrproject-rtos/zephyr.git          41d10b59730406bbab4ca9f1fbbe9e96aafb4966 /include/zephyr/sys/ring_buffer.h /LICENSE
+freertos-kernel       https://github.com/FreeRTOS/FreeRTOS-Kernel.git           89592801dd8b73329a7583719b7e3567b50910e5 /stream_buffer.c /include/ /LICENSE.md
+# wave 4 (2026-11-12)
+nuttx-circbuf         https://github.com/apache/nuttx.git                       2b5c0de5e933281c209f954a63b99cf10c132346 /libs/libc/misc/lib_circbuf.c /include/nuttx/circbuf.h /LICENSE /NOTICE
+arduino-api           https://github.com/arduino/ArduinoCore-API.git            cd91833d90b4fe50e428021ba5051e2b7ceafc84 /api/RingBuffer.h /LICENSE
+arduino-renesas       https://github.com/arduino/ArduinoCore-renesas.git        424e86eff92d37f72123c2b641dd8bbf06a38b47 /cores/arduino/SafeRingBuffer.h /cores/arduino/sync.h /LICENSE
+rt-thread             https://github.com/RT-Thread/rt-thread.git                99428a1e7f7447955aa860f7c969273a12095b8f /components/drivers/ipc/ringbuffer.c /components/drivers/include/ipc/ringbuffer.h /LICENSE
+mbed-ce               https://github.com/mbed-ce/mbed-os.git                    a4c70564a53408e748c7bd77c7fc08af2b7297dd /platform/include/platform/CircularBuffer.h /LICENSE.md /LICENSE-apache-2.0.txt
+moodycamel-rwq        https://github.com/cameron314/readerwriterqueue.git       8b2176698e9bdaba653cdc20c32b54737a934b47
+# Rust (2026-11-13): linked into the same firmware as a static library built
+# from ../rust-adapters (cargo --offline, every crate from these checkouts).
+heapless              https://github.com/rust-embedded/heapless.git             19188229ac2b76fc91ad79f57dee01fa362a1e15
+bbqueue               https://github.com/jamesmunns/bbqueue.git                 979abde48a9e2ecc33b0bf2bd445e14cb8099678
+embassy               https://github.com/embassy-rs/embassy.git                 84444a19eb57d978e3c09fcdc8e60cdd7278eb03 embassy-sync LICENSE-APACHE LICENSE-MIT
+# their dependencies (versions as cargo would pick them from crates.io on 2026-11-13; sources from the projects' repositories)
+rs-hash32             https://github.com/japaric/hash32.git                     d44eb33a01be4582669d9a1fa3f7c58455a21de9
+rs-byteorder          https://github.com/BurntSushi/byteorder.git               ec068eefa042d494475db125c4b034bd8e9e34dd
+rs-stable-deref-trait https://github.com/storyyeller/stable_deref_trait.git     66f9d8a15b7209c45f58edee6c1b6bb497b7bd31
+rs-const-init         https://tangled.sh/@jamesmunns.com/const-init             ea0c87a3a2a4dc562620807836974eeaf5932d66
+rs-critical-section   https://github.com/rust-embedded/critical-section.git     d81c423eeca4aed9234fbdf7c9d2f908068a079f
+rs-portable-atomic    https://github.com/taiki-e/portable-atomic.git            e4595528211f1d53b7f4d93e528ef84b491fc871
+rs-futures            https://github.com/rust-lang/futures-rs.git               705e6b5c0f06535b1aac1cb1989a172b3d45be8c
+rs-cfg-if             https://github.com/rust-lang/cfg-if.git                   8b0a2b0fc1fa3b3741b9e72895f390cf499fe36f
+rs-embedded-io        https://github.com/rust-embedded/embedded-hal.git         21e547acd5c8fc7b26d9794f88c291dde912a788 embedded-io embedded-io-async
