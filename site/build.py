@@ -176,7 +176,7 @@ def main():
     # (site/gen_libdata.py) and site/compare.js, all inline. The embargo check
     # below covers the data like any other page text.
     data = open(os.path.join(SITE, "data/libs.json")).read().replace("</", "<\\/")
-    pages["compare.html"] = page("compare", "Compare", (
+    pages["compare.html"] = page("compare", "Compare embedded ring buffers", (
         open(os.path.join(SITE, "content/compare.html")).read()
         + f'<script type="application/json" id="libdata">{data}</script>'
         + f'<script>{open(os.path.join(SITE, "compare.js")).read()}</script>'), "compare")
