@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night campaign with five compiler flag sets, Rust libraries and placement (2026-11-13/14) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="night-campaign-with-five-compiler-flag-sets-rust-libraries-and-placement-2026-11-1314">Night campaign with five compiler flag sets, Rust libraries and placement (2026-11-13/14)</h1>
+<p>Stress campaign on all six boards (<code>lab/tools/night-all.sh</code>, commit
+<code>9db3c96</code>), five boards from 21:53 to about 06:00 UTC, the Pico 2 from 22:52
+UTC (it finished its validation first). New since the campaign of
+2026-11-12/13:</p>
+<ul>
+<li><strong>the new code layout</strong> (<code>9898830</code>): the timing harness and the adapters
+  come first in flash, so a change elsewhere no longer moves them;</li>
+<li><strong>the Rust libraries</strong> in the stress test: heapless spsc::Queue, bbqueue
+  and embassy-sync Pipe, linked into the same firmware as the C libraries;</li>
+<li><strong>a fifth compiler flag set, <code>-Os</code> with LTO</strong> (the size build with
+  link-time optimisation that many products ship), next to <code>-Os</code>, <code>-O3</code>,
+  <code>-O2</code> with LTO and <code>-O2</code> with clang.</li>
+</ul>
+<p><strong>No errors in any real library in any valid run, on any board</strong>: 209 valid
+runs of 211, about 20 G bytes and 10.6 G interrupts through the libraries.
+The errors are where they are expected, as in the nights before: the
+variants their own projects do not call interrupt-safe (wizard97 and
+Arduino RingBufferN as shipped, RT-Thread rt_ringbuffer without a lock) on
+every board, and on the Pico 2 in two-core mode the single-core designs
+whose interrupt lock does nothing against the other core.</p>
+<h2 id="per-board">Per board</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Runs</th>
+<th>Valid</th>
+<th>Did not finish</th>
+<th>Too slow (time limit)</th>
+<th>Retries</th>
+<th>Power cycles</th>
+<th>Errors in real libraries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>17</td>
+<td>16</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>19</td>
+<td>19</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>63</td>
+<td>62</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>33</td>
+<td>33</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>11</td>
+<td>11</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Raspberry Pi Pico 2</td>
+<td>68</td>
+<td>68</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>nRF5340: <code>sweep-block</code> with the cache off at <code>-Os</code> was too slow for the
+  time limit (exit 4), the same configuration as the night before; it is
+  not hung, and the campaign neither retried nor power-cycled.</li>
+<li>NUCLEO-G474RE: one run could not read its results from the board ("probe
+  failure"); the campaign power-cycled the board and the retry passed.</li>
+<li>No run was invalid: the negative control was caught in every run that
+  finished.</li>
+</ul>
+<h2 id="compiler-flag-sets">Compiler flag sets</h2>
+<p>Runs that finished with the real libraries error-free and the control
+caught, all boards:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Flags</th>
+<th>Runs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-Os</code></td>
+<td>44 of 45 (the nRF5340 run that was too slow)</td>
+</tr>
+<tr>
+<td><code>-O3</code></td>
+<td>44 of 45 (the G474 probe failure; the retry passed)</td>
+</tr>
+<tr>
+<td><code>-O2</code> + LTO</td>
+<td>42 of 42</td>
+</tr>
+<tr>
+<td><code>-O2</code> + clang</td>
+<td>40 of 40</td>
+</tr>
+<tr>
+<td><code>-Os</code> + LTO</td>
+<td>39 of 39</td>
+</tr>
+</tbody>
+</table></div>
+<p>Before the campaign every flag set was built for all six boards, and
+<code>-Os</code> + LTO, <code>-O2</code> + LTO and clang were run once in <code>single</code> and <code>sweep</code>
+mode on every board (36 runs, all passed). With LTO the compiler sees the
+library and the code that calls it at once and may inline and reorder
+across what was a call; that is where a missing barrier would show. None
+did.</p>
+<h2 id="the-rust-libraries">The Rust libraries</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Valid runs (all modes)</th>
+<th>Errors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>heapless spsc::Queue</td>
+<td>165</td>
+<td>0</td>
+</tr>
+<tr>
+<td>bbqueue</td>
+<td>209</td>
+<td>0</td>
+</tr>
+<tr>
+<td>embassy-sync Pipe</td>
+<td>165</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<p>Including the interrupt sweep (51 to 62 runs each) and two-core runs on the
+Pico 2 (26 each). bbqueue has more runs because it also has a zero-copy
+API, so it is in the <code>dma</code> and <code>sweep-dma</code> runs too.</p>
+<h2 id="mutants">Mutants</h2>
+<p>As the night before: the interrupt sweep caught every mutant in every run in
+the directions where its defect can show; the random modes sometimes miss
+("drain re-reads head" in 24 of 45 random single-byte runs, "full test
+misses the wrap" in 32 of 43 random block runs in the main→interrupt
+direction). On the Pico 2's two cores every mutant was caught in both
+directions in every run.</p>
+<h2 id="placement-of-the-rust-and-multi-producer-sets">Placement of the Rust and multi-producer sets</h2>
+<p>The placement experiment (<code>SHIFT=0..28</code>, all library code moved by up to 28
+bytes, see the comparison page) was run for the Rust and multi-producer
+benchmark sets on five boards (80 runs), and for the SPSC set on the Pico 2.</p>
+<ul>
+<li>Most means do not move at all: the median spread of the one-byte means is
+  0.0 % on every board in both sets.</li>
+<li>The exception is embassy-sync Pipe on the NUCLEO-G474RE: its one-byte
+  write and read take 190 to 235 and 174 to 217 cycles depending on where
+  the code lies (24 %). On the NUCLEO-H723ZG bbqueue's one-byte write moves
+  by 4 %, and some block figures by up to 14 % (pxq Topology MPSC/MPMC
+  64-byte blocks, RIOT tsrb on the G0B1).</li>
+<li>The Pico 2 is the steadiest board for the SPSC set: median 0.0 %, largest
+  1.7 %, 72 of 74 one-byte means within 1 % (other boards: largest 4.9 % to
+  28.9 %).</li>
+</ul>
+<p>The comparison page shows placement ranges for the SPSC set on all six
+boards now; the ranges of the Rust and multi-producer sets are in
+<code>placement-rust-20261113.json</code> and <code>placement-mp-20261113.json</code> on the lab
+host and not yet on the page.</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

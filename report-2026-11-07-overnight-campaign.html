@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First overnight stress campaign, 2026-11-06/07 - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="first-overnight-stress-campaign-2026-11-0607">First overnight stress campaign, 2026-11-06/07</h1>
+<p>nRF5340 DK application core, 20 adapters (19 library configurations + the
+negative control), <a href="https://github.com/verified-libs/verified-libs/blob/main/firmware/nrf5340-rb-stress/overnight.sh"><code>overnight.sh</code></a>
+for 8 hours, 21:52–05:55 UTC. <strong>Harness development, not published
+results.</strong> ⚠ pxq RingBuffer_PackedState is the project owner's library
+(principle 6). Raw report: <a href="report-2026-11-07-overnight-campaign-raw.html"><code>2026-11-07-overnight-campaign-raw.md</code></a>;
+the JSON records stay on lib-lab1 in <code>~/lab-runs/overnight-20261106T215245Z/</code>.</p>
+<h2 id="result">Result</h2>
+<ul>
+<li><strong>32 runs: 24 valid, 5 invalid (control not caught), 3 did not finish.</strong></li>
+<li><strong>0 errors in every real library across all 24 valid runs.</strong> Per library
+  about 10.2 million bytes moved under 49–93 million interrupts, with new
+  random seeds in every run, single bytes and blocks, interrupt periods
+  from 160 to 10 688 cycles, cache on and off, code in flash and SRAM.</li>
+<li><strong>wizard97 as shipped:</strong> 219 737 errors, as its own header warns; with
+  the PRIMASK macros its README asks for: 0.</li>
+<li><strong>Coverage:</strong> every library found the buffer full and empty in both
+  directions in most runs; the "full in main → ISR" gap from the first
+  stress runs is closed (16–23 of 24 valid runs per library).</li>
+</ul>
+<h2 id="the-8-runs-that-do-not-count">The 8 runs that do not count</h2>
+<p><strong>5 invalid runs:</strong> all block mode at the slowest interrupt rate (prescaler 4,
+an interrupt every 2 560–10 688 cycles). At that rate the buffer stayed
+empty in ISR → main and full in main → ISR, so the control's bugs never had
+a chance to show (0 control errors). The validity rule did its job: these
+runs show nothing either way and were not counted.</p>
+<p><strong>3 unfinished runs:</strong> all single bytes, fastest interrupts (160–668
+cycles), instruction cache off. Re-running that setting and reading the
+progress after 2 and 4 minutes showed starvation, not a hang in a library:
+e.g. lwrb ISR → main had moved 30 820 bytes under 3.35 million interrupts,
+with the buffer found full 3.32 million times: with the cache off its
+interrupt handler takes about as long as the interrupt period, leaving the
+main loop almost no CPU time. Not a library defect: a test setting with
+more than 100 % interrupt load.</p>
+<h2 id="changes-made-after-this-campaign">Changes made after this campaign</h2>
+<ul>
+<li>Rotation: no prescaler 4 in block mode (replaced by prescaler 1, every
+  320–1 336 cycles) and no cache-off with prescaler 0 (replaced by
+  prescaler 2).</li>
+<li>Firmware: a starvation cap (60 interrupts per byte) ends a starved
+  library/direction instead of hanging the run; it is reported as
+  "starved", never as a pass.</li>
+</ul>
+<h2 id="limits">Limits</h2>
+<p>One core (interrupt vs main loop), one compiler (arm-none-eabi-gcc 14.2.1,
+<code>-O2</code>), one board. 0 errors over many runs makes hidden ordering bugs of
+this kind unlikely for these configurations; it does not prove their
+absence. GenMC found the diffstorm defects that this test cannot see
+(see <a href="https://github.com/verified-libs/verified-libs/blob/main/verify/findings"><code>../verify/findings</code></a>).</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

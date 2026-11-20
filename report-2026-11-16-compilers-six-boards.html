@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Four compilers on all six boards (2026-11-16) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="four-compilers-on-all-six-boards-2026-11-16">Four compilers on all six boards (2026-11-16)</h1>
+<p>The libraries under test and their adapters built with four compilers, on
+all six boards, benchmark <code>SET=spsc</code>, <code>-O2</code>, code in flash; harness, startup
+and link stay the Debian arm-none-eabi-gcc 14.2.1 with newlib-nano in every
+case (<code>firmware/common/compiler.mk</code>). Earlier only the STM32 boards had
+been compared (<a href="report-2026-11-12-compilers-stm32.html">2026-11-12</a>).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th><code>COMPILER=</code></th>
+<th>Compiler</th>
+<th>Image</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gcc</code></td>
+<td>Arm GNU Toolchain 14.2.1 (Debian <code>gcc-arm-none-eabi</code> 14.2.rel1)</td>
+<td>2026-11-05</td>
+</tr>
+<tr>
+<td><code>clang</code></td>
+<td>Ubuntu clang 21.1.8, GNU headers</td>
+<td>2026-11-05</td>
+</tr>
+<tr>
+<td><code>atfe</code></td>
+<td>Arm Toolchain for Embedded 23.1.0 (clang 23.1.0)</td>
+<td>2026-11-16</td>
+</tr>
+<tr>
+<td><code>zephyr-gcc</code></td>
+<td>Zephyr SDK 1.0.1 <code>arm-zephyr-eabi-gcc</code> 14.3.0, its own headers</td>
+<td>2026-11-16</td>
+</tr>
+</tbody>
+</table></div>
+<p>24 runs (6 boards x 4 compilers), records in
+<code>~/lab-runs/compilers-20261116/</code> on the lab host, source commit f1551e6
+(the G474's clang and ATfE runs at bd9d795: the first build also made the
+CCM SRAM image, which no longer fits with clang code, and stopped; run.sh
+now builds only the locations that run; the flash image is the same).
+Every run: 0 errors in every library.</p>
+<h2 id="speed-against-gcc">Speed against gcc</h2>
+<p>Geometric mean over all library configurations of mean cycles relative to
+gcc (cache on; 1 B: single-byte push and pop; 64 B: 64-byte block write and
+read). Below 1.00 is faster than gcc.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>clang 1 B</th>
+<th>clang 64 B</th>
+<th>ATfE 1 B</th>
+<th>ATfE 64 B</th>
+<th>Zephyr-gcc 1 B</th>
+<th>Zephyr-gcc 64 B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 (M33)</td>
+<td>1.02</td>
+<td>0.92</td>
+<td>1.02</td>
+<td>0.92</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>G0B1 (M0+)</td>
+<td>1.24</td>
+<td>1.09</td>
+<td>1.24</td>
+<td>1.09</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>G474 (M4)</td>
+<td>1.05</td>
+<td>0.96</td>
+<td>1.05</td>
+<td>0.96</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>H723 (M7)</td>
+<td>1.03</td>
+<td>0.97</td>
+<td>1.02</td>
+<td>0.97</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>SAM D20 (M0+)</td>
+<td>1.21</td>
+<td>1.08</td>
+<td>1.20</td>
+<td>1.08</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>RP2350 (M33)</td>
+<td>1.02</td>
+<td>0.92</td>
+<td>1.02</td>
+<td>0.92</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Zephyr SDK gcc measures the same as Arm GCC.</strong> The firmware differs
+  (other hashes; GCC 14.3 against 14.2, other headers), but with the cache
+  on every mean on five boards is within 1 % of gcc's (G0B1: 3 of 804 means
+  up to 1.6 %; SAM D20: 37 of 804 up to 7 %). The H723 differs in 259 means
+  by up to 174 %, all with the cache off, where the code's place in flash
+  decides (placement experiment).</li>
+<li><strong>ATfE measures like upstream clang.</strong> Its clang 23 is within 1 % of
+  Ubuntu clang 21 in these ratios on every board.</li>
+<li><strong>clang/ATfE against gcc depends on the core.</strong> On the M33, M4 and M7
+  single bytes cost 2-5 % more and 64-byte blocks 3-9 % less. On the two
+  Cortex-M0+ boards single bytes cost 20-24 % more and blocks 8-9 % more:
+  clang lowers every C11 atomic load and store on ARMv6-M to a call to
+  <code>__atomic_load_N</code> / <code>__atomic_store_N</code> (<code>firmware/common/armv6m_atomic.c</code>
+  here), where gcc inlines LDR/STR with DMB; the 2026-11-12 report shows
+  the libraries this hits. ATfE does the same. Per library the spread is
+  wide (G474, ATfE single push: DNedic lockfree 0.59, polycratia 1.58; G0B1:
+  jnk0le and polycratia about 3.1).</li>
+</ul>
+<h2 id="check-against-the-page">Check against the page</h2>
+<p>The gcc runs repeat the benchmark the comparison page shows (e9e9c42) at a
+newer commit, with the ST-LINK firmware updated the same day (V2J48 /
+V3J17): on five boards all 804 means are within 1 % of the page's records.
+On the RP2350 23 of 804 differ by up to 19 %, in a different build of the
+firmware: the cache-on differences (pxq blocks, ETL queue_spsc_locked by one
+cycle) lie within the range the placement experiment found for them on this
+board (pxq block 6.6-9.0 cycles/byte, ETL locked push 62.7-63.7); the
+cache-off differences (ETL locked, ece-mohammad, up to 3.7 %) are outside
+what that experiment covers (it measures with the cache on).</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

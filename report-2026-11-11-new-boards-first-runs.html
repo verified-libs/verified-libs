@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New boards: first runs (2026-11-11) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="new-boards-first-runs-2026-11-11">New boards: first runs (2026-11-11)</h1>
+<p>First bench and stress runs on the three Nucleo boards from the DigiKey
+order. Same firmware, libraries (<code>libs.lock</code>), toolchain image and adapters as
+on the nRF5340; only the board layer (<code>firmware/common/&lt;board&gt;/</code>) differs.
+Records are in <code>~/lab-runs/</code> on lib-lab1.</p>
+<h2 id="boards">Boards</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Core</th>
+<th>Clock</th>
+<th>Cycle counter</th>
+<th>Probe</th>
+<th>Port (power cycling)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>Cortex-M0+</td>
+<td>64 MHz (HSI16 + PLL)</td>
+<td>SysTick (no DWT on M0+)</td>
+<td>ST-LINK/V2-1</td>
+<td>monitor 1, hub <code>4B0708619185</code> port 2 (yes)</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>Cortex-M4F</td>
+<td>170 MHz (HSI16 + PLL, boost)</td>
+<td>DWT <code>CYCCNT</code></td>
+<td>STLINK-V3</td>
+<td>monitor 1, port 3 (yes)</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>Cortex-M7</td>
+<td>64 MHz (HSI, reset default)</td>
+<td>DWT <code>CYCCNT</code></td>
+<td>STLINK-V3</td>
+<td>monitor 2, hub <code>9E0C0069B5FA</code> port 2 (yes)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The H723ZG runs at its reset clock on purpose: 550 MHz needs a supply
+configuration that matches the board, and a wrong one can lock the chip.
+Cycle counts are what the bench reports, so the comparison holds; flash
+numbers with the cache off include the reset-default wait states.</p>
+<h2 id="bench-flash-cacheaccelerator-on-gcc-o2-newlib-nano-memcpy">Bench (flash, cache/accelerator on, gcc -O2, newlib-nano memcpy)</h2>
+<p>Mean cycles, 1-byte push / pop · 64-byte block, cycles per byte. All 25
+adapters ran with 0 FIFO errors on every board and code location (flash,
+SRAM, and CCM on the G474 / ITCM on the H723).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>NUCLEO-G0B1RE (M0+, 64 MHz)</th>
+<th>NUCLEO-G474RE (M4, 170 MHz)</th>
+<th>NUCLEO-H723ZG (M7, 64 MHz HSI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState (C++)</td>
+<td>35 / 38 · 10.2</td>
+<td>20 / 21 · 7.5</td>
+<td>17 / 16 · 3.5</td>
+</tr>
+<tr>
+<td>lwrb (C)</td>
+<td>263 / 256 · 13.5</td>
+<td>180 / 176 · 5.1</td>
+<td>145 / 136 · 3.8</td>
+</tr>
+<tr>
+<td>AndersKaloer Ring-Buffer (C)</td>
+<td>73 / 50 · 27.3</td>
+<td>57 / 41 · 20.1</td>
+<td>33 / 26 · 9.2</td>
+</tr>
+<tr>
+<td>jnk0le Ringbuffer (C++)</td>
+<td>36 / 42 · 11.8</td>
+<td>23 / 26 · 9.5</td>
+<td>35 / 35 · 6.6</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_isr (C++)</td>
+<td>73 / 68 · 53.6</td>
+<td>40 / 45 · 31.9</td>
+<td>42 / 45 · 28.5</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_atomic (C++)</td>
+<td>54 / 51 · 40.0</td>
+<td>30 / 27 · 23.9</td>
+<td>38 / 37 · 26.2</td>
+</tr>
+<tr>
+<td>QuantumLeaps LFRB (C)</td>
+<td>69 / 61 · 79.9</td>
+<td>46 / 46 · 53.4</td>
+<td>46 / 41 · 35.7</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf threadsafe (C)</td>
+<td>74 / 60 · 81.9</td>
+<td>56 / 46 · 58.4</td>
+<td>37 / 31 · 25.4</td>
+</tr>
+<tr>
+<td>ece-mohammad RingBuffer (C)</td>
+<td>111 / 109 · 12.4</td>
+<td>81 / 80 · 4.2</td>
+<td>51 / 50 · 3.0</td>
+</tr>
+<tr>
+<td>micoring SPSC mode (C)</td>
+<td>127 / 131 · 128.2</td>
+<td>98 / 97 · 96.9</td>
+<td>72 / 71 · 59.9</td>
+</tr>
+<tr>
+<td>kostyk348 lf_spsc (C)</td>
+<td>159 / 154 · 212.6</td>
+<td>72 / 67 · 79.4</td>
+<td>65 / 59 · 56.2</td>
+</tr>
+<tr>
+<td>diffstorm cb (C)</td>
+<td>122 / 131 · 141.4</td>
+<td>72 / 69 · 77.9</td>
+<td>51 / 63 · 48.4</td>
+</tr>
+<tr>
+<td>RIOT tsrb (C)</td>
+<td>65 / 64 · 30.1</td>
+<td>52 / 51 · 19.6</td>
+<td>46 / 44 · 11.4</td>
+</tr>
+<tr>
+<td>Contiki-NG ringbuf (C)</td>
+<td>61 / 53 · 71.9</td>
+<td>45 / 42 · 51.9</td>
+<td>31 / 29 · 22.2</td>
+</tr>
+<tr>
+<td>rigtorp SPSCQueue (C++)</td>
+<td>52 / 83 · 73.2</td>
+<td>35 / 49 · 45.5</td>
+<td>36 / 43 · 29.1</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++)</td>
+<td>41 / 41 · 55.9</td>
+<td>29 / 25 · 33.4</td>
+<td>24 / 22 · 16.5</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros (C++)</td>
+<td>57 / 61 · 73.9</td>
+<td>40 / 32 · 43.9</td>
+<td>52 / 49 · 43.9</td>
+</tr>
+<tr>
+<td>polycratia spscring (C++)</td>
+<td>39 / 46 · 11.8</td>
+<td>24 / 28 · 9.5</td>
+<td>38 / 32 · 5.2</td>
+</tr>
+<tr>
+<td>rt-spsc (C++)</td>
+<td>45 / 44 · 59.4</td>
+<td>26 / 24 · 31.9</td>
+<td>36 / 36 · 28.9</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo (C)</td>
+<td>138 / 131 · 12.3</td>
+<td>101 / 100 · 4.2</td>
+<td>57 / 60 · 3.5</td>
+</tr>
+<tr>
+<td>pxq Topology::None, single-context (C++)</td>
+<td>35 / 38 · 10.2</td>
+<td>19 / 20 · 7.5</td>
+<td>23 / 21 · 3.7</td>
+</tr>
+<tr>
+<td>micoring default, single-context (C)</td>
+<td>103 / 98 · 90.9</td>
+<td>78 / 75 · 66.5</td>
+<td>49 / 53 · 29.0</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf basic, single-context (C)</td>
+<td>87 / 80 · 98.4</td>
+<td>40 / 36 · 43.9</td>
+<td>33 / 29 · 24.9</td>
+</tr>
+<tr>
+<td>ETL etl::queue, single-context (C++)</td>
+<td>46 / 47 · 61.4</td>
+<td>32 / 34 · 38.9</td>
+<td>25 / 26 · 19.4</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>NUCLEO-G0B1RE (M0+, 64 MHz): <code>stm32g0b1-rb-bench-flash-20261111T184412Z.json</code></li>
+<li>NUCLEO-G474RE (M4, 170 MHz): <code>stm32g474-rb-bench-flash-20261111T183917Z.json</code></li>
+<li>NUCLEO-H723ZG (M7, 64 MHz HSI): <code>stm32h723-rb-bench-flash-20261111T184631Z.json</code></li>
+</ul>
+<p>Not yet checked: the read overheads <code>BOARD_READ_OVERHEAD</code> (G0B1 2, G474 2,
+H723 1) are assumed from the core manuals; the empty-call calibration in the
+records (raw minimum 9 / 8 / 2 cycles in flash) is consistent with them, but
+an independent check against a known instruction sequence (as
+<code>nrf5340-cyccnt</code> did for the M33) is still to do. Until then these numbers
+are preliminary.</p>
+<h2 id="stress-isr-main-50-000-values-per-library-and-direction">Stress (ISR &lt;-&gt; main, 50 000 values per library and direction)</h2>
+<p><code>~/lab-runs/stm32-stress-first-20261111T191247Z</code>: single, block and zero-copy
+(dma) on each board, 9 runs, all valid: real libraries error-free, the
+negative control caught in every run, nothing starved. wizard97 as shipped
+(not ISR-safe by its own docs) fails on all three boards (761–7989 errors),
+as on the nRF5340. Interrupt every 160–668 core cycles (prescaler 0).</p>
+<p>These are short runs, not a campaign.</p>
+<h3 id="fix-found-on-the-way">Fix found on the way</h3>
+<p>The first G474 run stalled: TIM2 is a 32-bit timer, and when the interrupt
+acknowledged a new period that the counter had already passed, it counted
+on to 2^32 (about 100 s at 170 MHz / 4) before the next interrupt.
+<code>common/stm32/tim2_stress.h</code> now restarts the counter in that case
+(commit <code>6a58fbc</code>), which matches the nRF5340's 8-bit timer behaviour. Two
+records made while an old test process still used the same board were
+discarded (<code>~/lab-runs/invalid-overlap-20261111/</code>).</p>
+<h2 id="multi-producer-multi-consumer-stress-evening">Multi-producer / multi-consumer stress (evening)</h2>
+<p>A second timer (TIM3, <code>common/stm32/tim3_stress_b.h</code>; base, enable bit and
+IRQ from ST's cmsis-device-g0 <code>7c77b7cb</code>, -g4 <code>626ee412</code>, -h7 <code>81db1ec6</code>) lets
+<code>rb-mp-stress</code> run on the three boards. 200 000 values per library, TIMER_PRESCALER 1
+(<code>~/lab-runs/stm32-mp-first-20261111T194458Z</code>):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>MPSC</th>
+<th>SPMC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G0B1RE (M0+)</td>
+<td>0 errors, control caught</td>
+<td>0 errors, control caught</td>
+</tr>
+<tr>
+<td>G474RE (M4)</td>
+<td>0 errors, control caught</td>
+<td>0 errors, control caught</td>
+</tr>
+<tr>
+<td>H723ZG (M7)</td>
+<td>0 errors, control caught</td>
+<td>0 errors, control caught</td>
+</tr>
+</tbody>
+</table></div>
+<p>0 errors = pxq (MPSC/SPMC and MPMC), RIOT tsrb, wizard97 + PRIMASK macros.</p>
+<p>The first G0B1 MPSC attempt failed because its <code>run.sh</code> was edited while it
+ran; it was rerun cleanly.</p>
+<h2 id="sam-d20-xplained-pro-not-working-yet">SAM D20 Xplained Pro (not working yet)</h2>
+<p>Board layer written (<code>common/samd20/</code>): 8 MHz OSC8M, 0 wait states, SysTick
+timing, TC0/TC2 as the two stress timers, flash image only (32 KB RAM).
+Register values from Zephyr hal_atmel <code>8f95c79f</code> (Microchip's headers).
+probe-rs cannot drive the board, so <code>common/samd20/bin/probe-rs</code> stands in
+with OpenOCD. Bench, stress and MP firmware build. On the board, SWD fails
+with "stalled AP operation" (also before our firmware was ever flashed), and
+a USB power cycle of its port did not clear it; it worked once after a
+manual replug. <code>adapter serial</code> crashes OpenOCD 0.12.0 with this EDBG, so the
+stand-in does not select the probe by serial. To check with the board in hand.</p>
+<h2 id="not-done-yet">Not done yet</h2>
+<ul>
+<li>SAM D20: get SWD working (see above), then verify the clock and the
+  SysTick timing on it.</li>
+<li>Pico 2: the Debug Probe needs firmware &gt;= 2.2.0 for probe-rs; after an
+  update attempt it does not enumerate (USB error -71), to be checked.</li>
+<li>Check the cycle-counter read overheads on the new cores.</li>
+<li>Overnight campaigns on the new boards; ST's own toolchain on the G0B1.</li>
+</ul></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

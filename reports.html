@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1>Reports</h1><ul><li><a href="report-2026-11-20-publication-rerun.html">Publication re-run: every test at one commit, all six boards (night 2026-11-19/20)</a> <span style="color:var(--mute)">(2026-11-20)</span></li><li><a href="report-2026-11-18-mp-campaign-coverage.html">MP stress campaign with coverage, all six boards (night 2026-11-17/18)</a> <span style="color:var(--mute)">(2026-11-18)</span></li><li><a href="report-2026-11-17-nrf5340-cross-core.html">nRF5340: SPSC ring buffers across the application and the network core (2026-11-17)</a> <span style="color:var(--mute)">(2026-11-17)</span></li><li><a href="report-2026-11-17-mp-per-library-validation.html">MP stress test: one library per reset, validated against the old way (2026-11-17)</a> <span style="color:var(--mute)">(2026-11-17)</span></li><li><a href="report-2026-11-17-mp-coverage-prototype.html">MP stress test: where the interrupts land, random vs aimed (prototype)</a> <span style="color:var(--mute)">(2026-11-17)</span></li><li><a href="report-2026-11-17-h723-thermal.html">NUCLEO-H723ZG at 520 MHz: die temperature under full load (2026-11-16/17)</a> <span style="color:var(--mute)">(2026-11-17)</span></li><li><a href="report-2026-11-17-dma-producer.html">DMA as a real producer: first results on the G474 and H723 (2026-11-17)</a> <span style="color:var(--mute)">(2026-11-17)</span></li><li><a href="report-2026-11-17-c-libraries.html">Five C libraries&#x27; memcpy on all six boards (2026-11-17)</a> <span style="color:var(--mute)">(2026-11-17)</span></li><li><a href="report-2026-11-16-compilers-six-boards.html">Four compilers on all six boards (2026-11-16)</a> <span style="color:var(--mute)">(2026-11-16)</span></li><li><a href="report-2026-11-14-night-flags-placement.html">Night campaign with five compiler flag sets, Rust libraries and placement (2026-11-13/14)</a> <span style="color:var(--mute)">(2026-11-14)</span></li><li><a href="report-2026-11-13-night-sweep-mutants-wave4.html">Night campaign with the interrupt sweep, mutants and wave 4 (2026-11-12/13)</a> <span style="color:var(--mute)">(2026-11-13)</span></li><li><a href="report-2026-11-13-memcpy-rust.html">Which memcpy the Rust libraries are measured with (2026-11-13)</a> <span style="color:var(--mute)">(2026-11-13)</span></li><li><a href="report-2026-11-12-night-six-boards.html">Night campaign on six boards (2026-11-11/12)</a> <span style="color:var(--mute)">(2026-11-12)</span></li><li><a href="report-2026-11-12-compilers-stm32.html">Four compilers on the STM32 boards (2026-11-12)</a> <span style="color:var(--mute)">(2026-11-12)</span></li><li><a href="report-2026-11-11-new-boards-first-runs.html">New boards: first runs (2026-11-11)</a> <span style="color:var(--mute)">(2026-11-11)</span></li><li><a href="report-2026-11-08-pxq-1.4-night-run.html">Night run 2026-11-08: pxq 1.3.2 → 1.4.0 → 1.4.1, stress, MPSC/SPMC</a> <span style="color:var(--mute)">(2026-11-08)</span></li><li><a href="report-2026-11-07-overnight-campaign.html">First overnight stress campaign, 2026-11-06/07</a> <span style="color:var(--mute)">(2026-11-07)</span></li><li><a href="report-2026-11-07-overnight-campaign-raw.html">Stress campaign overnight-20261106T215245Z</a> <span style="color:var(--mute)">(2026-11-07)</span></li><li><a href="report-2026-11-06-first-harness.html">First harness results, 2026-11-06</a> <span style="color:var(--mute)">(2026-11-06)</span></li></ul></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

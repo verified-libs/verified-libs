@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night campaign with the interrupt sweep, mutants and wave 4 (2026-11-12/13) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="night-campaign-with-the-interrupt-sweep-mutants-and-wave-4-2026-11-1213">Night campaign with the interrupt sweep, mutants and wave 4 (2026-11-12/13)</h1>
+<p>Stress campaign on all six boards (<code>lab/tools/night-all.sh</code>, each board with
+its own copy of the repository at commit <code>25c64d2</code>), 18:45 to about 07:00 UTC
+(the nRF5340 until 08:45: it was waiting in a run that was too slow, see
+below). New since the campaign of 2026-11-11/12:</p>
+<ul>
+<li>the <strong>interrupt sweep</strong> (modes <code>sweep</code>, <code>sweep-block</code>, <code>sweep-dma</code>): one
+  interrupt per call, at every delay from the start of the call, from five
+  fill levels and 256 start positions; 6 of the 17 rotation entries;</li>
+<li>the <strong>count check</strong>: after every sweep the buffer is drained and the number
+  of bytes compared with what went in and out (bytes lost and bytes too many
+  are reported);</li>
+<li>four <strong>mutants</strong> (<code>mutants.c</code>): ring buffers with one deliberate defect
+  each, to show which test modes can find which kind of defect. They do not
+  decide whether a run is valid; the negative control does, as before;</li>
+<li><strong>wave 4</strong>: NuttX circbuf, Arduino RingBufferN as shipped (ArduinoCore-API
+  issue 195 says it is not interrupt-safe; reported, not counted) and
+  Arduino SafeRingBufferN. 28 libraries and variants, plus the control and
+  the mutants.</li>
+</ul>
+<p><strong>No errors in any real library in any valid run, on any board</strong>: 422 valid
+runs of 427. The errors are where they are expected: the two variants their
+own projects call unsafe (wizard97 as shipped, Arduino RingBufferN as
+shipped), on every board and in every mode, and on the Pico 2 in SMP mode the
+single-core designs whose interrupt lock does nothing against the other core
+(ETL queue_spsc_isr and queue_spsc_locked, wizard97 with PRIMASK macros,
+Arduino SafeRingBufferN).</p>
+<h2 id="per-board">Per board</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Runs</th>
+<th>Valid</th>
+<th>Invalid (control)</th>
+<th>Did not finish</th>
+<th>Too slow (time limit)</th>
+<th>Build failed</th>
+<th>Retries</th>
+<th>Power cycles</th>
+<th>Errors in real libraries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nrf5340dk</td>
+<td>30</td>
+<td>26</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<td>nucleo-g0b1re</td>
+<td>38</td>
+<td>38</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>nucleo-g474re</td>
+<td>113</td>
+<td>113</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>nucleo-h723zg</td>
+<td>62</td>
+<td>62</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>sam-d20-xpro</td>
+<td>24</td>
+<td>23</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>pico2</td>
+<td>160</td>
+<td>160</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<p>The four nRF5340 runs under 'Did not finish' were too slow, not hung (see
+below); the campaign's <code>run.sh</code> could not yet tell the two apart.</p>
+<h2 id="valid-runs-per-configuration-valid-started">Valid runs per configuration (valid / started)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>nrf5340dk</th>
+<th>nucleo-g0b1re</th>
+<th>nucleo-g474re</th>
+<th>nucleo-h723zg</th>
+<th>sam-d20-xpro</th>
+<th>pico2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>single p0 cache on flash</td>
+<td>2/2</td>
+<td>3/3</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>2/2</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>block p0 cache on flash</td>
+<td>2/2</td>
+<td>3/3</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>3/3</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>single p2 cache on flash</td>
+<td>2/2</td>
+<td>3/3</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>3/3</td>
+<td>10/10</td>
+</tr>
+<tr>
+<td>sweep cache off flash</td>
+<td>2/2</td>
+<td>3/3</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>2/2</td>
+<td>-</td>
+</tr>
+<tr>
+<td>sweep cache on flash</td>
+<td>2/2</td>
+<td>2/2</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>2/2</td>
+<td>20/20</td>
+</tr>
+<tr>
+<td>block p1 cache on flash</td>
+<td>2/2</td>
+<td>2/2</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>3/3</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>single p2 cache off flash</td>
+<td>2/2</td>
+<td>2/2</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>2/2</td>
+<td>-</td>
+</tr>
+<tr>
+<td>sweep-block cache on flash</td>
+<td>2/2</td>
+<td>2/2</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>2/2</td>
+<td>18/18</td>
+</tr>
+<tr>
+<td>single p2 cache on sram</td>
+<td>2/2</td>
+<td>2/2</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>-</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>block p0 cache on sram</td>
+<td>2/2</td>
+<td>2/2</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>-</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>sweep-block cache off flash</td>
+<td><strong>0/4</strong></td>
+<td>2/2</td>
+<td>7/7</td>
+<td>4/4</td>
+<td>1/1</td>
+<td>-</td>
+</tr>
+<tr>
+<td>block p1 cache on sram</td>
+<td>1/1</td>
+<td>2/2</td>
+<td>6/6</td>
+<td>3/3</td>
+<td>-</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>dma p0 cache on flash</td>
+<td>1/1</td>
+<td>2/2</td>
+<td>6/6</td>
+<td>3/3</td>
+<td><strong>0/1</strong></td>
+<td>9/9</td>
+</tr>
+<tr>
+<td>dma p2 cache on flash</td>
+<td>1/1</td>
+<td>2/2</td>
+<td>6/6</td>
+<td>3/3</td>
+<td>1/1</td>
+<td>9/9</td>
+</tr>
+<tr>
+<td>dma p1 cache on sram</td>
+<td>1/1</td>
+<td>2/2</td>
+<td>6/6</td>
+<td>3/3</td>
+<td>-</td>
+<td>9/9</td>
+</tr>
+<tr>
+<td>sweep-dma cache on flash</td>
+<td>1/1</td>
+<td>2/2</td>
+<td>6/6</td>
+<td>3/3</td>
+<td>1/1</td>
+<td>9/9</td>
+</tr>
+<tr>
+<td>sweep-block cache on sram</td>
+<td>1/1</td>
+<td>2/2</td>
+<td>6/6</td>
+<td>3/3</td>
+<td>-</td>
+<td>9/9</td>
+</tr>
+<tr>
+<td>dma p1 cache on flash</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>1/1</td>
+<td>-</td>
+</tr>
+<tr>
+<td>smp p0 cache on flash</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>smp-block p0 cache on flash</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>smp p2 cache on flash</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>10/10</td>
+</tr>
+<tr>
+<td>smp-block p1 cache on flash</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>5/5</td>
+</tr>
+<tr>
+<td>smp p2 cache on sram</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>4/4</td>
+</tr>
+<tr>
+<td>smp-block p0 cache on sram</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>4/4</td>
+</tr>
+<tr>
+<td>smp-block p1 cache on sram</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>4/4</td>
+</tr>
+</tbody>
+</table></div>
+<p>Bold: at least one run of that configuration was invalid or did not finish.</p>
+<h2 id="errors-per-library-valid-runs">Errors per library (valid runs)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>nrf5340dk</th>
+<th>nucleo-g0b1re</th>
+<th>nucleo-g474re</th>
+<th>nucleo-h723zg</th>
+<th>sam-d20-xpro</th>
+<th>pico2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arduino RingBufferN as shipped (C++) <em>(not claimed ISR-safe)</em></td>
+<td>46,353</td>
+<td>60,644</td>
+<td>194,811</td>
+<td>138,764</td>
+<td>40,211</td>
+<td>152,281</td>
+</tr>
+<tr>
+<td>Arduino RingBufferN as shipped (C++) [SMP, single-core design] <em>(not claimed ISR-safe)</em></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>90,294</td>
+</tr>
+<tr>
+<td>Arduino RingBufferN as shipped (C++) [sweep] <em>(not claimed ISR-safe)</em></td>
+<td>471,808</td>
+<td>1,550,967</td>
+<td>3,980,265</td>
+<td>1,715,698</td>
+<td>771,130</td>
+<td>3,534,429</td>
+</tr>
+<tr>
+<td>Arduino SafeRingBufferN (C++) [SMP, single-core design]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>81,765</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_isr (C++) [SMP, single-core design]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>102,031</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_locked (C++) [SMP, single-core design]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>90,123</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros (C++) [SMP, single-core design]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>840,538</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++) <em>(not claimed ISR-safe)</em></td>
+<td>217,944</td>
+<td>348,946</td>
+<td>580,807</td>
+<td>139,256</td>
+<td>297,213</td>
+<td>209,253</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++) [SMP, single-core design] <em>(not claimed ISR-safe)</em></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1,378,431</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++) [sweep] <em>(not claimed ISR-safe)</em></td>
+<td>474,486</td>
+<td>1,457,091</td>
+<td>2,821,526</td>
+<td>940,085</td>
+<td>812,417</td>
+<td>2,868,307</td>
+</tr>
+</tbody>
+</table></div>
+<p>Rows without a tag count as errors in real libraries, except 'single-core design' rows (SMP runs of interrupt-only designs).</p>
+<h2 id="interrupt-sweep-valid-sweep-runs">Interrupt sweep (valid sweep runs)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Runs</th>
+<th>Trials</th>
+<th>Interrupt inside the call</th>
+<th>Library functions with instructions not interrupted</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nrf5340dk</td>
+<td>8</td>
+<td>222,648,964</td>
+<td>77.6%</td>
+<td>260</td>
+</tr>
+<tr>
+<td>nucleo-g0b1re</td>
+<td>13</td>
+<td>454,578,120</td>
+<td>73.9%</td>
+<td>138</td>
+</tr>
+<tr>
+<td>nucleo-g474re</td>
+<td>40</td>
+<td>1,247,266,170</td>
+<td>72.7%</td>
+<td>304</td>
+</tr>
+<tr>
+<td>nucleo-h723zg</td>
+<td>22</td>
+<td>524,629,714</td>
+<td>73.8%</td>
+<td>349</td>
+</tr>
+<tr>
+<td>sam-d20-xpro</td>
+<td>8</td>
+<td>249,306,478</td>
+<td>75.9%</td>
+<td>125</td>
+</tr>
+<tr>
+<td>pico2</td>
+<td>56</td>
+<td>982,911,563</td>
+<td>70.0%</td>
+<td>321</td>
+</tr>
+</tbody>
+</table></div>
+<p>'Not interrupted' includes paths the sweep never executes (see README, Interrupt sweep); the per-run lists are in each record under sweep.functions.</p>
+<h2 id="mutants-which-mode-finds-which-defect">Mutants: which mode finds which defect</h2>
+<p>Valid runs in which each mutant was caught, interrupt→main / main→interrupt
+direction, all boards together.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Mutant</th>
+<th>block</th>
+<th>single</th>
+<th>smp</th>
+<th>smp-block</th>
+<th>sweep</th>
+<th>sweep-block</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>drain re-reads head</td>
+<td>81 / 0 of 84</td>
+<td>39 / 0 of 89</td>
+<td>16 / 19 of 19</td>
+<td>18 / 18 of 18</td>
+<td>55 / 0 of 55</td>
+<td>70 / 0 of 70</td>
+</tr>
+<tr>
+<td>full test misses the wrap</td>
+<td>84 / 67 of 84</td>
+<td>89 / 88 of 89</td>
+<td>19 / 19 of 19</td>
+<td>18 / 18 of 18</td>
+<td>55 / 55 of 55</td>
+<td>70 / 70 of 70</td>
+</tr>
+<tr>
+<td>shared count, no lock</td>
+<td>84 / 84 of 84</td>
+<td>89 / 89 of 89</td>
+<td>19 / 19 of 19</td>
+<td>18 / 18 of 18</td>
+<td>55 / 55 of 55</td>
+<td>70 / 70 of 70</td>
+</tr>
+<tr>
+<td>shared count, pop without lock</td>
+<td>84 / 0 of 84</td>
+<td>89 / 0 of 89</td>
+<td>19 / 19 of 19</td>
+<td>18 / 18 of 18</td>
+<td>55 / 0 of 55</td>
+<td>70 / 0 of 70</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>The sweep finds every mutant in every run</strong> in the directions where the
+  defect can show (55 of 55 and 70 of 70), where the random modes sometimes
+  miss: "drain re-reads head" is caught in 39 of 89 random single-byte runs,
+  "full test misses the wrap" in 67 of 84 random block runs in the
+  main→interrupt direction.</li>
+<li>Two mutants cannot fail in the main→interrupt direction on one core (the
+  defective call then runs in the interrupt and is not interrupted itself);
+  on two cores (Pico 2, SMP) they are caught in both directions ("drain
+  re-reads head" in 16 of 19 random single-byte SMP runs one way, in every run
+  otherwise).</li>
+</ul>
+<h2 id="runs-that-did-not-count">Runs that did not count</h2>
+<ul>
+<li><strong>nRF5340 DK, 4 runs: <code>sweep-block</code> with the cache off was too slow, not
+  hung.</strong> At 256 start positions it needs about 1.7 hours on this board;
+  <code>run.sh</code> gave up after about 1.5 hours, the campaign power-cycled the board
+  and tried once more, twice (about 6 hours of the night). Checked afterwards:
+  the same build and seeds finish with 16 start positions (0 errors, control
+  caught). <code>run.sh</code> now tells a slow run from a hung one (two reads of the
+  result block; exit 4, no power cycle, no retry). The same configuration
+  took 95 minutes on the G0B1 and 94 on the H723, close to the limit.</li>
+<li><strong>SAM D20, first campaign of the night stopped by hand</strong>: run 0 (single
+  bytes, prescaler 0, 300 000 bytes) passed the same time limit with the
+  larger library list. Restarted at 20:39 UTC with a 2-hour limit; the table
+  shows that campaign. That run took 83 minutes.</li>
+<li><strong>SAM D20, 1 run invalid</strong> (<code>dma</code>, prescaler 0): the negative control was
+  caught in one direction only (9 950 errors interrupt→main, 0 main→interrupt
+  with 298 interrupts in the measured part: the main loop was starved). 0
+  errors in the real libraries; the run is not counted.</li>
+</ul>
+<h2 id="time-per-run">Time per run</h2>
+<p><code>sweep-block</code> at 256 start positions is by far the longest entry of the
+rotation: 10 to 14 minutes on the fast boards, 38 to 88 on the slow ones
+(cache on, flash; up to 95 with the cache off), against 2 to 18 for a random block run. The slow boards
+got 23 to 38 runs in the night, the fast ones 62 to 160. Open: fewer start
+positions for <code>sweep-block</code>, on all boards alike.</p>
+<h2 id="after-the-campaign-board-check-of-the-work-since-25c64d2">After the campaign: board check of the work since <code>25c64d2</code></h2>
+<p>Short runs on all six boards at <code>76c9581</code> (20 000 bytes or 16 start
+positions; records in <code>~/lab-runs/val-20261113/</code>): the six stress modes, the
+benchmark, and the multi-producer/multi-consumer stress (MPSC and SPMC), plus
+the SMP modes on the Pico 2. All 61 runs valid, no errors in real libraries in their documented mode.
+Records name their source commit.</p>
+<ul>
+<li><strong>Rest of wave 4</strong> (first board runs): RT-Thread rt_ringbuffer with
+  interrupts off per call, Mbed CE CircularBuffer and moodycamel
+  ReaderWriterQueue: 0 errors on one core on every board. RT-Thread as
+  shipped, without a lock (no claim; reported, not counted): 76 errors.
+  With the other side on core 1, the two interrupt-lock designs fail as
+  expected (RT-Thread with interrupt lock, Mbed CE); moodycamel, which is
+  documented for two threads, has 0 errors.</li>
+<li><strong>SMP sweep, first board run: it found nothing it should have found.</strong>
+  Single-byte <code>sweep-smp</code> reported 0 errors for wizard97 as shipped, Arduino
+  RingBufferN as shipped and three of the four mutants. Cause: core 1 has to
+  notice the start flag first, so its call always came after the first
+  instructions of core 0's call, and it moved in steps of its polling loop.
+  Fixed (a fixed lead on core 0, delay steps of about one cycle on core 1):
+  every mutant, every single-core design and both unsafe variants are now
+  caught in both directions in <code>sweep-smp</code> and <code>sweep-smp-block</code>; the
+  multicore-documented libraries stay at 0 errors. This is what the mutants
+  are for: the run was "valid" by the negative control alone.</li>
+</ul>
+<h2 id="how-many-start-positions-16-to-256-nucleo-g474re-sweep-block">How many start positions: 16 to 256 (NUCLEO-G474RE, <code>sweep-block</code>)</h2>
+<p>Question: the sweep runs with 256 start positions take up to 1.7 h on the
+slowest board; would fewer do? Measured on one board at <code>4e8e856</code>: 16, 32,
+64, 128 and 256 start positions, three seed pairs each, cache on, code in
+flash, <code>-O2</code> (15 runs, all valid, 0 errors in the real libraries; records in
+<code>~/lab-runs/reps-20261113/nucleo-g474re</code>).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Start positions</th>
+<th>Time per run</th>
+<th>Mutants, wizard97 as shipped, Arduino RingBufferN as shipped</th>
+<th>RT-Thread rt_ringbuffer, no lock: errors isr→main in the three runs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>16</td>
+<td>2.4 min</td>
+<td>caught in 3 of 3</td>
+<td>3 / 3 / 6</td>
+</tr>
+<tr>
+<td>32</td>
+<td>2.4 min</td>
+<td>caught in 3 of 3</td>
+<td>0 / 0 / 0</td>
+</tr>
+<tr>
+<td>64</td>
+<td>3.1 min</td>
+<td>caught in 3 of 3</td>
+<td>6 / 0 / 0</td>
+</tr>
+<tr>
+<td>128</td>
+<td>5.9 min</td>
+<td>caught in 3 of 3</td>
+<td>39 / 42 / 63</td>
+</tr>
+<tr>
+<td>256</td>
+<td>11.2 min</td>
+<td>caught in 3 of 3</td>
+<td>84 / 75 / 78</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>The mutants and the two unsafe variants do not distinguish the settings:
+  their error counts grow linearly with the number of start positions, and
+  the weakest ("full test misses the wrap") still has 85 to 101 errors per
+  direction at 16. "Pop without lock" and "drain re-reads head" are caught
+  isr→main only at every setting, as in the campaign.</li>
+<li>The rarest real finding does: RT-Thread without a lock, isr→main, is
+  missed in all three runs at 32 and in two of three at 64, and found in
+  every run from 128 up. main→isr was found in all 15 runs (2 to 4 errors at
+  16, 42 to 82 at 256). From 64 to 128 the isr→main count grows far more
+  than twofold; why has not been examined.</li>
+<li>The times at 16 and 32 are bounded below by <code>run.sh</code>'s fixed first wait of
+  120 s.</li>
+</ul>
+<p>Decision (owner, 2026-11-13): 256 start positions stay, the same on every
+board; the default time limit of <code>run.sh</code> goes from 300 to 600 polls (at
+least 2.5 h), so the slowest configuration (about 1.7 h) fits.</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

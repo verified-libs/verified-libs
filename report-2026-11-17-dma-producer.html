@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DMA as a real producer: first results on the G474 and H723 (2026-11-17) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="dma-as-a-real-producer-first-results-on-the-g474-and-h723-2026-11-17">DMA as a real producer: first results on the G474 and H723 (2026-11-17)</h1>
+<p>Plan item 2b (<code>lab/plans/2026-11-16-mp-bundle-and-open-areas.md</code>). New test
+firmware <code>firmware/rb-dma-stress</code>: DMA1 channel 1 of the STM32G474, paced by
+TIM6 update requests through DMAMUX (one byte per timer period, random
+period), copies the sequence into the area a library hands out with its
+zero-copy API (<code>dma_wr_acquire</code>); the transfer-complete interrupt commits it
+and starts the next. The main loop consumes with <code>dma_rd_acquire/release</code>
+and checks every byte. A transfer is in flight for many main-loop turns.
+Negative control: lwrb with the commit moved to before the DMA writes.
+One library per reset over the serial port; firmware commit d31886dc8357.</p>
+<h2 id="result">Result</h2>
+<p>NUCLEO-G474RE, 170 MHz, code in flash, 300000 bytes per library:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Prescaler 0: errors / lost+extra</th>
+<th>full events</th>
+<th>Prescaler 2: errors / lost+extra</th>
+<th>full events</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState ⚠</td>
+<td>0 / 0</td>
+<td>6510</td>
+<td>0 / 0</td>
+<td>60</td>
+</tr>
+<tr>
+<td>lwrb</td>
+<td>0 / 0</td>
+<td>10528</td>
+<td>0 / 0</td>
+<td>118</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf</td>
+<td>0 / 0</td>
+<td>15170</td>
+<td>0 / 0</td>
+<td>88</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo</td>
+<td>0 / 0</td>
+<td>11571</td>
+<td>0 / 0</td>
+<td>78</td>
+</tr>
+<tr>
+<td>ECE ring_buffer</td>
+<td>0 / 0</td>
+<td>5671</td>
+<td>0 / 0</td>
+<td>10</td>
+</tr>
+<tr>
+<td>NuttX circbuf</td>
+<td>0 / 0</td>
+<td>17839</td>
+<td>0 / 0</td>
+<td>188</td>
+</tr>
+<tr>
+<td>bbqueue (Rust)</td>
+<td>0 / 0</td>
+<td>18851</td>
+<td>0 / 0</td>
+<td>362</td>
+</tr>
+<tr>
+<td><strong>control</strong> (lwrb, commit before the DMA writes)</td>
+<td><strong>27764</strong> / 0</td>
+<td>5039</td>
+<td><strong>44182</strong> / 0</td>
+<td>99</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Every library: 0 sequence errors, 0 lost or extra bytes; the control is
+  caught in both runs.</li>
+<li>The window was exercised: in every library the consumer read 43000 to
+  50000 times while a transfer was in flight (36500 transfers per run).</li>
+<li>The buffer ran full in every library (acquire gave no area) - thousands
+  of times at the fastest DMA rate, tens to hundreds at prescaler 2. A first
+  run with shorter consumer pauses hardly filled it (0-5 times); the pauses
+  were lengthened before these runs.</li>
+<li>⚠ pxq is the project owner's library (principle 6).</li>
+</ul>
+<h2 id="h723-cortex-m7-with-d-cache">H723 (Cortex-M7 with D-cache)</h2>
+<p>DMA1 stream 0 + DMAMUX1 (TIM6_UP), 64 MHz. DMA1 cannot reach the DTCM, so
+the libraries' data is linked into AXI SRAM (<code>stm32h723_dma.ld</code>), every
+variable on its own 32-byte cache lines; the test's own state stays in
+DTCM. Firmware commit 7a61311 (DMA_CACHE runs), d83e3c3 (300000-byte runs).</p>
+<p><strong>DMA area not cacheable</strong> (MPU, the usual way; <code>DMA_CACHE=0</code>): the same
+result as on the G474. 300000 bytes per library at prescaler 0 and 2, and
+100000 at prescaler 1: every library 0 errors, 0 lost or extra bytes; the
+control caught (28683, 42412, 13785 errors); reads during transfers in every
+library; the buffer full thousands of times at prescaler 0.</p>
+<p><strong>DMA area cacheable, with the maintenance an application does through the
+zero-copy API</strong> (<code>DMA_CACHE=2</code>: clean + invalidate the acquired area's
+lines before the transfer, invalidate them after it, before the commit),
+100000 bytes, prescaler 1:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Errors</th>
+<th>Lost + extra</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lwrb, Zephyr ring_buf, TinyUSB tu_fifo, ECE ring_buffer, NuttX circbuf</td>
+<td>0</td>
+<td>0</td>
+<td>data area and state are separate objects: each on its own lines</td>
+</tr>
+<tr>
+<td>pxq RingBuffer_PackedState ⚠</td>
+<td>1404</td>
+<td>26142</td>
+<td>head/tail at offset 0 of the object, the data from offset 4</td>
+</tr>
+<tr>
+<td>bbqueue (Rust)</td>
+<td>5</td>
+<td>56, then stalled</td>
+<td>its coordinates before the storage in one struct (0x94 bytes)</td>
+</tr>
+<tr>
+<td>control</td>
+<td>13988</td>
+<td>0</td>
+<td>caught</td>
+</tr>
+</tbody>
+</table></div>
+<p>Why: the maintenance works on whole 32-byte lines. pxq and bbqueue keep
+their indices in the same object as the data, in the first cache line of
+it; a transfer into the first bytes of the data makes that line part of
+the DMA area, and invalidating it after the transfer drops the core's
+latest write of the indices. This is a property of their layout, not a
+defect in their code: neither promises a layout for cached DMA, and with
+the DMA area not cacheable both are error-free. For a user it means: on a
+core with a data cache, give pxq's or bbqueue's storage to a DMA only in
+non-cacheable memory; the other five can also be used with cache
+maintenance if their data array is line-aligned (as here). An earlier run
+of this variant (2f44bcd) had the test's own state in the libraries' first
+cache line and showed errors in Zephyr too; it is superseded.</p>
+<p>Without any maintenance (<code>DMA_CACHE=1</code>) every library fails, as expected:
+that run only shows that something is needed.</p>
+<h3 id="repeated-with-three-seed-pairs-and-the-queues-state-at-the-stall-2026-11-18">Repeated with three seed pairs, and the queue's state at the stall (2026-11-18)</h3>
+<p>The same variant (<code>DMA_CACHE=2</code>, 100000 bytes, prescaler 1) with three
+pairs of seeds, firmware fce74bc built with <code>DMA_SNAP=0x24000000</code>: when a
+run stalls, the firmware keeps the first 32 bytes of bbqueue's static as
+the core sees them, through the cache (a read over the debug port shows
+the memory, not the cache). The image without <code>DMA_SNAP</code> is byte-identical
+to the one of 7a61311 (all eight image hashes equal).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Seeds (main, DMA)</th>
+<th>Five C libraries</th>
+<th>pxq ⚠ errors</th>
+<th>bbqueue</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x12345678, 0xCAFEBABE</td>
+<td>0 errors</td>
+<td>1439</td>
+<td>stalled after 33 transfers, 138 bytes (1 error)</td>
+<td>13826, caught</td>
+</tr>
+<tr>
+<td>0x9E3779B9, 0x7F4A7C15</td>
+<td>0 errors</td>
+<td>1437</td>
+<td>stalled after 83 transfers, 591 bytes (10 errors)</td>
+<td>13869, caught</td>
+</tr>
+<tr>
+<td>0x2545F491, 0x6C078965</td>
+<td>0 errors</td>
+<td>1384</td>
+<td>stalled after 65 transfers, 433 bytes (7 errors)</td>
+<td>13748, caught</td>
+</tr>
+</tbody>
+</table></div>
+<p>bbqueue run again alone from a reset with each seed pair: the same
+numbers. With the run of 2026-11-17 (50 transfers, 312 bytes) that is four
+of four: in this variant bbqueue always stops within the first few
+hundred bytes.</p>
+<p>The coordinates at the stall, as the core saw them (<code>AtomicCoord</code>: write,
+read, last, reserve, read_in_progress, write_in_progress):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Seeds</th>
+<th>write</th>
+<th>read</th>
+<th>last</th>
+<th>reserve</th>
+<th>read_in_progress</th>
+<th>write_in_progress</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x12345678, 0xCAFEBABE</td>
+<td>116</td>
+<td>117</td>
+<td>127</td>
+<td>116</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>0x9E3779B9, 0x7F4A7C15</td>
+<td>114</td>
+<td>115</td>
+<td>127</td>
+<td>114</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>0x2545F491, 0x6C078965</td>
+<td>111</td>
+<td>112</td>
+<td>127</td>
+<td>111</td>
+<td>true</td>
+<td>false</td>
+</tr>
+</tbody>
+</table></div>
+<p>The snapshot is taken in the main loop between two of its calls, where it
+holds no read grant. So <code>read_in_progress</code> is left true: every later
+<code>read()</code> is refused (the adapter reports that as "nothing to read"), the
+consumer takes nothing more, and with write one behind read the queue is
+full, so the producer gets no grant either. That is the reading above,
+now seen in the queue's state: a release by the main loop (which clears
+the flag) was dropped when the line was invalidated, after the flag had
+been written to memory as true at a transfer's start. The memory read over
+the debug port held the same bytes as the core's view in all three.</p>
+<p>The first wrong byte was the same kind in every run, here and on
+2026-11-17, and in pxq too: a 0 where byte N was expected (N = 11, 2, 1
+for the three seed pairs), which is what a consumer gets when its release
+of the first N bytes is dropped and it reads from the start again.</p>
+<p>Records: <code>~/lab-runs/dma-h723-20261118/</code> (six records and <code>run.log</code> with
+the snapshots). One flash write on the H723 (the snapshot bundle).</p>
+<h2 id="not-covered-yet">Not covered yet</h2>
+<ul>
+<li>The other boards' DMA layers.</li>
+<li>Longer campaigns, code in SRAM, other compilers.</li>
+<li>The test does not end on a library's documented limit cases (e.g. a
+  zero-length acquire); it covers the DMA as writer, not every API path.</li>
+</ul>
+<p>Records: <code>~/lab-runs/dma-g474-20261117/</code> (lib-lab1).</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

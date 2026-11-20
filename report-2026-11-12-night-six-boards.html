@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night campaign on six boards (2026-11-11/12) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="night-campaign-on-six-boards-2026-11-1112">Night campaign on six boards (2026-11-11/12)</h1>
+<p>The first stress campaign on all six boards at once (<code>lab/tools/night-all.sh</code>,
+each board with its own copy of the repo at commit <code>37592d5</code>). The campaign
+ran from 23:13 to about 07:15 UTC. Each run rotates the mode (single bytes,
+blocks, DMA, and on the Pico 2 the SMP modes with the other side on core 1),
+the timer prescaler, cache, code location and build flags (<code>-O2</code>, <code>-Os</code>,
+<code>-O3</code>, <code>-O2</code> + LTO, <code>-O2</code> + clang). The libraries are the 20 from before wave 3;
+the wave-3 libraries (Zephyr ring_buf, lockfree, ETL locked, FreeRTOS stream
+buffer) came after this commit. Records are in
+<code>~/lab-runs/overnight-20261111T2313*-&lt;board&gt;/</code> on lib-lab1.</p>
+<p><strong>No errors in any real library in any valid run, on any board.</strong> The only
+errors are where they are expected: wizard97 as shipped (not ISR-safe by its
+own documentation) on every board, and on the Pico 2 in SMP mode the
+single-core designs (ETL queue_spsc_isr, wizard97 with and without PRIMASK
+macros), whose interrupt locks do nothing against the other core. Every
+multicore-documented library had 0 errors in its 59 valid SMP runs.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Runs</th>
+<th>Valid</th>
+<th>Did not finish</th>
+<th>Invalid (control not caught)</th>
+<th>Bytes moved, real libraries</th>
+<th>Interrupts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK (M33, 64 MHz)</td>
+<td>53</td>
+<td>52</td>
+<td>1</td>
+<td>0</td>
+<td>407 M</td>
+<td>1.90 G</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE (M0+, 64 MHz)</td>
+<td>97</td>
+<td>68</td>
+<td>24</td>
+<td>5</td>
+<td>538 M</td>
+<td>1.79 G</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE (M4, 170 MHz)</td>
+<td>144</td>
+<td>134</td>
+<td>0</td>
+<td>10</td>
+<td>1 070 M</td>
+<td>2.99 G</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG (M7, 64 MHz)</td>
+<td>94</td>
+<td>78</td>
+<td>1</td>
+<td>15</td>
+<td>638 M</td>
+<td>1.32 G</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro (M0+, 48 MHz)</td>
+<td>61</td>
+<td>42</td>
+<td>15</td>
+<td>4</td>
+<td>341 M</td>
+<td>1.71 G</td>
+</tr>
+<tr>
+<td>Pico 2 (RP2350 M33, 150 MHz; incl. 59 SMP runs)</td>
+<td>146</td>
+<td>128</td>
+<td>0</td>
+<td>18</td>
+<td>1 022 M</td>
+<td>2.84 G</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="runs-that-did-not-finish">Runs that did not finish</h2>
+<ul>
+<li><strong>G0B1 (24) and SAM D20 (15): every <code>-O2</code> + clang run failed to build.</strong>
+  clang treats atomics on ARMv6-M as not lock-free and turns each atomic load
+  and store into a call to <code>__atomic_load_4</code> / <code>__atomic_store_4</code>, which the
+  toolchain does not ship for Cortex-M (gcc inlines the same operations).
+  Fixed in <code>98e307b</code>: <code>firmware/common/armv6m_atomic.c</code>, built with gcc,
+  implements those calls with gcc's own inline atomics of the same order
+  (LDR/STR plus DMB), linked only for clang on Cortex-M0+. Read-modify-write
+  calls stay undefined, so a library that needs one still fails to link (there
+  is no LDREX/STREX on ARMv6-M). The smoke test before the campaign had no
+  clang run on an M0+ board, which is why this showed up only now.</li>
+<li>The SAM D20 records of this campaign describe the clock as "DFLL48M open
+  loop"; that text in <code>run.sh</code> was stale. The firmware ran closed loop on
+  XOSC32K (48.005 MHz), as it has since the 48 MHz switch. Text fixed.</li>
+<li>nRF5340 and H723: one run each did not finish; the retry after a power cycle
+  was valid.</li>
+</ul>
+<h2 id="runs-where-the-control-was-not-caught">Runs where the control was not caught</h2>
+<p>A run counts only if the negative control (a ring with a deliberate ordering
+bug) shows errors. The invalid runs cluster in two configurations:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>nRF5340</th>
+<th>G0B1</th>
+<th>G474</th>
+<th>H723</th>
+<th>SAM D20</th>
+<th>Pico 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>single bytes, prescaler 4</td>
+<td>0/7</td>
+<td>5/13</td>
+<td>10/19</td>
+<td>10/12</td>
+<td>3/8</td>
+<td>10/10</td>
+</tr>
+<tr>
+<td>blocks, prescaler 2</td>
+<td>0/7</td>
+<td>0/13</td>
+<td>0/20</td>
+<td>5/12</td>
+<td>0/8</td>
+<td>8/10</td>
+</tr>
+</tbody>
+</table></div>
+<p>At prescaler 4 the interrupt period is 2 560-10 688 cycles. Each interrupt
+moves one byte, and the main loop keeps up easily (interrupts = transfers in
+these runs), so the control's window, a few cycles long, is rarely hit in
+100 000 transfers. On the slower cores (nRF5340 with its flash path, the
+M0+ boards) it is hit more often. The libraries are not at fault, and the
+runs are correctly excluded. But these configurations add almost no valid
+data on the Pico 2 and the H723. Options, for a decision:
+1. more transfers for these configurations on fast cores (the run gets
+   longer: at prescaler 4 on the Pico 2, about 4x for 400 000);
+2. drop them from the rotation on boards where they are mostly invalid;
+3. keep them as they are, as a record that slow interrupt rates stress less.</p>
+<h2 id="model-checking-done-the-same-night">Model checking done the same night</h2>
+<ul>
+<li>GenMC: DNedic lockfree 3.0.1 <code>mpmc::Queue</code> (2 producers + 1 consumer, and
+  1 + 2, at capacity 4) passes; release and acquire mutants fail; full and
+  empty reached. The full suite has 130 checks, all as expected (<code>496aa36</code>).</li>
+<li>Zephyr ring_buf (CONFIG_SMP code) and lockfree spsc::RingBuf, including their
+  block and zero-copy APIs, pass with mutants failing (<code>8892384</code>).</li>
+</ul>
+<h2 id="next">Next</h2>
+<ul>
+<li>Board runs of the wave-3 libraries (bench, stress, MP), and RP2350 SMP MP.</li>
+<li>A clang check on the M0+ boards with the fix (a few runs, before the next
+  campaign).</li>
+</ul></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

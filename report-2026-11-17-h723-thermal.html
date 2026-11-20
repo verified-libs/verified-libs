@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NUCLEO-H723ZG at 520 MHz: die temperature under full load (2026-11-16/17) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="nucleo-h723zg-at-520-mhz-die-temperature-under-full-load-2026-11-1617">NUCLEO-H723ZG at 520 MHz: die temperature under full load (2026-11-16/17)</h1>
+<p>The owner asked how warm the board gets in its closed cabinet at 520 MHz
+(the fast-clock option, <code>common/stm32h723/board.h</code>, BOARD_CLOCK_FAST).
+<code>firmware/h7-thermal</code> logs the die temperature from the chip's digital
+temperature sensor (factory calibration T0 30 C, FMT0 711.0 kHz, ramp
+2035 Hz/C) while the core runs FPU and integer work on DTCM data at 520 MHz,
+then cools at 64 MHz. Stop at 85 C (never reached); VOS0 allows a junction
+temperature of 105 C (DS13313 Rev 5).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Idle 64 MHz</th>
+<th>Load 520 MHz</th>
+<th>Peak</th>
+<th>End of load</th>
+<th>Cooled to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>short (1/10/5 min, 1 s samples)</td>
+<td>31 C</td>
+<td>10 min</td>
+<td>50.0 C</td>
+<td>49.7 C</td>
+<td>34.2 C after 5 min</td>
+</tr>
+<tr>
+<td>long (5/60/45 min, 2 s samples)</td>
+<td>32.2 C</td>
+<td>60 min</td>
+<td>52.3 C</td>
+<td>51.5 C</td>
+<td>31.1 C after 45 min</td>
+</tr>
+</tbody>
+</table></div>
+<p>Long run during the load: +1 min 44.1 C, +5 min 48.0, +10 min 49.7, +20 min
+51.2, +30 min 51.2, +40 min 51.5, +60 min 51.7.</p>
+<p><strong>Time constants</strong> (sum of three exponentials fitted to the long run, rms
+0.18-0.19 C, about the sensor's step; grid fit, so the values are rough):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>Load</th>
+<th>Cooling</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>step at the switch</td>
+<td>&lt; 2 s</td>
+<td>&lt; 2 s</td>
+<td>the die (faster than the samples)</td>
+</tr>
+<tr>
+<td>fast</td>
+<td>6 s, +5.4 C</td>
+<td>8 s, -4.9 C</td>
+<td>die and package</td>
+</tr>
+<tr>
+<td>middle</td>
+<td>300 s, +6.9 C</td>
+<td>300 s, -6.2 C</td>
+<td>the board's copper</td>
+</tr>
+<tr>
+<td>slow</td>
+<td>~900 s, +1.5 C</td>
+<td>~900 s, -2.3 C</td>
+<td>board as a whole, cabinet air</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>The rise levels off: after 20 minutes it adds about 0.5 C in the next 40.
+  The cabinet does not keep warming the chip in a way these 60 minutes show.</li>
+<li>After 45 minutes of cooling the die is at 31.1 C, below the 32.2 C it
+  started at (which still had the short run's heat in it): nothing builds up.</li>
+<li>Total rise about 20 C for about 0.45 W (DS13313 table 20: ~135 mA at
+  3.3 V) is about 44 C/W; the datasheet gives 44.8 C/W for LQFP144.</li>
+<li>The benchmark at 520 MHz runs for about a minute and then returns to
+  64 MHz (board_idle), so in use the die sees the fast step, not the
+  50 C plateau.</li>
+</ul>
+<p>Records: <code>~/lab-runs/stm32h723-thermal-20261116T210635Z.json</code> (short),
+<code>~/lab-runs/stm32h723-thermal-20261116T213319Z.json</code> (long).</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

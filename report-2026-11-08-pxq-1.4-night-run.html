@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night run 2026-11-08: pxq 1.3.2 → 1.4.0 → 1.4.1, stress, MPSC/SPMC - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="night-run-2026-11-08-pxq-132-140-141-stress-mpscspmc">Night run 2026-11-08: pxq 1.3.2 → 1.4.0 → 1.4.1, stress, MPSC/SPMC</h1>
+<p>nRF5340 DK application core (Cortex-M33, 64 MHz), arm-none-eabi-gcc 14.2.1
+with newlib-nano 4.6.0 (Ubuntu package), <a href="https://github.com/verified-libs/verified-libs/blob/main/toolchain/README.md">pinned toolchain image</a>.
+<strong>This is harness development with the owner's library as the test object:
+not a comparison and not a recommendation.</strong> ⚠ pxq RingBuffer_PackedState
+is the project owner's library (principle 6), so its numbers count only
+after an independent repetition.
+<em>(Note of 2026-11-17: that last rule was a misunderstanding. Outside
+repetition is a long-term goal for every library, not a condition for pxq;
+see DECISIONS.md, 2026-11-17.)</em></p>
+<p>The JSON records stay on lib-lab1:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Directory under <code>~/lab-runs/</code></th>
+<th>pxq commit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v1.3.2 baseline (bench, 2026-11-07 21:22–21:27 UTC)</td>
+<td><code>nrf5340-rb-bench-*-20261107T21*.json</code></td>
+<td><code>312c421a</code> (1.3.2)</td>
+</tr>
+<tr>
+<td>Night run (bench, stress, MPSC/SPMC, size, then a 3 h campaign; 08:04–12:53 UTC)</td>
+<td><code>night-20261108T080415Z/</code>, bench records <code>nrf5340-rb-bench-*-20261108T08*.json</code>, campaign <code>overnight-20261108T094140Z/</code></td>
+<td><code>cf545773</code> (1.4.0, pinned in <code>libs.lock</code>)</td>
+</tr>
+<tr>
+<td>pxq branch <code>fix/word-copy</code> (12:54–13:40 UTC)</td>
+<td><code>pxq141-20261108T105126Z/</code></td>
+<td><code>01f54417</code> (1.4.1, not released)</td>
+</tr>
+<tr>
+<td>rb-size, v1.3.2 re-measured (container only)</td>
+<td><code>size-pxq132-20261108/</code></td>
+<td><code>312c421a</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>1.4.1 was built from a separate tree. The repo's <code>libs.lock</code> stays at 1.4.0
+until 1.4.1 is released.</p>
+<h2 id="result">Result</h2>
+<ul>
+<li><strong>Correctness: 0 errors in every real library, in every valid run.</strong></li>
+<li>pxq 1.4.0 passed: stress single, block and dma (code in flash and SRAM),
+    stress at -Os, and the 3 h campaign (22 of 22 runs valid).</li>
+<li>pxq 1.4.1 passed: stress single, block, dma and block at -Os.</li>
+<li>pxq <code>Topology::MPSC</code>, <code>SPMC</code> and <code>MPMC</code> (1.4.0 and 1.4.1) had 0 errors
+    in 1 million values per run, with two interrupt priorities as two
+    producers or two consumers.</li>
+<li>The negative control was caught in every run.</li>
+<li><strong>Speed: 1.4.0 traded block copies for a faster single pop. 1.4.1 has both.</strong></li>
+<li>1.4.0: single-byte pop 31 → 20 cycles, but 64-byte blocks became 2.2×
+    slower from flash and 3× slower from SRAM.</li>
+<li>1.4.1: keeps the single-byte pop and is the fastest of the three
+    versions at 16 and 64 bytes.</li>
+<li>At 4 bytes 1.4.1 sits between the two, about 13 cycles slower than 1.4.0.</li>
+<li><strong>Flash:</strong> 1.4.0 is the smallest version. 1.4.1 links newlib's <code>memcpy</code>
+  again, as 1.3.2 did:</li>
+<li>236 B of the difference is that <code>memcpy</code>. Any program that already
+    uses <code>memcpy</code> pays it anyway.</li>
+<li>The other +94 B is the copy logic in <code>push_n</code>/<code>pop_n</code>.</li>
+</ul>
+<h2 id="pxq-three-versions-side-by-side">pxq: three versions side by side</h2>
+<p>The same harness, toolchain image and board were used for all three. Values
+are mean cycles per call, push / pop, with the cache on. The other libraries
+in the same records moved by at most 5 cycles out of 5 635 (0.1 %) between
+the runs, so they serve as a control.</p>
+<p><strong>Code in flash, -O2:</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>1.3.2 (<code>memcpy</code>)</th>
+<th>1.4.0 (element loop)</th>
+<th>1.4.1 (loop ≤ 8 B, else <code>memcpy</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 byte</td>
+<td>17 / 31</td>
+<td>17 / 20</td>
+<td>17 / 20</td>
+</tr>
+<tr>
+<td>4-byte block</td>
+<td>131 / 131</td>
+<td>106 / 103</td>
+<td>119 / 119</td>
+</tr>
+<tr>
+<td>16-byte block</td>
+<td>152 / 149</td>
+<td>178 / 163</td>
+<td>141 / 139</td>
+</tr>
+<tr>
+<td>64-byte block</td>
+<td>207 / 192</td>
+<td>466 / 403</td>
+<td>198 / 185</td>
+</tr>
+<tr>
+<td>zero-copy, 64 B (acquire + commit)</td>
+<td>176 / 173</td>
+<td>176 / 173</td>
+<td>176 / 173</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Code in SRAM, -O2, 64-byte block:</strong> 362 / 353 (1.3.2), 1006 / 1194 (1.4.0),
+346 / 336 (1.4.1).</p>
+<p><strong>Other flags (flash, 64-byte block):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Flags</th>
+<th>1.3.2</th>
+<th>1.4.0</th>
+<th>1.4.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-Os</td>
+<td>207 / 193</td>
+<td>528 / 588</td>
+<td>194 / 180</td>
+</tr>
+<tr>
+<td>-O3</td>
+<td>216 / 195</td>
+<td>466 / 404</td>
+<td>204 / 194</td>
+</tr>
+<tr>
+<td>-O2 + LTO</td>
+<td>191 / 174</td>
+<td>452 / 390</td>
+<td>184 / 168</td>
+</tr>
+</tbody>
+</table></div>
+<p>At -Os in SRAM, 1.4.0 needs 1568 / 1184 cycles for 64 bytes and 1.4.1
+needs 330 / 323. There is no 1.3.2 record for -Os in SRAM: that run stalled
+at the 30 s wait, which is fixed since <code>dffbdc9</code>.</p>
+<h3 id="why-which-memcpy-gets-linked">Why: which <code>memcpy</code> gets linked</h3>
+<p>pxq 1.4.0 (commit <code>093e81e</code>) replaced <code>memcpy</code> in <code>push_n</code>/<code>pop_n</code> with
+element loops. The commit says "newlib-nano memcpy is a byte loop too",
+measured on an STM32G071 (Cortex-M0+). Whether that holds depends on how the
+C library was built. The core does not decide it:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Toolchain</th>
+<th><code>memcpy</code> in libc / libc_nano</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ubuntu <code>libnewlib-arm-none-eabi</code> 4.6.0 (ours), Cortex-M33 multilib</td>
+<td>236 B, copies words</td>
+<td>disassembled here</td>
+</tr>
+<tr>
+<td>Ubuntu newlib 4.6.0, Cortex-M0+ multilib</td>
+<td>168 B (not disassembled)</td>
+<td><code>nm</code> here</td>
+</tr>
+<tr>
+<td>STM32CubeIDE 1.13.2, GNU Tools for STM32 11.3, newlib 4.2.0</td>
+<td><code>memcpy-stub</code>, a byte loop: 18 B (M0+), 28 B (M4/M7), 26 B (M33)</td>
+<td>checked by the owner, not repeated here</td>
+</tr>
+</tbody>
+</table></div>
+<p>With our toolchain, the M33 <code>memcpy</code> handles 8 bytes or more like this: if
+the source or the destination is word-aligned, it goes straight to a word
+loop and lets the other side be unaligned. The M33 handles unaligned word
+access in hardware, which an M0+ could not do. If neither side is aligned,
+it first copies 1–3 bytes to align the destination. Below 8 bytes it is a
+byte loop. That is why the inline loop of 1.4.0 wins at 4 bytes but loses
+from 16 bytes up, and why 1.4.1's threshold of 8 bytes fits this library.
+With ST's toolchain, <code>memcpy</code> is a byte loop at every size. There, 1.4.0's
+inline loop is expected to be at least as fast as 1.3.2 at every size, but
+that has not been measured.</p>
+<p><strong>How the benchmark lays out the copies:</strong> the block scenarios start one slot
+into the ring (<code>scen_block</code> pushes and pops one byte first). The ring side
+of every copy is therefore at address ≡ 1 mod 4, and the user buffer is
+word-aligned. Every second 64-byte transfer is split at the wrap (63 + 1
+bytes). <code>memcpy</code> was measured in this less favourable case. With both sides
+aligned it would avoid unaligned accesses, but that is not measured.</p>
+<h3 id="flash-and-ram-rb-size-bytes-added-to-the-baseline-image">Flash and RAM (rb-size, bytes added to the baseline image)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>pxq</th>
+<th>-Os: 1 buffer</th>
+<th>-Os: 3 × 128</th>
+<th>-Os: 64 + 128 + 256</th>
+<th>-O2: 1 buffer</th>
+<th>-O2: 64 + 128 + 256</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.3.2</td>
+<td>936</td>
+<td>1528</td>
+<td>2092</td>
+<td>960</td>
+<td>2156</td>
+</tr>
+<tr>
+<td>1.4.0</td>
+<td>700</td>
+<td>1260</td>
+<td>1852</td>
+<td>712</td>
+<td>1884</td>
+</tr>
+<tr>
+<td>1.4.1</td>
+<td>1032</td>
+<td>1592</td>
+<td>2376</td>
+<td>1052</td>
+<td>2432</td>
+</tr>
+</tbody>
+</table></div>
+<p>RAM is the same for all three versions: 148 B for one buffer of 128.</p>
+<p>Symbol sizes in a one-buffer image at -Os, 1.4.0 → 1.4.1:
+- <code>push_n</code> 84 → 130 B
+- <code>pop_n</code> 82 → 130 B
+- <code>memcpy</code> 0 → 236 B (newlib's, shared by the whole program)</p>
+<p>Each further capacity (another template instantiation) adds the copy logic
+again, about 95 B. The number pxq repeats is the per-instantiation part,
+which the earlier reminder about a non-template core already covers.</p>
+<h2 id="correctness-runs">Correctness runs</h2>
+<p><strong>Stress, interrupt ↔ main loop on one core.</strong> Steps C to E of the night
+run, and the same steps for 1.4.1:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>pxq version</th>
+<th>Mode</th>
+<th>Errors (pxq)</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C single, prescaler 0, flash</td>
+<td>1.4.0 / 1.4.1</td>
+<td>single bytes</td>
+<td>0 / 0</td>
+<td>caught</td>
+</tr>
+<tr>
+<td>C block, prescaler 0, flash</td>
+<td>1.4.0 / 1.4.1</td>
+<td><code>push_n</code>/<code>pop_n</code> 1–16 B</td>
+<td>0 / 0</td>
+<td>caught</td>
+</tr>
+<tr>
+<td>D dma, prescaler 0, flash</td>
+<td>1.4.0 / 1.4.1</td>
+<td>zero-copy</td>
+<td>0 / 0</td>
+<td>caught</td>
+</tr>
+<tr>
+<td>D dma, prescaler 1, SRAM</td>
+<td>1.4.0</td>
+<td>zero-copy</td>
+<td>0</td>
+<td>caught</td>
+</tr>
+<tr>
+<td>E single and block at -Os</td>
+<td>1.4.0 / 1.4.1 (block only)</td>
+<td></td>
+<td>0 / 0</td>
+<td>caught</td>
+</tr>
+</tbody>
+</table></div>
+<p>All other libraries in these runs also had 0 errors.</p>
+<p><strong>Campaign</strong> (<code>overnight.sh</code> for 3 h, 09:41–12:53 UTC, pxq 1.4.0):
+- 22 runs, all 22 valid: none unfinished, no retries, no power cycles.
+- The modes were single, block and dma, at prescalers 0, 1, 2 and 4, with
+  the cache on and off and code in flash and SRAM.
+- The rotation change after the 2026-11-07 campaign worked. That campaign
+  had 5 invalid and 3 unfinished runs out of 32; this one had none.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Valid runs</th>
+<th>Bytes</th>
+<th>Interrupts</th>
+<th>Errors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState 1.4.0 ⚠</td>
+<td>22</td>
+<td>10 200 097</td>
+<td>41 864 790</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>lwrb, ece-mohammad (also in the dma runs)</td>
+<td>22</td>
+<td>10.2 million each</td>
+<td>48–70 million</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>the 15 other real configurations</td>
+<td>19</td>
+<td>8.6 million each</td>
+<td>37–54 million</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>wizard97 as shipped (not ISR-safe by its own docs)</td>
+<td>19</td>
+<td>8.6 million</td>
+<td>37 million</td>
+<td>164 383</td>
+</tr>
+</tbody>
+</table></div>
+<p>Every library reached full and empty in both directions in most runs. The
+weakest was micoring, which reached full in main → ISR in 11 of 19 runs.</p>
+<p><strong>MPSC and SPMC on one core</strong> (<a href="https://github.com/verified-libs/verified-libs/blob/main/firmware/rb-mp-stress"><code>rb-mp-stress</code></a>).
+Interrupts A and B have different priorities, so B can preempt A, and both
+preempt the main loop. Each run moves 1 million values:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Run (prescaler 1, valid)</th>
+<th>pxq MPSC / SPMC</th>
+<th>pxq MPMC</th>
+<th>RIOT tsrb</th>
+<th>wizard97 + PRIMASK</th>
+<th>control: jnk0le SPSC used with 2 producers / 2 consumers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MPSC, pxq 1.4.0</td>
+<td>0 errors</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>6 236 errors (caught)</td>
+</tr>
+<tr>
+<td>SPMC, pxq 1.4.0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>6 065 lost or duplicated (caught)</td>
+</tr>
+<tr>
+<td>MPSC, pxq 1.4.1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>6 159 errors (caught)</td>
+</tr>
+<tr>
+<td>SPMC, pxq 1.4.1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>6 224 lost or duplicated (caught)</td>
+</tr>
+</tbody>
+</table></div>
+<p>RIOT tsrb and wizard97 do not depend on pxq. Their four runs are just
+four independent runs with the same seeds. (An earlier draft of this
+report missed them because a log filter left them out.)</p>
+<p>At prescaler 0 (two interrupts with a minimum period of about 40 cycles)
+every library starved: the main loop got too little CPU to finish. Those
+runs end with exit 1 by design and do not count. pxq, RIOT tsrb and
+wizard97 still had 0 errors in them.</p>
+<p><strong>GenMC</strong> (host, 2026-11-08): the block and zero-copy APIs of lwrb, jnk0le,
+polycratia, micoring and ETL were added and all pass. Each check has
+mutants that must fail and reachability probes, and both did. See
+<a href="https://github.com/verified-libs/verified-libs/blob/main/verify/genmc/README.md"><code>../verify/genmc/README.md</code></a>. pxq is not covered,
+because it needs a model of its single-core contract (planned).</p>
+<h2 id="limits">Limits</h2>
+<ul>
+<li>One board and one core. The byte-loop <code>memcpy</code> case is measured with
+  newlib's stub on this M33 (addendum), not with ST's toolchain itself.</li>
+<li>0 errors over these runs makes hidden ordering bugs unlikely for these
+  configurations. It does not prove their absence.</li>
+<li>pxq is the owner's library. Its numbers need an independent repetition
+  before they count (principle 6).</li>
+</ul>
+<h2 id="follow-ups">Follow-ups</h2>
+<ul>
+<li>Repeat on the Cortex-M0+ (NUCLEO-G0B1RE, on order), with both toolchains.</li>
+<li>Update <code>libs.lock</code> when pxq 1.4.1 is released, and rerun the bench.</li>
+<li>Drop prescalers 3 and 4 from the MP campaign rotation: there the control
+  is never caught, so those runs are invalid by design.</li>
+</ul>
+<h2 id="addendum-evening-2026-11-08">Addendum (evening 2026-11-08)</h2>
+<h3 id="pxq-with-a-byte-loop-memcpy">pxq with a byte-loop <code>memcpy</code></h3>
+<p>The bench linked against newlib's <code>memcpy-stub</code> (a byte loop, what ST's
+toolchain ships; <code>MEMCPY=stub</code>). Push / pop cycles, cache on
+(<code>~/lab-runs/memstub-20261108T160218Z</code>):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Block</th>
+<th>Code, opt</th>
+<th>1.3.2</th>
+<th>1.4.0</th>
+<th>1.4.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>block4</td>
+<td>flash -O2</td>
+<td>155 / 155</td>
+<td>105 / 102</td>
+<td>121 / 118</td>
+</tr>
+<tr>
+<td>block16</td>
+<td>flash -O2</td>
+<td>239 / 239</td>
+<td><strong>177 / 162</strong></td>
+<td>230 / 228</td>
+</tr>
+<tr>
+<td>block64</td>
+<td>flash -O2</td>
+<td>575 / 575</td>
+<td><strong>465 / 402</strong></td>
+<td>566 / 564</td>
+</tr>
+<tr>
+<td>block64</td>
+<td>flash -Os</td>
+<td>574 / 574</td>
+<td><strong>527</strong> / 588</td>
+<td>560 / <strong>560</strong></td>
+</tr>
+<tr>
+<td>block64</td>
+<td>SRAM -O2</td>
+<td>1632 / 1632</td>
+<td><strong>1005 / 1192</strong></td>
+<td>1630 / 1630</td>
+</tr>
+</tbody>
+</table></div>
+<p>With a byte-loop <code>memcpy</code> the order reverses: 1.4.0's element loop is the
+fastest from 16 bytes up, and 1.4.1 inherits the byte loop above 8 bytes.
+1.4.0 measures the same as with the word-copying <code>memcpy</code> (465 / 402 against
+466 / 403), as expected since it does not call <code>memcpy</code>. So which version is
+faster depends on the C library, not only on pxq.</p>
+<h3 id="mp-campaign-lab-runsmp-campaign-20261108t154949z-3-h">MP campaign (<code>~/lab-runs/mp-campaign-20261108T154949Z</code>, 3 h)</h3>
+<p>23 runs: 14 valid, 9 invalid (8 at prescaler 3–4 and one at prescaler 2, the
+control not caught), none failed. Valid runs: 0 errors in pxq
+(MPSC, SPMC, MPMC), RIOT tsrb and wizard97 + PRIMASK macros: 8 million
+values per library in MPSC mode (8 runs) and 6 million in SPMC mode (6 runs),
+under 78–112 million interrupts per library and mode.
+The control was caught in every valid run.</p>
+<h3 id="validation-of-5da37e5-lab-runsvalidate-20261108t170955z">Validation of <code>5da37e5</code> (<code>~/lab-runs/validate-20261108T170955Z</code>)</h3>
+<p>All 8 steps passed: bench with gcc and with clang; stress single, block and
+zero-copy (including TinyUSB tu_fifo); stress block with clang; MPSC with
+clang; a 4-run campaign smoke test with the flag rotation
+<code>-Os -O3 -O2+lto -O2+clang</code>. Every stress step: real libraries error-free and
+the control caught.</p>
+<p>Flash, cache on, mean cycles (gcc / clang 21 for the libraries and adapters):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>1 byte push / pop</th>
+<th>64-byte block, cycles/byte</th>
+<th>zero-copy per 64 bytes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq 1.4.0</td>
+<td>17 / 20 · 17 / 22</td>
+<td>6.8 · 4.8</td>
+<td>176 / 173 · 80 / 80</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo</td>
+<td>107 / 108 · 114 / 112</td>
+<td>3.9 · 3.6</td>
+<td>201 / 215 · 255 / 258</td>
+</tr>
+</tbody>
+</table></div>
+<p>pxq's <code>gnu::optimize("Os")</code> is ignored by clang, so pxq is not built at
+<code>-Os</code> there; that may account for the difference (not investigated). The SPSC night campaign with the flag rotation started at
+19:37 UTC after this validation (<code>~/lab-runs/overnight-20261108T193735Z</code>).</p>
+<h3 id="night-campaign-with-the-flag-rotation-lab-runsovernight-20261108t193735z">Night campaign with the flag rotation (<code>~/lab-runs/overnight-20261108T193735Z</code>)</h3>
+<p>19:37–03:43 UTC, 55 runs, all valid (control caught in each, nothing
+starved, no retries, no power cycles). Flag sets: -Os 14, -O3 14, -O2 + LTO
+14, -O2 with clang 13 runs. 0 errors in every real library, 20.8–25.6
+million bytes per library under 86–142 million interrupts, TinyUSB tu_fifo
+included (25.6 million bytes, 0 errors). wizard97 as shipped (not ISR-safe by
+its own docs): 458 812 errors, as before.</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

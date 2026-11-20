@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MP stress test: where the interrupts land, random vs aimed (prototype) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="mp-stress-test-where-the-interrupts-land-random-vs-aimed-prototype">MP stress test: where the interrupts land, random vs aimed (prototype)</h1>
+<p>2026-11-17, NUCLEO-G474RE (Cortex-M4F, 170 MHz), rb-mp-stress built with
+<code>-DCOVERAGE=1</code> (a prototype build flag; the default image is byte-identical
+to the one before the change, checked). Owner's go the same day, after the
+question why the control is often not caught at the slow timer rates
+(prescaler 3 and 4): making the control easier to catch would hide that
+signal, so instead measure how well the test reaches each library's code,
+and try aiming the interrupts at it.</p>
+<h2 id="what-was-measured">What was measured</h2>
+<ul>
+<li><strong>Coverage.</strong> Every interrupt records the address it interrupted (the PC
+  the core stacked), per library and interrupt (main.c <code>vl_cov</code>, a hash
+  table of 4096 entries; none overflowed). <code>cov_report.py</code> maps each address
+  to the library's instructions with the image's line info (code inlined
+  from a library header counts as the library's), and counts per
+  <em>instruction boundary</em>: how often an interrupt landed exactly there.
+  Boundaries where interrupts are masked (after <code>cpsid i</code> / a saved PRIMASK,
+  followed along every path, nested saves included, plus the one boundary
+  right after the unmasking instruction, which the core never takes: seen
+  as 0 there and everything one instruction later) are not counted: no
+  interrupt can land there in any test. A basic block with at least one
+  interrupt in it was executed; boundaries in blocks without any are listed
+  apart (possibly never executed in this test, e.g. a retry path).</li>
+<li><strong>Aimed interrupts.</strong> Besides the timers, the main loop arms SysTick
+  before each of its push/pop with a random delay of 1-160 cycles, and
+  SysTick (highest priority) then pends interrupt A or B; interrupt A arms it
+  the same way for B before its own push/pop (B preempting A inside an
+  operation is the producer/producer resp. consumer/consumer race).</li>
+<li>Prescaler 3 (the rate where the control is often missed), 300 000 values
+  per library, the same seeds for random and aimed; one run each.</li>
+</ul>
+<h2 id="results">Results</h2>
+<p>Share of interrupts that landed in the library's code, boundaries
+interrupted at least 10 times out of those in executed blocks, and the
+median count per boundary:</p>
+<p>MPSC (two interrupts produce, main consumes)</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>In library code</th>
+<th>Boundaries &gt;= 10x</th>
+<th>Median per boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq MPSC</td>
+<td>4.1 % -&gt; 7.4 %</td>
+<td>15/18 -&gt; 14/16</td>
+<td>308 -&gt; 2988</td>
+</tr>
+<tr>
+<td>pxq MPMC</td>
+<td>2.0 % -&gt; 4.1 %</td>
+<td>4/5 -&gt; 5/5</td>
+<td>172 -&gt; 11020</td>
+</tr>
+<tr>
+<td>RIOT tsrb</td>
+<td>8.9 % -&gt; 23.3 %</td>
+<td>23/23 -&gt; 23/23</td>
+<td>1688 -&gt; 11157</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK</td>
+<td>3.3 % -&gt; 16.2 %</td>
+<td>10/12 -&gt; 11/12</td>
+<td>859 -&gt; 9769</td>
+</tr>
+<tr>
+<td>DNedic lockfree mpmc</td>
+<td>6.9 % -&gt; 17.0 %</td>
+<td>32/33 -&gt; 34/35</td>
+<td>228 -&gt; 3941</td>
+</tr>
+<tr>
+<td>heapless mpmc (Rust)</td>
+<td>10.0 % -&gt; 26.2 %</td>
+<td>65/94 -&gt; 90/121</td>
+<td>126 -&gt; 2712</td>
+</tr>
+<tr>
+<td>pxq MPSC reserve/commit</td>
+<td>6.4 % -&gt; 26.3 %</td>
+<td>51/55 -&gt; 50/53</td>
+<td>166 -&gt; 2634</td>
+</tr>
+<tr>
+<td>control (jnk0le SPSC)</td>
+<td>2.0 % -&gt; 3.7 %</td>
+<td>15/22 -&gt; 17/20</td>
+<td>184 -&gt; 2799</td>
+</tr>
+</tbody>
+</table></div>
+<p>SPMC (main produces, two interrupts consume)</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>In library code</th>
+<th>Boundaries &gt;= 10x</th>
+<th>Median per boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq SPMC</td>
+<td>4.7 % -&gt; 6.8 %</td>
+<td>15/16 -&gt; 13/14</td>
+<td>2146 -&gt; 3270</td>
+</tr>
+<tr>
+<td>pxq MPMC</td>
+<td>2.2 % -&gt; 3.7 %</td>
+<td>5/5 -&gt; 5/5</td>
+<td>2154 -&gt; 10463</td>
+</tr>
+<tr>
+<td>RIOT tsrb</td>
+<td>9.8 % -&gt; 21.4 %</td>
+<td>20/23 -&gt; 23/23</td>
+<td>1435 -&gt; 10573</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK</td>
+<td>7.5 % -&gt; 13.4 %</td>
+<td>10/12 -&gt; 9/10</td>
+<td>1426 -&gt; 9981</td>
+</tr>
+<tr>
+<td>DNedic lockfree mpmc</td>
+<td>6.6 % -&gt; 15.8 %</td>
+<td>26/35 -&gt; 33/33</td>
+<td>139 -&gt; 3823</td>
+</tr>
+<tr>
+<td>heapless mpmc (Rust)</td>
+<td>10.2 % -&gt; 24.3 %</td>
+<td>56/94 -&gt; 90/119</td>
+<td>25 -&gt; 2610</td>
+</tr>
+<tr>
+<td>control (jnk0le SPSC)</td>
+<td>2.1 % -&gt; 3.7 %</td>
+<td>12/20 -&gt; 17/20</td>
+<td>112 -&gt; 2983</td>
+</tr>
+</tbody>
+</table></div>
+<p>Control (errors / lost+duplicated): MPSC 1413/1418 random -&gt; 10196/10709
+aimed; SPMC 0/885 -&gt; 119/11737. Every library in its documented mode was
+error-free in all four runs.</p>
+<h2 id="reading">Reading</h2>
+<ul>
+<li>With random timer interrupts only 2-10 % of the interrupts land in the
+  code under test; the rest land in the test's own loop. Aimed, the share
+  is 2-4 times higher and the median count per boundary 2-20 times higher
+  (more where the operation is short compared to the timer period), in
+  the same run time.</li>
+<li>The libraries that mask interrupts (pxq, RIOT tsrb, wizard97 +
+  PRIMASK) have few boundaries where an interrupt can land at all; that is
+  their design, and the table counts only those. The lock-free ones
+  (DNedic, heapless) have many more, and there aiming matters most:
+  heapless had 56 of 94 boundaries hit 10 times or more at random, 90 of
+  119 aimed, and fewer blocks never interrupted (102 -&gt; 75-77 boundaries;
+  the rest are likely retry paths that need a real collision).</li>
+<li>The number per library is a measure the page could show: "every
+  interruptible boundary of push/pop interrupted at least N times", per
+  board, independent of the control.</li>
+</ul>
+<h2 id="limits-of-the-prototype">Limits of the prototype</h2>
+<ul>
+<li>One board, one rate, one run per setting; the window (160 cycles) is
+  fixed, not fitted to each library's operation length.</li>
+<li>Recording costs a few dozen cycles per interrupt, so the timing differs
+  slightly from the campaign image.</li>
+<li>Aimed runs shift the balance (interrupt B pushes or pops about two
+  thirds of the values).</li>
+<li>The prototype builds for the STM32 boards (TIM2/TIM3 IRQ numbers) and
+  ran on the G474 only. The nRF5340 and RP2350 need their timers' IRQ
+  numbers; on the M0+ boards (G0B1, SAM D20) SysTick also serves as the
+  cycle counter, so aiming there must be checked or done another way.</li>
+<li>The table is read over the debug port (one image of all libraries per
+  start, <code>PER_LIB=0</code>); for the campaigns it would go into the UART dump.</li>
+</ul>
+<p>Records, tables and images: <code>~/lab-runs/cov-proto-20261117/</code> on lib-lab1
+(<code>*.cov.txt</code>, <code>*.elf</code>, <code>*.cov.json</code>, <code>report1.txt</code>).</p>
+<h2 id="port-to-all-boards-and-one-library-per-reset-same-day-later">Port to all boards and one library per reset (same day, later)</h2>
+<p>The owner approved putting aimed runs into the campaigns (half of the
+prescaler 3/4 runs, coverage in every report) once the measurement ran on
+every board and with one library per reset. Changes:</p>
+<ul>
+<li>Timer IRQ numbers for the nRF5340 (TIMER0/1), RP2350 (PWM wrap 0/1) and
+  SAM D20 (TC0/TC2). On the M0+ boards (G0B1, SAM D20) board_init leaves
+  SysTick running as the cycle counter of time_call(), which this test
+  does not use; the first try there never aimed (the "already armed"
+  check: 0 aims), so aim_init now stops it.</li>
+<li>One library per reset (<code>PER_LIB=1</code>, the campaign way): the aim settings
+  are run parameters in the "go" line (<code>cov_aim</code>, <code>cov_window</code>,
+  <code>cov_seed</code>); after "dump" the host sends "dump2" for the table
+  (common/vls_uart.h <code>VLS_DUMP2</code>, common/uart_host.py <code>VLS_DUMP2=1</code>).
+  run.sh keeps one table per library with that library's image
+  (<code>&lt;record&gt;.cov.&lt;n&gt;.txt</code>, <code>elf/&lt;sha256&gt;.elf</code>, <code>&lt;record&gt;.cov.list</code>).
+  Images without COVERAGE stay byte-identical (checked on all six boards).</li>
+<li>cov_report.py reads the per-library tables; RP2350 addresses (8 hex
+  digits, which objdump prints unindented) were not parsed before.</li>
+<li>campaign.sh: <code>COVERAGE=1</code> by default, recording in the prescaler 3/4 runs
+  only (<code>cov_off</code> per run: at prescaler 1 the recording, some dozens of
+  cycles per interrupt, starved the SAM D20's main loop in a smoke test;
+  at prescaler 3 it adds about 3 % interrupts per value there), aimed runs
+  as above (which ones
+  alternates per pass of the rotation), cov_report.py over all records at
+  the end; summarize.py lists aimed runs apart and adds a coverage table.</li>
+</ul>
+<p>Check on five more boards, one library per reset from the shared bundle
+(<code>IMAGES=combined</code>), prescaler 3, 50 000 values per library, the same
+seeds for random and aimed, one run each; the libraries other than the
+control, random -&gt; aimed:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Mode</th>
+<th>In library code (range over libraries)</th>
+<th>Median per boundary (range)</th>
+<th>Control: errors + lost/dup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340</td>
+<td>MPSC</td>
+<td>1.0-9.1 % -&gt; 1.6-29.6 %</td>
+<td>18-416 -&gt; 434-1288</td>
+<td>0 -&gt; 2,306</td>
+</tr>
+<tr>
+<td>nRF5340</td>
+<td>SPMC</td>
+<td>1.1-10.0 % -&gt; 1.6-24.1 %</td>
+<td>15-378 -&gt; 433-1008</td>
+<td>277 -&gt; 1,359</td>
+</tr>
+<tr>
+<td>RP2350</td>
+<td>MPSC</td>
+<td>1.8-11.5 % -&gt; 1.7-23.4 %</td>
+<td>22-439 -&gt; 430-579</td>
+<td>0 -&gt; 2,308</td>
+</tr>
+<tr>
+<td>RP2350</td>
+<td>SPMC</td>
+<td>1.7-13.1 % -&gt; 1.9-20.2 %</td>
+<td>144-435 -&gt; 442-734</td>
+<td>295 -&gt; 1,119</td>
+</tr>
+<tr>
+<td>SAM D20</td>
+<td>MPSC</td>
+<td>9.6-21.0 % -&gt; 18.6-52.7 %</td>
+<td>12-476 -&gt; 45-1204</td>
+<td>537 -&gt; 6,283</td>
+</tr>
+<tr>
+<td>SAM D20</td>
+<td>SPMC</td>
+<td>11.5-21.6 % -&gt; 18.2-53.9 %</td>
+<td>8-361 -&gt; 44-1231</td>
+<td>269 -&gt; 3,261</td>
+</tr>
+<tr>
+<td>G0B1</td>
+<td>MPSC</td>
+<td>5.9-13.5 % -&gt; 14.9-42.7 %</td>
+<td>13-154 -&gt; 141-1446</td>
+<td>514 -&gt; 5,094</td>
+</tr>
+<tr>
+<td>G0B1</td>
+<td>SPMC</td>
+<td>7.7-14.0 % -&gt; 16.2-44.4 %</td>
+<td>4-261 -&gt; 142-2071</td>
+<td>316 -&gt; 2,695</td>
+</tr>
+<tr>
+<td>H723</td>
+<td>MPSC</td>
+<td>8.2-16.6 % -&gt; 10.7-26.3 %</td>
+<td>1-26 -&gt; 15-1071</td>
+<td>538 -&gt; 5,895</td>
+</tr>
+<tr>
+<td>H723</td>
+<td>SPMC</td>
+<td>7.5-17.7 % -&gt; 8.4-23.8 %</td>
+<td>1-50 -&gt; 82-576</td>
+<td>311 -&gt; 2,830</td>
+</tr>
+</tbody>
+</table></div>
+<p>The same picture as on the G474: aimed, more interrupts land in the
+library code and every library's median count per boundary rises,
+mostly by 2-20x (the lowest medians, at the random runs' weakest
+libraries, by more). Random runs missed the MPSC control on the nRF5340 and RP2350;
+aimed runs caught it on every board, 2-10 times as often. Every library in
+its documented mode was error-free in all 20 runs. Per-library tables:
+<code>~/lab-runs/cov-port-20261117/</code> (<code>report-*.txt</code>, <code>table.py</code>).</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

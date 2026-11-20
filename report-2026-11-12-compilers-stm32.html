@@ -1,0 +1,1483 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Four compilers on the STM32 boards (2026-11-12) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="four-compilers-on-the-stm32-boards-2026-11-12">Four compilers on the STM32 boards (2026-11-12)</h1>
+<p>The libraries under test and their adapters built with four compilers, on
+the three STM32 boards (G474, H723, G0B1); harness, startup and link stay
+the Debian arm-none-eabi-gcc 14.2.1 with newlib-nano in every case
+(<code>firmware/common/compiler.mk</code>):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th><code>COMPILER=</code></th>
+<th>Compiler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gcc</code></td>
+<td>Arm GNU Toolchain 14.2.1 (Debian <code>gcc-arm-none-eabi</code> 14.2.rel1)</td>
+</tr>
+<tr>
+<td><code>clang</code></td>
+<td>Ubuntu clang 21.1.8, GNU headers</td>
+</tr>
+<tr>
+<td><code>st-gcc</code></td>
+<td>GNU Tools for STM32 14.3.1 (STM32CubeCLT 1.22.0)</td>
+</tr>
+<tr>
+<td><code>st-clang</code></td>
+<td>ST Arm Clang 21.1.1 (<code>starm-clang</code>, CubeCLT 1.22.0), GNU headers</td>
+</tr>
+</tbody>
+</table></div>
+<p>The ST compilers run from a local image that is never pushed (ST licence
+SLA0048; <a href="https://github.com/verified-libs/verified-libs/blob/main/toolchain/st/README.md">toolchain/st</a>), and only for STM32
+boards (its clause 4).</p>
+<h2 id="correctness">Correctness</h2>
+<p>ISR stress (single bytes, blocks, DMA zero-copy) with <code>st-gcc</code> and
+<code>st-clang</code> at <code>-O2</code> (18 runs) and with <code>st-clang-omax</code> at <code>-O3</code> (9 runs):
+all valid (control caught), <strong>0 errors in every real library</strong>. Records:
+<code>~/lab-runs/st-compilers-20261112/&lt;board&gt;/</code> and
+<code>~/lab-runs/st-omax-20261112/&lt;board&gt;/</code>.</p>
+<h2 id="same-code-mostly">Same code, mostly</h2>
+<p>Object code compared function by function (<code>objdump -d</code>, addresses
+stripped), 44 objects per build:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Pair</th>
+<th>G474 (M4)</th>
+<th>G0B1 (M0+)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>st-clang</code> vs <code>clang</code></td>
+<td>0 differ</td>
+<td>0 differ</td>
+</tr>
+<tr>
+<td><code>st-gcc</code> vs <code>gcc</code></td>
+<td>11 differ</td>
+<td>2 differ</td>
+</tr>
+<tr>
+<td><code>clang</code> vs <code>gcc</code></td>
+<td>40 differ</td>
+<td>40 differ</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>ST Arm Clang 21.1.1 and Ubuntu clang 21.1.8 generate byte-identical code
+  for these libraries with the same flags and headers. What ST adds is its
+  runtime (newlib, libc++; not used here) and its optimisation presets
+  (below).</li>
+<li>GNU Tools for STM32 14.3.1 differs from Arm GCC 14.2.1 in small ways
+  (operand order of a compare, register choice). In the bench the cycles are
+  the same in every cell on the G474 and G0B1; on the H723 two cells differ
+  (lwrb push 151 vs 145, micoring single-context block 30.7 vs 29.0
+  cycles/byte).</li>
+</ul>
+<p>So, for these libraries, "ST's compiler" measures the same as the
+upstream compiler of the same family; the gcc/clang choice is what matters.</p>
+<h2 id="gcc-vs-clang-o2-flash-cache-on">gcc vs clang (<code>-O2</code>, flash, cache on)</h2>
+<p>Sum of mean push + pop cycles (1 byte) over the 29 library builds:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>gcc / st-gcc</th>
+<th>clang / st-clang</th>
+<th>clang vs gcc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G474 (M4)</td>
+<td>3 848</td>
+<td>3 980</td>
+<td>+3 %</td>
+</tr>
+<tr>
+<td>H723 (M7)</td>
+<td>3 038 (st-gcc 3 044)</td>
+<td>2 931</td>
+<td>−4 %</td>
+</tr>
+<tr>
+<td>G0B1 (M0+)</td>
+<td>5 610</td>
+<td>6 952</td>
+<td>+24 %</td>
+</tr>
+</tbody>
+</table></div>
+<p>On the M4 and M7 the two trade places library by library (clang is faster
+for lockfree spsc::RingBuf, FreeRTOS stream buffer, diffstorm; gcc for lwrb,
+Zephyr ring_buf, polycratia). On the M0+ clang is much slower for every
+library that uses C11/C++11 atomics: clang lowers each atomic load and
+store on ARMv6-M to a call to <code>__atomic_load_N</code> / <code>__atomic_store_N</code> (gcc
+inlines LDR/STR with DMB). Here those calls go to
+<code>firmware/common/armv6m_atomic.c</code>, which does what gcc inlines, after a
+switch on the memory order. Examples (push/pop cycles, gcc → clang): jnk0le
+36/42 → 113/118, ETL queue_spsc_atomic 54/51 → 121/121, QuantumLeaps LFRB
+69/61 → 174/154, rt-spsc 45/44 → 122/118, polycratia 39/46 → 124/129.
+Libraries without atomics (lwrb, ece-mohammad, TinyUSB, the
+interrupt-masking designs) are within a few cycles. A program built with
+clang for an M0+ has to supply these functions somehow; how cheaply it does
+so decides the cost of every atomic access.</p>
+<p>All cells are in the appendix.</p>
+<h2 id="sts-omax-preset-compilerst-clang-omax-o3">ST's Omax preset (<code>COMPILER=st-clang-omax</code>, <code>-O3</code>)</h2>
+<p><code>starm-clang --config=Omax.cfg</code>, ST's speed preset shipped with the compiler: <code>-O3</code> plus LLVM
+options for more inlining and unrolling, loop flattening, unroll-and-jam,
+DFA jump threading and inlined memcpy loads/stores. Compared with gcc and
+clang at <code>-O3</code> (same harness flags). It changes 9 of the 44 objects against
+clang <code>-O3</code>. Sum of mean push + pop cycles over the 29 library builds:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>gcc <code>-O3</code></th>
+<th>clang <code>-O3</code></th>
+<th>st-clang Omax</th>
+<th>Omax vs clang <code>-O3</code></th>
+<th>Omax vs gcc <code>-O3</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G474 (M4)</td>
+<td>3 468</td>
+<td>3 916</td>
+<td>3 672</td>
+<td>−6 %</td>
+<td>+6 %</td>
+</tr>
+<tr>
+<td>H723 (M7)</td>
+<td>2 731</td>
+<td>2 981</td>
+<td>2 866</td>
+<td>−4 %</td>
+<td>+5 %</td>
+</tr>
+<tr>
+<td>G0B1 (M0+)</td>
+<td>5 101</td>
+<td>6 896</td>
+<td>6 780</td>
+<td>−2 %</td>
+<td>+33 %</td>
+</tr>
+</tbody>
+</table></div>
+<p>Almost all of the gain is in the two libraries that call <code>memcpy</code> in their
+single-byte path, lwrb and the FreeRTOS stream buffer, which fits the
+preset's inlined memcpy (not checked instruction by instruction) (G474 lwrb
+push/pop: clang <code>-O3</code> 222/212, Omax 138/133, gcc <code>-O3</code> 129/125); the other
+libraries measure the same as clang <code>-O3</code>. gcc at <code>-O3</code> is the fastest of
+the three on every board.</p>
+<h2 id="appendix-all-cells-o2">Appendix: all cells, <code>-O2</code></h2>
+<p>Cells: push / pop mean cycles (1 byte) · 64-byte block, cycles per byte (mean of push and pop); flash, cache on.</p>
+<h3 id="nucleo-g474re">NUCLEO-G474RE</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>gcc</th>
+<th>clang</th>
+<th>st-gcc</th>
+<th>st-clang</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState (C++)</td>
+<td>20/21 · 7.5</td>
+<td>22/24 · 5.9</td>
+<td>20/21 · 7.5</td>
+<td>22/24 · 5.9</td>
+</tr>
+<tr>
+<td>lwrb (C)</td>
+<td>180/176 · 5.1</td>
+<td>210/208 · 5.0</td>
+<td>180/176 · 5.1</td>
+<td>210/208 · 5.0</td>
+</tr>
+<tr>
+<td>AndersKaloer Ring-Buffer (C)</td>
+<td>57/41 · 20.1</td>
+<td>68/41 · 20.8</td>
+<td>57/41 · 20.1</td>
+<td>68/41 · 20.8</td>
+</tr>
+<tr>
+<td>jnk0le Ringbuffer (C++)</td>
+<td>23/26 · 9.5</td>
+<td>27/36 · 8.8</td>
+<td>23/26 · 9.5</td>
+<td>27/36 · 8.8</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_isr (C++)</td>
+<td>40/45 · 31.9</td>
+<td>44/45 · 28.9</td>
+<td>40/45 · 31.9</td>
+<td>44/45 · 28.9</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_atomic (C++)</td>
+<td>30/27 · 23.9</td>
+<td>37/38 · 22.4</td>
+<td>30/27 · 23.9</td>
+<td>37/38 · 22.4</td>
+</tr>
+<tr>
+<td>QuantumLeaps LFRB (C)</td>
+<td>46/46 · 53.4</td>
+<td>56/54 · 60.9</td>
+<td>46/46 · 53.4</td>
+<td>56/54 · 60.9</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf threadsafe (C)</td>
+<td>56/46 · 58.4</td>
+<td>61/50 · 60.9</td>
+<td>56/46 · 58.4</td>
+<td>61/50 · 60.9</td>
+</tr>
+<tr>
+<td>ece-mohammad RingBuffer (C)</td>
+<td>81/80 · 4.2</td>
+<td>87/81 · 4.2</td>
+<td>81/80 · 4.2</td>
+<td>87/81 · 4.2</td>
+</tr>
+<tr>
+<td>micoring SPSC mode (C)</td>
+<td>98/97 · 96.9</td>
+<td>107/101 · 71.4</td>
+<td>98/97 · 96.9</td>
+<td>107/101 · 71.4</td>
+</tr>
+<tr>
+<td>kostyk348 lf_spsc (C)</td>
+<td>72/67 · 79.4</td>
+<td>82/68 · 81.4</td>
+<td>72/67 · 79.4</td>
+<td>82/68 · 81.4</td>
+</tr>
+<tr>
+<td>diffstorm cb (C)</td>
+<td>72/69 · 77.9</td>
+<td>56/59 · 62.9</td>
+<td>72/69 · 77.9</td>
+<td>56/59 · 62.9</td>
+</tr>
+<tr>
+<td>RIOT tsrb (C)</td>
+<td>52/51 · 19.6</td>
+<td>55/55 · 21.0</td>
+<td>52/51 · 19.6</td>
+<td>55/55 · 21.0</td>
+</tr>
+<tr>
+<td>Contiki-NG ringbuf (C)</td>
+<td>45/42 · 51.9</td>
+<td>44/41 · 49.4</td>
+<td>45/42 · 51.9</td>
+<td>44/41 · 49.4</td>
+</tr>
+<tr>
+<td>rigtorp SPSCQueue (C++)</td>
+<td>35/49 · 45.5</td>
+<td>37/38 · 39.9</td>
+<td>35/49 · 45.5</td>
+<td>37/38 · 39.9</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++)</td>
+<td>29/25 · 33.4</td>
+<td>29/28 · 32.4</td>
+<td>29/25 · 33.4</td>
+<td>29/28 · 32.4</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros (C++)</td>
+<td>40/32 · 43.9</td>
+<td>36/31 · 38.4</td>
+<td>40/32 · 43.9</td>
+<td>36/31 · 38.4</td>
+</tr>
+<tr>
+<td>polycratia spscring (C++)</td>
+<td>24/28 · 9.5</td>
+<td>38/31 · 8.5</td>
+<td>24/28 · 9.5</td>
+<td>38/31 · 8.5</td>
+</tr>
+<tr>
+<td>rt-spsc (C++)</td>
+<td>26/24 · 31.9</td>
+<td>26/26 · 30.4</td>
+<td>26/24 · 31.9</td>
+<td>26/26 · 30.4</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo (C)</td>
+<td>101/100 · 4.2</td>
+<td>105/103 · 4.5</td>
+<td>101/100 · 4.2</td>
+<td>105/103 · 4.5</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf (C)</td>
+<td>79/74 · 3.7</td>
+<td>94/89 · 4.0</td>
+<td>79/74 · 3.7</td>
+<td>94/89 · 4.0</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf, CONFIG_SMP (C)</td>
+<td>86/83 · 4.0</td>
+<td>96/91 · 4.1</td>
+<td>86/83 · 4.0</td>
+<td>96/91 · 4.1</td>
+</tr>
+<tr>
+<td>DNedic lockfree spsc::RingBuf (C++)</td>
+<td>98/88 · 3.8</td>
+<td>58/49 · 3.3</td>
+<td>98/88 · 3.8</td>
+<td>58/49 · 3.3</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_locked (C++)</td>
+<td>79/80 · 61.5</td>
+<td>83/82 · 58.0</td>
+<td>79/80 · 61.5</td>
+<td>83/82 · 58.0</td>
+</tr>
+<tr>
+<td>FreeRTOS stream buffer (C)</td>
+<td>355/273 · 6.7</td>
+<td>318/274 · 6.3</td>
+<td>355/273 · 6.7</td>
+<td>318/274 · 6.3</td>
+</tr>
+<tr>
+<td>pxq Topology::None, single-context (C++)</td>
+<td>19/20 · 7.5</td>
+<td>21/24 · 5.9</td>
+<td>19/20 · 7.5</td>
+<td>21/24 · 5.9</td>
+</tr>
+<tr>
+<td>micoring default, single-context (C)</td>
+<td>78/75 · 66.5</td>
+<td>84/77 · 60.0</td>
+<td>78/75 · 66.5</td>
+<td>84/77 · 60.0</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf basic, single-context (C)</td>
+<td>40/36 · 43.9</td>
+<td>50/40 · 49.4</td>
+<td>40/36 · 43.9</td>
+<td>50/40 · 49.4</td>
+</tr>
+<tr>
+<td>ETL etl::queue, single-context (C++)</td>
+<td>32/34 · 38.9</td>
+<td>32/33 · 36.4</td>
+<td>32/34 · 38.9</td>
+<td>32/33 · 36.4</td>
+</tr>
+<tr>
+<td><strong>sum push+pop (single)</strong></td>
+<td>3848 (29)</td>
+<td>3980 (29)</td>
+<td>3848 (29)</td>
+<td>3980 (29)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Records: gcc <code>stm32g474-rb-bench-flash-20261112T125732Z.json</code>, clang <code>stm32g474-rb-bench-flash-clang-20261112T125853Z.json</code>, st-gcc <code>stm32g474-rb-bench-flash-st-gcc-20261112T103459Z.json</code>, st-clang <code>stm32g474-rb-bench-flash-st-clang-20261112T104846Z.json</code>.</p>
+<h3 id="nucleo-h723zg">NUCLEO-H723ZG</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>gcc</th>
+<th>clang</th>
+<th>st-gcc</th>
+<th>st-clang</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState (C++)</td>
+<td>17/16 · 3.5</td>
+<td>17/19 · 3.3</td>
+<td>17/16 · 3.5</td>
+<td>17/19 · 3.3</td>
+</tr>
+<tr>
+<td>lwrb (C)</td>
+<td>145/136 · 3.8</td>
+<td>96/94 · 3.7</td>
+<td>151/136 · 3.9</td>
+<td>96/94 · 3.7</td>
+</tr>
+<tr>
+<td>AndersKaloer Ring-Buffer (C)</td>
+<td>33/26 · 9.2</td>
+<td>35/27 · 9.7</td>
+<td>33/26 · 9.2</td>
+<td>35/27 · 9.7</td>
+</tr>
+<tr>
+<td>jnk0le Ringbuffer (C++)</td>
+<td>35/35 · 6.6</td>
+<td>36/36 · 3.8</td>
+<td>35/35 · 6.6</td>
+<td>36/36 · 3.8</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_isr (C++)</td>
+<td>42/45 · 28.5</td>
+<td>45/46 · 26.4</td>
+<td>42/45 · 28.5</td>
+<td>45/46 · 26.4</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_atomic (C++)</td>
+<td>38/37 · 26.1</td>
+<td>41/40 · 27.4</td>
+<td>38/37 · 26.1</td>
+<td>41/40 · 27.4</td>
+</tr>
+<tr>
+<td>QuantumLeaps LFRB (C)</td>
+<td>46/41 · 35.7</td>
+<td>51/43 · 37.4</td>
+<td>46/41 · 35.7</td>
+<td>51/43 · 37.4</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf threadsafe (C)</td>
+<td>37/31 · 25.4</td>
+<td>37/33 · 25.4</td>
+<td>37/31 · 25.4</td>
+<td>37/33 · 25.4</td>
+</tr>
+<tr>
+<td>ece-mohammad RingBuffer (C)</td>
+<td>51/50 · 3.0</td>
+<td>53/49 · 3.2</td>
+<td>51/50 · 3.0</td>
+<td>53/49 · 3.2</td>
+</tr>
+<tr>
+<td>micoring SPSC mode (C)</td>
+<td>72/72 · 59.9</td>
+<td>79/71 · 48.4</td>
+<td>72/72 · 59.9</td>
+<td>79/71 · 48.4</td>
+</tr>
+<tr>
+<td>kostyk348 lf_spsc (C)</td>
+<td>64/59 · 56.2</td>
+<td>67/57 · 51.4</td>
+<td>64/59 · 56.2</td>
+<td>67/57 · 51.4</td>
+</tr>
+<tr>
+<td>diffstorm cb (C)</td>
+<td>50/63 · 48.4</td>
+<td>44/57 · 40.5</td>
+<td>50/63 · 48.4</td>
+<td>44/57 · 40.5</td>
+</tr>
+<tr>
+<td>RIOT tsrb (C)</td>
+<td>46/45 · 11.4</td>
+<td>44/41 · 11.2</td>
+<td>46/45 · 11.4</td>
+<td>44/41 · 11.2</td>
+</tr>
+<tr>
+<td>Contiki-NG ringbuf (C)</td>
+<td>32/28 · 22.2</td>
+<td>34/30 · 21.9</td>
+<td>32/28 · 22.2</td>
+<td>34/30 · 21.9</td>
+</tr>
+<tr>
+<td>rigtorp SPSCQueue (C++)</td>
+<td>37/43 · 29.1</td>
+<td>37/39 · 26.6</td>
+<td>37/43 · 29.1</td>
+<td>37/39 · 26.6</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++)</td>
+<td>24/22 · 16.5</td>
+<td>25/24 · 17.9</td>
+<td>24/22 · 16.5</td>
+<td>25/24 · 17.9</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros (C++)</td>
+<td>52/49 · 43.9</td>
+<td>53/49 · 44.4</td>
+<td>52/49 · 43.9</td>
+<td>53/49 · 44.4</td>
+</tr>
+<tr>
+<td>polycratia spscring (C++)</td>
+<td>38/32 · 5.2</td>
+<td>42/35 · 3.8</td>
+<td>38/32 · 5.2</td>
+<td>42/35 · 3.8</td>
+</tr>
+<tr>
+<td>rt-spsc (C++)</td>
+<td>36/36 · 28.9</td>
+<td>36/36 · 29.9</td>
+<td>36/36 · 28.9</td>
+<td>36/36 · 29.9</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo (C)</td>
+<td>61/64 · 3.5</td>
+<td>68/68 · 3.4</td>
+<td>61/64 · 3.5</td>
+<td>68/68 · 3.4</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf (C)</td>
+<td>53/51 · 3.0</td>
+<td>68/64 · 3.3</td>
+<td>53/51 · 3.0</td>
+<td>68/64 · 3.3</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf, CONFIG_SMP (C)</td>
+<td>71/66 · 3.3</td>
+<td>77/71 · 3.4</td>
+<td>71/66 · 3.3</td>
+<td>77/71 · 3.4</td>
+</tr>
+<tr>
+<td>DNedic lockfree spsc::RingBuf (C++)</td>
+<td>68/65 · 3.2</td>
+<td>52/48 · 3.2</td>
+<td>68/65 · 3.2</td>
+<td>52/48 · 3.2</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_locked (C++)</td>
+<td>69/68 · 43.6</td>
+<td>74/73 · 43.6</td>
+<td>69/68 · 43.6</td>
+<td>74/73 · 43.6</td>
+</tr>
+<tr>
+<td>FreeRTOS stream buffer (C)</td>
+<td>214/161 · 4.6</td>
+<td>165/125 · 4.1</td>
+<td>214/161 · 4.6</td>
+<td>165/125 · 4.1</td>
+</tr>
+<tr>
+<td>pxq Topology::None, single-context (C++)</td>
+<td>24/21 · 3.8</td>
+<td>22/26 · 3.3</td>
+<td>24/21 · 3.8</td>
+<td>22/26 · 3.3</td>
+</tr>
+<tr>
+<td>micoring default, single-context (C)</td>
+<td>50/54 · 29.0</td>
+<td>61/53 · 36.5</td>
+<td>50/54 · 30.7</td>
+<td>61/53 · 36.5</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf basic, single-context (C)</td>
+<td>33/30 · 24.9</td>
+<td>39/31 · 27.4</td>
+<td>33/30 · 24.9</td>
+<td>39/31 · 27.4</td>
+</tr>
+<tr>
+<td>ETL etl::queue, single-context (C++)</td>
+<td>25/26 · 19.4</td>
+<td>23/23 · 16.5</td>
+<td>25/26 · 19.4</td>
+<td>23/23 · 16.5</td>
+</tr>
+<tr>
+<td><strong>sum push+pop (single)</strong></td>
+<td>3038 (29)</td>
+<td>2931 (29)</td>
+<td>3044 (29)</td>
+<td>2931 (29)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Records: gcc <code>stm32h723-rb-bench-flash-20261112T125734Z.json</code>, clang <code>stm32h723-rb-bench-flash-clang-20261112T125855Z.json</code>, st-gcc <code>stm32h723-rb-bench-flash-st-gcc-20261112T103502Z.json</code>, st-clang <code>stm32h723-rb-bench-flash-st-clang-20261112T105426Z.json</code>.</p>
+<h3 id="nucleo-g0b1re">NUCLEO-G0B1RE</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>gcc</th>
+<th>clang</th>
+<th>st-gcc</th>
+<th>st-clang</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState (C++)</td>
+<td>35/38 · 10.2</td>
+<td>35/37 · 7.4</td>
+<td>35/38 · 10.2</td>
+<td>35/37 · 7.4</td>
+</tr>
+<tr>
+<td>lwrb (C)</td>
+<td>263/256 · 13.5</td>
+<td>305/299 · 14.1</td>
+<td>263/256 · 13.5</td>
+<td>305/299 · 14.1</td>
+</tr>
+<tr>
+<td>AndersKaloer Ring-Buffer (C)</td>
+<td>73/50 · 27.3</td>
+<td>82/51 · 26.4</td>
+<td>73/50 · 27.3</td>
+<td>82/51 · 26.4</td>
+</tr>
+<tr>
+<td>jnk0le Ringbuffer (C++)</td>
+<td>36/42 · 11.8</td>
+<td>113/118 · 12.5</td>
+<td>36/42 · 11.8</td>
+<td>113/118 · 12.5</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_isr (C++)</td>
+<td>73/68 · 53.6</td>
+<td>59/58 · 40.5</td>
+<td>73/68 · 53.6</td>
+<td>59/58 · 40.5</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_atomic (C++)</td>
+<td>54/51 · 40.0</td>
+<td>121/121 · 98.1</td>
+<td>54/51 · 40.0</td>
+<td>121/121 · 98.1</td>
+</tr>
+<tr>
+<td>QuantumLeaps LFRB (C)</td>
+<td>69/61 · 79.9</td>
+<td>174/154 · 175.8</td>
+<td>69/61 · 79.9</td>
+<td>174/154 · 175.8</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf threadsafe (C)</td>
+<td>74/60 · 81.9</td>
+<td>79/65 · 83.8</td>
+<td>74/60 · 81.9</td>
+<td>79/65 · 83.8</td>
+</tr>
+<tr>
+<td>ece-mohammad RingBuffer (C)</td>
+<td>111/109 · 12.4</td>
+<td>112/109 · 12.1</td>
+<td>111/109 · 12.4</td>
+<td>112/109 · 12.1</td>
+</tr>
+<tr>
+<td>micoring SPSC mode (C)</td>
+<td>127/131 · 128.2</td>
+<td>182/179 · 154.6</td>
+<td>127/131 · 128.2</td>
+<td>182/179 · 154.6</td>
+</tr>
+<tr>
+<td>kostyk348 lf_spsc (C)</td>
+<td>159/154 · 212.6</td>
+<td>179/166 · 184.3</td>
+<td>159/154 · 212.6</td>
+<td>179/166 · 184.3</td>
+</tr>
+<tr>
+<td>diffstorm cb (C)</td>
+<td>122/131 · 141.4</td>
+<td>186/182 · 195.8</td>
+<td>122/131 · 141.4</td>
+<td>186/182 · 195.8</td>
+</tr>
+<tr>
+<td>RIOT tsrb (C)</td>
+<td>65/64 · 30.1</td>
+<td>72/62 · 25.4</td>
+<td>65/64 · 30.1</td>
+<td>72/62 · 25.4</td>
+</tr>
+<tr>
+<td>Contiki-NG ringbuf (C)</td>
+<td>61/53 · 71.9</td>
+<td>63/52 · 69.3</td>
+<td>61/53 · 71.9</td>
+<td>63/52 · 69.3</td>
+</tr>
+<tr>
+<td>rigtorp SPSCQueue (C++)</td>
+<td>52/83 · 73.2</td>
+<td>109/178 · 141.7</td>
+<td>52/83 · 73.2</td>
+<td>109/178 · 141.7</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++)</td>
+<td>41/41 · 55.9</td>
+<td>48/47 · 59.3</td>
+<td>41/41 · 55.9</td>
+<td>48/47 · 59.3</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros (C++)</td>
+<td>57/61 · 73.9</td>
+<td>63/58 · 72.3</td>
+<td>57/61 · 73.9</td>
+<td>63/58 · 72.3</td>
+</tr>
+<tr>
+<td>polycratia spscring (C++)</td>
+<td>39/46 · 11.8</td>
+<td>124/129 · 11.9</td>
+<td>39/46 · 11.8</td>
+<td>124/129 · 11.9</td>
+</tr>
+<tr>
+<td>rt-spsc (C++)</td>
+<td>45/44 · 59.4</td>
+<td>122/118 · 131.8</td>
+<td>45/44 · 59.4</td>
+<td>122/118 · 131.8</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo (C)</td>
+<td>138/131 · 12.3</td>
+<td>133/134 · 12.3</td>
+<td>138/131 · 12.3</td>
+<td>133/134 · 12.3</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf (C)</td>
+<td>115/105 · 10.4</td>
+<td>126/127 · 11.2</td>
+<td>115/105 · 10.4</td>
+<td>126/127 · 11.2</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf, CONFIG_SMP (C)</td>
+<td>129/117 · 11.0</td>
+<td>227/225 · 13.0</td>
+<td>129/117 · 11.0</td>
+<td>227/225 · 13.0</td>
+</tr>
+<tr>
+<td>DNedic lockfree spsc::RingBuf (C++)</td>
+<td>163/155 · 12.3</td>
+<td>135/135 · 13.6</td>
+<td>163/155 · 12.3</td>
+<td>135/135 · 13.6</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_locked (C++)</td>
+<td>115/110 · 92.5</td>
+<td>109/101 · 85.6</td>
+<td>115/110 · 92.5</td>
+<td>109/101 · 85.6</td>
+</tr>
+<tr>
+<td>FreeRTOS stream buffer (C)</td>
+<td>373/325 · 13.1</td>
+<td>300/249 · 11.8</td>
+<td>373/325 · 13.1</td>
+<td>300/249 · 11.8</td>
+</tr>
+<tr>
+<td>pxq Topology::None, single-context (C++)</td>
+<td>35/38 · 10.2</td>
+<td>35/37 · 7.4</td>
+<td>35/38 · 10.2</td>
+<td>35/37 · 7.4</td>
+</tr>
+<tr>
+<td>micoring default, single-context (C)</td>
+<td>103/98 · 90.9</td>
+<td>106/100 · 93.3</td>
+<td>103/98 · 90.9</td>
+<td>106/100 · 93.3</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf basic, single-context (C)</td>
+<td>87/80 · 98.4</td>
+<td>97/81 · 100.8</td>
+<td>87/80 · 98.4</td>
+<td>97/81 · 100.8</td>
+</tr>
+<tr>
+<td>ETL etl::queue, single-context (C++)</td>
+<td>46/47 · 61.4</td>
+<td>43/41 · 53.9</td>
+<td>46/47 · 61.4</td>
+<td>43/41 · 53.9</td>
+</tr>
+<tr>
+<td><strong>sum push+pop (single)</strong></td>
+<td>5610 (29)</td>
+<td>6952 (29)</td>
+<td>5610 (29)</td>
+<td>6952 (29)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Records: gcc <code>stm32g0b1-rb-bench-flash-20261112T125733Z.json</code>, clang <code>stm32g0b1-rb-bench-flash-clang-20261112T125853Z.json</code>, st-gcc <code>stm32g0b1-rb-bench-flash-st-gcc-20261112T104719Z.json</code>, st-clang <code>stm32g0b1-rb-bench-flash-st-clang-20261112T112322Z.json</code>.</p>
+<h2 id="appendix-all-cells-o3">Appendix: all cells, <code>-O3</code></h2>
+<h3 id="nucleo-g474re_1">NUCLEO-G474RE</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>gcc -O3</th>
+<th>clang -O3</th>
+<th>Omax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState (C++)</td>
+<td>20/21 · 7.5</td>
+<td>22/24 · 6.3</td>
+<td>22/24 · 6.8</td>
+</tr>
+<tr>
+<td>lwrb (C)</td>
+<td>129/125 · 4.0</td>
+<td>222/212 · 5.1</td>
+<td>138/133 · 4.3</td>
+</tr>
+<tr>
+<td>AndersKaloer Ring-Buffer (C)</td>
+<td>57/41 · 19.6</td>
+<td>68/41 · 20.8</td>
+<td>68/41 · 20.8</td>
+</tr>
+<tr>
+<td>jnk0le Ringbuffer (C++)</td>
+<td>23/26 · 9.5</td>
+<td>27/36 · 8.8</td>
+<td>27/36 · 9.0</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_isr (C++)</td>
+<td>40/45 · 32.5</td>
+<td>44/45 · 28.9</td>
+<td>44/45 · 28.9</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_atomic (C++)</td>
+<td>30/27 · 25.4</td>
+<td>37/38 · 22.4</td>
+<td>37/38 · 22.4</td>
+</tr>
+<tr>
+<td>QuantumLeaps LFRB (C)</td>
+<td>46/46 · 52.4</td>
+<td>56/54 · 60.9</td>
+<td>56/54 · 60.9</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf threadsafe (C)</td>
+<td>56/46 · 57.4</td>
+<td>61/50 · 60.9</td>
+<td>61/50 · 60.9</td>
+</tr>
+<tr>
+<td>ece-mohammad RingBuffer (C)</td>
+<td>81/80 · 4.4</td>
+<td>87/81 · 4.4</td>
+<td>87/81 · 4.4</td>
+</tr>
+<tr>
+<td>micoring SPSC mode (C)</td>
+<td>98/97 · 70.0</td>
+<td>107/101 · 70.3</td>
+<td>107/101 · 70.3</td>
+</tr>
+<tr>
+<td>kostyk348 lf_spsc (C)</td>
+<td>72/67 · 78.4</td>
+<td>73/62 · 73.9</td>
+<td>73/62 · 73.9</td>
+</tr>
+<tr>
+<td>diffstorm cb (C)</td>
+<td>54/52 · 59.4</td>
+<td>56/58 · 62.4</td>
+<td>56/58 · 62.4</td>
+</tr>
+<tr>
+<td>RIOT tsrb (C)</td>
+<td>52/51 · 19.6</td>
+<td>55/54 · 21.0</td>
+<td>55/54 · 21.0</td>
+</tr>
+<tr>
+<td>Contiki-NG ringbuf (C)</td>
+<td>45/42 · 50.9</td>
+<td>44/41 · 49.4</td>
+<td>44/41 · 49.4</td>
+</tr>
+<tr>
+<td>rigtorp SPSCQueue (C++)</td>
+<td>35/49 · 44.5</td>
+<td>37/38 · 39.9</td>
+<td>37/38 · 39.9</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++)</td>
+<td>29/27 · 34.9</td>
+<td>29/28 · 32.4</td>
+<td>29/28 · 32.4</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros (C++)</td>
+<td>40/32 · 43.9</td>
+<td>36/31 · 38.4</td>
+<td>36/31 · 38.4</td>
+</tr>
+<tr>
+<td>polycratia spscring (C++)</td>
+<td>24/28 · 9.5</td>
+<td>38/31 · 8.5</td>
+<td>38/31 · 8.5</td>
+</tr>
+<tr>
+<td>rt-spsc (C++)</td>
+<td>26/24 · 30.9</td>
+<td>26/26 · 30.4</td>
+<td>26/26 · 30.4</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo (C)</td>
+<td>101/100 · 4.2</td>
+<td>105/103 · 4.4</td>
+<td>105/103 · 4.4</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf (C)</td>
+<td>79/74 · 4.0</td>
+<td>85/79 · 3.5</td>
+<td>85/79 · 3.5</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf, CONFIG_SMP (C)</td>
+<td>86/83 · 4.2</td>
+<td>88/82 · 3.6</td>
+<td>88/82 · 3.6</td>
+</tr>
+<tr>
+<td>DNedic lockfree spsc::RingBuf (C++)</td>
+<td>55/48 · 3.9</td>
+<td>57/50 · 3.4</td>
+<td>57/50 · 3.4</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_locked (C++)</td>
+<td>79/80 · 59.6</td>
+<td>83/82 · 58.0</td>
+<td>83/82 · 58.0</td>
+</tr>
+<tr>
+<td>FreeRTOS stream buffer (C)</td>
+<td>257/209 · 5.4</td>
+<td>301/264 · 6.1</td>
+<td>266/217 · 5.3</td>
+</tr>
+<tr>
+<td>pxq Topology::None, single-context (C++)</td>
+<td>19/20 · 7.5</td>
+<td>21/24 · 6.3</td>
+<td>21/24 · 6.7</td>
+</tr>
+<tr>
+<td>micoring default, single-context (C)</td>
+<td>78/75 · 57.4</td>
+<td>84/77 · 62.5</td>
+<td>84/77 · 58.0</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf basic, single-context (C)</td>
+<td>40/36 · 43.9</td>
+<td>50/40 · 49.4</td>
+<td>50/40 · 49.4</td>
+</tr>
+<tr>
+<td>ETL etl::queue, single-context (C++)</td>
+<td>32/34 · 38.9</td>
+<td>32/33 · 36.4</td>
+<td>32/33 · 36.4</td>
+</tr>
+<tr>
+<td><strong>sum push+pop (single)</strong></td>
+<td>3468 (29)</td>
+<td>3916 (29)</td>
+<td>3672 (29)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Records: gcc -O3 <code>stm32g474-rb-bench-flash-O3-20261112T130534Z.json</code>, clang -O3 <code>stm32g474-rb-bench-flash-O3-clang-20261112T130654Z.json</code>, Omax <code>stm32g474-rb-bench-flash-O3-st-clang-omax-20261112T130813Z.json</code>.</p>
+<h3 id="nucleo-h723zg_1">NUCLEO-H723ZG</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>gcc -O3</th>
+<th>clang -O3</th>
+<th>Omax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState (C++)</td>
+<td>17/16 · 3.5</td>
+<td>17/19 · 3.4</td>
+<td>17/19 · 3.5</td>
+</tr>
+<tr>
+<td>lwrb (C)</td>
+<td>100/90 · 3.2</td>
+<td>107/105 · 3.7</td>
+<td>91/90 · 3.6</td>
+</tr>
+<tr>
+<td>AndersKaloer Ring-Buffer (C)</td>
+<td>33/26 · 10.0</td>
+<td>35/27 · 9.7</td>
+<td>35/27 · 9.7</td>
+</tr>
+<tr>
+<td>jnk0le Ringbuffer (C++)</td>
+<td>35/35 · 6.6</td>
+<td>36/36 · 3.7</td>
+<td>36/36 · 3.9</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_isr (C++)</td>
+<td>42/45 · 27.5</td>
+<td>45/47 · 26.4</td>
+<td>45/47 · 26.4</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_atomic (C++)</td>
+<td>38/37 · 26.7</td>
+<td>42/42 · 27.4</td>
+<td>42/42 · 27.4</td>
+</tr>
+<tr>
+<td>QuantumLeaps LFRB (C)</td>
+<td>46/41 · 34.9</td>
+<td>52/43 · 37.5</td>
+<td>52/43 · 37.5</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf threadsafe (C)</td>
+<td>37/31 · 25.4</td>
+<td>38/33 · 25.4</td>
+<td>38/33 · 25.4</td>
+</tr>
+<tr>
+<td>ece-mohammad RingBuffer (C)</td>
+<td>51/51 · 3.2</td>
+<td>55/51 · 3.2</td>
+<td>55/51 · 3.2</td>
+</tr>
+<tr>
+<td>micoring SPSC mode (C)</td>
+<td>72/72 · 49.2</td>
+<td>74/74 · 47.5</td>
+<td>74/74 · 47.5</td>
+</tr>
+<tr>
+<td>kostyk348 lf_spsc (C)</td>
+<td>65/60 · 56.2</td>
+<td>66/55 · 50.0</td>
+<td>66/55 · 50.0</td>
+</tr>
+<tr>
+<td>diffstorm cb (C)</td>
+<td>43/55 · 39.9</td>
+<td>45/57 · 40.5</td>
+<td>45/57 · 40.5</td>
+</tr>
+<tr>
+<td>RIOT tsrb (C)</td>
+<td>46/44 · 11.4</td>
+<td>44/41 · 11.2</td>
+<td>44/41 · 11.2</td>
+</tr>
+<tr>
+<td>Contiki-NG ringbuf (C)</td>
+<td>31/29 · 20.9</td>
+<td>33/30 · 21.9</td>
+<td>33/30 · 21.9</td>
+</tr>
+<tr>
+<td>rigtorp SPSCQueue (C++)</td>
+<td>36/42 · 28.6</td>
+<td>37/39 · 26.6</td>
+<td>37/39 · 26.6</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++)</td>
+<td>24/22 · 16.5</td>
+<td>25/24 · 17.9</td>
+<td>25/24 · 17.9</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros (C++)</td>
+<td>51/49 · 43.4</td>
+<td>53/49 · 44.4</td>
+<td>53/49 · 44.4</td>
+</tr>
+<tr>
+<td>polycratia spscring (C++)</td>
+<td>37/32 · 5.2</td>
+<td>42/35 · 3.7</td>
+<td>42/35 · 3.7</td>
+</tr>
+<tr>
+<td>rt-spsc (C++)</td>
+<td>35/36 · 28.9</td>
+<td>36/36 · 29.9</td>
+<td>36/36 · 29.9</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo (C)</td>
+<td>61/64 · 3.4</td>
+<td>69/70 · 3.5</td>
+<td>69/70 · 3.5</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf (C)</td>
+<td>53/51 · 3.1</td>
+<td>64/60 · 3.1</td>
+<td>64/60 · 3.1</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf, CONFIG_SMP (C)</td>
+<td>73/66 · 3.4</td>
+<td>75/70 · 3.2</td>
+<td>75/70 · 3.2</td>
+</tr>
+<tr>
+<td>DNedic lockfree spsc::RingBuf (C++)</td>
+<td>51/48 · 3.3</td>
+<td>51/48 · 3.2</td>
+<td>51/48 · 3.2</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_locked (C++)</td>
+<td>69/66 · 44.5</td>
+<td>74/72 · 42.9</td>
+<td>74/72 · 42.9</td>
+</tr>
+<tr>
+<td>FreeRTOS stream buffer (C)</td>
+<td>118/98 · 3.7</td>
+<td>189/135 · 4.0</td>
+<td>139/100 · 3.6</td>
+</tr>
+<tr>
+<td>pxq Topology::None, single-context (C++)</td>
+<td>23/21 · 3.7</td>
+<td>22/26 · 3.3</td>
+<td>22/26 · 3.4</td>
+</tr>
+<tr>
+<td>micoring default, single-context (C)</td>
+<td>49/53 · 25.8</td>
+<td>61/53 · 36.5</td>
+<td>61/53 · 35.5</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf basic, single-context (C)</td>
+<td>33/29 · 24.9</td>
+<td>39/31 · 27.5</td>
+<td>39/32 · 27.5</td>
+</tr>
+<tr>
+<td>ETL etl::queue, single-context (C++)</td>
+<td>25/26 · 19.4</td>
+<td>23/24 · 16.5</td>
+<td>23/24 · 16.5</td>
+</tr>
+<tr>
+<td><strong>sum push+pop (single)</strong></td>
+<td>2731 (29)</td>
+<td>2981 (29)</td>
+<td>2866 (29)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Records: gcc -O3 <code>stm32h723-rb-bench-flash-O3-20261112T130535Z.json</code>, clang -O3 <code>stm32h723-rb-bench-flash-O3-clang-20261112T130656Z.json</code>, Omax <code>stm32h723-rb-bench-flash-O3-st-clang-omax-20261112T130816Z.json</code>.</p>
+<h3 id="nucleo-g0b1re_1">NUCLEO-G0B1RE</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>gcc -O3</th>
+<th>clang -O3</th>
+<th>Omax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState (C++)</td>
+<td>35/38 · 10.2</td>
+<td>35/37 · 7.4</td>
+<td>35/37 · 7.4</td>
+</tr>
+<tr>
+<td>lwrb (C)</td>
+<td>187/183 · 12.4</td>
+<td>309/298 · 14.1</td>
+<td>280/275 · 13.6</td>
+</tr>
+<tr>
+<td>AndersKaloer Ring-Buffer (C)</td>
+<td>73/50 · 27.3</td>
+<td>82/51 · 26.4</td>
+<td>82/51 · 26.4</td>
+</tr>
+<tr>
+<td>jnk0le Ringbuffer (C++)</td>
+<td>36/42 · 11.8</td>
+<td>113/118 · 12.5</td>
+<td>113/118 · 12.5</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_isr (C++)</td>
+<td>73/68 · 51.8</td>
+<td>59/58 · 40.5</td>
+<td>59/58 · 40.5</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_atomic (C++)</td>
+<td>54/51 · 39.6</td>
+<td>121/121 · 98.1</td>
+<td>121/121 · 98.1</td>
+</tr>
+<tr>
+<td>QuantumLeaps LFRB (C)</td>
+<td>69/61 · 78.9</td>
+<td>174/154 · 175.8</td>
+<td>174/154 · 175.8</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf threadsafe (C)</td>
+<td>74/60 · 80.9</td>
+<td>79/65 · 83.8</td>
+<td>79/65 · 83.8</td>
+</tr>
+<tr>
+<td>ece-mohammad RingBuffer (C)</td>
+<td>111/109 · 12.4</td>
+<td>112/110 · 12.2</td>
+<td>112/110 · 12.2</td>
+</tr>
+<tr>
+<td>micoring SPSC mode (C)</td>
+<td>127/131 · 99.8</td>
+<td>182/177 · 148.4</td>
+<td>182/177 · 148.4</td>
+</tr>
+<tr>
+<td>kostyk348 lf_spsc (C)</td>
+<td>159/154 · 211.6</td>
+<td>170/169 · 181.3</td>
+<td>170/169 · 181.3</td>
+</tr>
+<tr>
+<td>diffstorm cb (C)</td>
+<td>108/109 · 122.4</td>
+<td>186/181 · 195.8</td>
+<td>186/181 · 195.8</td>
+</tr>
+<tr>
+<td>RIOT tsrb (C)</td>
+<td>65/64 · 30.1</td>
+<td>72/62 · 25.4</td>
+<td>72/62 · 25.4</td>
+</tr>
+<tr>
+<td>Contiki-NG ringbuf (C)</td>
+<td>61/53 · 70.9</td>
+<td>63/52 · 69.3</td>
+<td>63/52 · 69.3</td>
+</tr>
+<tr>
+<td>rigtorp SPSCQueue (C++)</td>
+<td>52/83 · 71.1</td>
+<td>109/178 · 141.7</td>
+<td>109/178 · 141.7</td>
+</tr>
+<tr>
+<td>wizard97 as shipped (C++)</td>
+<td>41/41 · 53.9</td>
+<td>48/47 · 59.3</td>
+<td>48/47 · 59.3</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros (C++)</td>
+<td>57/61 · 73.9</td>
+<td>63/58 · 72.3</td>
+<td>63/58 · 72.3</td>
+</tr>
+<tr>
+<td>polycratia spscring (C++)</td>
+<td>39/46 · 11.8</td>
+<td>124/129 · 11.9</td>
+<td>124/129 · 11.9</td>
+</tr>
+<tr>
+<td>rt-spsc (C++)</td>
+<td>45/44 · 57.4</td>
+<td>129/118 · 135.3</td>
+<td>129/118 · 135.3</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo (C)</td>
+<td>132/130 · 12.2</td>
+<td>133/132 · 12.1</td>
+<td>133/132 · 12.1</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf (C)</td>
+<td>115/105 · 10.4</td>
+<td>118/113 · 10.3</td>
+<td>118/113 · 10.3</td>
+</tr>
+<tr>
+<td>Zephyr ring_buf, CONFIG_SMP (C)</td>
+<td>129/117 · 11.0</td>
+<td>212/212 · 12.3</td>
+<td>212/212 · 12.3</td>
+</tr>
+<tr>
+<td>DNedic lockfree spsc::RingBuf (C++)</td>
+<td>92/81 · 12.4</td>
+<td>135/135 · 13.6</td>
+<td>135/135 · 13.6</td>
+</tr>
+<tr>
+<td>ETL queue_spsc_locked (C++)</td>
+<td>115/110 · 91.4</td>
+<td>109/101 · 85.6</td>
+<td>109/101 · 85.6</td>
+</tr>
+<tr>
+<td>FreeRTOS stream buffer (C)</td>
+<td>290/237 · 11.9</td>
+<td>298/244 · 11.8</td>
+<td>265/213 · 11.3</td>
+</tr>
+<tr>
+<td>pxq Topology::None, single-context (C++)</td>
+<td>35/38 · 10.2</td>
+<td>35/37 · 7.4</td>
+<td>35/37 · 7.4</td>
+</tr>
+<tr>
+<td>micoring default, single-context (C)</td>
+<td>103/98 · 83.1</td>
+<td>106/100 · 92.9</td>
+<td>106/100 · 87.1</td>
+</tr>
+<tr>
+<td>EmbeddedArtistry cbuf basic, single-context (C)</td>
+<td>87/80 · 98.4</td>
+<td>97/81 · 100.8</td>
+<td>97/81 · 100.8</td>
+</tr>
+<tr>
+<td>ETL etl::queue, single-context (C++)</td>
+<td>46/47 · 61.4</td>
+<td>43/41 · 53.9</td>
+<td>43/41 · 53.9</td>
+</tr>
+<tr>
+<td><strong>sum push+pop (single)</strong></td>
+<td>5101 (29)</td>
+<td>6896 (29)</td>
+<td>6780 (29)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Records: gcc -O3 <code>stm32g0b1-rb-bench-flash-O3-20261112T130535Z.json</code>, clang -O3 <code>stm32g0b1-rb-bench-flash-O3-clang-20261112T130654Z.json</code>, Omax <code>stm32g0b1-rb-bench-flash-O3-st-clang-omax-20261112T130813Z.json</code>.</p>
+<h2 id="record-fix">Record fix</h2>
+<p>Until this commit the run scripts wrote a fixed <code>toolchain_image</code>
+(<code>verified-libs/toolchain:2026-11-05</code>) into every record, also for ST builds.
+The 24 ST records of 2026-11-12 (6 bench, 18 stress) were corrected to
+<code>verified-libs/toolchain-st:cubeclt-1.22.0</code> with a <code>toolchain_image_note</code>;
+their <code>toolchain</code> block (from the image itself) was right all along. The
+scripts now write the image they ran.</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

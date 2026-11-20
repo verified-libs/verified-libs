@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finding: diffstorm/cb, two defects (fixed upstream) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html" class=on>Findings</a><a href="reports.html">Reports</a></nav></header>
+<main><h1 id="finding-diffstormcb-two-defects-fixed-upstream">Finding: diffstorm/cb, two defects (fixed upstream)</h1>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Library</td>
+<td><a href="https://github.com/diffstorm/cb">diffstorm/cb</a>, MIT</td>
+</tr>
+<tr>
+<td>Affected</td>
+<td>up to commit <code>547d0812</code> (2025-07-18)</td>
+</tr>
+<tr>
+<td>Fixed in</td>
+<td><a href="https://github.com/diffstorm/cb/commit/91ae20b"><code>91ae20b</code></a> (2026-11-08); checked again at <code>11e05d6</code> (v1.3)</td>
+</tr>
+<tr>
+<td>Defects</td>
+<td>1. the overwrite flag can switch itself on (all platforms); 2. the consumer lacks acquire ordering (multi-core targets)</td>
+</tr>
+<tr>
+<td>Found by</td>
+<td>the verified-libs stress harness and GenMC (RC11 model checking)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="timeline">Timeline</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Date</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-11-06</td>
+<td>Found: a host reproducer and GenMC show both defects at <code>547d0812</code>.</td>
+</tr>
+<tr>
+<td>2026-11-08</td>
+<td>Reported to the maintainer by email, with the reproducer (<a href="https://github.com/verified-libs/verified-libs/blob/main/verify/findings/diffstorm-cb-overwrite-padding/demo.c"><code>demo.c</code></a>) and the GenMC harness (<a href="https://github.com/verified-libs/verified-libs/blob/main/verify/genmc/diffstorm_spsc.c"><code>diffstorm_spsc.c</code></a>); 90-day notice period.</td>
+</tr>
+<tr>
+<td>2026-11-08</td>
+<td>The maintainer pushed a fix the same day (<code>91ae20b</code>). Checked here the same evening: the reproducer gives the correct result, every access to <code>overwrite</code> is a 1-byte load or store on the Cortex-M33, and GenMC passes.</td>
+</tr>
+<tr>
+<td>2026-11-08</td>
+<td>Two further upstream commits (<code>17ffdc1</code>, <code>11e05d6</code>, v1.3) checked the same way: still fixed.</td>
+</tr>
+<tr>
+<td>2026-11-09</td>
+<td>The maintainer agreed to publication before the 90 days were over. <code>libs.lock</code> pins <code>11e05d60</code>; bench and board stress on it: 0 errors, control caught; GenMC run: all checks as expected.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Thanks to the maintainer for fixing both defects within hours.</p>
+<h2 id="defect-1-overwrite-mode-can-switch-itself-on-all-platforms">Defect 1: overwrite mode can switch itself on (all platforms)</h2>
+<p><code>overwrite</code> is a 1-byte <code>atomic_bool</code> (<code>cb.h</code>, inside <code>struct cb</code>).
+<code>cb_init_ex()</code> stores it with a 1-byte atomic store, but <code>cb_insert_ex()</code>
+(<code>cb.c:373</code>), <code>cb_insert_timeout</code> (<code>cb.c:499</code>) and <code>cb_get_overwrite_ex</code>
+(<code>cb.c:597</code>) read it with <code>CB_ATOMIC_LOAD</code>, which always casts to a 32-bit
+atomic, and <code>cb_set_overwrite_ex</code> (<code>cb.c:577</code>) writes it with a 32-bit
+store. The 3 padding bytes after <code>overwrite</code> are never initialised.</p>
+<p>Consequence: if the memory holding a <code>cb</code> object was not zero before
+<code>cb_init()</code> (a local variable, a reused buffer, <code>malloc</code>), the flag reads as
+true although overwrite mode was never enabled. A full buffer then accepts
+the insert, overwrites the oldest item, and the producer moves <code>out</code>, which
+belongs to the consumer (not SPSC-safe).</p>
+<p>Why <code>CB_ATOMIC_LOAD</code> is always 32-bit: <code>cb_atomic_access.h</code> selects the cast
+with <code>#if CB_ATOMIC_INDEX_TYPE == uint32_t</code>. In a preprocessor expression both
+type names are unknown identifiers and evaluate to 0, so the first branch is
+always taken. The library already has the correct macro,
+<code>CB_ATOMIC_LOAD_OW</code> (<code>cb.c:74/82</code>), but the lines above do not use it.</p>
+<p>Evidence:
+- Host demo (<a href="https://github.com/verified-libs/verified-libs/blob/main/verify/findings/diffstorm-cb-overwrite-padding/demo.c"><code>demo.c</code></a>, x86-64, gcc):
+  <code>zeroed memory:          overwrite flag=0  insert into full buffer=rejected  first item=1  -&gt; correct
+  memory that held 0xAA:  overwrite flag=1  insert into full buffer=accepted  first item=2  -&gt; WRONG</code>
+- Cortex-M33 (arm-none-eabi-gcc 14.2.1 <code>-O2</code>): <code>overwrite</code> is 1 byte at
+  offset 16 (padding 17–19); <code>cb_insert_ex</code> loads it with
+  <code>ldr r4, [r0, #16]</code> (32-bit); <code>cb_init_ex</code> stores it with <code>stlb</code> (8-bit).
+- GenMC: "Mixed-size accesses detected: tried to read with a 32-bit access".</p>
+<p>In our benchmark and stress tests the object is a zero-initialised static,
+so the defect did not show there.</p>
+<h2 id="defect-2-consumer-lacks-acquire-ordering-multi-core-targets">Defect 2: consumer lacks acquire ordering (multi-core targets)</h2>
+<p><code>cb_remove_ex()</code> loads <code>in</code> with a relaxed atomic load and then reads the
+item from the buffer; the only barrier comes after the read (release side).
+Under the C11 memory model that is a data race on the buffer: on a
+weakly ordered multi-core CPU (the library lists aarch64, Apple Silicon and
+RISC-V among its targets) the consumer can read the slot before the
+producer's write is visible.</p>
+<p>Evidence (GenMC 0.20, RC11, 1 producer + 1 consumer, 4 items, 4 slots;
+<code>CB_MEMORY_BARRIER</code> mapped to <code>atomic_thread_fence(memory_order_seq_cst)</code>,
+the usual C11 mapping of <code>dmb</code>; finding 1 neutralised with
+<code>CB_ATOMIC_LOAD_OW</code> so it does not mask this one):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>overwrite load fixed only</td>
+<td><strong>fail: non-atomic race</strong> on the buffer</td>
+</tr>
+<tr>
+<td>+ one <code>CB_MEMORY_BARRIER()</code> after the two index loads in <code>cb_remove_ex</code></td>
+<td>pass, 686 executions</td>
+</tr>
+</tbody>
+</table></div>
+<p>Not a problem for interrupt ↔ main on one Cortex-M core (sequential on one
+core); relevant for cross-core use.</p>
+<h2 id="how-it-was-fixed-upstream-91ae20b">How it was fixed upstream (<code>91ae20b</code>)</h2>
+<ul>
+<li>Every access to <code>overwrite</code> now goes through <code>CB_ATOMIC_LOAD_OW</code> /
+  <code>CB_ATOMIC_STORE_OW</code>, which use the flag's own 1-byte type.</li>
+<li>In <code>cb_remove_ex</code> and <code>cb_peek_ex</code> the consumer loads <code>out</code> with acquire
+  semantics and has a <code>CB_MEMORY_BARRIER()</code> after the index loads, before it
+  reads the item; the producer side stores <code>in</code> with release semantics.</li>
+</ul>
+<h2 id="reproduce">Reproduce</h2>
+<p>On lib-lab1 with the pinned toolchain image: <code>bash run.sh</code> here (defect 1,
+host and Cortex-M33, against the pre-fix pin <code>diffstorm-cb-547d0812</code>) and
+<code>bash ../../genmc/run.sh</code> (both defects at <code>547d0812</code>; the fixed <code>11e05d6</code>
+must pass).</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>
