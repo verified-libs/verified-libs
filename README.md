@@ -22,6 +22,7 @@ The libraries themselves each live in their own repo under the organisation.
 - [`verify/genmc/`](verify/genmc/README.md) – GenMC model checks with negative controls (lwrb, diffstorm)
 - [`verify/findings/`](verify/findings/) – defects found, each with reproducer and status (maintainer first)
 - [`toolchain/`](toolchain/README.md) – pinned container with GenMC, CBMC, clang, arm-none-eabi GCC, Rust and Miri
+- [`mcp-server/`](mcp-server/README.md) – MCP server: the comparison as tools for AI agents, the same answers as the website
 
 ## Suggest a library
 Do you think a library belongs on the test list, your own or one you use?
