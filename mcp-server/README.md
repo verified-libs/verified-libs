@@ -53,9 +53,10 @@ answer carries the SHA-256 of the data file it was computed from.
 | `about` | What is measured and how to read it: the tests, the boards and their records, the limits, the conflict of interest, the licence. |
 | `list_ring_buffers` | The tested configurations by name, with language, licence, documented producer/consumer modes and their group in the interrupt stress test. |
 | `compare_ring_buffers` | The comparison table for one board: filters for hard requirements, optional weights for a speed ranking. Each answer links to the same view on the website. |
-| `get_ring_buffer` | One configuration on every board and in every mode. |
+| `get_ring_buffer` | One configuration on every board and in every mode, with what the results page says about it in words: its notes and any published finding. |
+| `list_findings` | The published findings: what was wrong, the versions affected, where it was fixed, and the version the comparison shows. |
 
-All four are read-only and take a fraction of a second. A full comparison
+All five are read-only and take a fraction of a second. A full comparison
 (all configurations) is about 30 000 characters; filters make it shorter.
 
 ## The same answer as the website
@@ -93,17 +94,20 @@ What follows from that:
   It cannot make an agent read it carefully. The reading rules are in the
   server's instructions and in `about`; the link to the site in each answer
   lets a person check what the agent says.
-- The notes per library and the published findings on the
-  [results page](https://verified-libs.org/results.html#notes-per-library)
-  are not in `libs.json`, so the tools do not have them; `about` links there.
+- Of the notes per library on the
+  [results page](https://verified-libs.org/results.html#notes-per-library),
+  the tools have those that say something about the version shown
+  (`site/data/libs-meta.json` names them); notes about earlier versions and
+  earlier campaigns are on the results page only. Findings still under the
+  notice period to the maintainer are not in the data.
 - The stress results of the multi-producer and multi-consumer modes are on
   the results page, not in this data (as on the comparison page).
 - stdio only: the server runs on your machine, from your checkout. There is
   no hosted server.
 - Tested against the protocol's specification (versions 2025-11-25,
-  2025-06-18, 2025-03-26 and 2024-11-05) with our own client test, not yet
-  with a range of real clients. If yours does not get along with it, write
-  to contact@verified-libs.org.
+  2025-06-18, 2025-03-26 and 2024-11-05) with our own client test, and tried
+  with one real client (Claude Code), not yet with a range of them. If yours
+  does not get along with it, write to contact@verified-libs.org.
 
 ## Tests
 

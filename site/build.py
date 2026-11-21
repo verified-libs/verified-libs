@@ -103,6 +103,7 @@ def page(slug, title, body, nav_on):
 INDEX_TITLE = "verified-libs: embedded ring buffer libraries, measured and tested on real hardware"
 
 SITE_PAGES = {"reports.html", "findings.html"}   # pages with no markdown source
+SITE_FILES = {"data/libs.json": "data/libs.json"}   # served as they are: output path -> file under site/
 MISSING = []   # (page source, link target): links to files that are not in the tree
 
 
@@ -118,8 +119,8 @@ def render(md_text, src_rel, c, pagemap):
         full = os.path.normpath(os.path.join(base, path)) if path else src_rel
         if full in pagemap:
             return f"[{text}]({pagemap[full]}{'#' + frag if frag else ''})"
-        if base == "site/content" and path in SITE_PAGES | set(pagemap.values()):
-            return m.group(0)   # a site page named as the site names it (results.html)
+        if base == "site/content" and path in SITE_PAGES | set(pagemap.values()) | set(SITE_FILES):
+            return m.group(0)   # a site page or file named as the site names it (results.html)
         if not os.path.exists(os.path.join(ROOT, full)):
             MISSING.append((src_rel, target))
         return f"[{text}]({c['REPO_URL']}/{full}{'#' + frag if frag else ''})"
@@ -190,7 +191,15 @@ def main():
             print(f"BROKEN LINK: {src} links to {target}, which is not in the tree", file=sys.stderr)
         sys.exit("build refused: a page links to a file that does not exist")
 
+    # Files served as they are (the data of the comparison, for scripts and AI
+    # agents): through the same embargo check as the pages.
+    files = {name: open(os.path.join(SITE, src)).read() for name, src in SITE_FILES.items()}
     words = embargo_words()
+    held = [(name, w) for name, body in files.items() for w in words if w in body.lower()]
+    for name, w in held:
+        print(f"EMBARGO: '{w}' appears in {name}", file=sys.stderr)
+    if held:   # also in a preview: a data file cannot carry a banner
+        sys.exit("build refused: embargoed material in a served file (see site/embargo.txt)")
     bad = [(name, w) for name, body in pages.items() for w in words if w in body.lower()]
     if bad:
         for name, w in bad:
@@ -201,9 +210,10 @@ def main():
                   'PREVIEW - contains embargoed material, not for publication</div>')
         for name in {n for n, _ in bad}:
             pages[name] = pages[name].replace("<header>", banner + "<header>", 1)
-    for name, body in pages.items():
+    for name, body in {**pages, **files}.items():
+        os.makedirs(os.path.dirname(os.path.join(out, name)), exist_ok=True)
         open(os.path.join(out, name), "w").write(body)
-    print(f"{len(pages)} pages written to {out}")
+    print(f"{len(pages)} pages and {len(files)} data file{'s' if len(files) != 1 else ''} written to {out}")
 
 
 if __name__ == "__main__":

@@ -36,17 +36,33 @@ on measurements and not on which name the model has seen most.
 
 ## Done
 
-- `mcp-server/server.py`, `vlquery.py`, `tests/` (17 tests), `README.md`.
+- `mcp-server/server.py`, `vlquery.py`, `tests/` (19 tests), `README.md`.
 - Tools: `about`, `list_ring_buffers`, `compare_ring_buffers`,
-  `get_ring_buffer`; `--call` for agents with a shell and no MCP set-up.
+  `get_ring_buffer`, `list_findings`; `--call` for agents with a shell and
+  no MCP set-up.
+- A first test with a real client (Claude Code, 2026-11-21): it called the
+  tools itself, chose the board closest to the user's core, gave numbers
+  that match the data, said which library the project owner wrote, and gave
+  the link to the same view on the site.
+- Notes and findings in the data (2026-11-21): `site/data/libs-meta.json`
+  names, per configuration, the notes of RESULTS.md ("Notes per library")
+  that say something about the version shown, and the published findings;
+  `site/gen_libdata.py` takes the texts from RESULTS.md and from the
+  finding's own page, so they are written in one place only. A test fails
+  when `libs.json` no longer has the text of RESULTS.md. The notes about
+  earlier versions and earlier campaigns (N5, N6) are left on the results
+  page.
+- The data as a file on the website: `data/libs.json`, through the same
+  embargo check as the pages (`site/build.py`); `site/check_links.py`
+  accepts a link to it only if the file is in the built site.
+- The website names the server: a section on the front page and a paragraph
+  under the comparison table.
 
 ## Open
 
-- A test with real clients (so far: our own client test against the
-  specification).
-- The notes per library and the findings are not in `libs.json`; a tool for
-  them needs the data generator to carry them.
-- The JSON data as files on the website, for agents without a checkout.
+- More real clients (so far one).
 - A hosted server (HTTP transport): a question of who runs it and where,
-  not of code.
-- A line about the server on the website.
+  not of code. Waits until someone asks for it.
+- The server reads the data from a checkout. Reading `data/libs.json` from
+  the website instead would save the `git pull`, at the price of a network
+  call in a tool that has none today.

@@ -27,7 +27,13 @@ Sources:
 - license, version, model check: site/data/libs-meta.json (by hand);
   repository and commit: firmware/nrf5340-rb-bench/libs.lock;
 - labels (zero-copy API, documented for two cores, unsafe by its own
-  documentation): firmware/nrf5340-rb-stress/decode.py.
+  documentation): firmware/nrf5340-rb-stress/decode.py;
+- notes: the "Notes per library" of RESULTS.md that site/data/libs-meta.json
+  names for a configuration, as text (the public text: embargo markup is
+  applied first), with their links as paths in the repository;
+- findings: the published findings (PUBLISH_FINDINGS of site/site.conf): the
+  heading and the table at the top of verify/findings/<name>/README.md, and
+  the configurations that libs-meta.json names for them.
 
 The output is committed; site/build.py embeds it in compare.html and runs
 its embargo check over it like over every page. The negative control, the
@@ -48,6 +54,8 @@ sys.path.insert(0, STRESS)
 from decode import MULTICORE_DOCUMENTED, MUTANTS, UNSAFE_BY_OWN_DOCS, ZERO_COPY   # noqa: E402
 from summarize import CONTROL, analyse                                            # noqa: E402
 from summarize_all import BOARD_ORDER, board_of                      # noqa: E402
+sys.path.insert(0, HERE)
+from embargo_strip import strip_embargo                              # noqa: E402
 
 # lab board name -> firmware board (the prefix of the record file names)
 FW = {"nrf5340dk": "nrf5340", "nucleo-g0b1re": "stm32g0b1", "nucleo-g474re": "stm32g474",
@@ -195,6 +203,61 @@ def not_counted(records, valid):
                 tags.append("SMP" if n in MULTICORE_DOCUMENTED else "SMP, single-core design")
             key = n + (f" [{', '.join(tags)}]" if tags else "")
             out[key] = out.get(key, 0) + 1
+    return out
+
+
+def _read(path):
+    with open(path) as fh:
+        return fh.read()
+
+
+_LINK = re.compile(r"\[([^\]]*)\]\(([^)\s]+)\)")
+
+
+def plain(md, base):
+    """A piece of markdown as one line of text, and its links: a link into the repository as its
+    path there (which must exist), any other as its address."""
+    links = []
+
+    def fix(m):
+        text, target = " ".join(m.group(1).replace("`", "").split()), m.group(2)
+        if re.match(r"^[a-z]+:", target):
+            links.append({"text": text, "url": target})
+        else:
+            path = os.path.normpath(os.path.join(base, target.split("#")[0]))
+            if not os.path.exists(os.path.join(ROOT, path)):
+                sys.exit(f"link to {target}: {path} is not in the tree")
+            links.append({"text": text, "path": path})
+        return text
+    return " ".join(_LINK.sub(fix, md).split()), links
+
+
+def result_notes():
+    """[N..] label -> the note of RESULTS.md ("Notes per library"), public text."""
+    text = strip_embargo(_read(os.path.join(ROOT, "RESULTS.md")))
+    sec = re.search(r"^### Notes per library\n(.*?)^#{1,3} ", text, re.S | re.M)
+    if not sec:
+        sys.exit('RESULTS.md has no "Notes per library" section')
+    notes = {}
+    for m in re.finditer(r"^- \*\*\[(N\d+)\]\*\* (.*?)(?=^- \*\*\[N\d+\]\*\* |\Z)", sec.group(1), re.S | re.M):
+        t, links = plain(m.group(2), "")
+        notes[m.group(1)] = {"id": m.group(1), "text": t, "links": links}
+    return notes
+
+
+def published_findings():
+    """Name -> the published finding: heading, the facts of the table at its top, path."""
+    conf = _read(os.path.join(HERE, "site.conf"))
+    m = re.search(r"^PUBLISH_FINDINGS=(.*)$", conf, re.M)
+    out = {}
+    for f in [x.strip() for x in (m.group(1) if m else "").split(",") if x.strip()]:
+        rel = f"verify/findings/{f}/README.md"
+        text = strip_embargo(_read(os.path.join(ROOT, rel)))
+        title = re.search(r"^# (.+)$", text, re.M).group(1).strip()
+        o = {"id": f, "title": re.sub(r"^Finding:\s*", "", title), "path": rel}
+        for row in re.finditer(r"^\| ([^|\n]+?) \| (.+?) \|$", text.split("\n## ")[0], re.M):
+            o[row.group(1).strip().lower().replace(" ", "_")] = plain(row.group(2), os.path.dirname(rel))[0]
+        out[f] = o
     return out
 
 
@@ -359,6 +422,9 @@ def main():
     hold_file = os.path.join(HERE, "data/hold.txt")   # configurations not shown for now (not in the public tree)
     hold = {l.strip() for l in open(hold_file) if l.strip() and not l.startswith("#")} if os.path.exists(hold_file) else set()
     contract, contract_run = contract_by_record(a.contract, list(libs))
+    notes, findings = result_notes(), published_findings()
+    for f in findings.values():
+        f["configurations"] = []
     out = []
     for n, d in libs.items():
         if n in MUTANTS or n == CONTROL or n in hold:
@@ -382,17 +448,30 @@ def main():
         # than the one pinned now (a library update after the campaign):
         # named on the page, so the stress column is not read as this version's.
         tested = sorted(c for c in stress_pins.get(m["lock"], set()) if not commit.startswith(c))
+        name = re.sub(r" \((C\+\+|C|Rust)\)$", "", n)
+        for k in m.get("notes", []):
+            if k not in notes:
+                sys.exit(f"{n}: libs-meta.json names note {k}, which RESULTS.md does not have")
+        for k in m.get("findings", []):
+            if k not in findings:   # libs-meta.json is public: it must not name a finding that is not
+                sys.exit(f"{n}: libs-meta.json names finding {k}, which is not in PUBLISH_FINDINGS of site.conf")
+            findings[k]["configurations"].append(name)
         stress_other = [c[:8] for c in tested] if d["stress"] and tested else None
-        out.append({"name": re.sub(r" \((C\+\+|C|Rust)\)$", "", n), "record_name": n, "lang": lang.group(1) if lang else "?",
+        out.append({"name": name, "record_name": n, "lang": lang.group(1) if lang else "?",
                     "stress_tested_commits": stress_other,
                     "license": m["license"], "version": m.get("version"), "commit": commit[:15] if commit.startswith("sha256:") else commit[:8], "url": url,
                     "own": bool(m.get("own")), "genmc": m.get("genmc"), "mp": mp, "contract": contract.get(n),
                     "zero_copy": n in ZERO_COPY or any(v["dma_w"] for v in d["speed"].values()), "two_cores_documented": n in MULTICORE_DOCUMENTED,
                     "boards_only": m.get("boards_only"), "boards_only_why": m.get("boards_only_why"),
                     "unsafe_by_own_docs": n in UNSAFE_BY_OWN_DOCS, "single_context": "single-context" in n,
+                    "notes": [notes[k] for k in m.get("notes", [])], "findings": list(m.get("findings", [])),
                     "size": {}, **d})
     out.sort(key=lambda x: x["name"].lower())
-    json.dump({"boards": boards, "contract": contract_run, "libs": out}, open(a.out, "w"), indent=1, ensure_ascii=False)
+    for f in findings.values():
+        if not f["configurations"]:
+            sys.exit(f"finding {f['id']}: no configuration in libs-meta.json names it")
+    json.dump({"boards": boards, "contract": contract_run, "findings": list(findings.values()), "libs": out},
+              open(a.out, "w"), indent=1, ensure_ascii=False)
     print(f"{len(out)} configurations, {len(boards)} boards -> {a.out}")
     # A record whose commit is unknown or had uncommitted changes cannot be
     # rebuilt by lab/tools/verify-build.sh: say so (never publish such numbers).

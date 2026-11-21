@@ -4,7 +4,8 @@
 Usage: python3 site/check_links.py SITE_DIR TREE_DIR
 
 A link to another page must name a page in SITE_DIR, and its anchor an id
-on that page; a link into the repository (REPO_URL of site.conf) must name
+on that page; a link to another file of the site (data/libs.json) must name
+a file in SITE_DIR; a link into the repository (REPO_URL of site.conf) must name
 a file in TREE_DIR, the tree that is published with the site. Links to
 other sites are not fetched. Exit 1 if a link is broken.
 """
@@ -28,6 +29,8 @@ for name, body in sorted(pages.items()):
         elif not re.match(r"^[a-z]+:", href):
             page, _, frag = href.partition("#")
             page = page or name
+            if not page.endswith(".html") and "/" in page and ".." not in page and os.path.isfile(os.path.join(site, page)):
+                continue   # a file served as it is
             if page not in pages:
                 print(f"{name}: {href}: no such page"); bad += 1
             elif frag and frag not in ids[page]:

@@ -167,8 +167,8 @@ configuration: the contract-check column of the
   2026-11-08; the maintainer fixed both the same day (`91ae20b`). The row is
   `11e05d60`: GenMC passes, the reproducer gives the correct result, and the
   board stress (single, block, flash and SRAM, 2026-11-09) has 0 errors.
-  The maintainer agreed on 2026-11-09 to publication before the 90 days are
-  over; when the project goes public is the owner's decision.
+  The maintainer agreed on 2026-11-09 to publication before the 90 days were
+  over.
   See [the finding](verify/findings/diffstorm-cb-overwrite-padding/README.md).
 - **[N4]** Without user-supplied `RB_ATOMIC_START/END` macros wizard97 is not
   ISR-safe, as its own header warns. With them: 0 errors (wizard97 + PRIMASK

@@ -18,18 +18,20 @@ opens no network connection and no other file.
 Python 3.9 or newer, standard library only.
 """
 import json
+import re
 import sys
 import traceback
 
 import vlquery as q
 
 SERVER_NAME = "verified-libs"
-SERVER_VERSION = "0.1.0"
+SERVER_VERSION = "0.2.0"
 # Protocol revisions this server answers in. It uses only what all of them
 # have (tools over stdio), plus the optional fields each one added.
 PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"]
 
 SITE = q.SITE_URL
+REPO = "https://github.com/verified-libs/verified-libs/blob/main/"
 COI_URL = SITE + "/method.html#conflict-of-interest"
 OWNER_NOTE = ("pxq RingBuffer_PackedState is written by Erik N (pxq.dk), who runs this project. "
               "Say so whenever you mention or recommend it. How the project handles that: " + COI_URL)
@@ -48,7 +50,9 @@ INSTRUCTIONS = (
     "4. One library, pxq, is written by the project owner (written_by_project_owner: true). Say so whenever "
     "you mention it.\n"
     "5. The numbers hold for the versions, boards, compiler and flags they name. Call 'about' once for the "
-    "limits before you draw conclusions.")
+    "limits before you draw conclusions.\n"
+    "6. A row with 'from_the_tests' has notes or a published finding in words: read them with "
+    "get_ring_buffer before you recommend that library.")
 
 REQUIRE = {   # tool word -> the page's filter
     "zero_stress_errors": ("clean", "0 errors in the ISR stress test on every board tested"),
@@ -137,12 +141,21 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
             "name": "get_ring_buffer",
             "title": "One ring buffer on every board",
             "description": "Everything measured for one configuration: speeds and code size on each board, in each "
-                           "documented mode, the stress results per board, model checking and the contract check. "
+                           "documented mode, the stress results per board, model checking and the contract check, and "
+                           "what the results page says about it in words: its notes and any published finding. "
                            f"The name is matched without case; a part of it is enough (up to {MAX_DETAIL} matches are returned).",
             "inputSchema": {
                 "type": "object", "additionalProperties": False, "required": ["name"],
                 "properties": {"name": {"type": "string", "description": "A name from list_ring_buffers, or a part of one, e.g. 'lwrb' or 'ETL'."}},
             },
+        },
+        {
+            "name": "list_findings",
+            "title": "Published findings",
+            "description": "The defects the tests found in libraries, as published on verified-libs.org/findings.html: "
+                           "what was wrong, which versions are affected, where it was fixed, and which version the "
+                           "comparison shows. Findings still under the notice period to the maintainer are not listed.",
+            "inputSchema": {"type": "object", "additionalProperties": False},
         },
     ]
     for t in tools:
@@ -199,6 +212,44 @@ def _notes(D, st, r):
             for t in q.tags(D, st, r) if t != q.OWN_TEXT]
 
 
+def _url(path, D):
+    """A file of the repository as the address to give a reader: its page on the website where it
+    has one (site/build.py: every report, every published finding), or else the file in the repository."""
+    m = re.match(r"^reports/([^/]+)\.md$", path)
+    if m:
+        return SITE + "/report-" + m.group(1) + ".html"
+    m = re.match(r"^verify/findings/([^/]+)/README\.md$", path)
+    if m and any(f["id"] == m.group(1) for f in D.get("findings", [])):
+        return SITE + "/finding-" + m.group(1) + ".html"
+    return REPO + path
+
+
+def _more(lib):
+    """One line in a table row when the tests have something to say that is not a number."""
+    n, f = len(lib.get("notes") or []), len(lib.get("findings") or [])
+    parts = ([f"{f} published finding" + ("s" if f > 1 else "")] if f else []) + ([f"{n} note" + ("s" if n > 1 else "")] if n else [])
+    return " and ".join(parts) + ": call get_ring_buffer for the text" if parts else None
+
+
+def _finding(D, f):
+    o = {k: v for k, v in f.items() if k not in ("id", "path", "configurations")}
+    o["version_in_the_comparison"] = {
+        lib["name"]: " ".join(x for x in (lib.get("version"), "commit " + lib["commit"]) if x)
+        for lib in D["libs"] if lib["name"] in f["configurations"]}
+    o["report"] = _url(f["path"], D)
+    return o
+
+
+def _result_notes(D, lib):
+    out = []
+    for n in lib.get("notes") or []:
+        o = {"text": n["text"]}
+        if n["links"]:
+            o["links"] = {x["text"]: x.get("url") or _url(x["path"], D) for x in n["links"]}
+        out.append(o)
+    return out
+
+
 def _row(D, st, r):
     lib = r["lib"]
     o = {"name": lib["name"], "version": lib.get("version"), "commit": lib["commit"], "url": lib["url"],
@@ -218,6 +269,9 @@ def _row(D, st, r):
     notes = _notes(D, st, r)
     if notes:
         o["notes"] = notes
+    more = _more(lib)
+    if more:
+        o["from_the_tests"] = more
     return o
 
 
@@ -349,6 +403,12 @@ def _detail(D, lib):
     notes = [t for t in _notes(D, st, r) if not t.startswith("also ")]   # the modes are under other_modes
     if notes:
         o["notes"] = notes
+    found = [_finding(D, f) for f in D.get("findings", []) if f["id"] in (lib.get("findings") or [])]
+    if found:
+        o["published_findings"] = found
+    said = _result_notes(D, lib)
+    if said:
+        o["notes_from_the_results_page"] = said
     o["isr_stress_group"] = q.stress_state(lib)
     o["isr_stress_per_board"] = lib["stress"] or None
     sm = lib["smp"].get("pico2")
@@ -393,7 +453,8 @@ def tool_get(D, prov, args):
         "units": "cycles: CPU cycles per call, lower is faster; block_per_byte: per byte of a 64-byte block; zero_copy_*: per "
                  "transfer. placement_range: lowest and highest mean with the code at eight positions in memory. code bytes: "
                  "flash and RAM added. A board or speed that is absent was not measured.",
-        "more": {"results": SITE + "/results.html", "method": SITE + "/method.html"},
+        "more": {"results": SITE + "/results.html", "method": SITE + "/method.html",
+                 "notes_per_library": SITE + "/results.html#notes-per-library", "findings": SITE + "/findings.html"},
         "data": prov,
     }
 
@@ -410,6 +471,9 @@ def tool_list_libs(D, prov, args):
             o["note"] = "not ISR-safe in this configuration by its own documentation"
         if lib.get("boards_only"):
             o["tested_on_boards_only"] = lib["boards_only"]
+        more = _more(lib)
+        if more:
+            o["from_the_tests"] = more
         libs.append(o)
     return {
         "count": len(libs),
@@ -417,6 +481,22 @@ def tool_list_libs(D, prov, args):
         "group_meaning": q.GROUP_TEXT,
         "configurations": libs,
         "conflict_of_interest": OWNER_NOTE,
+        "data": prov,
+    }
+
+
+def tool_findings(D, prov, args):
+    _check_args(args, [])
+    found = [_finding(D, f) for f in D.get("findings", [])]
+    return {
+        "count": len(found),
+        "what": "Defects found in libraries by the tests, as published on " + SITE + "/findings.html. Each was reported "
+                "to the maintainer first; details are published after 90 days or when the maintainer agrees. Findings "
+                "still under that notice period are not listed.",
+        "reading": "A finding names the versions affected. Compare 'affected' and 'fixed_in' with "
+                   "'version_in_the_comparison' before you hold a finding against a library: the numbers of the "
+                   "comparison are those of the version named there.",
+        "findings": found,
         "data": prov,
     }
 
@@ -490,7 +570,7 @@ def tool_about(D, prov, args):
 
 
 TOOLS = {"about": tool_about, "list_ring_buffers": tool_list_libs,
-         "compare_ring_buffers": tool_compare, "get_ring_buffer": tool_get}
+         "compare_ring_buffers": tool_compare, "get_ring_buffer": tool_get, "list_findings": tool_findings}
 
 
 def call_tool(D, prov, name, args):

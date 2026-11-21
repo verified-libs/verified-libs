@@ -11,6 +11,7 @@ import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SERVER = os.path.join(os.path.dirname(HERE), "server.py")
+ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.dirname(HERE))
 import server   # noqa: E402
 import vlquery as q   # noqa: E402
@@ -195,8 +196,54 @@ class Answers(unittest.TestCase):
         self.assertEqual(self.tool("list_ring_buffers")["count"], len(self.D["libs"]))
 
     def test_answers_name_their_data(self):
-        for name, args in (("about", {}), ("list_ring_buffers", {}), ("compare_ring_buffers", {}), ("get_ring_buffer", {"name": "lwrb"})):
+        for name, args in (("about", {}), ("list_ring_buffers", {}), ("compare_ring_buffers", {}), ("get_ring_buffer", {"name": "lwrb"}),
+                           ("list_findings", {})):
             self.assertEqual(len(self.tool(name, args)["data"]["sha256"]), 64)
+
+    def test_notes_and_findings(self):
+        """What the results page says in words reaches the agent, with links that lead somewhere."""
+        D = self.D
+        with_more = {lib["name"] for lib in D["libs"] if lib["notes"] or lib["findings"]}
+        self.assertTrue(with_more)
+        for tool, key in (("list_ring_buffers", "configurations"), ("compare_ring_buffers", "rows")):
+            rows = self.tool(tool, {} if tool == "list_ring_buffers" else {"include_single_context": True})[key]
+            self.assertEqual({r["name"] for r in rows if "from_the_tests" in r}, with_more & {r["name"] for r in rows})
+        found = self.tool("list_findings")
+        self.assertEqual(found["count"], len(D["findings"]))
+        self.assertEqual([f["title"] for f in found["findings"]], [f["title"] for f in D["findings"]])
+        urls = [f["report"] for f in found["findings"]]
+        for lib in D["libs"]:
+            cfg = self.tool("get_ring_buffer", {"name": lib["name"]})["configurations"][0]
+            self.assertEqual([n["text"] for n in cfg.get("notes_from_the_results_page", [])], [n["text"] for n in lib["notes"]])
+            self.assertEqual([f["title"] for f in cfg.get("published_findings", [])],
+                             [f["title"] for f in D["findings"] if f["id"] in lib["findings"]])
+            for f in cfg.get("published_findings", []):
+                self.assertIn(lib["name"], f["version_in_the_comparison"])
+                self.assertIn(lib["commit"], f["version_in_the_comparison"][lib["name"]])
+            for n in cfg.get("notes_from_the_results_page", []):
+                urls += list(n.get("links", {}).values())
+            for n in lib["notes"]:        # a link into the repository names a file that is there
+                for x in n["links"]:
+                    self.assertTrue("url" in x or os.path.exists(os.path.join(ROOT, x["path"])), x)
+        for f in D["findings"]:
+            self.assertTrue(os.path.exists(os.path.join(ROOT, f["path"])), f["path"])
+            self.assertTrue(f["configurations"])
+        self.assertTrue(urls)
+        for u in urls:
+            self.assertTrue(u.startswith(server.SITE + "/") or u.startswith(server.REPO), u)
+
+    def test_notes_are_those_of_the_results_page(self):
+        """libs.json carries the notes and findings as the repository has them now (site/gen_libdata.py)."""
+        sys.path.insert(0, os.path.join(ROOT, "site"))
+        import gen_libdata as gen
+        notes, findings = gen.result_notes(), gen.published_findings()
+        seen = 0
+        for lib in self.D["libs"]:
+            for n in lib["notes"]:
+                self.assertEqual(n, notes[n["id"]], f"{lib['name']}: note {n['id']} is not the text of RESULTS.md; run site/gen_libdata.py")
+                seen += 1
+        self.assertTrue(seen)
+        self.assertEqual([{k: v for k, v in f.items() if k != "configurations"} for f in self.D["findings"]], list(findings.values()))
 
     def test_command_line_call(self):
         p = subprocess.run([sys.executable, SERVER, "--call", "compare_ring_buffers", '{"board": "pico2"}'],

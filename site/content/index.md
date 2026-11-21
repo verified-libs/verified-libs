@@ -22,6 +22,20 @@ on Cortex-M, in C and C++.
 - **[Reports](reports.html)**: the campaign and measurement reports, in
   date order.
 
+## For AI agents and scripts
+
+The comparison can be read without a browser:
+
+- **[MCP server](../../mcp-server/README.md)**: the comparison as tools for
+  an AI agent (Model Context Protocol). It gives the same rows in the same
+  order as the [comparison page](compare.html), with the notes and published
+  findings, and it says which library the project owner wrote. It runs on
+  your own machine from a copy of the repository; there is no hosted server.
+- **[data/libs.json](data/libs.json)**: the data behind the comparison page
+  as one JSON file: every number of the page, and the records and campaigns
+  it comes from. [`site/gen_libdata.py`](../gen_libdata.py) says where each
+  field comes from. The layout follows the page and can change with it.
+
 ## Principles, in short
 
 - Every result says what it was measured on: board, core, clock, compiler,
