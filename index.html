@@ -53,6 +53,19 @@ on Cortex-M, in C and C++.</p>
 <li><strong><a href="reports.html">Reports</a></strong>: the campaign and measurement reports, in
   date order.</li>
 </ul>
+<h2 id="for-ai-agents-and-scripts">For AI agents and scripts</h2>
+<p>The comparison can be read without a browser:</p>
+<ul>
+<li><strong><a href="https://github.com/verified-libs/verified-libs/blob/main/mcp-server/README.md">MCP server</a></strong>: the comparison as tools for
+  an AI agent (Model Context Protocol). It gives the same rows in the same
+  order as the <a href="compare.html">comparison page</a>, with the notes and published
+  findings, and it says which library the project owner wrote. It runs on
+  your own machine from a copy of the repository; there is no hosted server.</li>
+<li><strong><a href="data/libs.json">data/libs.json</a></strong>: the data behind the comparison page
+  as one JSON file: every number of the page, and the records and campaigns
+  it comes from. <a href="https://github.com/verified-libs/verified-libs/blob/main/site/gen_libdata.py"><code>site/gen_libdata.py</code></a> says where each
+  field comes from. The layout follows the page and can change with it.</li>
+</ul>
 <h2 id="principles-in-short">Principles, in short</h2>
 <ul>
 <li>Every result says what it was measured on: board, core, clock, compiler,

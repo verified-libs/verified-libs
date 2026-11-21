@@ -154,6 +154,10 @@ repeated outside the project (<a href="reproduce.html">Reproduce</a>). A row wit
 The stress counts are from the newest night campaign on each board, added together with the nights
 before it as long as the test did not change in between (the same stress firmware, libraries and
 compiler flag rotation); the campaigns used are named under the table.</p>
+<h2>The same table without a browser</h2>
+<p>The data of this page is one file: <a href="data/libs.json">data/libs.json</a>. For AI agents the
+<a href="https://github.com/verified-libs/verified-libs/blob/main/mcp-server/README.md">MCP server</a>
+in the repository gives this table as tools: the same rows in the same order, and a link back to the same view here.</p>
 <script type="application/json" id="libdata">{
  "boards": [
   {
@@ -599,6 +603,21 @@ compiler flag rotation); the campaigns used are named under the table.</p>
   "trials": 7039483,
   "interrupts_per_call": 2
  },
+ "findings": [
+  {
+   "id": "diffstorm-cb-overwrite-padding",
+   "title": "diffstorm/cb, two defects (fixed upstream)",
+   "path": "verify/findings/diffstorm-cb-overwrite-padding/README.md",
+   "library": "diffstorm/cb, MIT",
+   "affected": "up to commit `547d0812` (2025-07-18)",
+   "fixed_in": "91ae20b (2026-11-08); checked again at `11e05d6` (v1.3)",
+   "defects": "1. the overwrite flag can switch itself on (all platforms); 2. the consumer lacks acquire ordering (multi-core targets)",
+   "found_by": "the verified-libs stress harness and GenMC (RC11 model checking)",
+   "configurations": [
+    "diffstorm cb"
+   ]
+  }
+ ],
  "libs": [
   {
    "name": "AndersKaloer Ring-Buffer",
@@ -624,6 +643,14 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [
+    {
+     "id": "N2",
+     "text": "AndersKaloer uses plain variables; this build happens to keep a safe store order, which the language does not guarantee. Its queue function overwrites when full; the adapter checks for space first.",
+     "links": []
+    }
+   ],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 372,
@@ -848,6 +875,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": true,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 304,
@@ -1072,6 +1101,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 344,
@@ -1296,6 +1327,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 7560,
@@ -1568,6 +1601,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 228,
@@ -1792,6 +1827,21 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [
+    {
+     "id": "N3",
+     "text": "diffstorm up to `547d0812` had two defects, found by GenMC and a host reproducer: the 1-byte overwrite flag was accessed with 32-bit loads/stores, so uninitialised padding could turn overwrite mode on (silent data loss), and the consumer lacked acquire ordering (matters across cores). The stress test passed only because the test object is in zeroed memory. Reported on 2026-11-08; the maintainer fixed both the same day (`91ae20b`). The row is `11e05d60`: GenMC passes, the reproducer gives the correct result, and the board stress (single, block, flash and SRAM, 2026-11-09) has 0 errors. The maintainer agreed on 2026-11-09 to publication before the 90 days were over. See the finding.",
+     "links": [
+      {
+       "text": "the finding",
+       "path": "verify/findings/diffstorm-cb-overwrite-padding/README.md"
+      }
+     ]
+    }
+   ],
+   "findings": [
+    "diffstorm-cb-overwrite-padding"
+   ],
    "size": {
     "nrf5340dk": {
      "flash": 472,
@@ -2305,6 +2355,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 452,
@@ -2529,6 +2581,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 1020,
@@ -2801,6 +2855,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 6452,
@@ -3021,6 +3077,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": true,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 312,
@@ -3208,6 +3266,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 336,
@@ -3427,6 +3487,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": true,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 236,
@@ -3614,6 +3676,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 340,
@@ -3838,6 +3902,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 516,
@@ -4062,6 +4128,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 704,
@@ -4286,6 +4354,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 1500,
@@ -4992,6 +5062,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 216,
@@ -5216,6 +5288,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 268,
@@ -5440,6 +5514,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 984,
@@ -5712,6 +5788,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 1180,
@@ -5931,6 +6009,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": true,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 564,
@@ -6118,6 +6198,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 724,
@@ -6342,6 +6424,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 532,
@@ -6563,6 +6647,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": "Nordic's licence allows use with Nordic chips only; the nRF5 SDK is a zip from nordicsemi.com, pinned by SHA-256 (nrf5-sdk.lock)",
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {},
    "speed": {
     "nrf5340dk": {
@@ -6600,6 +6686,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 304,
@@ -7309,6 +7397,28 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [
+    {
+     "id": "N1",
+     "text": "pxq uses `volatile` for its documented contract (ISR ↔ main loop on one core). Under the C11 model that is a data race by definition, so it is checked against its contract (the one-core contract check), not with the plain C11 check.",
+     "links": []
+    },
+    {
+     "id": "N7",
+     "text": "pxq ⚠: its MPSC, SPMC and MPMC modes mask interrupts, so they are for one core; with the producers or consumers on the Pico 2's two cores they give errors, and reserve/commit starves (not counted: not a documented use; see the validation report). On the NUCLEO-H723ZG its indices share a cache line with its data; a DMA can only use it in non-cacheable memory (DMA report).",
+     "links": [
+      {
+       "text": "the validation report",
+       "path": "reports/2026-11-17-mp-per-library-validation.md"
+      },
+      {
+       "text": "DMA report",
+       "path": "reports/2026-11-17-dma-producer.md"
+      }
+     ]
+    }
+   ],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 576,
@@ -7576,6 +7686,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": true,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 584,
@@ -7811,6 +7923,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 256,
@@ -8035,6 +8149,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 400,
@@ -8728,6 +8844,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 356,
@@ -8952,6 +9070,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 212,
@@ -9176,6 +9296,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 680,
@@ -9400,6 +9522,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": true,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 620,
@@ -9624,6 +9748,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 1296,
@@ -10365,6 +10491,14 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [
+    {
+     "id": "N4",
+     "text": "Without user-supplied `RB_ATOMIC_START/END` macros wizard97 is not ISR-safe, as its own header warns. With them: 0 errors (wizard97 + PRIMASK macros).",
+     "links": []
+    }
+   ],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 320,
@@ -10589,6 +10723,14 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": true,
    "single_context": false,
+   "notes": [
+    {
+     "id": "N4",
+     "text": "Without user-supplied `RB_ATOMIC_START/END` macros wizard97 is not ISR-safe, as its own header warns. With them: 0 errors (wizard97 + PRIMASK macros).",
+     "links": []
+    }
+   ],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 200,
@@ -10813,6 +10955,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 800,
@@ -11085,6 +11229,8 @@ compiler flag rotation); the campaigns used are named under the table.</p>
    "boards_only_why": null,
    "unsafe_by_own_docs": false,
    "single_context": false,
+   "notes": [],
+   "findings": [],
    "size": {
     "nrf5340dk": {
      "flash": 956,
