@@ -146,9 +146,12 @@ def page(slug, title, body, nav_on, desc="", listed=True):
 
 
 # The front page's heading is the project's name; its browser title says more.
-INDEX_TITLE = "verified-libs: embedded ring buffer libraries, measured and tested on real hardware"
-INDEX_DESC = ("Embedded ring buffer (FIFO) libraries for microcontrollers, compared on six boards: speed, code size, "
-              "interrupt stress tests and model checks. Every number links to its record and source.")
+# The project is a registry of more than one kind of library; ring buffers
+# are the first niche. Name both, the project first.
+INDEX_TITLE = "verified-libs: libraries tested on real hardware, first embedded ring buffers"
+INDEX_DESC = ("An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. "
+              "The first niche: embedded ring buffer (FIFO) libraries for microcontrollers on six boards, "
+              "every number with its record and source.")
 # What a search engine shows under the page's title. Pages not named here
 # (reports, findings) get their first paragraph (describe).
 DESCRIPTIONS = {
