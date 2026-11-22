@@ -1,10 +1,10 @@
 {
  "board": "SAM D20 Xplained Pro",
  "campaigns": [
-  "overnight-20261119T180549Z-sam-d20-xpro"
+  "overnight-20261122T001440Z-sam-d20-xpro"
  ],
  "commits": [
-  "8d8880f4bf78"
+  "a7a206190337"
  ],
  "modes": {
   "single": {
@@ -101,7 +101,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 34080,
+     "errors": 34003,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -161,7 +161,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 2432,
+     "errors": 2560,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -329,7 +329,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 2,
      "runs_with_errors": 2,
-     "errors": 86483,
+     "errors": 86008,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -389,7 +389,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 2,
      "runs_with_errors": 2,
-     "errors": 11286,
+     "errors": 10040,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -401,7 +401,7 @@
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 2,
      "runs_with_errors": 1,
-     "errors": 120,
+     "errors": 108,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {
@@ -785,7 +785,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 1,
      "runs_with_errors": 1,
-     "errors": 234725,
+     "errors": 235246,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -845,7 +845,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 1,
      "runs_with_errors": 1,
-     "errors": 249729,
+     "errors": 226954,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {

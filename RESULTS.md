@@ -9,7 +9,7 @@
 > maintainers first (principle 5) and stay unpublished for 90 days from
 > sending.
 
-Updated 2026-11-20. Six boards: nRF5340 DK (application core), Raspberry Pi
+Updated 2026-11-22. Six boards: nRF5340 DK (application core), Raspberry Pi
 Pico 2 (RP2350), NUCLEO-G474RE, NUCLEO-H723ZG, NUCLEO-G0B1RE and SAM D20
 Xplained Pro ([method](site/content/method.md)). Compiler:
 arm-none-eabi-gcc 14.2.1, `-O2 -DNDEBUG`, newlib-nano; the Rust libraries
@@ -32,7 +32,7 @@ code size and placement ranges.
 ## Speed on six boards
 Cells: mean cycles per call, 1-byte push / pop · 64-byte block, cycles per
 byte (mean of write and read); code in flash, cache or flash accelerator on,
-gcc -O2 (2026-11-19, commit `8d8880f4bf78`). Clocks: nRF5340 64 MHz,
+gcc -O2 (night 2026-11-21/22, commit `a7a206190337`). Clocks: nRF5340 64 MHz,
 Pico 2 150 MHz, G474 170 MHz, H723 64 MHz, G0B1 64 MHz, SAM D20 48 MHz.
 Cycles, not time, so the clocks do not matter; wait states and the memory
 system do. Sorted by name;
@@ -41,62 +41,67 @@ there is no ranking of ours. ⚠ marks the project owner's own library.
 <!-- table:speed -->
 | Library | nRF5340 M33 | Pico 2 M33 | G474 M4 | H723 M7 | G0B1 M0+ | SAM D20 M0+ |
 |---|---|---|---|---|---|---|
-| AndersKaloer Ring-Buffer (C) | 56 / 41 · 16.7 | 44 / 31 · 16.5 | 57 / 41 · 20.1 | 33 / 27 · 9.3 | 73 / 50 · 25.3 | 73 / 48 · 24.4 |
-| *Arduino RingBufferN as shipped (C++)* ¹ | 37 / 46 · 48.1 | 33 / 36 · 40.8 | 42 / 39 · 48.4 | 36 / 34 · 26.9 | 81 / 91 · 100.9 | 78 / 87 · 91.5 |
-| Arduino SafeRingBufferN (C++) | 53 / 54 · 59.7 | 44 / 44 · 50.3 | 56 / 48 · 60.4 | 58 / 59 · 50.4 | 99 / 113 · 120.9 | 97 / 111 · 114.5 |
+| AndersKaloer Ring-Buffer (C) | 58 / 40 · 16.7 | 44 / 31 · 16.5 | 57 / 41 · 20.1 | 33 / 27 · 9.3 | 73 / 50 · 27.3 | 72 / 48 · 24.4 |
+| *Arduino RingBufferN as shipped (C++)* ¹ | 37 / 46 · 48.1 | 33 / 36 · 40.8 | 42 / 39 · 48.4 | 36 / 34 · 26.9 | 81 / 91 · 100.9 | 78 / 87 · 93.5 |
+| Arduino SafeRingBufferN (C++) | 53 / 54 · 59.6 | 44 / 44 · 50.3 | 56 / 48 · 60.4 | 58 / 59 · 50.4 | 99 / 113 · 120.9 | 97 / 111 · 114.5 |
 | bbqueue (Rust) | 175 / 157 · 5.9 | 121 / 105 · 4.4 | 161 / 139 · 7.1 | 150 / 112 · 5.8 | 270 / 229 · 15.2 | 284 / 240 · 15.4 |
-| Contiki-NG ringbuf (C) | 40 / 40 · 46.6 | 33 / 32 · 38.8 | 45 / 42 · 51.9 | 39 / 34 · 28.6 | 61 / 53 · 71.9 | 60 / 52 · 64.0 |
-| diffstorm cb (C) | 79 / 72 · 82.1 | 56 / 56 · 62.3 | 72 / 69 · 77.9 | 59 / 74 · 58.5 | 122 / 129 · 140.4 | 114 / 126 · 131.0 |
-| DNedic lockfree spsc::RingBuf (C++) | 123 / 123 · 3.4 | 83 / 83 · 2.8 | 98 / 88 · 3.8 | 73 / 70 · 3.4 | 165 / 157 · 12.4 | 168 / 160 · 12.4 |
-| ece-mohammad RingBuffer (C) | 90 / 89 · 3.7 | 66 / 64 · 2.9 | 81 / 80 · 4.2 | 57 / 53 · 3.1 | 111 / 109 · 12.4 | 112 / 111 · 12.4 |
+| Contiki-NG ringbuf (C) | 40 / 40 · 46.6 | 33 / 32 · 38.8 | 45 / 42 · 51.9 | 39 / 35 · 28.6 | 61 / 53 · 71.9 | 60 / 52 · 63.0 |
+| diffstorm cb (C) | 79 / 72 · 82.1 | 56 / 56 · 62.3 | 72 / 69 · 77.9 | 59 / 73 · 58.0 | 122 / 131 · 141.4 | 114 / 127 · 131.0 |
+| DNedic lockfree spsc::RingBuf (C++) | 126 / 126 · 3.5 | 83 / 83 · 2.8 | 98 / 88 · 3.8 | 72 / 70 · 3.4 | 163 / 155 · 12.4 | 167 / 159 · 12.4 |
+| ece-mohammad RingBuffer (C) | 93 / 92 · 3.8 | 66 / 64 · 2.9 | 81 / 80 · 4.1 | 57 / 53 · 3.1 | 110 / 109 · 12.4 | 111 / 111 · 12.4 |
 | embassy-sync Pipe (Rust) | 222 / 213 · 6.1 | 196 / 189 · 5.4 | 229 / 217 · 6.4 | 114 / 105 · 4.3 | 271 / 252 · 13.6 | 289 / 267 · 13.9 |
-| EmbeddedArtistry cbuf basic, single-context (C) | 38 / 37 · 44.1 | 35 / 32 · 39.8 | 40 / 36 · 43.9 | 33 / 29 · 24.9 | 87 / 80 · 98.4 | 84 / 76 · 90.5 |
-| EmbeddedArtistry cbuf threadsafe (C) | 54 / 44 · 54.8 | 41 / 34 · 43.8 | 56 / 46 · 58.4 | 38 / 31 · 31.8 | 74 / 60 · 81.9 | 75 / 58 · 74.0 |
+| EmbeddedArtistry cbuf basic, single-context (C) | 38 / 37 · 44.1 | 35 / 32 · 39.8 | 40 / 36 · 43.9 | 33 / 29 · 24.9 | 87 / 80 · 98.4 | 84 / 76 · 91.4 |
+| EmbeddedArtistry cbuf threadsafe (C) | 53 / 44 · 54.6 | 41 / 34 · 43.8 | 56 / 46 · 58.4 | 38 / 31 · 31.8 | 74 / 60 · 81.9 | 75 / 58 · 73.5 |
 | ETL etl::queue, single-context (C++) | 25 / 29 · 33.6 | 26 / 28 · 33.3 | 32 / 34 · 38.9 | 25 / 26 · 19.4 | 46 / 47 · 61.4 | 47 / 48 · 54.5 |
 | ETL queue_spsc_atomic (C++) | 24 / 31 · 22.6 | 25 / 26 · 22.3 | 30 / 27 · 23.9 | 33 / 32 · 26.0 | 54 / 51 · 40.0 | 57 / 53 · 37.6 |
 | ETL queue_spsc_isr (C++) | 33 / 38 · 27.6 | 34 / 32 · 27.2 | 40 / 45 · 31.9 | 39 / 40 · 28.4 | 73 / 68 · 53.6 | 73 / 68 · 53.2 |
-| ETL queue_spsc_locked (C++) | 80 / 80 · 51.7 | 63 / 61 · 50.9 | 79 / 80 · 61.5 | 79 / 77 · 60.5 | 117 / 112 · 94.5 | 110 / 106 · 90.1 |
-| FreeRTOS stream buffer (C) | 301 / 249 · 5.3 | 208 / 170 · 4.0 | 354 / 277 · 6.9 | 207 / 150 · 4.5 | 357 / 313 · 12.9 | 359 / 316 · 12.9 |
+| ETL queue_spsc_locked (C++) | 80 / 80 · 51.7 | 63 / 61 · 50.9 | 79 / 80 · 61.5 | 79 / 77 · 60.5 | 115 / 110 · 92.5 | 108 / 104 · 87.6 |
+| FreeRTOS stream buffer (C) | 302 / 252 · 5.3 | 208 / 170 · 4.0 | 347 / 279 · 6.5 | 206 / 150 · 4.5 | 373 / 325 · 13.2 | 359 / 322 · 13.0 |
 | heapless spsc::Queue (Rust) | 31 / 37 · 39.7 | 23 / 27 · 31.4 | 35 / 37 · 43.0 | 40 / 35 · 28.0 | 61 / 63 · 73.0 | 66 / 68 · 76.0 |
-| jnk0le Ringbuffer (C++) | 17 / 19 · 9.5 | 17 / 18 · 9.4 | 23 / 26 · 9.5 | 30 / 30 · 6.5 | 36 / 42 · 11.8 | 36 / 43 · 11.8 |
-| kostyk348 lf_spsc (C) | 79 / 73 · 84.6 | 58 / 55 · 65.3 | 72 / 67 · 79.4 | 58 / 53 · 56.1 | 159 / 154 · 212.6 | 163 / 161 · 228.4 |
-| lwrb (C) | 218 / 215 · 4.4 | 153 / 149 · 3.5 | 180 / 176 · 5.1 | 143 / 128 · 4.0 | 263 / 256 · 13.5 | 278 / 267 · 13.6 |
-| Mbed CE CircularBuffer (C++) | 69 / 58 · 8.5 | 66 / 53 · 7.5 | 79 / 69 · 8.9 | 66 / 63 · 4.9 | 120 / 103 · 12.2 | 121 / 108 · 12.4 |
-| micoring default, single-context (C) | 98 / 100 · 75.4 | 60 / 59 · 50.7 | 78 / 75 · 66.5 | 54 / 56 · 29.0 | 103 / 98 · 92.9 | 103 / 99 · 92.0 |
-| micoring SPSC mode (C) | 120 / 125 · 116.4 | 74 / 77 · 75.7 | 98 / 97 · 96.9 | 78 / 71 · 59.9 | 127 / 131 · 128.2 | 129 / 132 · 131.9 |
-| moodycamel ReaderWriterQueue (C++) | 51 / 66 · 61.2 | 39 / 47 · 45.9 | 53 / 64 · 62.5 | 54 / 54 · 44.0 | 77 / 81 · 88.6 | 77 / 80 · 83.1 |
-| NuttX circbuf (C) | 140 / 119 · 2.9 | 108 / 96 · 2.5 | 123 / 110 · 2.8 | 93 / 83 · 2.6 | 228 / 221 · 11.7 | 233 / 219 · 11.8 |
+| jnk0le Ringbuffer (C++) | 17 / 19 · 9.5 | 17 / 17 · 9.4 | 23 / 26 · 9.5 | 30 / 30 · 6.5 | 36 / 42 · 11.8 | 36 / 42 · 11.8 |
+| kostyk348 lf_spsc (C) | 82 / 76 · 84.6 | 58 / 55 · 65.3 | 72 / 67 · 79.4 | 58 / 53 · 56.1 | 160 / 156 · 214.6 | 164 / 162 · 227.6 |
+| lwrb (C) | 55 / 58 · 4.5 | 40 / 42 · 3.6 | 54 / 57 · 5.2 | 49 / 44 · 3.9 | 65 / 67 · 13.6 | 65 / 69 · 13.7 |
+| Mbed CE CircularBuffer (C++) | 69 / 58 · 8.5 | 66 / 53 · 7.5 | 79 / 69 · 9.0 | 66 / 63 · 4.9 | 120 / 103 · 12.2 | 121 / 108 · 12.3 |
+| micoring default, single-context (C) | 97 / 98 · 75.4 | 60 / 59 · 50.7 | 78 / 75 · 66.5 | 52 / 55 · 29.0 | 103 / 99 · 91.9 | 102 / 99 · 92.0 |
+| micoring SPSC mode (C) | 119 / 123 · 116.4 | 74 / 77 · 75.7 | 98 / 97 · 96.8 | 79 / 71 · 60.0 | 127 / 133 · 131.2 | 127 / 132 · 131.9 |
+| moodycamel ReaderWriterQueue (C++) | 51 / 66 · 61.2 | 39 / 47 · 45.9 | 53 / 64 · 62.5 | 54 / 54 · 44.0 | 77 / 81 · 88.6 | 77 / 82 · 83.2 |
+| NuttX circbuf (C) | 144 / 123 · 2.9 | 108 / 96 · 2.5 | 123 / 110 · 2.8 | 93 / 83 · 2.7 | 234 / 218 · 11.8 | 233 / 220 · 11.9 |
 | polycratia spscring (C++) | 19 / 24 · 8.6 | 19 / 22 · 8.4 | 24 / 28 · 9.5 | 37 / 32 · 5.2 | 39 / 46 · 11.8 | 39 / 49 · 11.9 |
-| pxq RingBuffer_PackedState (C++) ⚠ | 17 / 20 · 3.2 | 17 / 18 · 5.3 | 20 / 21 · 3.5 | 17 / 16 · 2.9 | 35 / 38 · 9.3 | 37 / 39 · 9.3 |
-| pxq Topology::None, single-context (C++) ⚠ | 25 / 21 · 3.0 | 20 / 19 · 2.5 | 19 / 20 · 3.5 | 23 / 21 · 2.9 | 35 / 38 · 9.3 | 37 / 39 · 9.3 |
-| QuantumLeaps LFRB (C) | 50 / 44 · 53.6 | 39 / 36 · 43.8 | 46 / 46 · 53.4 | 47 / 42 · 42.3 | 69 / 61 · 79.9 | 69 / 61 · 72.5 |
+| pxq RingBuffer_PackedState (C++) ⚠ | 17 / 20 · 3.4 | 17 / 18 · 8.3 | 20 / 21 · 3.5 | 17 / 16 · 2.9 | 35 / 38 · 9.3 | 37 / 39 · 9.3 |
+| pxq Topology::None, single-context (C++) ⚠ | 25 / 21 · 3.1 | 20 / 19 · 2.5 | 19 / 20 · 3.4 | 23 / 21 · 2.9 | 35 / 38 · 9.3 | 37 / 39 · 9.3 |
+| QuantumLeaps LFRB (C) | 50 / 44 · 53.6 | 39 / 36 · 43.8 | 46 / 46 · 53.4 | 47 / 42 · 42.3 | 69 / 61 · 79.9 | 70 / 63 · 74.5 |
 | rigtorp SPSCQueue (C++) | 35 / 43 · 41.2 | 27 / 37 · 33.9 | 35 / 49 · 45.5 | 36 / 42 · 29.1 | 52 / 83 · 73.2 | 55 / 82 · 69.7 |
-| RIOT tsrb (C) | 49 / 48 · 17.7 | 38 / 37 · 17.4 | 52 / 51 · 19.6 | 56 / 49 · 11.4 | 65 / 64 · 27.1 | 65 / 64 · 25.1 |
+| RIOT tsrb (C) | 49 / 48 · 17.7 | 38 / 37 · 17.4 | 52 / 51 · 19.6 | 55 / 50 · 11.4 | 65 / 64 · 30.1 | 65 / 65 · 25.1 |
 | rt-spsc (C++) | 20 / 19 · 26.1 | 21 / 17 · 25.8 | 26 / 24 · 31.9 | 35 / 36 · 28.9 | 45 / 44 · 59.4 | 47 / 46 · 54.5 |
-| RT-Thread rt_ringbuffer + interrupt lock (C) | 73 / 52 · 3.4 | 57 / 42 · 2.9 | 73 / 54 · 3.8 | 62 / 54 · 3.4 | 100 / 78 · 12.1 | 96 / 83 · 12.1 |
-| *RT-Thread rt_ringbuffer, no lock (C)* ¹ | 55 / 35 · 3.1 | 48 / 33 · 2.7 | 57 / 39 · 3.4 | 40 / 33 · 3.1 | 94 / 70 · 12.0 | 88 / 74 · 12.0 |
-| TinyUSB tu_fifo (C) | 142 / 125 · 4.0 | 82 / 85 · 3.1 | 101 / 100 · 4.2 | 66 / 69 · 3.3 | 132 / 130 · 12.3 | 137 / 137 · 12.4 |
+| RT-Thread rt_ringbuffer + interrupt lock (C) | 73 / 52 · 3.4 | 57 / 42 · 2.9 | 73 / 54 · 3.8 | 62 / 54 · 3.4 | 98 / 78 · 12.2 | 96 / 82 · 12.1 |
+| *RT-Thread rt_ringbuffer, no lock (C)* ¹ | 56 / 35 · 3.2 | 48 / 33 · 2.7 | 57 / 39 · 3.6 | 39 / 34 · 3.1 | 92 / 70 · 12.1 | 88 / 73 · 12.0 |
+| TinyUSB tu_fifo (C) | 141 / 131 · 4.0 | 82 / 85 · 3.1 | 101 / 100 · 4.2 | 66 / 69 · 3.3 | 138 / 131 · 12.4 | 138 / 134 · 12.5 |
 | wizard97 + PRIMASK macros (C++) | 37 / 27 · 38.6 | 30 / 26 · 34.3 | 40 / 32 · 43.9 | 51 / 49 · 43.9 | 57 / 61 · 73.9 | 61 / 65 · 71.0 |
 | *wizard97 as shipped (C++)* ¹ | 22 / 22 · 28.6 | 18 / 20 · 26.3 | 29 / 25 · 33.4 | 24 / 21 · 16.5 | 41 / 41 · 55.9 | 43 / 41 · 50.5 |
-| Zephyr ring_buf (C) | 76 / 71 · 3.1 | 64 / 62 · 2.7 | 79 / 74 · 3.7 | 54 / 50 · 3.1 | 115 / 105 · 10.4 | 116 / 108 · 10.5 |
-| Zephyr ring_buf, CONFIG_SMP (C) | 88 / 92 · 3.4 | 72 / 73 · 2.9 | 86 / 83 · 4.0 | 71 / 67 · 3.3 | 129 / 117 · 11.0 | 133 / 124 · 11.2 |
+| Zephyr ring_buf (C) | 79 / 74 · 3.1 | 64 / 62 · 2.7 | 79 / 74 · 3.7 | 54 / 50 · 3.1 | 115 / 105 · 10.5 | 115 / 107 · 10.5 |
+| Zephyr ring_buf, CONFIG_SMP (C) | 91 / 94 · 3.5 | 72 / 73 · 2.9 | 86 / 83 · 3.9 | 72 / 67 · 3.3 | 129 / 117 · 11.1 | 132 / 123 · 11.2 |
 
 ¹ Not interrupt-safe by its own documentation or maintainers; measured for comparison only.
 
-Records (in [`records/bench/`](records/README.md)): `nrf5340-rb-bench-flash-20261119T173538Z.json`, `nrf5340-rb-bench-rust-flash-20261119T180914Z.json`, `rp2350-rb-bench-flash-20261119T173735Z.json`, `rp2350-rb-bench-rust-flash-20261119T184707Z.json`, `stm32g474-rb-bench-flash-20261119T173537Z.json`, `stm32g474-rb-bench-rust-flash-20261119T180914Z.json`, `stm32h723-rb-bench-flash-20261119T173537Z.json`, `stm32h723-rb-bench-rust-flash-20261119T180914Z.json`, `stm32g0b1-rb-bench-flash-20261119T173537Z.json`, `stm32g0b1-rb-bench-rust-flash-20261119T180914Z.json`, `samd20-rb-bench-flash-20261119T173539Z.json`, `samd20-rb-bench-rust-flash-20261119T175640Z.json`.
+Records (in [`records/bench/`](records/README.md)): `nrf5340-rb-bench-flash-20261121T234544Z.json`, `nrf5340-rb-bench-rust-flash-20261122T001920Z.json`, `rp2350-rb-bench-flash-20261121T234741Z.json`, `rp2350-rb-bench-rust-flash-20261122T005713Z.json`, `stm32g474-rb-bench-flash-20261121T234437Z.json`, `stm32g474-rb-bench-rust-flash-20261122T001919Z.json`, `stm32h723-rb-bench-flash-20261121T234543Z.json`, `stm32h723-rb-bench-rust-flash-20261122T001919Z.json`, `stm32g0b1-rb-bench-flash-20261121T234437Z.json`, `stm32g0b1-rb-bench-rust-flash-20261122T001919Z.json`, `samd20-rb-bench-flash-20261121T234441Z.json`, `samd20-rb-bench-rust-flash-20261122T000532Z.json`.
 <!-- /table:speed -->
 
 Notes:
 - Where a library's code lies in flash can change a mean by up to 25 % on
-  some boards, and one number by 54 % (pxq's ⚠ 64-byte block on the Pico 2,
-  3.5 to 5.4 cycles per byte); 703 of the 1,002 numbers do not move at all.
+  some boards (pxq's ⚠ 64-byte block on the Pico 2: 7.8 to 9.8 cycles per
+  byte); 710 of the 1,002 numbers move by 0.05 % or less.
   The comparison page shows the range over eight placements under each
   number, and
   [the 2026-11-14 report](reports/2026-11-14-night-flags-placement.md) and
   `firmware/nrf5340-rb-bench/placement.py` explain how it is measured. Two
   numbers within each other's range are not measurably different. A range
-  is a lower bound: another build can land outside it
-  ([2026-11-20 report](reports/2026-11-20-publication-rerun.md)).
+  is a lower bound: another build can land outside it. When lwrb's code
+  changed (v3.4.0), 29 of the 666 means of the other C and C++
+  configurations landed outside the range shown before, 26 of them on the
+  nRF5340 (by up to 5 %), and pxq's ⚠ block number on the Pico 2 went from
+  3.5-5.4 to 7.8-9.8 cycles per byte
+  ([2026-11-22 report](reports/2026-11-22-lwrb-v3.4.0-rerun.md),
+  [2026-11-20 report](reports/2026-11-20-publication-rerun.md)).
 - The H723 runs at its reset clock (64 MHz) with reset-default flash wait
   states; the Pico 2 fetches code through its XIP cache from QSPI flash.
 - The Cortex-M33 and M7 issue some instruction pairs together, so they can
@@ -203,15 +208,32 @@ designs whose interrupt lock does nothing against the other core.
 
 Since 2026-11-15 the test runs each library from its own image after its
 own reset, with the run's parameters set at run time. The comparison page
-and the records show the publication re-run, the first campaign below; the
-campaigns after it used the method before that, at earlier commits.
+and the records show the re-run with lwrb v3.4.0, the first campaign
+below. The publication re-run after it is the same method with lwrb
+v3.3.0; the campaigns after that used the method before, at earlier
+commits.
+
+### Re-run with lwrb v3.4.0 (2026-11-21/22)
+lwrb moved to v3.4.0, which adds functions for one byte, and every test
+ran again at one commit (`a7a206190337`), as in the publication re-run:
+five hours of the ISR stress test per board, gcc -O2, 108 runs on the six
+boards, all valid, **no errors in any real library**. The runs per board
+are the same as below (9, 9, 27, 13, 8 and 42), and so is what the five
+hours did not reach (the zero-copy entries on the nRF5340, the G0B1 and
+the SAM D20). The sweep caught every mutant in every sweep run. Three runs
+at the fastest interrupt rate starved a slow library on the SAM D20 or
+the G0B1, the same libraries as below. lwrb itself: 0 errors in its 108
+runs (13 of them with the two sides on the Pico 2's two cores). Details,
+the speed numbers against the earlier ones and the flash writes:
+[reports/2026-11-22-lwrb-v3.4.0-rerun.md](reports/2026-11-22-lwrb-v3.4.0-rerun.md).
 
 ### Publication re-run (night 2026-11-19/20)
 Every test again at one commit (`8d8880f4bf78`), five hours of the ISR
 stress test per board, gcc -O2: 108 runs on the six boards, all valid,
 **no errors in any real library**. 9 runs on the nRF5340 and the G0B1, 27
-on the G474, 13 on the H723, 8 on the SAM D20 and 42 on the Pico 2 (15 of
-them with the two sides on its two cores). The sweep caught every mutant
+on the G474, 13 on the H723, 8 on the SAM D20 and 42 on the Pico 2 (13 of
+them with the two sides on its two cores; this line said 15 until
+2026-11-22, a counting error). The sweep caught every mutant
 in every sweep run. Three runs at the fastest interrupt rate starved a
 slow library on the SAM D20 or the G0B1 (FreeRTOS stream buffer,
 embassy-sync Pipe, NuttX circbuf); such a run is reported and not counted
@@ -302,9 +324,10 @@ library configurations' block numbers move by more than 5 %:
 ## What the numbers say
 - **Single bytes:** on every board pxq, jnk0le, polycratia and rt-spsc are
   among the fastest (17–24 cycles on the nRF5340); the general stream APIs
-  (lwrb, FreeRTOS stream buffer, embassy-sync Pipe, bbqueue) are the
-  slowest (about 175–300 there), because one byte goes through several
-  calls and `memcpy`.
+  (FreeRTOS stream buffer, embassy-sync Pipe, bbqueue) are the
+  slowest (about 155–300 there), because one byte goes through several
+  calls and `memcpy`. lwrb was among them up to v3.3.0 (218 / 215 there);
+  v3.4.0 has functions for one byte (55 / 58).
 - **Blocks:** the libraries that copy with `memcpy` (NuttX circbuf, Zephyr
   ring_buf, RT-Thread, DNedic lockfree, ece-mohammad, TinyUSB, lwrb, the
   FreeRTOS stream buffer, Mbed CE, the Rust stream buffers) need 2.5–6
@@ -337,14 +360,17 @@ libraries' own documentation (2026-11-07):
 Stress with several producers or consumers on one core
 ([`rb-mp-stress`](firmware/rb-mp-stress/)): two interrupts at different
 priorities, where B preempts A, are the two producers (MPSC) or the two
-consumers (SPMC), and the main loop is the other side. Night 2026-11-19/20
-on all six boards (the publication re-run, five hours per board), up to
-1 million values per library and run, four interrupt rates; at the two
+consumers (SPMC), and the main loop is the other side. On 2026-11-22
+on all six boards (the re-run with lwrb v3.4.0, five hours per board), up
+to 1 million values per library and run, four interrupt rates; at the two
 slowest every run aims the interrupts at the push and pop and records
 where they landed. A run is valid when the control was caught in it: 322
-of 324 runs ([report](reports/2026-11-20-publication-rerun.md), with the
-coverage per board). The campaign before it, 13 hours per board with half
-the slow-rate runs aimed, had 750 valid runs of 850 and no errors either
+of 324 runs ([report](reports/2026-11-22-lwrb-v3.4.0-rerun.md), with the
+coverage per board). The publication re-run of 2026-11-19/20 gave the
+same counts with the same images
+([report](reports/2026-11-20-publication-rerun.md)). The campaign before
+it, 13 hours per board with half the slow-rate runs aimed, had 750 valid
+runs of 850 and no errors either
 ([report](reports/2026-11-18-mp-campaign-coverage.md)).
 
 | Library, mode | MPSC | SPMC |
@@ -359,8 +385,9 @@ the slow-rate runs aimed, had 750 valid runs of 850 and no errors either
 
 The control was caught in every run with aimed interrupts (156 of 156) and
 in 166 of 168 with random ones at the two faster rates; the two where it
-was not caught (nRF5340, MPSC, the slower of those two rates) are not
-counted. In the campaign of 2026-11-17/18 it was caught in 210 of 210
+was not caught (nRF5340, MPSC, the slower of those two rates, code in
+flash) are not counted. The same two entries of the rotation missed it on
+2026-11-19/20, with other seeds. In the campaign of 2026-11-17/18 it was caught in 210 of 210
 aimed runs and 540 of 640 random ones; the 100 where it was not caught
 all had random interrupts at the slower rates, which is why those rates
 are aimed now.

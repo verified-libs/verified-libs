@@ -1,6 +1,6 @@
 {
  "nRF5340 DK": {
-  "commit": "8d8880f4bf78",
+  "commit": "a7a206190337",
   "shifts": [
    0,
    4,
@@ -408,18 +408,18 @@
    }
   },
   "records": {
-   "0": "nrf5340-rb-bench-rust-flash-20261119T180914Z.json",
-   "4": "nrf5340-rb-bench-rust-flash-shift4-20261119T181123Z.json",
-   "8": "nrf5340-rb-bench-rust-flash-shift8-20261119T181335Z.json",
-   "12": "nrf5340-rb-bench-rust-flash-shift12-20261119T181544Z.json",
-   "16": "nrf5340-rb-bench-rust-flash-shift16-20261119T181757Z.json",
-   "20": "nrf5340-rb-bench-rust-flash-shift20-20261119T182006Z.json",
-   "24": "nrf5340-rb-bench-rust-flash-shift24-20261119T182218Z.json",
-   "28": "nrf5340-rb-bench-rust-flash-shift28-20261119T182427Z.json"
+   "0": "nrf5340-rb-bench-rust-flash-20261122T001920Z.json",
+   "4": "nrf5340-rb-bench-rust-flash-shift4-20261122T002129Z.json",
+   "8": "nrf5340-rb-bench-rust-flash-shift8-20261122T002341Z.json",
+   "12": "nrf5340-rb-bench-rust-flash-shift12-20261122T002550Z.json",
+   "16": "nrf5340-rb-bench-rust-flash-shift16-20261122T002802Z.json",
+   "20": "nrf5340-rb-bench-rust-flash-shift20-20261122T003011Z.json",
+   "24": "nrf5340-rb-bench-rust-flash-shift24-20261122T003223Z.json",
+   "28": "nrf5340-rb-bench-rust-flash-shift28-20261122T003432Z.json"
   }
  },
  "NUCLEO-G0B1RE": {
-  "commit": "8d8880f4bf78",
+  "commit": "a7a206190337",
   "shifts": [
    0,
    4,
@@ -827,18 +827,18 @@
    }
   },
   "records": {
-   "0": "stm32g0b1-rb-bench-rust-flash-20261119T180914Z.json",
-   "4": "stm32g0b1-rb-bench-rust-flash-shift4-20261119T181122Z.json",
-   "8": "stm32g0b1-rb-bench-rust-flash-shift8-20261119T181335Z.json",
-   "12": "stm32g0b1-rb-bench-rust-flash-shift12-20261119T181543Z.json",
-   "16": "stm32g0b1-rb-bench-rust-flash-shift16-20261119T181756Z.json",
-   "20": "stm32g0b1-rb-bench-rust-flash-shift20-20261119T182004Z.json",
-   "24": "stm32g0b1-rb-bench-rust-flash-shift24-20261119T182217Z.json",
-   "28": "stm32g0b1-rb-bench-rust-flash-shift28-20261119T182425Z.json"
+   "0": "stm32g0b1-rb-bench-rust-flash-20261122T001919Z.json",
+   "4": "stm32g0b1-rb-bench-rust-flash-shift4-20261122T002127Z.json",
+   "8": "stm32g0b1-rb-bench-rust-flash-shift8-20261122T002341Z.json",
+   "12": "stm32g0b1-rb-bench-rust-flash-shift12-20261122T002548Z.json",
+   "16": "stm32g0b1-rb-bench-rust-flash-shift16-20261122T002802Z.json",
+   "20": "stm32g0b1-rb-bench-rust-flash-shift20-20261122T003009Z.json",
+   "24": "stm32g0b1-rb-bench-rust-flash-shift24-20261122T003223Z.json",
+   "28": "stm32g0b1-rb-bench-rust-flash-shift28-20261122T003431Z.json"
   }
  },
  "NUCLEO-G474RE": {
-  "commit": "8d8880f4bf78",
+  "commit": "a7a206190337",
   "shifts": [
    0,
    4,
@@ -1246,18 +1246,18 @@
    }
   },
   "records": {
-   "0": "stm32g474-rb-bench-rust-flash-20261119T180914Z.json",
-   "4": "stm32g474-rb-bench-rust-flash-shift4-20261119T181122Z.json",
-   "8": "stm32g474-rb-bench-rust-flash-shift8-20261119T181335Z.json",
-   "12": "stm32g474-rb-bench-rust-flash-shift12-20261119T181543Z.json",
-   "16": "stm32g474-rb-bench-rust-flash-shift16-20261119T181756Z.json",
-   "20": "stm32g474-rb-bench-rust-flash-shift20-20261119T182004Z.json",
-   "24": "stm32g474-rb-bench-rust-flash-shift24-20261119T182217Z.json",
-   "28": "stm32g474-rb-bench-rust-flash-shift28-20261119T182425Z.json"
+   "0": "stm32g474-rb-bench-rust-flash-20261122T001919Z.json",
+   "4": "stm32g474-rb-bench-rust-flash-shift4-20261122T002127Z.json",
+   "8": "stm32g474-rb-bench-rust-flash-shift8-20261122T002341Z.json",
+   "12": "stm32g474-rb-bench-rust-flash-shift12-20261122T002548Z.json",
+   "16": "stm32g474-rb-bench-rust-flash-shift16-20261122T002802Z.json",
+   "20": "stm32g474-rb-bench-rust-flash-shift20-20261122T003009Z.json",
+   "24": "stm32g474-rb-bench-rust-flash-shift24-20261122T003223Z.json",
+   "28": "stm32g474-rb-bench-rust-flash-shift28-20261122T003430Z.json"
   }
  },
  "NUCLEO-H723ZG": {
-  "commit": "8d8880f4bf78",
+  "commit": "a7a206190337",
   "shifts": [
    0,
    4,
@@ -1665,18 +1665,18 @@
    }
   },
   "records": {
-   "0": "stm32h723-rb-bench-rust-flash-20261119T180914Z.json",
-   "4": "stm32h723-rb-bench-rust-flash-shift4-20261119T181123Z.json",
-   "8": "stm32h723-rb-bench-rust-flash-shift8-20261119T181335Z.json",
-   "12": "stm32h723-rb-bench-rust-flash-shift12-20261119T181544Z.json",
-   "16": "stm32h723-rb-bench-rust-flash-shift16-20261119T181756Z.json",
-   "20": "stm32h723-rb-bench-rust-flash-shift20-20261119T182005Z.json",
-   "24": "stm32h723-rb-bench-rust-flash-shift24-20261119T182217Z.json",
-   "28": "stm32h723-rb-bench-rust-flash-shift28-20261119T182426Z.json"
+   "0": "stm32h723-rb-bench-rust-flash-20261122T001919Z.json",
+   "4": "stm32h723-rb-bench-rust-flash-shift4-20261122T002128Z.json",
+   "8": "stm32h723-rb-bench-rust-flash-shift8-20261122T002341Z.json",
+   "12": "stm32h723-rb-bench-rust-flash-shift12-20261122T002550Z.json",
+   "16": "stm32h723-rb-bench-rust-flash-shift16-20261122T002802Z.json",
+   "20": "stm32h723-rb-bench-rust-flash-shift20-20261122T003011Z.json",
+   "24": "stm32h723-rb-bench-rust-flash-shift24-20261122T003223Z.json",
+   "28": "stm32h723-rb-bench-rust-flash-shift28-20261122T003432Z.json"
   }
  },
  "Raspberry Pi Pico 2 H": {
-  "commit": "8d8880f4bf78",
+  "commit": "a7a206190337",
   "shifts": [
    0,
    4,
@@ -2084,18 +2084,18 @@
    }
   },
   "records": {
-   "0": "rp2350-rb-bench-rust-flash-20261119T184707Z.json",
-   "4": "rp2350-rb-bench-rust-flash-shift4-20261119T185128Z.json",
-   "8": "rp2350-rb-bench-rust-flash-shift8-20261119T185549Z.json",
-   "12": "rp2350-rb-bench-rust-flash-shift12-20261119T190011Z.json",
-   "16": "rp2350-rb-bench-rust-flash-shift16-20261119T190432Z.json",
-   "20": "rp2350-rb-bench-rust-flash-shift20-20261119T190853Z.json",
-   "24": "rp2350-rb-bench-rust-flash-shift24-20261119T191314Z.json",
-   "28": "rp2350-rb-bench-rust-flash-shift28-20261119T191735Z.json"
+   "0": "rp2350-rb-bench-rust-flash-20261122T005713Z.json",
+   "4": "rp2350-rb-bench-rust-flash-shift4-20261122T010134Z.json",
+   "8": "rp2350-rb-bench-rust-flash-shift8-20261122T010555Z.json",
+   "12": "rp2350-rb-bench-rust-flash-shift12-20261122T011016Z.json",
+   "16": "rp2350-rb-bench-rust-flash-shift16-20261122T011437Z.json",
+   "20": "rp2350-rb-bench-rust-flash-shift20-20261122T011858Z.json",
+   "24": "rp2350-rb-bench-rust-flash-shift24-20261122T012319Z.json",
+   "28": "rp2350-rb-bench-rust-flash-shift28-20261122T012741Z.json"
   }
  },
  "SAM D20 Xplained Pro": {
-  "commit": "8d8880f4bf78",
+  "commit": "a7a206190337",
   "shifts": [
    0,
    4,
@@ -2503,14 +2503,14 @@
    }
   },
   "records": {
-   "0": "samd20-rb-bench-rust-flash-20261119T175640Z.json",
-   "4": "samd20-rb-bench-rust-flash-shift4-20261119T175757Z.json",
-   "8": "samd20-rb-bench-rust-flash-shift8-20261119T175915Z.json",
-   "12": "samd20-rb-bench-rust-flash-shift12-20261119T180035Z.json",
-   "16": "samd20-rb-bench-rust-flash-shift16-20261119T180154Z.json",
-   "20": "samd20-rb-bench-rust-flash-shift20-20261119T180312Z.json",
-   "24": "samd20-rb-bench-rust-flash-shift24-20261119T180429Z.json",
-   "28": "samd20-rb-bench-rust-flash-shift28-20261119T180547Z.json"
+   "0": "samd20-rb-bench-rust-flash-20261122T000532Z.json",
+   "4": "samd20-rb-bench-rust-flash-shift4-20261122T000650Z.json",
+   "8": "samd20-rb-bench-rust-flash-shift8-20261122T000808Z.json",
+   "12": "samd20-rb-bench-rust-flash-shift12-20261122T000926Z.json",
+   "16": "samd20-rb-bench-rust-flash-shift16-20261122T001043Z.json",
+   "20": "samd20-rb-bench-rust-flash-shift20-20261122T001202Z.json",
+   "24": "samd20-rb-bench-rust-flash-shift24-20261122T001320Z.json",
+   "28": "samd20-rb-bench-rust-flash-shift28-20261122T001438Z.json"
   }
  }
 }

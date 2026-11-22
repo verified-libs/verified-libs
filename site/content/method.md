@@ -75,7 +75,8 @@ short random delay, so that the interrupt lands inside the operation
 rather than by chance. The runs at those rates also record the address
 each interrupt landed on, and the report shows for each library how many
 of the places where an interrupt can land were hit
-([report of 2026-11-20](../../reports/2026-11-20-publication-rerun.md),
+([report of 2026-11-22](../../reports/2026-11-22-lwrb-v3.4.0-rerun.md),
+[of 2026-11-20](../../reports/2026-11-20-publication-rerun.md),
 [of 2026-11-18](../../reports/2026-11-18-mp-campaign-coverage.md)).
 
 **One library per reset** (night campaigns from 2026-11-14 on; earlier
@@ -123,7 +124,7 @@ the code (the interrupt sweep on the boards does) or two cores.
 Overnight campaigns repeat the stress test with new random seeds, interrupt
 rates, cache settings and code locations, and a report lists every run
 with its status. The campaign the comparison shows ran at one commit with
-gcc -O2 ([report](../../reports/2026-11-20-publication-rerun.md)); earlier
+gcc -O2 ([report](../../reports/2026-11-22-lwrb-v3.4.0-rerun.md)); earlier
 campaigns also rotated the compiler flags (-Os, -O3, -O2 with LTO, -Os
 with LTO, and clang).
 

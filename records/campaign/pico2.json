@@ -1,10 +1,10 @@
 {
  "board": "Raspberry Pi Pico 2 H",
  "campaigns": [
-  "overnight-20261119T191737Z-pico2"
+  "overnight-20261122T012743Z-pico2"
  ],
  "commits": [
-  "8d8880f4bf78"
+  "a7a206190337"
  ],
  "modes": {
   "single": {
@@ -101,7 +101,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 7,
      "runs_with_errors": 7,
-     "errors": 5232,
+     "errors": 5393,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -161,7 +161,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 7,
      "runs_with_errors": 7,
-     "errors": 7025,
+     "errors": 4887,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -231,7 +231,7 @@
     },
     "mutant: drain re-reads head": {
      "runs": 7,
-     "isr_to_main": 2,
+     "isr_to_main": 3,
      "main_to_isr": 0
     }
    }
@@ -329,7 +329,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 6,
      "runs_with_errors": 6,
-     "errors": 69063,
+     "errors": 69042,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -389,7 +389,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 6,
      "runs_with_errors": 6,
-     "errors": 39069,
+     "errors": 39521,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -401,7 +401,7 @@
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 6,
      "runs_with_errors": 6,
-     "errors": 1284,
+     "errors": 1274,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {
@@ -785,7 +785,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 420188,
+     "errors": 420899,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -845,7 +845,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 510417,
+     "errors": 519908,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -857,7 +857,7 @@
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 720,
+     "errors": 791,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {
@@ -1057,7 +1057,7 @@
     "ETL queue_spsc_isr (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 696,
+     "errors": 691,
      "did_not_finish": 0
     },
     "ETL queue_spsc_atomic (C++)": {
@@ -1117,13 +1117,13 @@
     "wizard97 as shipped (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 4653,
+     "errors": 4645,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 2641,
+     "errors": 2515,
      "did_not_finish": 0
     },
     "polycratia spscring (C++)": {
@@ -1165,7 +1165,7 @@
     "ETL queue_spsc_locked (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 990,
+     "errors": 894,
      "did_not_finish": 0
     },
     "FreeRTOS stream buffer (C)": {
@@ -1177,13 +1177,13 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 995,
+     "errors": 883,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 635,
+     "errors": 767,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer, no lock (C)": {
@@ -1285,7 +1285,7 @@
     "ETL queue_spsc_isr (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 22119,
+     "errors": 23923,
      "did_not_finish": 0
     },
     "ETL queue_spsc_atomic (C++)": {
@@ -1345,13 +1345,13 @@
     "wizard97 as shipped (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 205608,
+     "errors": 205489,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 193377,
+     "errors": 194423,
      "did_not_finish": 0
     },
     "polycratia spscring (C++)": {
@@ -1393,7 +1393,7 @@
     "ETL queue_spsc_locked (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 20180,
+     "errors": 19428,
      "did_not_finish": 0
     },
     "FreeRTOS stream buffer (C)": {
@@ -1405,31 +1405,31 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 21394,
+     "errors": 19797,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 18037,
+     "errors": 18778,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 1092,
+     "errors": 1130,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 822,
+     "errors": 808,
      "did_not_finish": 0
     },
     "Mbed CE CircularBuffer (C++)": {
      "runs": 4,
      "runs_with_errors": 4,
-     "errors": 4993,
+     "errors": 5120,
      "did_not_finish": 0
     },
     "moodycamel ReaderWriterQueue (C++)": {
@@ -1741,7 +1741,7 @@
     "ETL queue_spsc_isr (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 621076,
+     "errors": 646120,
      "did_not_finish": 0
     },
     "ETL queue_spsc_atomic (C++)": {
@@ -1801,13 +1801,13 @@
     "wizard97 as shipped (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 1177872,
+     "errors": 1175133,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 1528736,
+     "errors": 1525776,
      "did_not_finish": 0
     },
     "polycratia spscring (C++)": {
@@ -1849,7 +1849,7 @@
     "ETL queue_spsc_locked (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 921491,
+     "errors": 930190,
      "did_not_finish": 0
     },
     "FreeRTOS stream buffer (C)": {
@@ -1861,25 +1861,25 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 717126,
+     "errors": 665894,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 645490,
+     "errors": 653105,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 678,
+     "errors": 722,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 867,
+     "errors": 833,
      "did_not_finish": 0
     },
     "Mbed CE CircularBuffer (C++)": {

@@ -42,6 +42,39 @@ under the C11 memory model, for this test's bounds. With
 `LWRB_DISABLE_ATOMIC` it is not, under the C11 model; whether that matters
 on a single-core MCU (ISR ↔ main) is a separate question, see below.
 
+### lwrb v3.4.0 (2026-11-22)
+The pin moved to v3.4.0, which adds functions for one byte,
+`lwrb_write_byte` and `lwrb_read_byte`. The same test runs twice: with
+`lwrb_write` / `lwrb_read` and a length of 1 as before, and with the byte
+functions (`-DBYTE_API`). The byte functions have their own controls and
+two probes: an assertion that the first write (first read) never fails,
+which must itself fail, so the full (empty) buffer is reached.
+
+| Run (2026-11-22), lwrb v3.4.0 | Expected | Result | Executions |
+|---|---|---|---|
+| `lwrb_write` / `lwrb_read`, 1 byte per call | pass | **pass** | 7118 |
+| control: `-DLWRB_DISABLE_ATOMIC` | fail | fail: non-atomic race | – |
+| control: every `memory_order_release` → `relaxed` | fail | fail: non-atomic race | – |
+| `lwrb_write_byte` / `lwrb_read_byte` | pass | **pass** | 7118 |
+| control: byte functions, `-DLWRB_DISABLE_ATOMIC` | fail | fail: non-atomic race | – |
+| control: byte functions, release → `relaxed` | fail | fail: non-atomic race | – |
+| control: byte functions, acquire → `relaxed` | fail | fail: non-atomic race | – |
+| probe: byte functions, buffer full reached | fail | fail: assertion | – |
+| probe: byte functions, buffer empty reached | fail | fail: assertion | – |
+
+The block and zero-copy checks further down give the same results with
+v3.4.0 as with v3.3.0 (730 and 8988 executions; mutants fail, probes
+reached).
+
+One change to the model: from v3.4.0 `lwrb_init` clears its whole structure
+with `memset`, and GenMC stops at a `memset` over atomic objects ("Invalid
+call to memset()"). The structure in the test is a static object, zero from
+the start, and `lwrb_init` runs before the threads exist, so the test
+replaces that `memset` with a function that writes nothing and asserts that
+zero is the value asked for.
+
+`run.sh` exited 0 with all 136 checks as expected.
+
 ## diffstorm/cb SPSC ([`diffstorm_spsc.c`](diffstorm_spsc.c))
 Same shape as the lwrb check (4 items, 4 slots). `CB_MEMORY_BARRIER()` is
 mapped to `atomic_thread_fence(memory_order_seq_cst)` (GenMC cannot run

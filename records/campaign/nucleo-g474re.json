@@ -1,10 +1,10 @@
 {
  "board": "NUCLEO-G474RE",
  "campaigns": [
-  "overnight-20261119T182427Z-nucleo-g474re"
+  "overnight-20261122T003432Z-nucleo-g474re"
  ],
  "commits": [
-  "8d8880f4bf78"
+  "a7a206190337"
  ],
  "modes": {
   "single": {
@@ -101,7 +101,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 7,
      "runs_with_errors": 7,
-     "errors": 19082,
+     "errors": 19038,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -161,7 +161,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 7,
      "runs_with_errors": 7,
-     "errors": 4105,
+     "errors": 3867,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -329,7 +329,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 6,
      "runs_with_errors": 6,
-     "errors": 125244,
+     "errors": 125542,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -389,7 +389,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 6,
      "runs_with_errors": 6,
-     "errors": 39017,
+     "errors": 37728,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -400,8 +400,8 @@
     },
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 6,
-     "runs_with_errors": 6,
-     "errors": 534,
+     "runs_with_errors": 5,
+     "errors": 568,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {
@@ -785,7 +785,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 5,
      "runs_with_errors": 5,
-     "errors": 763723,
+     "errors": 763946,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -845,7 +845,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 5,
      "runs_with_errors": 5,
-     "errors": 1054118,
+     "errors": 1049389,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -857,7 +857,7 @@
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 5,
      "runs_with_errors": 5,
-     "errors": 1311,
+     "errors": 1182,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {

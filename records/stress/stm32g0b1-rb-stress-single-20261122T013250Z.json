@@ -1,0 +1,1425 @@
+{
+  "schema": "nrf5340-rb-stress/0.2",
+  "transfers": 300000,
+  "params": {
+    "main_seed": "0x64023cc9",
+    "isr_seed": "0xaca0490e",
+    "timer_prescaler": 0,
+    "isr_period_cycles": [
+      160,
+      668
+    ],
+    "cache_on": true,
+    "code_in_sram": false,
+    "board_id": 2,
+    "board_decoded": "NUCLEO-G0B1RE (STM32G0B1RET6, Cortex-M0+)",
+    "clock_hz": 64000000
+  },
+  "libs": [
+    {
+      "name": "pxq RingBuffer_PackedState (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4116332,
+        "empty_events": 73681,
+        "irqs": 4416459
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 72934,
+        "empty_events": 4260709,
+        "irqs": 4560709
+      },
+      "n/a": false
+    },
+    {
+      "name": "lwrb (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5031312,
+        "empty_events": 3,
+        "irqs": 5331439
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5523801,
+        "irqs": 5823801
+      },
+      "n/a": false
+    },
+    {
+      "name": "AndersKaloer Ring-Buffer (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4409184,
+        "empty_events": 4,
+        "irqs": 4709311
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5024360,
+        "irqs": 5324360
+      },
+      "n/a": false
+    },
+    {
+      "name": "jnk0le Ringbuffer (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4288392,
+        "empty_events": 53645,
+        "irqs": 4588520
+      },
+      "main_to_isr": {
+        "transferred": 300001,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 44248,
+        "empty_events": 4872712,
+        "irqs": 5172713
+      },
+      "n/a": false
+    },
+    {
+      "name": "ETL queue_spsc_isr (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4382079,
+        "empty_events": 4,
+        "irqs": 4682207
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 4530552,
+        "irqs": 4830552
+      },
+      "n/a": false
+    },
+    {
+      "name": "ETL queue_spsc_atomic (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4516416,
+        "empty_events": 10172,
+        "irqs": 4816544
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 2944,
+        "empty_events": 4998562,
+        "irqs": 5298562
+      },
+      "n/a": false
+    },
+    {
+      "name": "QuantumLeaps LFRB (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5061164,
+        "empty_events": 3,
+        "irqs": 5361291
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5382704,
+        "irqs": 5682704
+      },
+      "n/a": false
+    },
+    {
+      "name": "EmbeddedArtistry cbuf threadsafe (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5038551,
+        "empty_events": 3,
+        "irqs": 5338678
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 4942517,
+        "irqs": 5242517
+      },
+      "n/a": false
+    },
+    {
+      "name": "ece-mohammad RingBuffer (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5519284,
+        "empty_events": 3,
+        "irqs": 5819411
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5946764,
+        "irqs": 6246764
+      },
+      "n/a": false
+    },
+    {
+      "name": "micoring SPSC mode (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5798116,
+        "empty_events": 3,
+        "irqs": 6098244
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 6144757,
+        "irqs": 6444757
+      },
+      "n/a": false
+    },
+    {
+      "name": "kostyk348 lf_spsc (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5553243,
+        "empty_events": 3,
+        "irqs": 5853371
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5974873,
+        "irqs": 6274873
+      },
+      "n/a": false
+    },
+    {
+      "name": "diffstorm cb (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 8175406,
+        "empty_events": 3,
+        "irqs": 8475533
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 6940786,
+        "irqs": 7240786
+      },
+      "n/a": false
+    },
+    {
+      "name": "RIOT tsrb (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4971290,
+        "empty_events": 3,
+        "irqs": 5271418
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5547490,
+        "irqs": 5847490
+      },
+      "n/a": false
+    },
+    {
+      "name": "Contiki-NG ringbuf (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4946930,
+        "empty_events": 462,
+        "irqs": 5247057
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5459718,
+        "irqs": 5759718
+      },
+      "n/a": false
+    },
+    {
+      "name": "rigtorp SPSCQueue (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5056255,
+        "empty_events": 3,
+        "irqs": 5356383
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5306265,
+        "irqs": 5606265
+      },
+      "n/a": false
+    },
+    {
+      "name": "wizard97 as shipped (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 10651,
+        "first_error_at": 18,
+        "first_error_got": 19,
+        "first_error_want": 18,
+        "full_events": 4109647,
+        "empty_events": 62104,
+        "irqs": 4411890
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 10270,
+        "first_error_at": 6,
+        "first_error_got": 5,
+        "first_error_want": 6,
+        "full_events": 76793,
+        "empty_events": 4078833,
+        "irqs": 4378833
+      },
+      "n/a": false
+    },
+    {
+      "name": "wizard97 + PRIMASK macros (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4493943,
+        "empty_events": 5,
+        "irqs": 4794071
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5041261,
+        "irqs": 5341261
+      },
+      "n/a": false
+    },
+    {
+      "name": "polycratia spscring (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4204342,
+        "empty_events": 47197,
+        "irqs": 4504470
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 50631,
+        "empty_events": 4429844,
+        "irqs": 4729844
+      },
+      "n/a": false
+    },
+    {
+      "name": "rt-spsc (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4251327,
+        "empty_events": 40775,
+        "irqs": 4551455
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 42456,
+        "empty_events": 4450540,
+        "irqs": 4750540
+      },
+      "n/a": false
+    },
+    {
+      "name": "TinyUSB tu_fifo (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 6003567,
+        "empty_events": 3,
+        "irqs": 6303695
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 6272395,
+        "irqs": 6572395
+      },
+      "n/a": false
+    },
+    {
+      "name": "Zephyr ring_buf (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5633144,
+        "empty_events": 3,
+        "irqs": 5933271
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5913314,
+        "irqs": 6213314
+      },
+      "n/a": false
+    },
+    {
+      "name": "Zephyr ring_buf, CONFIG_SMP (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5949674,
+        "empty_events": 3,
+        "irqs": 6249801
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 6084841,
+        "irqs": 6384841
+      },
+      "n/a": false
+    },
+    {
+      "name": "DNedic lockfree spsc::RingBuf (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 6273091,
+        "empty_events": 3,
+        "irqs": 6573218
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 6706314,
+        "irqs": 7006314
+      },
+      "n/a": false
+    },
+    {
+      "name": "ETL queue_spsc_locked (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4379413,
+        "empty_events": 3,
+        "irqs": 4679541
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 4682313,
+        "irqs": 4982313
+      },
+      "n/a": false
+    },
+    {
+      "name": "FreeRTOS stream buffer (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 12631287,
+        "empty_events": 2,
+        "irqs": 12931413
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 7986482,
+        "irqs": 8286482
+      },
+      "n/a": false
+    },
+    {
+      "name": "NuttX circbuf (C)",
+      "isr_to_main": {
+        "transferred": 129523,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 17870350,
+        "empty_events": 2,
+        "irqs": 18000001
+      },
+      "main_to_isr": {
+        "transferred": 121645,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 17878355,
+        "irqs": 18000001
+      },
+      "n/a": false
+    },
+    {
+      "name": "Arduino RingBufferN as shipped (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 790,
+        "first_error_at": 311,
+        "first_error_got": 182,
+        "first_error_want": 55,
+        "full_events": 4301961,
+        "empty_events": 4,
+        "irqs": 4604756
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 650,
+        "first_error_at": 24,
+        "first_error_got": 200,
+        "first_error_want": 24,
+        "full_events": 0,
+        "empty_events": 4884862,
+        "irqs": 5184862
+      },
+      "n/a": false
+    },
+    {
+      "name": "Arduino SafeRingBufferN (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4430584,
+        "empty_events": 3,
+        "irqs": 4730711
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5451374,
+        "irqs": 5751374
+      },
+      "n/a": false
+    },
+    {
+      "name": "RT-Thread rt_ringbuffer, no lock (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5273620,
+        "empty_events": 3,
+        "irqs": 5573748
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 6033503,
+        "irqs": 6333503
+      },
+      "n/a": false
+    },
+    {
+      "name": "RT-Thread rt_ringbuffer + interrupt lock (C)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 5533246,
+        "empty_events": 3,
+        "irqs": 5833374
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 6347893,
+        "irqs": 6647893
+      },
+      "n/a": false
+    },
+    {
+      "name": "Mbed CE CircularBuffer (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4299391,
+        "empty_events": 3,
+        "irqs": 4599518
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 6695155,
+        "irqs": 6995155
+      },
+      "n/a": false
+    },
+    {
+      "name": "moodycamel ReaderWriterQueue (C++)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 6153442,
+        "empty_events": 3,
+        "irqs": 6453569
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5670601,
+        "irqs": 5970601
+      },
+      "n/a": false
+    },
+    {
+      "name": "heapless spsc::Queue (Rust)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4903587,
+        "empty_events": 4,
+        "irqs": 5203714
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 5153393,
+        "irqs": 5453393
+      },
+      "n/a": false
+    },
+    {
+      "name": "bbqueue (Rust)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 10835738,
+        "empty_events": 2,
+        "irqs": 11135864
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 11379787,
+        "irqs": 11679787
+      },
+      "n/a": false
+    },
+    {
+      "name": "embassy-sync Pipe (Rust)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 9836341,
+        "empty_events": 2,
+        "irqs": 10136468
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 0,
+        "empty_events": 14127469,
+        "irqs": 14427469
+      },
+      "n/a": false
+    },
+    {
+      "name": "broken (negative control)",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 4322105,
+        "empty_events": 31217,
+        "irqs": 4622232
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 15958,
+        "first_error_at": 4114,
+        "first_error_got": 146,
+        "first_error_want": 18,
+        "full_events": 31306,
+        "empty_events": 4464027,
+        "irqs": 4764027
+      },
+      "n/a": false
+    },
+    {
+      "name": "mutant: shared count, no lock",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 723,
+        "first_error_at": 4097,
+        "first_error_got": 129,
+        "first_error_want": 1,
+        "full_events": 4103962,
+        "empty_events": 29632,
+        "irqs": 4407270
+      },
+      "main_to_isr": {
+        "transferred": 300001,
+        "errors": 925,
+        "first_error_at": 4097,
+        "first_error_got": 129,
+        "first_error_want": 1,
+        "full_events": 32277,
+        "empty_events": 4272030,
+        "irqs": 4572031
+      },
+      "n/a": false
+    },
+    {
+      "name": "mutant: shared count, pop without lock",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 785,
+        "first_error_at": 4097,
+        "first_error_got": 129,
+        "first_error_want": 1,
+        "full_events": 4104573,
+        "empty_events": 17781,
+        "irqs": 4408119
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 14235,
+        "empty_events": 4313796,
+        "irqs": 4613796
+      },
+      "n/a": false
+    },
+    {
+      "name": "mutant: full test misses the wrap",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 1107,
+        "first_error_at": 4224,
+        "first_error_got": 0,
+        "first_error_want": 128,
+        "full_events": 4136503,
+        "empty_events": 46572,
+        "irqs": 4578326
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 121,
+        "first_error_at": 1152,
+        "first_error_got": 0,
+        "first_error_want": 128,
+        "full_events": 24115,
+        "empty_events": 4686062,
+        "irqs": 4986062
+      },
+      "n/a": false
+    },
+    {
+      "name": "mutant: drain re-reads head",
+      "isr_to_main": {
+        "transferred": 300000,
+        "errors": 2637,
+        "first_error_at": 19,
+        "first_error_got": 20,
+        "first_error_want": 19,
+        "full_events": 4328064,
+        "empty_events": 32214,
+        "irqs": 4631420
+      },
+      "main_to_isr": {
+        "transferred": 300000,
+        "errors": 0,
+        "first_error_at": 0,
+        "first_error_got": 0,
+        "first_error_want": 0,
+        "full_events": 32231,
+        "empty_events": 4576689,
+        "irqs": 4876689
+      },
+      "n/a": false
+    }
+  ],
+  "time": "2026-11-22T01:32:50Z",
+  "host": "lib-lab1",
+  "board": "NUCLEO-G0B1RE",
+  "core": "Cortex-M0+, 64 MHz",
+  "per_lib": {
+    "one_library_per_reset": true,
+    "control": "uart",
+    "results_read": "uart_dump",
+    "limit_s": 1800,
+    "unfinished": [],
+    "not_run": []
+  },
+  "params_at_runtime": true,
+  "run_params": "go mode=1 sweep=0 smp=0 main_seed=0x64023cc9 isr_seed=0xaca0490e prescaler=0 cache=1 transfers=300000",
+  "run_params_confirmed": "VLS go mode=0x00000001 sweep=0x00000000 smp=0x00000000 main_seed=0x64023cc9 isr_seed=0xaca0490e prescaler=0x00000000 cache=0x00000001 transfers=0x000493e0 reps=0x00000010",
+  "images": {
+    "kind": "per_library",
+    "select_addr": "0x2001fff0",
+    "align": 4096,
+    "boot_len": 4096,
+    "bundles": [
+      {
+        "bundle": 0,
+        "sha256": "ac2d0b04cf2c4f680e5b5ed24ad587f71ee376f73d630ebc1d5e279455dbefaa",
+        "boot_sha256": "f2875db4c49d9c6ea6cf45c5b32a5931c4aa9a9ed90ea3e5119a04d3ca9b5da7",
+        "flash_bytes": 518440,
+        "libs": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ]
+      }
+    ],
+    "libs": {
+      "0": {
+        "sha256": "cfbeab5d45e066b8c76f6fb3ab9fe7b1c36917340127f601c5f9b3de76f27e2e",
+        "base": "0x08001000",
+        "bytes": 9800,
+        "bundle": 0,
+        "dir": null
+      },
+      "1": {
+        "sha256": "4ee8c3523ba6953df697fbad41cabbe8cfc81fe382fca738563ba24208396994",
+        "base": "0x08004000",
+        "bytes": 10700,
+        "bundle": 0,
+        "dir": null
+      },
+      "2": {
+        "sha256": "d3efabe53feb17979cf9df8d2608f53adf51ee8c4e6ac158a48fbc43d9909d4d",
+        "base": "0x08007000",
+        "bytes": 9568,
+        "bundle": 0,
+        "dir": null
+      },
+      "3": {
+        "sha256": "7f2e88412e8b0520fce344eb21c781eacd7c81e027d2a51f63ef0089a3157065",
+        "base": "0x0800a000",
+        "bytes": 9516,
+        "bundle": 0,
+        "dir": null
+      },
+      "4": {
+        "sha256": "1e49e842593f880e386d3af69bd31c982f4b6915065787a946f7a5626ce06706",
+        "base": "0x0800d000",
+        "bytes": 10244,
+        "bundle": 0,
+        "dir": null
+      },
+      "5": {
+        "sha256": "f6b6d8b70ca659aaa553899efd3f0959f37c0fae124731d2e511c30a0b6a0d2b",
+        "base": "0x08010000",
+        "bytes": 10244,
+        "bundle": 0,
+        "dir": null
+      },
+      "6": {
+        "sha256": "e0a226e7be2e08c73e5dc3deaa24d59965f097dd90a1d2e6382b71e560fae735",
+        "base": "0x08013000",
+        "bytes": 9512,
+        "bundle": 0,
+        "dir": null
+      },
+      "7": {
+        "sha256": "86ff190aeb31547c8bc21d99e5b7b233e4a66e5757145fd95206817f896e8165",
+        "base": "0x08016000",
+        "bytes": 9560,
+        "bundle": 0,
+        "dir": null
+      },
+      "8": {
+        "sha256": "28efd99e40d366987c3a15df6e6564c201b72e20ff2208216edc5fe48a21a2d1",
+        "base": "0x08019000",
+        "bytes": 10224,
+        "bundle": 0,
+        "dir": null
+      },
+      "9": {
+        "sha256": "c292b7f6a48c5c741be5af951bffb0d93ac7ac9f466acd8e9108e0050bc607f4",
+        "base": "0x0801c000",
+        "bytes": 10260,
+        "bundle": 0,
+        "dir": null
+      },
+      "10": {
+        "sha256": "a819f152d798057348bf786a46042cec888db072b02fcd4c19893611338bfaad",
+        "base": "0x0801f000",
+        "bytes": 9512,
+        "bundle": 0,
+        "dir": null
+      },
+      "11": {
+        "sha256": "c500d6c2661ec2f1307e26b8697bc4a1004dfdbefc00966292c5c72ba46d58dd",
+        "base": "0x08022000",
+        "bytes": 9712,
+        "bundle": 0,
+        "dir": null
+      },
+      "12": {
+        "sha256": "2c8fdc53187315cd7812ea049feb52ebfed0df0e3b4fb6df63b9f533dc5ead5e",
+        "base": "0x08025000",
+        "bytes": 9536,
+        "bundle": 0,
+        "dir": null
+      },
+      "13": {
+        "sha256": "c34e7b8ac15493ed9490af72f46af0459ac80fd000f3d92686f631a3ca5d5fc9",
+        "base": "0x08028000",
+        "bytes": 9436,
+        "bundle": 0,
+        "dir": null
+      },
+      "14": {
+        "sha256": "cdee576233908ddabe8ba38110dc4818c6a8416143dbde3c66dba4bb52069b3d",
+        "base": "0x0802b000",
+        "bytes": 9656,
+        "bundle": 0,
+        "dir": null
+      },
+      "15": {
+        "sha256": "300b59a71dd5ba0e709cdb84d7ac6d4a70aa8cfe78ee2e38ec0e25f507ecc185",
+        "base": "0x0802e000",
+        "bytes": 9440,
+        "bundle": 0,
+        "dir": null
+      },
+      "16": {
+        "sha256": "36edab760801df25c92a3a4d63b9fa7fc6d263d179974b8ccd71eb69cb5360c3",
+        "base": "0x08031000",
+        "bytes": 9584,
+        "bundle": 0,
+        "dir": null
+      },
+      "17": {
+        "sha256": "8f65880cb2b771bb4eeac49f66552ce942f1d68a0f64971e88ae8a147a1846b2",
+        "base": "0x08034000",
+        "bytes": 9696,
+        "bundle": 0,
+        "dir": null
+      },
+      "18": {
+        "sha256": "841b0f0997ac0c0953d77d3e50e32d2c9e3a9ab43a9fe8a1efa1dac96c0c9bd9",
+        "base": "0x08037000",
+        "bytes": 9460,
+        "bundle": 0,
+        "dir": null
+      },
+      "19": {
+        "sha256": "1b63f6f61db4e71b986a2ae3519e89b031d80acc5d28d1efde474fdad3cf99c1",
+        "base": "0x0803a000",
+        "bytes": 10544,
+        "bundle": 0,
+        "dir": null
+      },
+      "20": {
+        "sha256": "9a631008c33e104609d924e85f43a825daadce054bd1d37bbebcc0ec5bdb6ac6",
+        "base": "0x0803d000",
+        "bytes": 10008,
+        "bundle": 0,
+        "dir": null
+      },
+      "21": {
+        "sha256": "a08c4ab634db84edc6414069f83bc1c069feec12cdf13451ad14e11d84ae14e0",
+        "base": "0x08040000",
+        "bytes": 10220,
+        "bundle": 0,
+        "dir": null
+      },
+      "22": {
+        "sha256": "57fb27b4a03195731aa75c7653dc39dec8e041a3d789d9e1df290e3d4b6a8682",
+        "base": "0x08043000",
+        "bytes": 9712,
+        "bundle": 0,
+        "dir": null
+      },
+      "23": {
+        "sha256": "f7903ca5f50720fb3d11fcec3bc3debbc5eea597875ea2459eabcc96a8b1c8cb",
+        "base": "0x08046000",
+        "bytes": 9956,
+        "bundle": 0,
+        "dir": null
+      },
+      "24": {
+        "sha256": "49a307fabfd2b9115fb416739fcfea866688b1a1bea0bbba2ac9797fc2e063f1",
+        "base": "0x08049000",
+        "bytes": 10976,
+        "bundle": 0,
+        "dir": null
+      },
+      "25": {
+        "sha256": "f7f72e31bb65a8b3c7c196840f8585dee432246a34e5c34f32e5955488b4fd48",
+        "base": "0x0804c000",
+        "bytes": 9896,
+        "bundle": 0,
+        "dir": null
+      },
+      "26": {
+        "sha256": "2b699d98ce5499135963a5a46bb64e42256865c169eb948cc195f2f7506b89e6",
+        "base": "0x0804f000",
+        "bytes": 9608,
+        "bundle": 0,
+        "dir": null
+      },
+      "27": {
+        "sha256": "8ae547e555d82dbc91fdf56fbc4d1982392434a6a5ef8599528b9a658e1217d6",
+        "base": "0x08052000",
+        "bytes": 9704,
+        "bundle": 0,
+        "dir": null
+      },
+      "28": {
+        "sha256": "0ef6b90cccccc75589786a2b40677067e585a4ad2666dd0a1d8f73ab48c08627",
+        "base": "0x08055000",
+        "bytes": 9856,
+        "bundle": 0,
+        "dir": null
+      },
+      "29": {
+        "sha256": "6c9bbc10775232a26b913002a2bb5b42e15be2128e77cffe408ddc4ebb02d605",
+        "base": "0x08058000",
+        "bytes": 9856,
+        "bundle": 0,
+        "dir": null
+      },
+      "30": {
+        "sha256": "a3db656fa2fea2e21622a17eab4f8471d839cb92b1fe308ea7bab8196fc42830",
+        "base": "0x0805b000",
+        "bytes": 10780,
+        "bundle": 0,
+        "dir": null
+      },
+      "31": {
+        "sha256": "cacc33835730c812f6f276d7266c6bcf3eed7a8b279821e4c13261ddd8ddfe06",
+        "base": "0x0805e000",
+        "bytes": 9736,
+        "bundle": 0,
+        "dir": null
+      },
+      "32": {
+        "sha256": "a82d5a5f171927b114fb530fb0519b4ade56462e5e620a4c91441cea5127ab0b",
+        "base": "0x08061000",
+        "bytes": 19604,
+        "bundle": 0,
+        "dir": null
+      },
+      "33": {
+        "sha256": "3fa5c7a1c972aafd1bf6a080a22918abe4b1db1b7b41f3dbdc0949021119eb61",
+        "base": "0x08066000",
+        "bytes": 19604,
+        "bundle": 0,
+        "dir": null
+      },
+      "34": {
+        "sha256": "fea8f1f034fbc42a82002015d6c718ec6a8f63f362ba30fd802d815a03281918",
+        "base": "0x0806b000",
+        "bytes": 19604,
+        "bundle": 0,
+        "dir": null
+      },
+      "35": {
+        "sha256": "d47d784f2d3157b3aee0298a4b44a8f25d4032097ad8b8243cbb6062cf461cdd",
+        "base": "0x08070000",
+        "bytes": 9960,
+        "bundle": 0,
+        "dir": null
+      },
+      "36": {
+        "sha256": "748107ddee89cb33eb2ad58be61e9afa9d5c4a7934bd620d4e05dc0041212d09",
+        "base": "0x08073000",
+        "bytes": 10536,
+        "bundle": 0,
+        "dir": null
+      },
+      "37": {
+        "sha256": "8c1e1bf2ce246dae5cbbaf01c8a16a36acb9972a7fe3cd7f9cc95be40b2d1ee8",
+        "base": "0x08076000",
+        "bytes": 10536,
+        "bundle": 0,
+        "dir": null
+      },
+      "38": {
+        "sha256": "4f577d7b0221756a11597c41cacbabdf76756a15eedbe4469d8a8344593ef3dd",
+        "base": "0x08079000",
+        "bytes": 10536,
+        "bundle": 0,
+        "dir": null
+      },
+      "39": {
+        "sha256": "255356af6869ebc494ac6ab257aded17e11e873012f9da0f0a0b91a718b05f18",
+        "base": "0x0807c000",
+        "bytes": 10536,
+        "bundle": 0,
+        "dir": null
+      }
+    }
+  },
+  "build_flags": "",
+  "code_location": "flash",
+  "opt": "-O2",
+  "lto": false,
+  "compiler_libs": "gcc",
+  "fw_sha256": "adc23ed9744c20807a81c4f45278a22a7e34496451bdf7abcda0090eac4afe42",
+  "source_commit": "a7a206190337",
+  "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+  "toolchain_image": "verified-libs/toolchain:2026-11-13",
+  "toolchain": {
+    "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+    "ubuntu_snapshot": "20261105T000000Z",
+    "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+    "cbmc": "6.6.0 (cbmc-6.6.0)",
+    "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+    "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+    "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+    "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+  },
+  "libs_pinned": [
+    "pxq-ringbuffer-cortex eec68a93fd3e",
+    "lwrb b8534fd15925",
+    "anders-ringbuffer 8de8fff55a0b",
+    "jnk0le-ringbuffer 9efa07fffc0f",
+    "etl 7d604f2e4f7f",
+    "qp-lfrb 0d6354a10a3c",
+    "rigtorp-spscqueue 59a6a938513e",
+    "wizard97-ringbuf 5cd8410c162a",
+    "embeddedartistry 9733be2eacdc",
+    "ece-ringbuffer 94083a63259e",
+    "micoring a6f91ee2991a",
+    "kostyk-lockfree 38649b8f964e",
+    "polycratia-spscring 9d2445a55970",
+    "rt-spsc 5454de55a2a1",
+    "diffstorm-cb 11e05d60462a",
+    "diffstorm-cb-547d0812 547d0812f30d",
+    "riot 9c9a6abec901",
+    "contiki-ng a3c7119915a5",
+    "tinyusb dae3f9a366bf",
+    "lockfree-dnedic ae6c4df12453",
+    "zephyr-ringbuf 41d10b597304",
+    "freertos-kernel 89592801dd8b",
+    "nuttx-circbuf 2b5c0de5e933",
+    "arduino-api cd91833d90b4",
+    "arduino-renesas 424e86eff92d",
+    "rt-thread 99428a1e7f74",
+    "mbed-ce a4c70564a534",
+    "moodycamel-rwq 8b2176698e9b",
+    "heapless 19188229ac2b",
+    "bbqueue 979abde48a9e",
+    "embassy 84444a19eb57",
+    "rs-hash32 d44eb33a01be",
+    "rs-byteorder ec068eefa042",
+    "rs-stable-deref-trait 66f9d8a15b72",
+    "rs-const-init ea0c87a3a2a4",
+    "rs-critical-section d81c423eeca4",
+    "rs-portable-atomic e4595528211f",
+    "rs-futures 705e6b5c0f06",
+    "rs-cfg-if 8b0a2b0fc1fa",
+    "rs-embedded-io 21e547acd5c8"
+  ],
+  "mode": "single bytes (push/pop)",
+  "smp": false,
+  "starved": [
+    "NuttX circbuf (C) / isr_to_main",
+    "NuttX circbuf (C) / main_to_isr"
+  ],
+  "did_not_finish": [],
+  "not_run": [],
+  "partial": false,
+  "mutants_caught": {
+    "mutant: shared count, no lock": {
+      "isr_to_main": true,
+      "main_to_isr": true
+    },
+    "mutant: shared count, pop without lock": {
+      "isr_to_main": true,
+      "main_to_isr": false
+    },
+    "mutant: full test misses the wrap": {
+      "isr_to_main": true,
+      "main_to_isr": true
+    },
+    "mutant: drain re-reads head": {
+      "isr_to_main": true,
+      "main_to_isr": false
+    }
+  }
+}

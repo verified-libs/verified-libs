@@ -1,4 +1,8 @@
-/* Adapter: MaJerle/lwrb, default configuration (C11 atomics enabled). */
+/* Adapter: MaJerle/lwrb, default configuration (C11 atomics enabled).
+ * Single bytes go through lwrb_write_byte / lwrb_read_byte (new in v3.4.0,
+ * the library's functions for one byte); blocks through lwrb_write /
+ * lwrb_read. Up to v3.3.0 a single byte was lwrb_write / lwrb_read with a
+ * length of 1. */
 #include "lwrb/lwrb.h"
 #include "bench.h"
 
@@ -10,14 +14,13 @@ BENCH_ALIGN static void lwrb_bench_reset(void) { lwrb_init(&rb, data, sizeof dat
 BENCH_ALIGN static uint32_t lwrb_bench_push(uintptr_t v, uintptr_t unused)
 {
     (void)unused;
-    uint8_t b = (uint8_t)v;
-    return lwrb_write(&rb, &b, 1) == 1;
+    return lwrb_write_byte(&rb, (uint8_t)v);
 }
 
 BENCH_ALIGN static uint32_t lwrb_bench_pop(uintptr_t p, uintptr_t unused)
 {
     (void)unused;
-    return lwrb_read(&rb, (void *)p, 1) == 1;
+    return lwrb_read_byte(&rb, (uint8_t *)p);
 }
 
 BENCH_ALIGN static uint32_t lwrb_bench_push_n(uintptr_t p, uintptr_t n)

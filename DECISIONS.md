@@ -2,6 +2,24 @@
 
 Short log of what was decided and why. Newest first.
 
+## 2026-11-22: A new version of a library (lwrb v3.4.0)
+- **lwrb is pinned at v3.4.0 and every test ran again at one commit**
+  (`a7a206190337`; [report](reports/2026-11-22-lwrb-v3.4.0-rerun.md)).
+  Why everything: the pin and the adapter are test sources, and a record
+  must name sources the reader has (2026-11-16); with the tools as they
+  are, that means new records for every library.
+- **lwrb's single bytes are measured through `lwrb_write_byte` and
+  `lwrb_read_byte`**, which v3.4.0 adds. Why: each library is measured
+  through the call it offers for the job, as every other library with a
+  call for one element is. Up to v3.3.0 lwrb had none, and one byte went
+  through `lwrb_write` / `lwrb_read` with a length of 1. Blocks and
+  zero-copy are measured as before. The numbers of v3.3.0 stay in the
+  report of 2026-11-20 and in the report above, not on the comparison
+  page: the page shows one version per library.
+- **The model check covers both ways** (the byte functions and the block
+  calls with a length of 1), each with its own controls
+  ([verify/genmc](verify/genmc/README.md)).
+
 ## 2026-11-20: How version 1 is published
 - **Commits in the public repository carry the project's name and
   address** (`verified-libs <contact@verified-libs.org>`), not a person's.

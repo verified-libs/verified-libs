@@ -91,9 +91,15 @@ podman run --rm -v "$PWD/../..":/work:Z -w /work "$IMG" bash -c "
   }
   ok=0
   echo '== lwrb'
-  check 'lwrb v3.3.0 (C11 atomics)'                    pass lwrb_spsc.c -I$LWRB/include -I$LWRB || ok=1
+  check 'lwrb v3.4.0 (C11 atomics)'                    pass lwrb_spsc.c -I$LWRB/include -I$LWRB || ok=1
   check 'control: LWRB_DISABLE_ATOMIC'                 fail lwrb_spsc.c -DLWRB_DISABLE_ATOMIC -I$LWRB/include -I$LWRB || ok=1
   check 'control: release -> relaxed mutant'           fail lwrb_spsc.c -I$LWRB/include -Iverify/genmc/build/mutant || ok=1
+  check 'lwrb v3.4.0 lwrb_write_byte/lwrb_read_byte'   pass lwrb_spsc.c -DBYTE_API -I$LWRB/include -I$LWRB || ok=1
+  check 'control: byte API, LWRB_DISABLE_ATOMIC'       fail lwrb_spsc.c -DBYTE_API -DLWRB_DISABLE_ATOMIC -I$LWRB/include -I$LWRB || ok=1
+  check 'control: byte API, release -> relaxed mutant' fail lwrb_spsc.c -DBYTE_API -I$LWRB/include -Iverify/genmc/build/mutant || ok=1
+  check 'control: byte API, acquire -> relaxed mutant' fail lwrb_spsc.c -DBYTE_API -I$LWRB/include -Iverify/genmc/build/mut/lwrb-acq || ok=1
+  check 'probe FULL reachable: byte API'               fail lwrb_spsc.c -DBYTE_API -DPROBE_FULL -I$LWRB/include -I$LWRB || ok=1
+  check 'probe EMPTY reachable: byte API'              fail lwrb_spsc.c -DBYTE_API -DPROBE_EMPTY -I$LWRB/include -I$LWRB || ok=1
   echo '== diffstorm cb (findings, see ../findings/)'
   check 'diffstorm 547d0812 as is'                     fail diffstorm_spsc.c -I$DS || ok=1
   check 'diffstorm 11e05d6 (fixed upstream) as is'     pass diffstorm_spsc.c -I$DSNEW || ok=1

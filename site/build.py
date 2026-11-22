@@ -19,6 +19,7 @@ a missing list accepted.)
 Needs the python3-markdown package.
 """
 import html
+import json
 import os
 import re
 import sys
@@ -86,12 +87,57 @@ NAV = [("index", "Home"), ("results", "Results"), ("compare", "Compare"), ("meth
        ("reproduce", "Reproduce"), ("repeats", "Repeats"), ("findings", "Findings"), ("reports", "Reports")]
 
 
-def page(slug, title, body, nav_on):
+SITE_URL = ""   # from site.conf (main): the address the pages are served at, for search engines
+
+
+def describe(md_text):
+    """A page's description for search engines: its first paragraph of plain text."""
+    for para in re.split(r"\n\s*\n", md_text):
+        para = " ".join(para.split())
+        if not para or para[0] in "#|-*`<>!" or para[:2].isdigit():
+            continue
+        para = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", para)
+        para = re.sub(r"[`*]", "", para)   # not "_": it is part of the names (lwrb_write_byte)
+        if len(para) > 160:
+            para = para[:158].rsplit(" ", 1)[0].rstrip(",;:(") + " ..."
+        return para
+    return ""
+
+
+# The icon a browser tab and a search result show next to the site's name.
+FAVICON = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#1f5f8b"/>'
+           '<path d="M8 17l5 5 11-12" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" '
+           'stroke-linejoin="round"/></svg>\n')
+
+
+def page(slug, title, body, nav_on, desc="", listed=True):
+    """One page. listed=False: a page that is not content (404.html): no address of its own, not for search engines."""
     links = "".join(f'<a href="{s}.html"{" class=on" if s == nav_on else ""}>{t}</a>' for s, t in NAV[1:])
+    name = slug if slug.endswith(".html") else slug + ".html"
+    full = title if title.startswith("verified-libs") else title + " - verified-libs"
+    seo = (f'<meta name="description" content="{html.escape(desc)}">\n' if desc else "")
+    if not listed:
+        seo += '<meta name="robots" content="noindex">\n'
+        if SITE_URL:   # served for any address that does not exist: the links must not depend on it
+            seo += f'<base href="{SITE_URL}/">\n'
+    elif SITE_URL:   # one address per page: the front page is the site's root
+        url = f'{SITE_URL}/{"" if name == "index.html" else name}'
+        seo += f'<link rel="canonical" href="{url}">\n'
+        # What a link to the page shows where it is shared (Open Graph, read by most sites and chat programs).
+        seo += (f'<meta property="og:site_name" content="verified-libs">\n'
+                f'<meta property="og:type" content="{"website" if name == "index.html" else "article"}">\n'
+                f'<meta property="og:title" content="{html.escape(full)}">\n'
+                + (f'<meta property="og:description" content="{html.escape(desc)}">\n' if desc else "")
+                + f'<meta property="og:url" content="{url}">\n<meta name="twitter:card" content="summary">\n')
+        if name == "index.html":   # the site's name for search engines
+            seo += ('<script type="application/ld+json">'
+                    + json.dumps({"@context": "https://schema.org", "@type": "WebSite", "name": "verified-libs", "url": SITE_URL + "/"})
+                    + '</script>\n')
+    seo += '<link rel="icon" href="favicon.svg" type="image/svg+xml">\n'
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title if title.startswith("verified-libs") else title + " - verified-libs")}</title><style>{CSS}</style></head>
+{seo}<title>{html.escape(full)}</title><style>{CSS}</style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a>{links}</nav></header>
 <main>{body}</main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
@@ -101,6 +147,20 @@ def page(slug, title, body, nav_on):
 
 # The front page's heading is the project's name; its browser title says more.
 INDEX_TITLE = "verified-libs: embedded ring buffer libraries, measured and tested on real hardware"
+INDEX_DESC = ("Embedded ring buffer (FIFO) libraries for microcontrollers, compared on six boards: speed, code size, "
+              "interrupt stress tests and model checks. Every number links to its record and source.")
+# What a search engine shows under the page's title. Pages not named here
+# (reports, findings) get their first paragraph (describe).
+DESCRIPTIONS = {
+    "index.html": INDEX_DESC,
+    "method.html": "How the ring buffer libraries are tested: cycle-counted benchmarks on six microcontroller boards, "
+                   "interrupt stress tests with a known-bad control, model checks and contract checks.",
+    "results.html": "Results for embedded ring buffer libraries on six microcontroller boards: cycles per push and pop, "
+                    "code size, interrupt stress tests and model checks, each with its record.",
+    "reproduce.html": "How to rebuild the firmware bit for bit and repeat the measurements: every number comes from a "
+                      "record that names the commit, the toolchain, the flags and the pinned library versions.",
+    "repeats.html": "Repeats of the tests by people outside the project, and how to send in your own.",
+}
 
 SITE_PAGES = {"reports.html", "findings.html"}   # pages with no markdown source
 SITE_FILES = {"data/libs.json": "data/libs.json"}   # served as they are: output path -> file under site/
@@ -141,6 +201,8 @@ def main():
     out = args[0] if args else os.path.join(SITE, "_build")
     os.makedirs(out, exist_ok=True)
     c = conf()
+    global SITE_URL
+    SITE_URL = c.get("SITE_URL", "").rstrip("/")
     findings = [f for f in c.get("PUBLISH_FINDINGS", "").split(",") if f.strip()]
     reports = sorted(f for f in os.listdir(os.path.join(ROOT, "reports")) if f.endswith(".md"))
 
@@ -163,11 +225,12 @@ def main():
                   "reproduce.html": "reproduce", "repeats.html": "repeats"}.get(
             dst, "reports" if dst.startswith("report-") else "findings")
         title = INDEX_TITLE if dst == "index.html" else title_of(text, dst)
-        pages[dst] = page(dst, title, render(text, src, c, pagemap), nav_on)
+        pages[dst] = page(dst, title, render(text, src, c, pagemap), nav_on, DESCRIPTIONS.get(dst) or describe(text))
 
     rep = "".join(f'<li><a href="{pagemap["reports/" + r]}">{html.escape(title_of(open(os.path.join(ROOT, "reports", r)).read(), r))}</a> '
                   f'<span style="color:var(--mute)">({r[:10]})</span></li>' for r in reversed(reports))
-    pages["reports.html"] = page("reports", "Reports", f"<h1>Reports</h1><ul>{rep}</ul>", "reports")
+    pages["reports.html"] = page("reports", "Reports", f"<h1>Reports</h1><ul>{rep}</ul>", "reports",
+                                 "The reports behind the results: what was run, on which boards, at which commit, and what came out.")
     fin = "".join(f'<li><a href="{pagemap[f"verify/findings/{f}/README.md"]}">'
                   f'{html.escape(title_of(open(os.path.join(ROOT, "verify/findings", f, "README.md")).read(), f))}</a></li>'
                   for f in findings)
@@ -175,7 +238,7 @@ def main():
         "<h1>Findings</h1><p>Defects found by the tests. Each was reported to the maintainer first; "
         "details are published after 90 days or when the maintainer agrees. Findings still under that "
         "notice period are not listed.</p>" + (f"<ul>{fin}</ul>" if fin else "<p>None published yet.</p>")),
-        "findings")
+        "findings", "Defects found by the tests, published after the maintainer was told and the notice period is over.")
 
     # Interactive comparison: static controls, the data of site/data/libs.json
     # (site/gen_libdata.py) and site/compare.js, all inline. The embargo check
@@ -184,7 +247,15 @@ def main():
     pages["compare.html"] = page("compare", "Compare embedded ring buffers", (
         open(os.path.join(SITE, "content/compare.html")).read()
         + f'<script type="application/json" id="libdata">{data}</script>'
-        + f'<script>{open(os.path.join(SITE, "compare.js")).read()}</script>'), "compare")
+        + f'<script>{open(os.path.join(SITE, "compare.js")).read()}</script>'), "compare",
+        "Compare embedded ring buffer libraries by board: speed, code size, stress test and model check results, "
+        "with filters and your own weights.")
+
+    # What the server shows for an address that does not exist (GitHub Pages serves 404.html).
+    pages["404.html"] = page("404", "Page not found", (
+        '<h1>Page not found</h1><p>There is no page at this address. The <a href="index.html">front page</a>, '
+        'the <a href="compare.html">comparison</a>, the <a href="results.html">results</a> and the '
+        '<a href="reports.html">reports</a> are where they were.</p>'), "", listed=False)
 
     if MISSING:
         for src, target in MISSING:
@@ -194,6 +265,14 @@ def main():
     # Files served as they are (the data of the comparison, for scripts and AI
     # agents): through the same embargo check as the pages.
     files = {name: open(os.path.join(SITE, src)).read() for name, src in SITE_FILES.items()}
+    files["favicon.svg"] = FAVICON
+    # For search engines: every page by its address, and where the list is.
+    if SITE_URL:
+        urls = [SITE_URL + "/"] + [f"{SITE_URL}/{n}" for n in sorted(pages) if n not in ("index.html", "404.html")]
+        files["sitemap.xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+                                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                                + "".join(f"<url><loc>{html.escape(u)}</loc></url>\n" for u in urls) + "</urlset>\n")
+        files["robots.txt"] = f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n"
     words = embargo_words()
     held = [(name, w) for name, body in files.items() for w in words if w in body.lower()]
     for name, w in held:
@@ -213,7 +292,7 @@ def main():
     for name, body in {**pages, **files}.items():
         os.makedirs(os.path.dirname(os.path.join(out, name)), exist_ok=True)
         open(os.path.join(out, name), "w").write(body)
-    print(f"{len(pages)} pages and {len(files)} data file{'s' if len(files) != 1 else ''} written to {out}")
+    print(f"{len(pages)} pages and {len(files)} other file{'s' if len(files) != 1 else ''} written to {out}")
 
 
 if __name__ == "__main__":

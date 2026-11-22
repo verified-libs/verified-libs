@@ -4,7 +4,7 @@
 # The sources are fetched by fetch-libs.sh into build/libs/ and never copied
 # into this repo.
 pxq-ringbuffer-cortex https://github.com/pxq-dk/RingBuffer-Cortex.git          eec68a93fd3e6aaad6e4dd543e514c4789b1573e
-lwrb                  https://github.com/MaJerle/lwrb.git                       413b7093dcad7a61b17992e19f4de46223b18c18
+lwrb                  https://github.com/MaJerle/lwrb.git                       b8534fd15925a0947e1819dc39ac2e8796e02a7b
 anders-ringbuffer     https://github.com/AndersKaloer/Ring-Buffer.git           8de8fff55a0baee4fef2a1c6a82d258a27c3c0ba
 jnk0le-ringbuffer     https://github.com/jnk0le/Ring-Buffer.git                 9efa07fffc0ff282495ed31942f29321730174e4
 etl                   https://github.com/ETLCPP/etl.git                         7d604f2e4f7fa79ff49bf675c089656943f9171b

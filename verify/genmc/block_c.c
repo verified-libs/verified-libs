@@ -73,9 +73,22 @@ static void *model_memmove(void *dst, const void *src, size_t n)
 
 #if defined(LIB_LWRB_BLOCK) || defined(LIB_LWRB_ZC)
 #include "lwrb/lwrb.h"
+/* lwrb_init (from v3.4.0) clears the whole structure with memset, which
+ * GenMC cannot model over atomic objects ("Invalid call to memset()"). The
+ * structure here is a static object, zero from the start, and lwrb_init runs
+ * before the threads exist: clearing it to zero changes nothing, so the model
+ * leaves the write out and only checks that zero is the value asked for. */
+static void *model_memset(void *dst, int c, size_t n)
+{
+    (void)n;
+    assert(c == 0);
+    return dst;
+}
 #define memcpy model_memcpy
+#define memset model_memset
 #include "lwrb/lwrb.c" /* GenMC checks one translation unit */
 #undef memcpy
+#undef memset
 static lwrb_t rb;
 static uint8_t storage[CAP];
 static void q_init(void) { lwrb_init(&rb, storage, CAP); }

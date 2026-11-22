@@ -1,0 +1,1141 @@
+{
+  "schema": "nrf5340-rb-bench/0.3",
+  "result_version": 6,
+  "board_id": 3,
+  "board_decoded": "NUCLEO-G474RE (STM32G474RET6, Cortex-M4F)",
+  "clock_hz": 170000000,
+  "runs": 1024,
+  "overhead_subtracted": 2,
+  "empty_call_raw_min": 8,
+  "set": "rust",
+  "scenarios": [
+    "single",
+    "burst16",
+    "block4",
+    "block16",
+    "block64",
+    "dma16",
+    "dma64"
+  ],
+  "libs": [
+    {
+      "name": "baseline",
+      "results": {
+        "single/cache_off": {
+          "push": {
+            "min": 25,
+            "max": 25,
+            "mean": 25.0,
+            "first": 25,
+            "count": 1024
+          },
+          "pop": {
+            "min": 27,
+            "max": 27,
+            "mean": 27.0,
+            "first": 27,
+            "count": 1024
+          }
+        },
+        "burst16/cache_off": {
+          "push": {
+            "min": 25,
+            "max": 25,
+            "mean": 25.0,
+            "first": 25,
+            "count": 1024
+          },
+          "pop": {
+            "min": 27,
+            "max": 27,
+            "mean": 27.0,
+            "first": 27,
+            "count": 1024
+          }
+        },
+        "block4/cache_off": {
+          "push": {
+            "min": 105,
+            "max": 105,
+            "mean": 105.0,
+            "first": 105,
+            "count": 1024
+          },
+          "pop": {
+            "min": 101,
+            "max": 101,
+            "mean": 101.0,
+            "first": 101,
+            "count": 1024
+          }
+        },
+        "block16/cache_off": {
+          "push": {
+            "min": 123,
+            "max": 123,
+            "mean": 123.0,
+            "first": 123,
+            "count": 1024
+          },
+          "pop": {
+            "min": 119,
+            "max": 119,
+            "mean": 119.0,
+            "first": 119,
+            "count": 1024
+          }
+        },
+        "block64/cache_off": {
+          "push": {
+            "min": 195,
+            "max": 195,
+            "mean": 195.0,
+            "first": 195,
+            "count": 1024
+          },
+          "pop": {
+            "min": 191,
+            "max": 191,
+            "mean": 191.0,
+            "first": 191,
+            "count": 1024
+          }
+        },
+        "dma16/cache_off": {
+          "push": null,
+          "pop": null
+        },
+        "dma64/cache_off": {
+          "push": null,
+          "pop": null
+        },
+        "single/cache_on": {
+          "push": {
+            "min": 9,
+            "max": 27,
+            "mean": 9.018,
+            "first": 27,
+            "count": 1024
+          },
+          "pop": {
+            "min": 11,
+            "max": 22,
+            "mean": 11.011,
+            "first": 22,
+            "count": 1024
+          }
+        },
+        "burst16/cache_on": {
+          "push": {
+            "min": 9,
+            "max": 9,
+            "mean": 9.0,
+            "first": 9,
+            "count": 1024
+          },
+          "pop": {
+            "min": 11,
+            "max": 11,
+            "mean": 11.0,
+            "first": 11,
+            "count": 1024
+          }
+        },
+        "block4/cache_on": {
+          "push": {
+            "min": 45,
+            "max": 87,
+            "mean": 45.041,
+            "first": 87,
+            "count": 1024
+          },
+          "pop": {
+            "min": 44,
+            "max": 54,
+            "mean": 44.01,
+            "first": 54,
+            "count": 1024
+          }
+        },
+        "block16/cache_on": {
+          "push": {
+            "min": 51,
+            "max": 58,
+            "mean": 51.007,
+            "first": 58,
+            "count": 1024
+          },
+          "pop": {
+            "min": 50,
+            "max": 50,
+            "mean": 50.0,
+            "first": 50,
+            "count": 1024
+          }
+        },
+        "block64/cache_on": {
+          "push": {
+            "min": 75,
+            "max": 120,
+            "mean": 75.044,
+            "first": 120,
+            "count": 1024
+          },
+          "pop": {
+            "min": 74,
+            "max": 74,
+            "mean": 74.0,
+            "first": 74,
+            "count": 1024
+          }
+        },
+        "dma16/cache_on": {
+          "push": null,
+          "pop": null
+        },
+        "dma64/cache_on": {
+          "push": null,
+          "pop": null
+        }
+      },
+      "errors": null
+    },
+    {
+      "name": "pxq RingBuffer_PackedState (C++)",
+      "results": {
+        "single/cache_off": {
+          "push": {
+            "min": 46,
+            "max": 46,
+            "mean": 46.0,
+            "first": 46,
+            "count": 1024
+          },
+          "pop": {
+            "min": 46,
+            "max": 46,
+            "mean": 46.0,
+            "first": 46,
+            "count": 1024
+          }
+        },
+        "burst16/cache_off": {
+          "push": {
+            "min": 46,
+            "max": 46,
+            "mean": 46.0,
+            "first": 46,
+            "count": 1024
+          },
+          "pop": {
+            "min": 46,
+            "max": 46,
+            "mean": 46.0,
+            "first": 46,
+            "count": 1024
+          }
+        },
+        "block4/cache_off": {
+          "push": {
+            "min": 198,
+            "max": 202,
+            "mean": 201.875,
+            "first": 202,
+            "count": 1024
+          },
+          "pop": {
+            "min": 205,
+            "max": 208,
+            "mean": 207.906,
+            "first": 208,
+            "count": 1024
+          }
+        },
+        "block16/cache_off": {
+          "push": {
+            "min": 231,
+            "max": 344,
+            "mean": 245.125,
+            "first": 231,
+            "count": 1024
+          },
+          "pop": {
+            "min": 235,
+            "max": 343,
+            "mean": 248.5,
+            "first": 235,
+            "count": 1024
+          }
+        },
+        "block64/cache_off": {
+          "push": {
+            "min": 303,
+            "max": 434,
+            "mean": 368.5,
+            "first": 303,
+            "count": 1024
+          },
+          "pop": {
+            "min": 307,
+            "max": 433,
+            "mean": 370.0,
+            "first": 307,
+            "count": 1024
+          }
+        },
+        "dma16/cache_off": {
+          "push": {
+            "min": 103,
+            "max": 208,
+            "mean": 116.125,
+            "first": 103,
+            "count": 1024
+          },
+          "pop": {
+            "min": 102,
+            "max": 206,
+            "mean": 115.0,
+            "first": 102,
+            "count": 1024
+          }
+        },
+        "dma64/cache_off": {
+          "push": {
+            "min": 103,
+            "max": 208,
+            "mean": 155.5,
+            "first": 103,
+            "count": 1024
+          },
+          "pop": {
+            "min": 102,
+            "max": 206,
+            "mean": 154.0,
+            "first": 102,
+            "count": 1024
+          }
+        },
+        "single/cache_on": {
+          "push": {
+            "min": 20,
+            "max": 37,
+            "mean": 20.017,
+            "first": 37,
+            "count": 1024
+          },
+          "pop": {
+            "min": 21,
+            "max": 35,
+            "mean": 21.016,
+            "first": 35,
+            "count": 1024
+          }
+        },
+        "burst16/cache_on": {
+          "push": {
+            "min": 20,
+            "max": 20,
+            "mean": 20.0,
+            "first": 20,
+            "count": 1024
+          },
+          "pop": {
+            "min": 21,
+            "max": 21,
+            "mean": 21.0,
+            "first": 21,
+            "count": 1024
+          }
+        },
+        "block4/cache_on": {
+          "push": {
+            "min": 95,
+            "max": 149,
+            "mean": 95.119,
+            "first": 149,
+            "count": 1024
+          },
+          "pop": {
+            "min": 92,
+            "max": 144,
+            "mean": 92.145,
+            "first": 144,
+            "count": 1024
+          }
+        },
+        "block16/cache_on": {
+          "push": {
+            "min": 112,
+            "max": 200,
+            "mean": 142.895,
+            "first": 200,
+            "count": 1024
+          },
+          "pop": {
+            "min": 115,
+            "max": 173,
+            "mean": 135.684,
+            "first": 151,
+            "count": 1024
+          }
+        },
+        "block64/cache_on": {
+          "push": {
+            "min": 225,
+            "max": 269,
+            "mean": 247.034,
+            "first": 266,
+            "count": 1024
+          },
+          "pop": {
+            "min": 182,
+            "max": 228,
+            "mean": 205.017,
+            "first": 199,
+            "count": 1024
+          }
+        },
+        "dma16/cache_on": {
+          "push": {
+            "min": 54,
+            "max": 110,
+            "mean": 61.031,
+            "first": 86,
+            "count": 1024
+          },
+          "pop": {
+            "min": 47,
+            "max": 96,
+            "mean": 53.153,
+            "first": 76,
+            "count": 1024
+          }
+        },
+        "dma64/cache_on": {
+          "push": {
+            "min": 54,
+            "max": 110,
+            "mean": 82.009,
+            "first": 63,
+            "count": 1024
+          },
+          "pop": {
+            "min": 47,
+            "max": 96,
+            "mean": 71.508,
+            "first": 55,
+            "count": 1024
+          }
+        }
+      },
+      "errors": 0
+    },
+    {
+      "name": "heapless spsc::Queue (Rust)",
+      "results": {
+        "single/cache_off": {
+          "push": {
+            "min": 58,
+            "max": 58,
+            "mean": 58.0,
+            "first": 58,
+            "count": 1024
+          },
+          "pop": {
+            "min": 60,
+            "max": 60,
+            "mean": 60.0,
+            "first": 60,
+            "count": 1024
+          }
+        },
+        "burst16/cache_off": {
+          "push": {
+            "min": 58,
+            "max": 58,
+            "mean": 58.0,
+            "first": 58,
+            "count": 1024
+          },
+          "pop": {
+            "min": 60,
+            "max": 60,
+            "mean": 60.0,
+            "first": 60,
+            "count": 1024
+          }
+        },
+        "block4/cache_off": {
+          "push": {
+            "min": 353,
+            "max": 353,
+            "mean": 353.0,
+            "first": 353,
+            "count": 1024
+          },
+          "pop": {
+            "min": 361,
+            "max": 361,
+            "mean": 361.0,
+            "first": 361,
+            "count": 1024
+          }
+        },
+        "block16/cache_off": {
+          "push": {
+            "min": 1289,
+            "max": 1289,
+            "mean": 1289.0,
+            "first": 1289,
+            "count": 1024
+          },
+          "pop": {
+            "min": 1321,
+            "max": 1321,
+            "mean": 1321.0,
+            "first": 1321,
+            "count": 1024
+          }
+        },
+        "block64/cache_off": {
+          "push": {
+            "min": 5033,
+            "max": 5033,
+            "mean": 5033.0,
+            "first": 5033,
+            "count": 1024
+          },
+          "pop": {
+            "min": 5161,
+            "max": 5161,
+            "mean": 5161.0,
+            "first": 5161,
+            "count": 1024
+          }
+        },
+        "dma16/cache_off": {
+          "push": null,
+          "pop": null
+        },
+        "dma64/cache_off": {
+          "push": null,
+          "pop": null
+        },
+        "single/cache_on": {
+          "push": {
+            "min": 35,
+            "max": 52,
+            "mean": 35.017,
+            "first": 52,
+            "count": 1024
+          },
+          "pop": {
+            "min": 37,
+            "max": 49,
+            "mean": 37.012,
+            "first": 49,
+            "count": 1024
+          }
+        },
+        "burst16/cache_on": {
+          "push": {
+            "min": 35,
+            "max": 35,
+            "mean": 35.0,
+            "first": 35,
+            "count": 1024
+          },
+          "pop": {
+            "min": 37,
+            "max": 37,
+            "mean": 37.0,
+            "first": 37,
+            "count": 1024
+          }
+        },
+        "block4/cache_on": {
+          "push": {
+            "min": 201,
+            "max": 216,
+            "mean": 201.015,
+            "first": 216,
+            "count": 1024
+          },
+          "pop": {
+            "min": 204,
+            "max": 216,
+            "mean": 204.012,
+            "first": 216,
+            "count": 1024
+          }
+        },
+        "block16/cache_on": {
+          "push": {
+            "min": 705,
+            "max": 705,
+            "mean": 705.0,
+            "first": 705,
+            "count": 1024
+          },
+          "pop": {
+            "min": 720,
+            "max": 720,
+            "mean": 720.0,
+            "first": 720,
+            "count": 1024
+          }
+        },
+        "block64/cache_on": {
+          "push": {
+            "min": 2721,
+            "max": 2721,
+            "mean": 2721.0,
+            "first": 2721,
+            "count": 1024
+          },
+          "pop": {
+            "min": 2784,
+            "max": 2784,
+            "mean": 2784.0,
+            "first": 2784,
+            "count": 1024
+          }
+        },
+        "dma16/cache_on": {
+          "push": null,
+          "pop": null
+        },
+        "dma64/cache_on": {
+          "push": null,
+          "pop": null
+        }
+      },
+      "errors": 0
+    },
+    {
+      "name": "bbqueue (Rust)",
+      "results": {
+        "single/cache_off": {
+          "push": {
+            "min": 278,
+            "max": 279,
+            "mean": 278.008,
+            "first": 278,
+            "count": 1024
+          },
+          "pop": {
+            "min": 227,
+            "max": 228,
+            "mean": 227.008,
+            "first": 227,
+            "count": 1024
+          }
+        },
+        "burst16/cache_off": {
+          "push": {
+            "min": 277,
+            "max": 279,
+            "mean": 277.98,
+            "first": 278,
+            "count": 1024
+          },
+          "pop": {
+            "min": 227,
+            "max": 228,
+            "mean": 227.008,
+            "first": 227,
+            "count": 1024
+          }
+        },
+        "block4/cache_off": {
+          "push": {
+            "min": 403,
+            "max": 781,
+            "mean": 413.422,
+            "first": 405,
+            "count": 1024
+          },
+          "pop": {
+            "min": 345,
+            "max": 650,
+            "mean": 353.609,
+            "first": 347,
+            "count": 1024
+          }
+        },
+        "block16/cache_off": {
+          "push": {
+            "min": 421,
+            "max": 867,
+            "mean": 483.861,
+            "first": 442,
+            "count": 1024
+          },
+          "pop": {
+            "min": 363,
+            "max": 742,
+            "mean": 421.118,
+            "first": 390,
+            "count": 1024
+          }
+        },
+        "block64/cache_off": {
+          "push": {
+            "min": 493,
+            "max": 957,
+            "mean": 713.873,
+            "first": 514,
+            "count": 1024
+          },
+          "pop": {
+            "min": 435,
+            "max": 832,
+            "mean": 621.842,
+            "first": 462,
+            "count": 1024
+          }
+        },
+        "dma16/cache_off": {
+          "push": {
+            "min": 367,
+            "max": 750,
+            "mean": 412.366,
+            "first": 367,
+            "count": 1024
+          },
+          "pop": {
+            "min": 330,
+            "max": 663,
+            "mean": 369.356,
+            "first": 330,
+            "count": 1024
+          }
+        },
+        "dma64/cache_off": {
+          "push": {
+            "min": 367,
+            "max": 750,
+            "mean": 557.113,
+            "first": 367,
+            "count": 1024
+          },
+          "pop": {
+            "min": 330,
+            "max": 663,
+            "mean": 495.207,
+            "first": 330,
+            "count": 1024
+          }
+        },
+        "single/cache_on": {
+          "push": {
+            "min": 161,
+            "max": 235,
+            "mean": 161.08,
+            "first": 235,
+            "count": 1024
+          },
+          "pop": {
+            "min": 139,
+            "max": 186,
+            "mean": 139.081,
+            "first": 186,
+            "count": 1024
+          }
+        },
+        "burst16/cache_on": {
+          "push": {
+            "min": 160,
+            "max": 231,
+            "mean": 161.052,
+            "first": 231,
+            "count": 1024
+          },
+          "pop": {
+            "min": 139,
+            "max": 186,
+            "mean": 139.081,
+            "first": 186,
+            "count": 1024
+          }
+        },
+        "block4/cache_on": {
+          "push": {
+            "min": 298,
+            "max": 509,
+            "mean": 305.673,
+            "first": 348,
+            "count": 1024
+          },
+          "pop": {
+            "min": 252,
+            "max": 446,
+            "mean": 257.715,
+            "first": 252,
+            "count": 1024
+          }
+        },
+        "block16/cache_on": {
+          "push": {
+            "min": 307,
+            "max": 564,
+            "mean": 347.583,
+            "first": 377,
+            "count": 1024
+          },
+          "pop": {
+            "min": 260,
+            "max": 482,
+            "mean": 293.705,
+            "first": 275,
+            "count": 1024
+          }
+        },
+        "block64/cache_on": {
+          "push": {
+            "min": 397,
+            "max": 629,
+            "mean": 507.092,
+            "first": 437,
+            "count": 1024
+          },
+          "pop": {
+            "min": 288,
+            "max": 527,
+            "mean": 402.365,
+            "first": 323,
+            "count": 1024
+          }
+        },
+        "dma16/cache_on": {
+          "push": {
+            "min": 305,
+            "max": 538,
+            "mean": 332.575,
+            "first": 309,
+            "count": 1024
+          },
+          "pop": {
+            "min": 266,
+            "max": 477,
+            "mean": 290.933,
+            "first": 266,
+            "count": 1024
+          }
+        },
+        "dma64/cache_on": {
+          "push": {
+            "min": 305,
+            "max": 538,
+            "mean": 420.633,
+            "first": 309,
+            "count": 1024
+          },
+          "pop": {
+            "min": 266,
+            "max": 477,
+            "mean": 370.676,
+            "first": 266,
+            "count": 1024
+          }
+        }
+      },
+      "errors": 0
+    },
+    {
+      "name": "embassy-sync Pipe (Rust)",
+      "results": {
+        "single/cache_off": {
+          "push": {
+            "min": 316,
+            "max": 316,
+            "mean": 316.0,
+            "first": 316,
+            "count": 1024
+          },
+          "pop": {
+            "min": 312,
+            "max": 312,
+            "mean": 312.0,
+            "first": 312,
+            "count": 1024
+          }
+        },
+        "burst16/cache_off": {
+          "push": {
+            "min": 288,
+            "max": 316,
+            "mean": 289.75,
+            "first": 316,
+            "count": 1024
+          },
+          "pop": {
+            "min": 312,
+            "max": 312,
+            "mean": 312.0,
+            "first": 312,
+            "count": 1024
+          }
+        },
+        "block4/cache_off": {
+          "push": {
+            "min": 341,
+            "max": 611,
+            "mean": 348.781,
+            "first": 343,
+            "count": 1024
+          },
+          "pop": {
+            "min": 323,
+            "max": 603,
+            "mean": 331.016,
+            "first": 325,
+            "count": 1024
+          }
+        },
+        "block16/cache_off": {
+          "push": {
+            "min": 359,
+            "max": 697,
+            "mean": 408.99,
+            "first": 380,
+            "count": 1024
+          },
+          "pop": {
+            "min": 341,
+            "max": 695,
+            "mean": 396.156,
+            "first": 368,
+            "count": 1024
+          }
+        },
+        "block64/cache_off": {
+          "push": {
+            "min": 431,
+            "max": 787,
+            "mean": 598.186,
+            "first": 452,
+            "count": 1024
+          },
+          "pop": {
+            "min": 413,
+            "max": 785,
+            "mean": 587.432,
+            "first": 440,
+            "count": 1024
+          }
+        },
+        "dma16/cache_off": {
+          "push": null,
+          "pop": null
+        },
+        "dma64/cache_off": {
+          "push": null,
+          "pop": null
+        },
+        "single/cache_on": {
+          "push": {
+            "min": 229,
+            "max": 288,
+            "mean": 229.058,
+            "first": 288,
+            "count": 1024
+          },
+          "pop": {
+            "min": 217,
+            "max": 222,
+            "mean": 217.005,
+            "first": 222,
+            "count": 1024
+          }
+        },
+        "burst16/cache_on": {
+          "push": {
+            "min": 162,
+            "max": 283,
+            "mean": 166.741,
+            "first": 283,
+            "count": 1024
+          },
+          "pop": {
+            "min": 174,
+            "max": 222,
+            "mean": 176.699,
+            "first": 222,
+            "count": 1024
+          }
+        },
+        "block4/cache_on": {
+          "push": {
+            "min": 244,
+            "max": 436,
+            "mean": 268.729,
+            "first": 244,
+            "count": 1024
+          },
+          "pop": {
+            "min": 236,
+            "max": 397,
+            "mean": 240.621,
+            "first": 248,
+            "count": 1024
+          }
+        },
+        "block16/cache_on": {
+          "push": {
+            "min": 270,
+            "max": 492,
+            "mean": 304.286,
+            "first": 272,
+            "count": 1024
+          },
+          "pop": {
+            "min": 242,
+            "max": 432,
+            "mean": 276.668,
+            "first": 267,
+            "count": 1024
+          }
+        },
+        "block64/cache_on": {
+          "push": {
+            "min": 336,
+            "max": 554,
+            "mean": 436.634,
+            "first": 336,
+            "count": 1024
+          },
+          "pop": {
+            "min": 270,
+            "max": 487,
+            "mean": 382.349,
+            "first": 315,
+            "count": 1024
+          }
+        },
+        "dma16/cache_on": {
+          "push": null,
+          "pop": null
+        },
+        "dma64/cache_on": {
+          "push": null,
+          "pop": null
+        }
+      },
+      "errors": 0
+    }
+  ],
+  "code_bytes": {
+    "baseline_reset": 2,
+    "__aeabi_memcpy": 4,
+    "__aeabi_memcpy4": 4,
+    "__aeabi_memcpy8": 4,
+    "baseline_push": 12,
+    "pxq_reset": 12,
+    "baseline_pop": 16,
+    "baseline_pop_n": 20,
+    "hl_reset": 20,
+    "pxq_pop_n": 20,
+    "pxq_push_n": 20,
+    "baseline_push_n": 24,
+    "time_call": 28,
+    "emb_reset": 36,
+    "pxq_dma_rd_release": 36,
+    "pxq_dma_wr_commit": 36,
+    "core::panicking::panic_bounds_check": 40,
+    "pxq_pop": 40,
+    "pxq_push": 40,
+    "bbq_reset": 42,
+    "bbq_dma_rd_release": 44,
+    "hl_pop_n": 44,
+    "hl_push_n": 44,
+    "bbq_dma_wr_commit": 46,
+    "pxq_dma_rd_acquire": 48,
+    "emb_push": 54,
+    "hl_push": 54,
+    "pxq_dma_wr_acquire": 56,
+    "hl_pop": 58,
+    "bbq_push": 66,
+    "emb_pop": 66,
+    "bbq_pop": 80,
+    "emb_pop_n": 84,
+    "emb_push_n": 84,
+    "bbq_dma_rd_acquire": 108,
+    "bbq_dma_wr_acquire": 108,
+    "bbq_push_n": 128,
+    "bbq_pop_n": 130,
+    "memcpy": 308
+  },
+  "time": "2026-11-22T00:34:30Z",
+  "host": "lib-lab1",
+  "board": "NUCLEO-G474RE",
+  "core": "Cortex-M4F",
+  "code_location": "flash",
+  "opt": "-O2",
+  "lto": false,
+  "compiler_libs": "arm-none-eabi-gcc",
+  "memcpy": "C library (newlib-nano from the toolchain image)",
+  "shift": 28,
+  "clock_fast": false,
+  "libc": "newlib-nano",
+  "fw_sha256": "5cd0e9bd9bcc497cbd46474ed04da24be31250caba9d33eb477a84e11932ccca",
+  "bench_commit": "a7a206190337",
+  "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+  "toolchain_image": "verified-libs/toolchain:2026-11-13",
+  "toolchain": {
+    "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+    "ubuntu_snapshot": "20261105T000000Z",
+    "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+    "cbmc": "6.6.0 (cbmc-6.6.0)",
+    "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+    "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+    "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+    "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+  },
+  "libs_pinned": [
+    "pxq-ringbuffer-cortex eec68a93fd3e",
+    "lwrb b8534fd15925",
+    "anders-ringbuffer 8de8fff55a0b",
+    "jnk0le-ringbuffer 9efa07fffc0f",
+    "etl 7d604f2e4f7f",
+    "qp-lfrb 0d6354a10a3c",
+    "rigtorp-spscqueue 59a6a938513e",
+    "wizard97-ringbuf 5cd8410c162a",
+    "embeddedartistry 9733be2eacdc",
+    "ece-ringbuffer 94083a63259e",
+    "micoring a6f91ee2991a",
+    "kostyk-lockfree 38649b8f964e",
+    "polycratia-spscring 9d2445a55970",
+    "rt-spsc 5454de55a2a1",
+    "diffstorm-cb 11e05d60462a",
+    "diffstorm-cb-547d0812 547d0812f30d",
+    "riot 9c9a6abec901",
+    "contiki-ng a3c7119915a5",
+    "tinyusb dae3f9a366bf",
+    "lockfree-dnedic ae6c4df12453",
+    "zephyr-ringbuf 41d10b597304",
+    "freertos-kernel 89592801dd8b",
+    "nuttx-circbuf 2b5c0de5e933",
+    "arduino-api cd91833d90b4",
+    "arduino-renesas 424e86eff92d",
+    "rt-thread 99428a1e7f74",
+    "mbed-ce a4c70564a534",
+    "moodycamel-rwq 8b2176698e9b",
+    "heapless 19188229ac2b",
+    "bbqueue 979abde48a9e",
+    "embassy 84444a19eb57",
+    "rs-hash32 d44eb33a01be",
+    "rs-byteorder ec068eefa042",
+    "rs-stable-deref-trait 66f9d8a15b72",
+    "rs-const-init ea0c87a3a2a4",
+    "rs-critical-section d81c423eeca4",
+    "rs-portable-atomic e4595528211f",
+    "rs-futures 705e6b5c0f06",
+    "rs-cfg-if 8b0a2b0fc1fa",
+    "rs-embedded-io 21e547acd5c8"
+  ]
+}

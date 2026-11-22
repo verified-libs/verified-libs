@@ -15,7 +15,7 @@ library (principle 6).
 | Candidate | Pinned | Cycle benchmark | ISR stress, single bytes | ISR stress, blocks | GenMC (C11) |
 |---|---|---|---|---|---|
 | pxq RingBuffer_PackedState ⚠ | `312c421a8f61` | ✓ | ✓ 0 errors | ✓ 0 errors | not yet (volatile; needs a model of its contract) |
-| lwrb | v3.3.0 | ✓ | ✓ 0 errors | ✓ 0 errors | ✓ pass, controls caught |
+| lwrb | v3.4.0 | ✓ | ✓ 0 errors | ✓ 0 errors | ✓ pass, controls caught |
 | AndersKaloer Ring-Buffer | `8de8fff55a0b` | ✓ | ✓ 0 errors | ✓ 0 errors | – |
 | jnk0le Ringbuffer | `9efa07fffc0f` | ✓ | ✓ 0 errors | ✓ 0 errors | – |
 | ETL queue_spsc_isr | 20.49.0 | ✓ | ✓ 0 errors | ✓ 0 errors | – |

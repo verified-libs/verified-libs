@@ -1,5 +1,14 @@
 # verified-libs / project
 
+Embedded ring buffer (FIFO) libraries for microcontrollers, measured and
+tested on real hardware: speed, code size, interrupt stress tests and model
+checks on six boards, every number with its record and source.
+
+**Website: [verified-libs.org](https://verified-libs.org)** ·
+[compare the libraries](https://verified-libs.org/compare.html) ·
+[results](https://verified-libs.org/results.html) ·
+[method](https://verified-libs.org/method.html)
+
 Shared project repo for verified-libs: purpose, principles and the test lab.
 The libraries themselves each live in their own repo under the organisation.
 

@@ -15,7 +15,7 @@ How to check them: [Reproduce our results](../site/content/reproduce.md).
   the mode that passed. The page's stress counts come from the whole
   campaigns (8 to 42 runs per board of the ISR test and 25 to 89 of the
   two-interrupt test, see
-  [the report](../reports/2026-11-20-publication-rerun.md)); the other
+  [the report](../reports/2026-11-22-lwrb-v3.4.0-rerun.md)); the other
   records are not in the repository because of their size, ask for them at
   contact@verified-libs.org.
 

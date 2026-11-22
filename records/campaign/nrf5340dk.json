@@ -1,10 +1,10 @@
 {
  "board": "nRF5340 DK",
  "campaigns": [
-  "overnight-20261119T182641Z-nrf5340dk"
+  "overnight-20261122T003646Z-nrf5340dk"
  ],
  "commits": [
-  "8d8880f4bf78"
+  "a7a206190337"
  ],
  "modes": {
   "single": {
@@ -101,7 +101,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 9302,
+     "errors": 9469,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -161,7 +161,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 3,
      "runs_with_errors": 3,
-     "errors": 2288,
+     "errors": 2239,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -329,7 +329,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 2,
      "runs_with_errors": 2,
-     "errors": 35824,
+     "errors": 35539,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -389,7 +389,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 2,
      "runs_with_errors": 2,
-     "errors": 12884,
+     "errors": 11809,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -401,7 +401,7 @@
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 2,
      "runs_with_errors": 2,
-     "errors": 224,
+     "errors": 198,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {
@@ -785,7 +785,7 @@
     "wizard97 as shipped (C++)": {
      "runs": 2,
      "runs_with_errors": 2,
-     "errors": 302960,
+     "errors": 303062,
      "did_not_finish": 0
     },
     "wizard97 + PRIMASK macros (C++)": {
@@ -845,7 +845,7 @@
     "Arduino RingBufferN as shipped (C++)": {
      "runs": 2,
      "runs_with_errors": 2,
-     "errors": 454053,
+     "errors": 524580,
      "did_not_finish": 0
     },
     "Arduino SafeRingBufferN (C++)": {
@@ -857,7 +857,7 @@
     "RT-Thread rt_ringbuffer, no lock (C)": {
      "runs": 2,
      "runs_with_errors": 2,
-     "errors": 559,
+     "errors": 622,
      "did_not_finish": 0
     },
     "RT-Thread rt_ringbuffer + interrupt lock (C)": {
