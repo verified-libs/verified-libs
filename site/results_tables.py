@@ -8,7 +8,10 @@ Reads site/data/libs.json for the boards and the names of their benchmark
 records (SPSC set and Rust set), and the records themselves from
 records/bench/ (site/collect_records.py copies them there). Unlike the
 comparison page it lists every configuration of those records, also the ones
-held off the page (site/data/hold.txt): the Results page keeps them.
+held off the page (site/data/hold.txt): the Results page keeps them. The
+second column is the tested version: the release from
+site/data/libs-meta.json, where the library has one, and the pinned commit
+from firmware/nrf5340-rb-bench/libs.lock.
 Replaces the text between <!-- table:speed --> and <!-- /table:speed --> in
 RESULTS.md. --check: exit 1 if RESULTS.md is not up to date.
 """
@@ -44,8 +47,27 @@ def cell(res):
     return s
 
 
+def versions():
+    """Tested version of each configuration: the release, where the library
+    has one (site/data/libs-meta.json), and the first eight digits of the
+    commit it is pinned to (libs.lock)."""
+    lock = {}
+    for line in open(os.path.join(ROOT, "firmware/nrf5340-rb-bench/libs.lock")):
+        f = line.split()
+        if len(f) >= 3 and not line.startswith("#"):
+            lock[f[0]] = f[2]
+    out = {}
+    for name, m in json.load(open(os.path.join(HERE, "data/libs-meta.json"))).items():
+        if not isinstance(m, dict) or m.get("lock") not in lock:
+            continue
+        pin = f"`{lock[m['lock']][:8]}`"
+        out[name] = f"{m['version']} · {pin}" if m.get("version") else pin
+    return out
+
+
 def table():
     data = json.load(open(os.path.join(HERE, "data/libs.json")))
+    ver = versions()
     boards = {b["id"]: b for b in data["boards"]}
     own = {l["record_name"] for l in data["libs"] if l.get("own")}
     rows, recs = {}, []
@@ -64,13 +86,15 @@ def table():
                 rows.setdefault(n, {})[bid] = cell(lib.get("results"))
     core = {"nrf5340dk": "M33", "pico2": "M33", "nucleo-g474re": "M4", "nucleo-h723zg": "M7",
             "nucleo-g0b1re": "M0+", "sam-d20-xpro": "M0+"}
-    head = "| Library | " + " | ".join(f"{SHORT[b]} {core[b]}" for b in ORDER) + " |"
-    out = [head, "|---|" + "---|" * len(ORDER)]
+    head = "| Library | Version · commit | " + " | ".join(f"{SHORT[b]} {core[b]}" for b in ORDER) + " |"
+    out = [head, "|---|---|" + "---|" * len(ORDER)]
     for n in sorted(rows, key=str.lower):
         label = n + (" ⚠" if n in own else "")
         if n in UNSAFE_BY_OWN_DOCS:
             label = f"*{label}* ¹"
-        out.append(f"| {label} | " + " | ".join(rows[n].get(b, "–") for b in ORDER) + " |")
+        if n not in ver:
+            sys.exit(f"no pinned commit found for {n!r} (site/data/libs-meta.json, libs.lock)")
+        out.append(f"| {label} | {ver[n]} | " + " | ".join(rows[n].get(b, "–") for b in ORDER) + " |")
     out.append("")
     out.append("¹ Not interrupt-safe by its own documentation or maintainers; measured for comparison only.")
     out.append("")
