@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="lwrb released v3.4.0 (b8534fd15925), which adds functions for one byte, lwrb_write_byte and lwrb_read_byte. The pin moved from v3.3.0 (413b7093dcad), and ...">
+<link rel="canonical" href="https://verified-libs.org/report-2026-11-22-lwrb-v3.4.0-rerun.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Re-run with lwrb v3.4.0: every test at one commit, all six boards (2026-11-21/22) - verified-libs">
+<meta property="og:description" content="lwrb released v3.4.0 (b8534fd15925), which adds functions for one byte, lwrb_write_byte and lwrb_read_byte. The pin moved from v3.3.0 (413b7093dcad), and ...">
+<meta property="og:url" content="https://verified-libs.org/report-2026-11-22-lwrb-v3.4.0-rerun.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Re-run with lwrb v3.4.0: every test at one commit, all six boards (2026-11-21/22) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="re-run-with-lwrb-v340-every-test-at-one-commit-all-six-boards-2026-11-2122">Re-run with lwrb v3.4.0: every test at one commit, all six boards (2026-11-21/22)</h1>
+<p>lwrb released v3.4.0 (<code>b8534fd15925</code>), which adds functions for one byte,
+<code>lwrb_write_byte</code> and <code>lwrb_read_byte</code>. The pin moved from v3.3.0
+(<code>413b7093dcad</code>), and lwrb's single bytes are now measured through the new
+functions (DECISIONS 2026-11-22). The pin and the adapter are test
+sources, and a record must name sources the reader has, so everything the
+site shows was measured again at one commit, <code>a7a206190337</code>, the same way
+as in the <a href="report-2026-11-20-publication-rerun.html">publication re-run</a>:
+<code>lab/tools/publication-rerun.sh 5 5</code> on each board (code size, the three
+benchmark sets at eight code placements, five hours of the ISR stress
+test, five hours of the two-interrupt test). Start 2026-11-21 23:42 UTC;
+the last board finished 2026-11-22 12:52 UTC. The method is the frozen
+one (tag <code>v1-method-freeze-2</code>); no test and no campaign script changed.</p>
+<h2 id="result">Result</h2>
+<ul>
+<li><strong>lwrb v3.4.0: no errors</strong> in its 108 runs of the ISR stress test (13
+  of them with the two sides on the Pico 2's two cores), and the model
+  check passes for the byte functions and for the block calls.</li>
+<li><strong>lwrb's single bytes are 3 to 4 times faster</strong> through the new
+  functions (table below). Its blocks and its zero-copy calls cost what
+  they did, within 4 %. Its code grew by 108 to 132 bytes.</li>
+<li><strong>ISR stress test: no errors in any real library in any run</strong> (108 runs
+  on six boards, all valid).</li>
+<li><strong>Two-interrupt test: no errors in any library in its documented mode in
+  any valid run</strong> (324 runs on six boards, 322 valid). lwrb is a
+  single-producer, single-consumer library and is not in this test.</li>
+<li>No step failed: no benchmark image needed a second try, no stress run
+  was repeated, no board was power-cycled.</li>
+<li><strong>The other libraries' speed numbers moved too</strong>, although their code
+  did not change, because all the C and C++ libraries share one benchmark
+  image and its layout changed. Most moves are small; 29 of 666 means left
+  the placement range shown before, and one number moved by 57 % (see
+  "What moved in the other libraries").</li>
+<li>The two invalid runs of the two-interrupt test are the same two entries
+  of the rotation as on 2026-11-19/20.</li>
+</ul>
+<h2 id="lwrb-v330-and-v340">lwrb v3.3.0 and v3.4.0</h2>
+<p>Mean cycles per call for one byte, push / pop; cycles per byte for a
+64-byte block (mean of write and read); cycles per transfer for the
+zero-copy calls, write / read. Code in flash, gcc -O2. v3.3.0: the
+records of 2026-11-19 (commit <code>8d8880f4bf78</code>).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>1 byte, v3.3.0</th>
+<th>1 byte, v3.4.0</th>
+<th>Block, v3.3.0</th>
+<th>Block, v3.4.0</th>
+<th>Zero-copy, v3.3.0</th>
+<th>Zero-copy, v3.4.0</th>
+<th>Code, v3.3.0</th>
+<th>Code, v3.4.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 (M33)</td>
+<td>218 / 215</td>
+<td>55 / 58</td>
+<td>4.36</td>
+<td>4.52</td>
+<td>238 / 238</td>
+<td>240 / 239</td>
+<td>984</td>
+<td>1,100</td>
+</tr>
+<tr>
+<td>Pico 2 (M33)</td>
+<td>153 / 149</td>
+<td>40 / 42</td>
+<td>3.46</td>
+<td>3.56</td>
+<td>186 / 182</td>
+<td>189 / 185</td>
+<td>984</td>
+<td>1,100</td>
+</tr>
+<tr>
+<td>G474 (M4)</td>
+<td>180 / 176</td>
+<td>54 / 57</td>
+<td>5.05</td>
+<td>5.18</td>
+<td>281 / 274</td>
+<td>288 / 277</td>
+<td>968</td>
+<td>1,084</td>
+</tr>
+<tr>
+<td>H723 (M7)</td>
+<td>143 / 128</td>
+<td>49 / 44</td>
+<td>3.95</td>
+<td>3.91</td>
+<td>194 / 176</td>
+<td>202 / 186</td>
+<td>964</td>
+<td>1,096</td>
+</tr>
+<tr>
+<td>G0B1 (M0+)</td>
+<td>263 / 256</td>
+<td>65 / 67</td>
+<td>13.48</td>
+<td>13.61</td>
+<td>325 / 325</td>
+<td>335 / 326</td>
+<td>1,160</td>
+<td>1,268</td>
+</tr>
+<tr>
+<td>SAM D20 (M0+)</td>
+<td>278 / 267</td>
+<td>65 / 69</td>
+<td>13.56</td>
+<td>13.68</td>
+<td>337 / 328</td>
+<td>340 / 332</td>
+<td>1,160</td>
+<td>1,268</td>
+</tr>
+</tbody>
+</table></div>
+<p>The single-byte columns compare two different calls: in v3.3.0 the only
+way to move one byte was <code>lwrb_write</code> / <code>lwrb_read</code> with a length of 1,
+which goes through the block path and <code>memcpy</code>; v3.4.0 has a call for it.
+The block call with a length of 1 was not timed again with v3.4.0, so the
+table does not say whether that path changed. RAM is 152 bytes in both
+versions.</p>
+<p>The single-byte numbers of v3.4.0 are also steadier over the eight code
+placements: on the G474, push was 180 to 211 cycles with v3.3.0 and is
+54.02 at every placement with v3.4.0. Its zero-copy numbers have the
+range they had (on the G474 261 to 288 for the write side).</p>
+<p>Host-side checks with v3.4.0, before any board ran:</p>
+<ul>
+<li>GenMC (<a href="https://github.com/verified-libs/verified-libs/blob/main/verify/genmc/README.md">verify/genmc</a>): the byte functions
+  pass (7,118 executions), as do the block calls with a length of 1
+  (7,118), blocks (730) and zero-copy (8,988). The controls fail as they
+  must: without atomics, and with release or acquire weakened to relaxed.
+  <code>run.sh</code> gave all 136 checks as expected. <code>lwrb_init</code> clears its
+  structure with <code>memset</code> from v3.4.0, which GenMC cannot model over
+  atomic objects; the model leaves that one write out (the README says
+  why that is sound here).</li>
+<li>The one-core contract check (<code>verify/contract</code>): pass.</li>
+</ul>
+<h2 id="benchmarks">Benchmarks</h2>
+<p>24 images per board (three sets at placement shifts 0, 4, ..., 28), 25 on
+the nRF5340 (Nordic's nrf_ringbuf, one placement). All 145 ran at the
+first try. The records are in <code>records/bench/</code> (151 with the six code-size
+records).</p>
+<p>Only one of the benchmark images changed with the pin: the one with the C
+and C++ single-producer libraries, which holds lwrb. The Rust image, the
+multi-producer image and Nordic's were byte for byte those of the
+publication re-run (built at both commits and compared before the run).
+They were written and measured again all the same, and gave the same
+numbers: all 66 means of the Rust libraries and the 5 of Nordic's
+nrf_ringbuf are identical to the last digit recorded, and so are 716 of
+the 720 numbers of the multi-producer set (means and range ends); the
+other four differ by at most 0.03 %. An image that is the same gives the
+same cycle counts on these boards.</p>
+<h3 id="what-moved-in-the-other-libraries">What moved in the other libraries</h3>
+<p>The C and C++ single-producer libraries are linked into one image. lwrb's
+code is 108 to 132 bytes larger, so the code after it lies at other
+addresses, and the alignment the benchmark gives each timed function does
+not remove all of that. Of the 666 means of the configurations other than
+lwrb (C and C++, the six boards):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identical</td>
+<td>396</td>
+</tr>
+<tr>
+<td>within 0.5 %</td>
+<td>548</td>
+</tr>
+<tr>
+<td>moved by more than 2 %</td>
+<td>43</td>
+</tr>
+<tr>
+<td>outside the placement range shown before</td>
+<td>29</td>
+</tr>
+</tbody>
+</table></div>
+<p>The 29 outside their range: 26 on the nRF5340, 2 on the H723, 1 on the
+Pico 2. On the nRF5340 they moved by 0.6 to 5.3 %, typically by two or
+three cycles per call (Zephyr ring_buf 76 / 71 → 79 / 74, DNedic lockfree
+123 / 123 → 126 / 126, ece-mohammad 90 / 89 → 93 / 92), and their range
+over the eight placements is one cycle wide before and after. So on that
+board the eight placements of one build do not show how much another
+build moves a number. The largest moves per board:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Number</th>
+<th>Before</th>
+<th>Now</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pico 2</td>
+<td>pxq RingBuffer_PackedState ⚠, 64-byte block</td>
+<td>5.26 (range 3.53-5.44)</td>
+<td>8.27 (range 7.82-9.78)</td>
+<td>57 %</td>
+</tr>
+<tr>
+<td>G0B1</td>
+<td>RIOT tsrb, 64-byte block</td>
+<td>27.1</td>
+<td>30.1</td>
+<td>11 %</td>
+</tr>
+<tr>
+<td>G474</td>
+<td>FreeRTOS stream buffer, 64-byte block</td>
+<td>6.90</td>
+<td>6.47</td>
+<td>6 %</td>
+</tr>
+<tr>
+<td>nRF5340</td>
+<td>pxq RingBuffer_PackedState ⚠, 64-byte block</td>
+<td>3.22</td>
+<td>3.39</td>
+<td>5 %</td>
+</tr>
+<tr>
+<td>H723</td>
+<td>micoring default, push</td>
+<td>54.1</td>
+<td>52.1</td>
+<td>4 %</td>
+</tr>
+<tr>
+<td>SAM D20</td>
+<td>QuantumLeaps LFRB, pop</td>
+<td>61</td>
+<td>63</td>
+<td>3 %</td>
+</tr>
+</tbody>
+</table></div>
+<p>The first row is the number the report of 2026-11-20 called the least
+stable in the table: 4.49-5.83 in the records of 2026-11-13, 3.53-5.44 on
+2026-11-19, 7.82-9.78 now, three builds with three ranges of which the
+last does not overlap the others. The same library's single-byte numbers
+on the same board did not move (17.4 / 18.4 cycles at every placement
+in both builds). The cause has still not been looked into (the
+Pico 2 fetches its code through the XIP cache from QSPI flash, and the
+block write there also varies from call to call within one run). The
+comparison page shows the new number with its range, as it does for
+every library. ⚠ marks the project owner's own library; no test was
+changed and none was repeated for it.</p>
+<p>What follows for reading the page: a difference of a few per cent between
+two libraries on the nRF5340, and any block number of pxq ⚠ on the Pico 2,
+is within what a rebuild can move. The note under the speed table in
+RESULTS.md says so.</p>
+<p>Placement, over the 1,002 numbers that have a range: 710 move by 0.05 %
+or less over the eight placements and 832 by 1 % or less (703 and 823 on
+2026-11-19, counted the same way; the report of 2026-11-20 gave the
+second as 826). The largest ranges now:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Number</th>
+<th>Range over eight placements</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pxq RingBuffer_PackedState ⚠, 64-byte block, Pico 2</td>
+<td>7.82-9.78 cycles per byte</td>
+<td>25 %</td>
+</tr>
+<tr>
+<td>embassy-sync Pipe, pop, G474</td>
+<td>174-217 cycles</td>
+<td>25 %</td>
+</tr>
+<tr>
+<td>pxq ⚠ (both variants), 64-byte block, G474</td>
+<td>2.88-3.57 cycles per byte</td>
+<td>24 %</td>
+</tr>
+<tr>
+<td>embassy-sync Pipe, push, G474</td>
+<td>190-235 cycles</td>
+<td>24 %</td>
+</tr>
+<tr>
+<td>TinyUSB tu_fifo, pop, nRF5340</td>
+<td>123-141 cycles</td>
+<td>15 %</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="isr-stress-test">ISR stress test</h2>
+<p><code>firmware/nrf5340-rb-stress/overnight.sh</code>, five hours per board, each
+library from its own image after its own reset, gcc -O2, the rotation of
+17 entries grouped by code location. A run is valid when the control (a
+deliberately broken buffer) was caught in it. The runs per board, mode,
+code location and cache setting are those of 2026-11-19/20. So are the
+images of every library but lwrb: by the checksums in the records, 39 of
+the 40 library images per code location are byte for byte the same, and
+the one that differs is lwrb's.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Runs</th>
+<th>Valid</th>
+<th>Modes (runs)</th>
+<th>Code</th>
+<th>Cache or accelerator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>9</td>
+<td>9</td>
+<td>single 3, block 2, sweep 2, sweep-block 2</td>
+<td>flash 9</td>
+<td>on 6, off 3</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>9</td>
+<td>9</td>
+<td>single 3, block 2, sweep 2, sweep-block 2</td>
+<td>flash 9</td>
+<td>on 6, off 3</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>27</td>
+<td>27</td>
+<td>single 7, block 6, dma 4, sweep 4, sweep-block 5, sweep-dma 1</td>
+<td>flash 22, SRAM 5</td>
+<td>on 21, off 6</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>13</td>
+<td>13</td>
+<td>single 4, block 2, dma 2, sweep 2, sweep-block 2, sweep-dma 1</td>
+<td>flash 12, SRAM 1</td>
+<td>on 10, off 3</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>8</td>
+<td>8</td>
+<td>single 3, block 2, sweep 2, sweep-block 1</td>
+<td>flash 8</td>
+<td>on 6, off 2</td>
+</tr>
+<tr>
+<td>Pico 2</td>
+<td>42</td>
+<td>42</td>
+<td>single 7, block 6, dma 6, sweep 4, sweep-block 4, sweep-dma 2; two cores: smp 4, smp-block 4, sweep-smp 2, sweep-smp-block 3</td>
+<td>flash 32, SRAM 10</td>
+<td>on 42</td>
+</tr>
+<tr>
+<td>All</td>
+<td>108</td>
+<td>108</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Summed over the library rows of the six campaign reports: 11.6 × 10⁹ bytes
+through the buffers under 6.3 × 10⁹ interrupts. The interrupt sweep made
+114 to 539 million trials per board, with the interrupt inside the call
+in 76 to 82 % of them.</p>
+<p><strong>lwrb v3.4.0</strong> was in every run: 9, 9, 27, 13 and 8 runs on the nRF5340,
+the G0B1, the G474, the H723 and the SAM D20, and 42 on the Pico 2 (13 of
+them on two cores, which lwrb documents). No errors. The stress test
+moves its single bytes through the byte functions too; its zero-copy
+calls were stressed on the G474, the H723 and the Pico 2.</p>
+<p><strong>Errors only where they are expected</strong>, as in every campaign before:</p>
+<ul>
+<li>on every board, the three variants their own projects do not call
+  interrupt-safe: wizard97 as shipped, Arduino RingBufferN as shipped and
+  RT-Thread rt_ringbuffer without a lock;</li>
+<li>on the Pico 2 with the two sides on two cores, the nine single-core
+  designs (their interrupt lock does nothing against the other core).</li>
+</ul>
+<p><strong>Mutants</strong> (four buffers with one deliberate defect each): the sweep
+caught every mutant in every sweep run in the directions where its defect
+can show, on all six boards. With random interrupts the weak spots are
+the same as before: "drain re-reads head" was caught in 12 of 27
+single-byte runs (11 of 27 on 2026-11-19/20), and "full test misses the
+wrap" in the direction main to interrupt in 16 of 20 block runs.</p>
+<p><strong>Starved parts.</strong> The same three entries of the rotation as on
+2026-11-19/20, at the fastest interrupt rate on the two Cortex-M0+
+boards. A starved part is reported, not counted as a pass and not as an
+error:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Starved</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAM D20, single, <code>samd20-rb-stress-single-20261122T015316Z</code></td>
+<td>FreeRTOS stream buffer (interrupt to main), embassy-sync Pipe (main to interrupt), NuttX circbuf (both directions)</td>
+</tr>
+<tr>
+<td>SAM D20, block, <code>samd20-rb-stress-block-20261122T022250Z</code></td>
+<td>NuttX circbuf (interrupt to main)</td>
+</tr>
+<tr>
+<td>G0B1, single, <code>stm32g0b1-rb-stress-single-20261122T013250Z</code></td>
+<td>NuttX circbuf (both directions)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Not reached</strong>, as on 2026-11-19/20: the rotation's zero-copy entries
+come after the flash entries for single bytes and blocks, and five hours
+ended before them on the three slowest boards. There is no ISR stress run
+of the zero-copy API on the nRF5340, the G0B1 and the SAM D20; there are
+5 on the G474, 3 on the H723 and 8 on the Pico 2. The same three boards
+have no run from SRAM.</p>
+<h2 id="two-interrupt-test-mpsc-spmc">Two-interrupt test (MPSC / SPMC)</h2>
+<p><code>firmware/rb-mp-stress/campaign.sh</code>, five hours per board, each library
+from its own image, random interrupts at prescaler 1 and 2, aimed
+interrupts at 3 and 4. lwrb is not in this test, and the test's images
+are the ones of 2026-11-19/20 (the same checksums on every board); only
+the seeds are new.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Runs</th>
+<th>Valid</th>
+<th>Control caught, random interrupts</th>
+<th>Control caught, aimed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>25</td>
+<td>23</td>
+<td>11 of 13</td>
+<td>12 of 12</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>43</td>
+<td>43</td>
+<td>23 of 23</td>
+<td>20 of 20</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>83</td>
+<td>83</td>
+<td>43 of 43</td>
+<td>40 of 40</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>57</td>
+<td>57</td>
+<td>29 of 29</td>
+<td>28 of 28</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>27</td>
+<td>27</td>
+<td>15 of 15</td>
+<td>12 of 12</td>
+</tr>
+<tr>
+<td>Pico 2</td>
+<td>89</td>
+<td>89</td>
+<td>45 of 45</td>
+<td>44 of 44</td>
+</tr>
+<tr>
+<td>All</td>
+<td>324</td>
+<td>322</td>
+<td>166 of 168</td>
+<td>156 of 156</td>
+</tr>
+</tbody>
+</table></div>
+<p>No run failed (probe, serial port or build).</p>
+<p><strong>The two invalid runs repeat.</strong> Runs 2 and 10 on the nRF5340: MPSC,
+random interrupts at prescaler 2, code in flash. The same two entries of
+the rotation were the invalid ones on 2026-11-19/20, with other seeds, so
+this entry has now missed the control in 4 of 4 runs. The third MPSC run
+at that rate on the nRF5340, with the code in SRAM, caught it both times.
+It is not chance: on this board random interrupts at prescaler 2 do not
+reach the control's defect when the code runs from flash. The runs are
+left out, as the rule says, and nothing else rests on them; aiming that
+rate on the nRF5340 as well would be a change to the frozen method and is
+left for the version after 1.</p>
+<p>Coverage of the aimed runs (the control left out): the share of
+interrupts that landed in the library's code, the median number of
+interrupts per instruction boundary where one can land, and how many of
+those boundaries were interrupted at least 10 times in the weakest run.
+Range over the libraries:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>In library code</th>
+<th>Median per boundary</th>
+<th>Boundaries &gt;= 10x, weakest run</th>
+<th>Rows with every boundary &gt;= 10x</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>8.5-31.9 %</td>
+<td>2,824-9,768</td>
+<td>64-97 %</td>
+<td>0 of 13</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>14.3-42.8 %</td>
+<td>709-15,770</td>
+<td>84-100 %</td>
+<td>8 of 11</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>4.2-27.8 %</td>
+<td>2,242-18,611</td>
+<td>65-100 %</td>
+<td>4 of 13</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>9.0-26.1 %</td>
+<td>51-5,628</td>
+<td>51-100 %</td>
+<td>1 of 13</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>18.2-53.6 %</td>
+<td>432-12,262</td>
+<td>84-100 %</td>
+<td>8 of 11</td>
+</tr>
+<tr>
+<td>Pico 2</td>
+<td>1.9-24.5 %</td>
+<td>1,734-7,928</td>
+<td>65-100 %</td>
+<td>2 of 13</td>
+</tr>
+</tbody>
+</table></div>
+<p>Per library, the valid runs of all boards together:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Mode</th>
+<th>Boards</th>
+<th>Runs</th>
+<th>Values</th>
+<th>Interrupts</th>
+<th>Errors</th>
+<th>Lost + duplicated</th>
+<th>Both interrupts hit full/empty</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DNedic lockfree mpmc::Queue</td>
+<td>mpsc</td>
+<td>4</td>
+<td>127</td>
+<td>89,808,771</td>
+<td>644,258,431</td>
+<td>0</td>
+<td>0</td>
+<td>127 of 127</td>
+</tr>
+<tr>
+<td>RIOT tsrb</td>
+<td>mpsc</td>
+<td>6</td>
+<td>163</td>
+<td>116,211,179</td>
+<td>893,614,355</td>
+<td>0</td>
+<td>0</td>
+<td>163 of 163</td>
+</tr>
+<tr>
+<td>control: jnk0le Ringbuffer (SPSC) with two producers</td>
+<td>mpsc</td>
+<td>6</td>
+<td>163</td>
+<td>116,210,216</td>
+<td>801,577,451</td>
+<td>2,093,011</td>
+<td>2,181,632</td>
+<td>163 of 163</td>
+</tr>
+<tr>
+<td>heapless mpmc::Queue (Rust)</td>
+<td>mpsc</td>
+<td>6</td>
+<td>163</td>
+<td>116,212,274</td>
+<td>959,171,132</td>
+<td>0</td>
+<td>0</td>
+<td>163 of 163</td>
+</tr>
+<tr>
+<td>pxq ⚠ RingBuffer_PackedState, Topology::MPMC</td>
+<td>mpsc</td>
+<td>6</td>
+<td>163</td>
+<td>116,210,660</td>
+<td>824,358,954</td>
+<td>0</td>
+<td>0</td>
+<td>163 of 163</td>
+</tr>
+<tr>
+<td>pxq ⚠ RingBuffer_PackedState, Topology::MPSC</td>
+<td>mpsc</td>
+<td>6</td>
+<td>163</td>
+<td>116,209,982</td>
+<td>822,655,146</td>
+<td>0</td>
+<td>0</td>
+<td>163 of 163</td>
+</tr>
+<tr>
+<td>pxq ⚠ RingBuffer_PackedState, Topology::MPSC, reserve/commit</td>
+<td>mpsc</td>
+<td>6</td>
+<td>163</td>
+<td>116,214,603</td>
+<td>1,117,619,107</td>
+<td>0</td>
+<td>0</td>
+<td>163 of 163</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros</td>
+<td>mpsc</td>
+<td>6</td>
+<td>163</td>
+<td>116,211,118</td>
+<td>838,130,393</td>
+<td>0</td>
+<td>0</td>
+<td>163 of 163</td>
+</tr>
+<tr>
+<td>DNedic lockfree mpmc::Queue</td>
+<td>spmc</td>
+<td>4</td>
+<td>125</td>
+<td>87,800,053</td>
+<td>589,602,410</td>
+<td>0</td>
+<td>0</td>
+<td>125 of 125</td>
+</tr>
+<tr>
+<td>RIOT tsrb</td>
+<td>spmc</td>
+<td>6</td>
+<td>159</td>
+<td>112,200,077</td>
+<td>805,509,632</td>
+<td>0</td>
+<td>0</td>
+<td>159 of 159</td>
+</tr>
+<tr>
+<td>control: jnk0le Ringbuffer (SPSC) with two consumers</td>
+<td>spmc</td>
+<td>6</td>
+<td>159</td>
+<td>112,200,102</td>
+<td>732,757,584</td>
+<td>10,591</td>
+<td>2,143,696</td>
+<td>159 of 159</td>
+</tr>
+<tr>
+<td>heapless mpmc::Queue (Rust)</td>
+<td>spmc</td>
+<td>6</td>
+<td>159</td>
+<td>112,200,114</td>
+<td>865,375,906</td>
+<td>0</td>
+<td>0</td>
+<td>159 of 159</td>
+</tr>
+<tr>
+<td>pxq ⚠ RingBuffer_PackedState, Topology::MPMC</td>
+<td>spmc</td>
+<td>6</td>
+<td>159</td>
+<td>112,200,067</td>
+<td>754,600,752</td>
+<td>0</td>
+<td>0</td>
+<td>159 of 159</td>
+</tr>
+<tr>
+<td>pxq ⚠ RingBuffer_PackedState, Topology::SPMC</td>
+<td>spmc</td>
+<td>6</td>
+<td>159</td>
+<td>112,200,089</td>
+<td>753,979,345</td>
+<td>0</td>
+<td>0</td>
+<td>159 of 159</td>
+</tr>
+<tr>
+<td>wizard97 + PRIMASK macros</td>
+<td>spmc</td>
+<td>6</td>
+<td>159</td>
+<td>112,200,079</td>
+<td>763,691,776</td>
+<td>0</td>
+<td>0</td>
+<td>159 of 159</td>
+</tr>
+</tbody>
+</table></div>
+<p>DNedic's queue cannot be built for the two Cortex-M0+ boards. pxq ⚠ has
+five of the rows because it documents that many modes; every documented
+mode is tested (<a href="method.html">conflict of interest</a>).</p>
+<p>The reading is that of 2026-11-20: a pass means "no error while
+interrupts arrived at these points this often". The thinnest coverage is
+again heapless <code>mpmc::Queue</code> on the H723 (median 51 hits per boundary in
+MPSC mode), and on the nRF5340 no row has every boundary interrupted 10
+times in its weakest run.</p>
+<h2 id="what-this-run-says-about-re-running">What this run says about re-running</h2>
+<p>Three things were measured here that the project did not know before:</p>
+<ul>
+<li>The same image gives the same numbers (787 of 791 identical, the rest
+  within 0.03 %), and the two-interrupt test with the same images gave
+  the same run counts, the same valid runs and no errors.</li>
+<li>A change in one library's code moves the numbers of the libraries that
+  share its image, on the nRF5340 by more than their placement range.</li>
+<li>Most of what ran had not changed. Of the 24 or 25 benchmark images per
+  board, 16 or 17 were the same (the Rust, multi-producer and Nordic
+  sets). In the stress tests each library runs from its own image: every
+  image of the two-interrupt test, and every image of the ISR test except
+  lwrb's, is byte for byte the one of 2026-11-19/20. Running them again
+  changed nothing on the page beyond the campaigns' new seeds.</li>
+</ul>
+<p>So measuring everything again for one library's new version buys little
+for the images that did not change, and it is what the record rule
+requires today. A proposal for a rule that keeps the records of
+unchanged images is in the plan
+(<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-22-same-image-rule.md">lab/plans/2026-11-22-same-image-rule.md</a>); it is a
+proposal, and nothing in the tools has changed.</p>
+<h2 id="corrections-found-while-evaluating">Corrections found while evaluating</h2>
+<ul>
+<li>RESULTS.md said that 15 of the Pico 2's 42 ISR runs of 2026-11-19/20
+  had the two sides on two cores. It is 13 (the table in the report of
+  2026-11-20 was right). Corrected.</li>
+<li><code>firmware/nrf5340-rb-bench/README.md</code> still names lwrb v3.3.0 and
+  <code>lwrb_write</code> / <code>lwrb_read</code> in its list of what is measured. The file is
+  part of the test sources the records name, so it is corrected with the
+  next change there; <code>libs.lock</code> and the adapter are what is built, and
+  every record lists the pinned commits (<code>libs_pinned</code>).</li>
+</ul>
+<h2 id="flash-writes">Flash writes</h2>
+<p>Counted from the benchmark logs and from the bundle checksums in the
+stress records (a bundle is written when its checksum changes; some of
+those writes change only part of the flash). The same as on 2026-11-19/20:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Benchmark images</th>
+<th>Bundles</th>
+<th>Sum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>25</td>
+<td>3</td>
+<td>28</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>24</td>
+<td>3</td>
+<td>27</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>24</td>
+<td>5</td>
+<td>29</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>24</td>
+<td>4</td>
+<td>28</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>24</td>
+<td>17</td>
+<td>41</td>
+</tr>
+<tr>
+<td>Pico 2</td>
+<td>24</td>
+<td>7</td>
+<td>31</td>
+</tr>
+</tbody>
+</table></div>
+<p>The SAM D20's 256 KB hold the ISR test's libraries only as two bundles
+written in turn, so each of its eight ISR runs wrote the flash twice.
+Before the run, the smoke test of every step (shrunk) wrote the G474
+three times.</p>
+<h2 id="records">Records</h2>
+<ul>
+<li><code>records/bench/</code>: every benchmark and code-size record of the run.</li>
+<li><code>records/stress/</code>: one run per board and mode (58 records), as before.</li>
+<li><code>records/campaign/</code>: the per-mode summary of each board's ISR campaign.</li>
+<li>The records of 2026-11-19/20 are replaced; the numbers of lwrb v3.3.0
+  are in the table above and in the report of 2026-11-20.</li>
+<li>The campaign directories with every run stay on the lab host
+  (<code>~/lab-runs/overnight-20261122T*</code> and <code>mp-campaign-20261122T*</code>).</li>
+</ul></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

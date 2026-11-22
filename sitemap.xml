@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://verified-libs.org/</loc></url>
+<url><loc>https://verified-libs.org/compare.html</loc></url>
+<url><loc>https://verified-libs.org/finding-diffstorm-cb-overwrite-padding.html</loc></url>
+<url><loc>https://verified-libs.org/findings.html</loc></url>
+<url><loc>https://verified-libs.org/method.html</loc></url>
+<url><loc>https://verified-libs.org/repeats.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-06-first-harness.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-07-overnight-campaign-raw.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-07-overnight-campaign.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-08-pxq-1.4-night-run.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-11-new-boards-first-runs.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-12-compilers-stm32.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-12-night-six-boards.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-13-memcpy-rust.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-13-night-sweep-mutants-wave4.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-14-night-flags-placement.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-16-compilers-six-boards.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-17-c-libraries.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-17-dma-producer.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-17-h723-thermal.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-17-mp-coverage-prototype.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-17-mp-per-library-validation.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-17-nrf5340-cross-core.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-18-mp-campaign-coverage.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-20-publication-rerun.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-22-lwrb-v3.4.0-rerun.html</loc></url>
+<url><loc>https://verified-libs.org/reports.html</loc></url>
+<url><loc>https://verified-libs.org/reproduce.html</loc></url>
+<url><loc>https://verified-libs.org/results.html</loc></url>
+</urlset>

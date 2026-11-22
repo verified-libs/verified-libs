@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How the ring buffer libraries are tested: cycle-counted benchmarks on six microcontroller boards, interrupt stress tests with a known-bad control, model checks and contract checks.">
+<link rel="canonical" href="https://verified-libs.org/method.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Method: how the embedded ring buffers are measured and tested - verified-libs">
+<meta property="og:description" content="How the ring buffer libraries are tested: cycle-counted benchmarks on six microcontroller boards, interrupt stress tests with a known-bad control, model checks and contract checks.">
+<meta property="og:url" content="https://verified-libs.org/method.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>Method: how the embedded ring buffers are measured and tested - verified-libs</title><style>
 :root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
 @media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
@@ -135,7 +144,8 @@ short random delay, so that the interrupt lands inside the operation
 rather than by chance. The runs at those rates also record the address
 each interrupt landed on, and the report shows for each library how many
 of the places where an interrupt can land were hit
-(<a href="report-2026-11-20-publication-rerun.html">report of 2026-11-20</a>,
+(<a href="report-2026-11-22-lwrb-v3.4.0-rerun.html">report of 2026-11-22</a>,
+<a href="report-2026-11-20-publication-rerun.html">of 2026-11-20</a>,
 <a href="report-2026-11-18-mp-campaign-coverage.html">of 2026-11-18</a>).</p>
 <p><strong>One library per reset</strong> (night campaigns from 2026-11-14 on; earlier
 campaigns ran all libraries in one start, and the two kinds are not added
@@ -176,7 +186,7 @@ the code (the interrupt sweep on the boards does) or two cores.</p>
 <p>Overnight campaigns repeat the stress test with new random seeds, interrupt
 rates, cache settings and code locations, and a report lists every run
 with its status. The campaign the comparison shows ran at one commit with
-gcc -O2 (<a href="report-2026-11-20-publication-rerun.html">report</a>); earlier
+gcc -O2 (<a href="report-2026-11-22-lwrb-v3.4.0-rerun.html">report</a>); earlier
 campaigns also rotated the compiler flags (-Os, -O3, -O2 with LTO, -Os
 with LTO, and clang).</p>
 <h2 id="conflict-of-interest">Conflict of interest</h2>
