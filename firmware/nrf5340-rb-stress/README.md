@@ -4,7 +4,8 @@ ISR ↔ main loop stress test of SPSC ring buffers on one Cortex-M33 core
 (nRF5340 DK application core, 64 MHz, code in flash, cache on): the use
 case of an interrupt-driven UART, ADC or similar.
 
-> **Harness development, not published results.** pxq
+> The published results of this test are in [RESULTS.md](../../RESULTS.md)
+> and under [records/](../../records/README.md). pxq
 > RingBuffer_PackedState (⚠) is written by the project owner; see
 > principle 6.
 

@@ -1,6 +1,8 @@
 # Results: embedded ring buffers (all in one place)
 
-> **Status: harness development, not published results.** Numbers are facts
+> **Status: published results.** Every number comes from a record under
+> [records/](records/README.md) that can be rebuilt and repeated from this
+> repository ([how](site/content/reproduce.md)). Numbers are facts
 > about the pinned versions, configuration and board below, not general
 > rankings. ⚠ marks the project owner's own library; under principle 6 it
 > is tested with the same suite as every other library and more (every

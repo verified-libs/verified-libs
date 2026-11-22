@@ -32,6 +32,12 @@
 #   VL_COMMIT     the commit for records that do not name one (records
 #                 before 2026-11-12 20:16 CET: the campaign's commit); used
 #                 only when the record has no commit field, and reported
+#   VL_TREE=1     build from the tree at hand (REPO: what is committed at
+#                 HEAD, or an exported tree as it is) instead of from the
+#                 record's commit: does this tree still build the image
+#                 the record was measured from (DECISIONS 2026-11-22)? For
+#                 a stress record that differs, the libraries whose images
+#                 differ are named; the others still match.
 #   VL_KEEP=1     keep the build directory (it is printed)
 # Exit: 0 if every record matched, 1 if one did not, 2 if one could not be
 # checked (dirty or unknown commit, commit not available, missing image,
@@ -76,7 +82,18 @@ verify_one() {
     podman image exists "$img" || { echo "$base: toolchain image $img not present (see toolchain/README.md)"; return 2; }
 
     tree=$(mktemp -d "$TMPROOT/vl-verify.XXXXXX")
-    if git -C "$REPO" cat-file -e "$commit^{commit}" 2>/dev/null; then
+    local src="$commit"
+    if [ "${VL_TREE:-0}" = 1 ]; then
+        # The tree at hand, whatever commit the record names: what is
+        # committed at HEAD if REPO is a git repository, else REPO as it is.
+        if [ "$(git -C "$REPO" rev-parse --show-toplevel 2>/dev/null)" = "$REPO" ]; then
+            git -C "$REPO" archive HEAD | tar -x -C "$tree"
+            src="this tree at $(git -C "$REPO" rev-parse --short=12 HEAD), record made at $commit"
+        else
+            cp -a "$REPO/." "$tree/"
+            src="this tree, record made at $commit"
+        fi
+    elif git -C "$REPO" cat-file -e "$commit^{commit}" 2>/dev/null; then
         git -C "$REPO" archive "$commit" | tar -x -C "$tree"
     elif { [ -f "$REPO/EXPORTED_FROM" ] && [ "$(cut -c1-12 "$REPO/EXPORTED_FROM")" = "${commit:0:12}" ]; } \
          || { [ -f "$REPO/SAME_SOURCES" ] && grep -qx "${commit:0:12}" "$REPO/SAME_SOURCES"; }; then
@@ -159,9 +176,9 @@ verify_one() {
     [ -z "$tc_rec" ] || [ "$tc_rec" = "$tc_img" ] || tcnote=" (image $img reports other tool versions than the record)"
     local r=0 keep=${VL_KEEP:-0}
     if [ "$got" = "$want" ]; then
-        echo "$base: MATCH  $got  ($commit, $img)$tcnote$given"
+        echo "$base: MATCH  $got  ($src, $img)$tcnote$given"
     else
-        echo "$base: DIFFERS  record $want, rebuilt $got  ($commit, $img)$tcnote$given"; r=1; keep=1
+        echo "$base: DIFFERS  record $want, rebuilt $got  ($src, $img)$tcnote$given"; r=1; keep=1
         if [ "$elf" = build/bundle.json ]; then
             # per library: which images differ (the others still match)
             jq -r --slurpfile b "$tree/$fwdir/$elf" '.images.libs | to_entries[]

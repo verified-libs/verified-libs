@@ -4,7 +4,9 @@ Cycles per call for push/pop of single bytes and of blocks, on the nRF5340
 DK application core (Cortex-M33, 64 MHz), per library, with the instruction
 cache off and on.
 
-> **Status: harness development, not a published result.** One of the two
+> The published results of this benchmark are in
+> [RESULTS.md](../../RESULTS.md) and under
+> [records/](../../records/README.md). One of the
 > libraries, pxq RingBuffer_PackedState, is written by the project owner.
 > Under principle 6 it is tested with the same suite as the others and more
 > (every documented mode and topology), its numbers can be repeated outside

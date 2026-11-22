@@ -1,7 +1,9 @@
 # Proposal: keep the records of images that did not change (2026-11-22)
 
-A proposal for the owner to accept, change or turn down. Nothing in the
-rules or the tools has changed. The owner's question, after the re-run for
+**Accepted by the owner on 2026-11-22** (the answers are at the end; the
+decision is in [DECISIONS](../../DECISIONS.md)). The tools still check the
+earlier, stricter rule until they are changed. The text below is the
+proposal as it was written. The owner's question, after the re-run for
 lwrb v3.4.0 was started: when one library changes, can we measure only
 what changed?
 
@@ -137,3 +139,12 @@ frozen.
 5. **Collecting updates.** Proposed: new library versions are collected
    and run together, at most once a month, unless a maintainer asks for a
    test of a release.
+
+## The owner's answers (2026-11-22)
+
+1. Yes.
+2. As proposed.
+3. As proposed.
+4. Yes.
+5. Not for now: new versions are tested as they come. One collected run a
+   month may come later.

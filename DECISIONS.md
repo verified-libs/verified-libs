@@ -2,6 +2,47 @@
 
 Short log of what was decided and why. Newest first.
 
+## 2026-11-22: A record stands as long as its image does
+Decided by the owner on the proposal in
+[lab/plans/2026-11-22-same-image-rule.md](lab/plans/2026-11-22-same-image-rule.md),
+after the full re-run for lwrb v3.4.0.
+- **A record may be shown if the published tree builds, byte for byte, the
+  image it was measured from, and runs and judges it the same way.** This
+  replaces "every record is made at the published sources" (2026-11-16,
+  2026-11-19). Why: the reader's check is the same (the tree they have
+  builds what was measured, by checksum), and the re-run showed what the
+  old rule cost for nothing: one new library version made every record of
+  every library unshowable, although most images had not changed and the
+  unchanged ones gave the same numbers to the last digit.
+- **What is measured again follows from the images.** A changed library:
+  the benchmark set its image belongs to, its code size, its own stress
+  images. A changed test firmware, run script or judge: everything that
+  test produces. Rows of the comparison then carry the date and commit of
+  their own records.
+- **A changed library is stressed alone over the rotation entries the last
+  full campaign reached on that board.** Why: its row then rests on the
+  same runs as its neighbours', not on more.
+- **Everything runs again at every method version, and otherwise twice a
+  year.** Why: a checksum does not see the boards, the probes or the room.
+- **One benchmark image per library is on the list for the version after
+  1.** Why: the C and C++ single-producer libraries share one image, so a
+  change in one still moves the others' numbers and costs eight writes per
+  board. It changes the benchmark firmware, so it comes with a full re-run.
+- **New library versions are tested as they come, for now.** Collecting
+  them into one run a month may come later.
+- **The ISR campaign script will take a list of libraries, and the change
+  is made together with the first library update** (decided the same
+  evening). Why: `overnight.sh` runs all libraries or none, so one library
+  cannot be stressed alone today. Changing a run script means the ISR
+  stress records are made once more by a full campaign; the first update
+  needs that campaign anyway, so the change costs no extra flash writes.
+  The other way, a second script that walks the same rotation, would leave
+  the rotation in two places.
+- **The tools follow in steps**, and until they are complete nothing is
+  shown that the earlier, stricter rule would not allow: every record
+  shown today meets both. The plan for the tools:
+  [lab/plans/2026-11-22-same-image-tools.md](lab/plans/2026-11-22-same-image-tools.md).
+
 ## 2026-11-22: A new version of a library (lwrb v3.4.0)
 - **lwrb is pinned at v3.4.0 and every test ran again at one commit**
   (`a7a206190337`; [report](reports/2026-11-22-lwrb-v3.4.0-rerun.md)).
