@@ -61,8 +61,11 @@ one (tag <code>v1-method-freeze-2</code>); no test and no campaign script change
   of them with the two sides on the Pico 2's two cores), and the model
   check passes for the byte functions and for the block calls.</li>
 <li><strong>lwrb's single bytes are 3 to 4 times faster</strong> through the new
-  functions (table below). Its blocks and its zero-copy calls cost what
-  they did, within 4 %. Its code grew by 108 to 132 bytes.</li>
+  functions (table below). Its blocks cost what they did within 4 %, and
+  its zero-copy calls within 6 %, most of them a little more than before.
+  Its code grew by 108 to 132 bytes. (Until a correction on 2026-11-22 this
+  line said "within 4 %" for both; two zero-copy numbers on the H723 are
+  4.3 and 5.4 % higher.)</li>
 <li><strong>ISR stress test: no errors in any real library in any run</strong> (108 runs
   on six boards, all valid).</li>
 <li><strong>Two-interrupt test: no errors in any library in its documented mode in

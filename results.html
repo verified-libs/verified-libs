@@ -98,13 +98,16 @@ byte (mean of write and read); code in flash, cache or flash accelerator on,
 gcc -O2 (night 2026-11-21/22, commit <code>a7a206190337</code>). Clocks: nRF5340 64 MHz,
 Pico 2 150 MHz, G474 170 MHz, H723 64 MHz, G0B1 64 MHz, SAM D20 48 MHz.
 Cycles, not time, so the clocks do not matter; wait states and the memory
-system do. Sorted by name;
+system do. The second column is the version tested: the release, where the
+library has releases, and the first eight digits of the commit it is pinned
+to in <a href="https://github.com/verified-libs/verified-libs/blob/main/firmware/nrf5340-rb-bench/libs.lock"><code>libs.lock</code></a>. Sorted by name;
 there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <!-- table:speed -->
 <div class="tw"><table>
 <thead>
 <tr>
 <th>Library</th>
+<th>Version · commit</th>
 <th>nRF5340 M33</th>
 <th>Pico 2 M33</th>
 <th>G474 M4</th>
@@ -116,6 +119,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <tbody>
 <tr>
 <td>AndersKaloer Ring-Buffer (C)</td>
+<td><code>8de8fff5</code></td>
 <td>58 / 40 · 16.7</td>
 <td>44 / 31 · 16.5</td>
 <td>57 / 41 · 20.1</td>
@@ -125,6 +129,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td><em>Arduino RingBufferN as shipped (C++)</em> ¹</td>
+<td><code>cd91833d</code></td>
 <td>37 / 46 · 48.1</td>
 <td>33 / 36 · 40.8</td>
 <td>42 / 39 · 48.4</td>
@@ -134,6 +139,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>Arduino SafeRingBufferN (C++)</td>
+<td><code>424e86ef</code></td>
 <td>53 / 54 · 59.6</td>
 <td>44 / 44 · 50.3</td>
 <td>56 / 48 · 60.4</td>
@@ -143,6 +149,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>bbqueue (Rust)</td>
+<td>0.6.1 · <code>979abde4</code></td>
 <td>175 / 157 · 5.9</td>
 <td>121 / 105 · 4.4</td>
 <td>161 / 139 · 7.1</td>
@@ -152,6 +159,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>Contiki-NG ringbuf (C)</td>
+<td><code>a3c71199</code></td>
 <td>40 / 40 · 46.6</td>
 <td>33 / 32 · 38.8</td>
 <td>45 / 42 · 51.9</td>
@@ -161,6 +169,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>diffstorm cb (C)</td>
+<td>v1.3 · <code>11e05d60</code></td>
 <td>79 / 72 · 82.1</td>
 <td>56 / 56 · 62.3</td>
 <td>72 / 69 · 77.9</td>
@@ -170,6 +179,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>DNedic lockfree spsc::RingBuf (C++)</td>
+<td><code>ae6c4df1</code></td>
 <td>126 / 126 · 3.5</td>
 <td>83 / 83 · 2.8</td>
 <td>98 / 88 · 3.8</td>
@@ -179,6 +189,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>ece-mohammad RingBuffer (C)</td>
+<td><code>94083a63</code></td>
 <td>93 / 92 · 3.8</td>
 <td>66 / 64 · 2.9</td>
 <td>81 / 80 · 4.1</td>
@@ -188,6 +199,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>embassy-sync Pipe (Rust)</td>
+<td>embassy-sync 0.8.0 · <code>84444a19</code></td>
 <td>222 / 213 · 6.1</td>
 <td>196 / 189 · 5.4</td>
 <td>229 / 217 · 6.4</td>
@@ -197,6 +209,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>EmbeddedArtistry cbuf basic, single-context (C)</td>
+<td><code>9733be2e</code></td>
 <td>38 / 37 · 44.1</td>
 <td>35 / 32 · 39.8</td>
 <td>40 / 36 · 43.9</td>
@@ -206,6 +219,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>EmbeddedArtistry cbuf threadsafe (C)</td>
+<td><code>9733be2e</code></td>
 <td>53 / 44 · 54.6</td>
 <td>41 / 34 · 43.8</td>
 <td>56 / 46 · 58.4</td>
@@ -215,6 +229,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>ETL etl::queue, single-context (C++)</td>
+<td>20.49.0 · <code>7d604f2e</code></td>
 <td>25 / 29 · 33.6</td>
 <td>26 / 28 · 33.3</td>
 <td>32 / 34 · 38.9</td>
@@ -224,6 +239,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>ETL queue_spsc_atomic (C++)</td>
+<td>20.49.0 · <code>7d604f2e</code></td>
 <td>24 / 31 · 22.6</td>
 <td>25 / 26 · 22.3</td>
 <td>30 / 27 · 23.9</td>
@@ -233,6 +249,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>ETL queue_spsc_isr (C++)</td>
+<td>20.49.0 · <code>7d604f2e</code></td>
 <td>33 / 38 · 27.6</td>
 <td>34 / 32 · 27.2</td>
 <td>40 / 45 · 31.9</td>
@@ -242,6 +259,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>ETL queue_spsc_locked (C++)</td>
+<td>20.49.0 · <code>7d604f2e</code></td>
 <td>80 / 80 · 51.7</td>
 <td>63 / 61 · 50.9</td>
 <td>79 / 80 · 61.5</td>
@@ -251,6 +269,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>FreeRTOS stream buffer (C)</td>
+<td><code>89592801</code></td>
 <td>302 / 252 · 5.3</td>
 <td>208 / 170 · 4.0</td>
 <td>347 / 279 · 6.5</td>
@@ -260,6 +279,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>heapless spsc::Queue (Rust)</td>
+<td>0.9.1 · <code>19188229</code></td>
 <td>31 / 37 · 39.7</td>
 <td>23 / 27 · 31.4</td>
 <td>35 / 37 · 43.0</td>
@@ -269,6 +289,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>jnk0le Ringbuffer (C++)</td>
+<td><code>9efa07ff</code></td>
 <td>17 / 19 · 9.5</td>
 <td>17 / 17 · 9.4</td>
 <td>23 / 26 · 9.5</td>
@@ -278,6 +299,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>kostyk348 lf_spsc (C)</td>
+<td><code>38649b8f</code></td>
 <td>82 / 76 · 84.6</td>
 <td>58 / 55 · 65.3</td>
 <td>72 / 67 · 79.4</td>
@@ -287,6 +309,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>lwrb (C)</td>
+<td>v3.4.0 · <code>b8534fd1</code></td>
 <td>55 / 58 · 4.5</td>
 <td>40 / 42 · 3.6</td>
 <td>54 / 57 · 5.2</td>
@@ -296,6 +319,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>Mbed CE CircularBuffer (C++)</td>
+<td><code>a4c70564</code></td>
 <td>69 / 58 · 8.5</td>
 <td>66 / 53 · 7.5</td>
 <td>79 / 69 · 9.0</td>
@@ -305,6 +329,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>micoring default, single-context (C)</td>
+<td><code>a6f91ee2</code></td>
 <td>97 / 98 · 75.4</td>
 <td>60 / 59 · 50.7</td>
 <td>78 / 75 · 66.5</td>
@@ -314,6 +339,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>micoring SPSC mode (C)</td>
+<td><code>a6f91ee2</code></td>
 <td>119 / 123 · 116.4</td>
 <td>74 / 77 · 75.7</td>
 <td>98 / 97 · 96.8</td>
@@ -323,6 +349,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>moodycamel ReaderWriterQueue (C++)</td>
+<td><code>8b217669</code></td>
 <td>51 / 66 · 61.2</td>
 <td>39 / 47 · 45.9</td>
 <td>53 / 64 · 62.5</td>
@@ -332,6 +359,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>NuttX circbuf (C)</td>
+<td>nuttx-13.1.0 · <code>2b5c0de5</code></td>
 <td>144 / 123 · 2.9</td>
 <td>108 / 96 · 2.5</td>
 <td>123 / 110 · 2.8</td>
@@ -341,6 +369,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>polycratia spscring (C++)</td>
+<td><code>9d2445a5</code></td>
 <td>19 / 24 · 8.6</td>
 <td>19 / 22 · 8.4</td>
 <td>24 / 28 · 9.5</td>
@@ -350,6 +379,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>pxq RingBuffer_PackedState (C++) ⚠</td>
+<td>1.5.0 · <code>eec68a93</code></td>
 <td>17 / 20 · 3.4</td>
 <td>17 / 18 · 8.3</td>
 <td>20 / 21 · 3.5</td>
@@ -359,6 +389,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>pxq Topology::None, single-context (C++) ⚠</td>
+<td>1.5.0 · <code>eec68a93</code></td>
 <td>25 / 21 · 3.1</td>
 <td>20 / 19 · 2.5</td>
 <td>19 / 20 · 3.4</td>
@@ -368,6 +399,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>QuantumLeaps LFRB (C)</td>
+<td><code>0d6354a1</code></td>
 <td>50 / 44 · 53.6</td>
 <td>39 / 36 · 43.8</td>
 <td>46 / 46 · 53.4</td>
@@ -377,6 +409,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>rigtorp SPSCQueue (C++)</td>
+<td><code>59a6a938</code></td>
 <td>35 / 43 · 41.2</td>
 <td>27 / 37 · 33.9</td>
 <td>35 / 49 · 45.5</td>
@@ -386,6 +419,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>RIOT tsrb (C)</td>
+<td><code>9c9a6abe</code></td>
 <td>49 / 48 · 17.7</td>
 <td>38 / 37 · 17.4</td>
 <td>52 / 51 · 19.6</td>
@@ -395,6 +429,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>rt-spsc (C++)</td>
+<td><code>5454de55</code></td>
 <td>20 / 19 · 26.1</td>
 <td>21 / 17 · 25.8</td>
 <td>26 / 24 · 31.9</td>
@@ -404,6 +439,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>RT-Thread rt_ringbuffer + interrupt lock (C)</td>
+<td><code>99428a1e</code></td>
 <td>73 / 52 · 3.4</td>
 <td>57 / 42 · 2.9</td>
 <td>73 / 54 · 3.8</td>
@@ -413,6 +449,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td><em>RT-Thread rt_ringbuffer, no lock (C)</em> ¹</td>
+<td><code>99428a1e</code></td>
 <td>56 / 35 · 3.2</td>
 <td>48 / 33 · 2.7</td>
 <td>57 / 39 · 3.6</td>
@@ -422,6 +459,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>TinyUSB tu_fifo (C)</td>
+<td>0.21.0 · <code>dae3f9a3</code></td>
 <td>141 / 131 · 4.0</td>
 <td>82 / 85 · 3.1</td>
 <td>101 / 100 · 4.2</td>
@@ -431,6 +469,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>wizard97 + PRIMASK macros (C++)</td>
+<td><code>5cd8410c</code></td>
 <td>37 / 27 · 38.6</td>
 <td>30 / 26 · 34.3</td>
 <td>40 / 32 · 43.9</td>
@@ -440,6 +479,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td><em>wizard97 as shipped (C++)</em> ¹</td>
+<td><code>5cd8410c</code></td>
 <td>22 / 22 · 28.6</td>
 <td>18 / 20 · 26.3</td>
 <td>29 / 25 · 33.4</td>
@@ -449,6 +489,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>Zephyr ring_buf (C)</td>
+<td>v4.5.0 · <code>41d10b59</code></td>
 <td>79 / 74 · 3.1</td>
 <td>64 / 62 · 2.7</td>
 <td>79 / 74 · 3.7</td>
@@ -458,6 +499,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 </tr>
 <tr>
 <td>Zephyr ring_buf, CONFIG_SMP (C)</td>
+<td>v4.5.0 · <code>41d10b59</code></td>
 <td>91 / 94 · 3.5</td>
 <td>72 / 73 · 2.9</td>
 <td>86 / 83 · 3.9</td>
