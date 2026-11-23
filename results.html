@@ -79,7 +79,7 @@ code size and placement ranges.</p>
 <tbody>
 <tr>
 <td>Speed</td>
-<td>cycle benchmark with the core's cycle counter, timing in assembly, 1024 calls per scenario, code in flash with the cache or flash accelerator on</td>
+<td>cycle benchmark with the core's cycle counter, timing in assembly, 1024 calls per scenario, each configuration in a firmware image of its own, code in flash with the cache or flash accelerator on</td>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/firmware/nrf5340-rb-bench/README.md">benchmark</a></td>
 </tr>
 <tr>
@@ -97,7 +97,9 @@ code size and placement ranges.</p>
 <h2 id="speed-on-six-boards">Speed on six boards</h2>
 <p>Cells: mean cycles per call, 1-byte push / pop · 64-byte block, cycles per
 byte (mean of write and read); code in flash, cache or flash accelerator on,
-gcc -O2 (night 2026-11-21/22, commit <code>a7a206190337</code>). Clocks: nRF5340 64 MHz,
+gcc -O2 (benchmark version 2, 2026-11-23, commit <code>d06180e914ab</code>). Each
+configuration is measured in a firmware image of its own, so no number
+depends on which other libraries were built with it. Clocks: nRF5340 64 MHz,
 Pico 2 150 MHz, G474 170 MHz, H723 64 MHz, G0B1 64 MHz, SAM D20 48 MHz.
 Cycles, not time, so the clocks do not matter; wait states and the memory
 system do. The second column is the version tested: the release, where the
@@ -122,8 +124,8 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <tr>
 <td>AndersKaloer Ring-Buffer (C)</td>
 <td><code>8de8fff5</code></td>
-<td>58 / 40 · 16.7</td>
-<td>44 / 31 · 16.5</td>
+<td>57 / 40 · 16.7</td>
+<td>44 / 31 · 16.4</td>
 <td>57 / 41 · 20.1</td>
 <td>33 / 27 · 9.3</td>
 <td>73 / 50 · 27.3</td>
@@ -135,79 +137,79 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>37 / 46 · 48.1</td>
 <td>33 / 36 · 40.8</td>
 <td>42 / 39 · 48.4</td>
-<td>36 / 34 · 26.9</td>
+<td>30 / 27 · 26.8</td>
 <td>81 / 91 · 100.9</td>
-<td>78 / 87 · 93.5</td>
+<td>77 / 86 · 89.0</td>
 </tr>
 <tr>
 <td>Arduino SafeRingBufferN (C++)</td>
 <td><code>424e86ef</code></td>
-<td>53 / 54 · 59.6</td>
+<td>52 / 54 · 59.6</td>
 <td>44 / 44 · 50.3</td>
 <td>56 / 48 · 60.4</td>
-<td>58 / 59 · 50.4</td>
+<td>53 / 51 · 50.3</td>
 <td>99 / 113 · 120.9</td>
-<td>97 / 111 · 114.5</td>
+<td>98 / 112 · 115.5</td>
 </tr>
 <tr>
 <td>bbqueue (Rust)</td>
 <td>0.6.1 · <code>979abde4</code></td>
 <td>175 / 157 · 5.9</td>
-<td>121 / 105 · 4.4</td>
-<td>161 / 139 · 7.1</td>
-<td>150 / 112 · 5.8</td>
+<td>121 / 105 · 4.3</td>
+<td>161 / 139 · 6.9</td>
+<td>155 / 123 · 5.9</td>
 <td>270 / 229 · 15.2</td>
 <td>284 / 240 · 15.4</td>
 </tr>
 <tr>
 <td>Contiki-NG ringbuf (C)</td>
 <td><code>a3c71199</code></td>
-<td>40 / 40 · 46.6</td>
+<td>40 / 42 · 46.6</td>
 <td>33 / 32 · 38.8</td>
 <td>45 / 42 · 51.9</td>
-<td>39 / 35 · 28.6</td>
+<td>33 / 27 · 28.8</td>
 <td>61 / 53 · 71.9</td>
-<td>60 / 52 · 63.0</td>
+<td>60 / 51 · 64.0</td>
 </tr>
 <tr>
 <td>diffstorm cb (C)</td>
 <td>v1.3 · <code>11e05d60</code></td>
-<td>79 / 72 · 82.1</td>
+<td>79 / 74 · 82.1</td>
 <td>56 / 56 · 62.3</td>
 <td>72 / 69 · 77.9</td>
-<td>59 / 73 · 58.0</td>
+<td>53 / 67 · 57.8</td>
 <td>122 / 131 · 141.4</td>
-<td>114 / 127 · 131.0</td>
+<td>114 / 128 · 131.5</td>
 </tr>
 <tr>
 <td>DNedic lockfree spsc::RingBuf (C++)</td>
 <td><code>ae6c4df1</code></td>
-<td>126 / 126 · 3.5</td>
+<td>128 / 129 · 3.5</td>
 <td>83 / 83 · 2.8</td>
-<td>98 / 88 · 3.8</td>
-<td>72 / 70 · 3.4</td>
-<td>163 / 155 · 12.4</td>
+<td>98 / 88 · 3.5</td>
+<td>69 / 67 · 3.1</td>
+<td>165 / 157 · 12.4</td>
 <td>167 / 159 · 12.4</td>
 </tr>
 <tr>
 <td>ece-mohammad RingBuffer (C)</td>
 <td><code>94083a63</code></td>
-<td>93 / 92 · 3.8</td>
+<td>93 / 90 · 3.7</td>
 <td>66 / 64 · 2.9</td>
-<td>81 / 80 · 4.1</td>
-<td>57 / 53 · 3.1</td>
-<td>110 / 109 · 12.4</td>
-<td>111 / 111 · 12.4</td>
+<td>81 / 80 · 3.9</td>
+<td>54 / 52 · 3.1</td>
+<td>111 / 109 · 12.4</td>
+<td>111 / 109 · 12.4</td>
 </tr>
 <tr>
 <td>embassy-sync Pipe (Rust)</td>
 <td>embassy-sync 0.8.0 · <code>84444a19</code></td>
-<td>222 / 213 · 6.1</td>
-<td>196 / 189 · 5.4</td>
-<td>229 / 217 · 6.4</td>
-<td>114 / 105 · 4.3</td>
+<td>221 / 217 · 6.1</td>
+<td>197 / 190 · 5.4</td>
+<td>190 / 174 · 6.4</td>
+<td>120 / 111 · 4.4</td>
 <td>271 / 252 · 13.6</td>
-<td>289 / 267 · 13.9</td>
+<td>290 / 266 · 13.9</td>
 </tr>
 <tr>
 <td>EmbeddedArtistry cbuf basic, single-context (C)</td>
@@ -215,19 +217,19 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>38 / 37 · 44.1</td>
 <td>35 / 32 · 39.8</td>
 <td>40 / 36 · 43.9</td>
-<td>33 / 29 · 24.9</td>
+<td>28 / 26 · 24.8</td>
 <td>87 / 80 · 98.4</td>
-<td>84 / 76 · 91.4</td>
+<td>84 / 76 · 91.0</td>
 </tr>
 <tr>
 <td>EmbeddedArtistry cbuf threadsafe (C)</td>
 <td><code>9733be2e</code></td>
-<td>53 / 44 · 54.6</td>
+<td>54 / 44 · 54.6</td>
 <td>41 / 34 · 43.8</td>
 <td>56 / 46 · 58.4</td>
-<td>38 / 31 · 31.8</td>
+<td>37 / 33 · 31.8</td>
 <td>74 / 60 · 81.9</td>
-<td>75 / 58 · 73.5</td>
+<td>75 / 59 · 75.0</td>
 </tr>
 <tr>
 <td>ETL etl::queue, single-context (C++)</td>
@@ -235,7 +237,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>25 / 29 · 33.6</td>
 <td>26 / 28 · 33.3</td>
 <td>32 / 34 · 38.9</td>
-<td>25 / 26 · 19.4</td>
+<td>22 / 21 · 19.3</td>
 <td>46 / 47 · 61.4</td>
 <td>47 / 48 · 54.5</td>
 </tr>
@@ -245,7 +247,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>24 / 31 · 22.6</td>
 <td>25 / 26 · 22.3</td>
 <td>30 / 27 · 23.9</td>
-<td>33 / 32 · 26.0</td>
+<td>33 / 32 · 26.1</td>
 <td>54 / 51 · 40.0</td>
 <td>57 / 53 · 37.6</td>
 </tr>
@@ -265,17 +267,17 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>80 / 80 · 51.7</td>
 <td>63 / 61 · 50.9</td>
 <td>79 / 80 · 61.5</td>
-<td>79 / 77 · 60.5</td>
+<td>75 / 72 · 61.9</td>
 <td>115 / 110 · 92.5</td>
-<td>108 / 104 · 87.6</td>
+<td>108 / 104 · 89.1</td>
 </tr>
 <tr>
 <td>FreeRTOS stream buffer (C)</td>
 <td><code>89592801</code></td>
-<td>302 / 252 · 5.3</td>
-<td>208 / 170 · 4.0</td>
-<td>347 / 279 · 6.5</td>
-<td>206 / 150 · 4.5</td>
+<td>307 / 257 · 5.4</td>
+<td>209 / 172 · 4.0</td>
+<td>325 / 273 · 6.5</td>
+<td>224 / 172 · 4.6</td>
 <td>373 / 325 · 13.2</td>
 <td>359 / 322 · 13.0</td>
 </tr>
@@ -285,7 +287,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>31 / 37 · 39.7</td>
 <td>23 / 27 · 31.4</td>
 <td>35 / 37 · 43.0</td>
-<td>40 / 35 · 28.0</td>
+<td>34 / 29 · 27.9</td>
 <td>61 / 63 · 73.0</td>
 <td>66 / 68 · 76.0</td>
 </tr>
@@ -302,10 +304,10 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <tr>
 <td>kostyk348 lf_spsc (C)</td>
 <td><code>38649b8f</code></td>
-<td>82 / 76 · 84.6</td>
-<td>58 / 55 · 65.3</td>
+<td>79 / 73 · 84.5</td>
+<td>59 / 55 · 65.3</td>
 <td>72 / 67 · 79.4</td>
-<td>58 / 53 · 56.1</td>
+<td>54 / 50 · 51.7</td>
 <td>160 / 156 · 214.6</td>
 <td>164 / 162 · 227.6</td>
 </tr>
@@ -313,101 +315,101 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>lwrb (C)</td>
 <td>v3.4.0 · <code>b8534fd1</code></td>
 <td>55 / 58 · 4.5</td>
-<td>40 / 42 · 3.6</td>
-<td>54 / 57 · 5.2</td>
-<td>49 / 44 · 3.9</td>
+<td>40 / 42 · 3.5</td>
+<td>54 / 57 · 5.0</td>
+<td>47 / 44 · 4.0</td>
 <td>65 / 67 · 13.6</td>
 <td>65 / 69 · 13.7</td>
 </tr>
 <tr>
 <td>Mbed CE CircularBuffer (C++)</td>
 <td><code>a4c70564</code></td>
-<td>69 / 58 · 8.5</td>
+<td>69 / 58 · 8.4</td>
 <td>66 / 53 · 7.5</td>
-<td>79 / 69 · 9.0</td>
-<td>66 / 63 · 4.9</td>
+<td>79 / 69 · 8.9</td>
+<td>61 / 58 · 4.8</td>
 <td>120 / 103 · 12.2</td>
 <td>121 / 108 · 12.3</td>
 </tr>
 <tr>
 <td>micoring default, single-context (C)</td>
 <td><code>a6f91ee2</code></td>
-<td>97 / 98 · 75.4</td>
-<td>60 / 59 · 50.7</td>
+<td>96 / 98 · 77.0</td>
+<td>60 / 60 · 50.7</td>
 <td>78 / 75 · 66.5</td>
-<td>52 / 55 · 29.0</td>
-<td>103 / 99 · 91.9</td>
-<td>102 / 99 · 92.0</td>
+<td>43 / 48 · 36.8</td>
+<td>103 / 99 · 91.8</td>
+<td>102 / 99 · 91.1</td>
 </tr>
 <tr>
 <td>micoring SPSC mode (C)</td>
 <td><code>a6f91ee2</code></td>
-<td>119 / 123 · 116.4</td>
+<td>118 / 123 · 118.4</td>
 <td>74 / 77 · 75.7</td>
-<td>98 / 97 · 96.8</td>
-<td>79 / 71 · 60.0</td>
-<td>127 / 133 · 131.2</td>
-<td>127 / 132 · 131.9</td>
+<td>98 / 97 · 96.9</td>
+<td>78 / 71 · 60.0</td>
+<td>127 / 132 · 128.7</td>
+<td>128 / 132 · 131.4</td>
 </tr>
 <tr>
 <td>moodycamel ReaderWriterQueue (C++)</td>
 <td><code>8b217669</code></td>
 <td>51 / 66 · 61.2</td>
-<td>39 / 47 · 45.9</td>
+<td>39 / 47 · 46.0</td>
 <td>53 / 64 · 62.5</td>
-<td>54 / 54 · 44.0</td>
+<td>48 / 49 · 44.4</td>
 <td>77 / 81 · 88.6</td>
-<td>77 / 82 · 83.2</td>
+<td>77 / 82 · 82.2</td>
 </tr>
 <tr>
 <td>NuttX circbuf (C)</td>
 <td>nuttx-13.1.0 · <code>2b5c0de5</code></td>
-<td>144 / 123 · 2.9</td>
+<td>142 / 127 · 3.0</td>
 <td>108 / 96 · 2.5</td>
 <td>123 / 110 · 2.8</td>
-<td>93 / 83 · 2.7</td>
-<td>234 / 218 · 11.8</td>
-<td>233 / 220 · 11.9</td>
+<td>91 / 87 · 2.7</td>
+<td>229 / 223 · 11.8</td>
+<td>231 / 218 · 11.9</td>
 </tr>
 <tr>
 <td>polycratia spscring (C++)</td>
 <td><code>9d2445a5</code></td>
 <td>19 / 24 · 8.6</td>
 <td>19 / 22 · 8.4</td>
-<td>24 / 28 · 9.5</td>
-<td>37 / 32 · 5.2</td>
+<td>24 / 28 · 9.6</td>
+<td>32 / 29 · 5.1</td>
 <td>39 / 46 · 11.8</td>
 <td>39 / 49 · 11.9</td>
 </tr>
 <tr>
 <td>pxq RingBuffer_PackedState (C++) ⚠</td>
 <td>1.5.0 · <code>eec68a93</code></td>
-<td>17 / 20 · 3.4</td>
-<td>17 / 18 · 8.3</td>
-<td>20 / 21 · 3.5</td>
-<td>17 / 16 · 2.9</td>
+<td>17 / 20 · 3.0</td>
+<td>17 / 18 · 2.5</td>
+<td>20 / 21 · 3.0</td>
+<td>17 / 16 · 2.7</td>
 <td>35 / 38 · 9.3</td>
-<td>37 / 39 · 9.3</td>
+<td>37 / 38 · 9.3</td>
 </tr>
 <tr>
 <td>pxq Topology::None, single-context (C++) ⚠</td>
 <td>1.5.0 · <code>eec68a93</code></td>
-<td>25 / 21 · 3.1</td>
+<td>25 / 21 · 3.0</td>
 <td>20 / 19 · 2.5</td>
-<td>19 / 20 · 3.4</td>
-<td>23 / 21 · 2.9</td>
+<td>19 / 20 · 3.0</td>
+<td>18 / 18 · 2.7</td>
 <td>35 / 38 · 9.3</td>
-<td>37 / 39 · 9.3</td>
+<td>37 / 38 · 9.3</td>
 </tr>
 <tr>
 <td>QuantumLeaps LFRB (C)</td>
 <td><code>0d6354a1</code></td>
-<td>50 / 44 · 53.6</td>
-<td>39 / 36 · 43.8</td>
+<td>51 / 44 · 53.6</td>
+<td>39 / 35 · 43.8</td>
 <td>46 / 46 · 53.4</td>
 <td>47 / 42 · 42.3</td>
 <td>69 / 61 · 79.9</td>
-<td>70 / 63 · 74.5</td>
+<td>70 / 63 · 75.5</td>
 </tr>
 <tr>
 <td>rigtorp SPSCQueue (C++)</td>
@@ -415,17 +417,17 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>35 / 43 · 41.2</td>
 <td>27 / 37 · 33.9</td>
 <td>35 / 49 · 45.5</td>
-<td>36 / 42 · 29.1</td>
+<td>31 / 39 · 29.0</td>
 <td>52 / 83 · 73.2</td>
 <td>55 / 82 · 69.7</td>
 </tr>
 <tr>
 <td>RIOT tsrb (C)</td>
 <td><code>9c9a6abe</code></td>
-<td>49 / 48 · 17.7</td>
+<td>51 / 48 · 17.7</td>
 <td>38 / 37 · 17.4</td>
 <td>52 / 51 · 19.6</td>
-<td>55 / 50 · 11.4</td>
+<td>49 / 42 · 11.2</td>
 <td>65 / 64 · 30.1</td>
 <td>65 / 65 · 25.1</td>
 </tr>
@@ -435,37 +437,37 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>20 / 19 · 26.1</td>
 <td>21 / 17 · 25.8</td>
 <td>26 / 24 · 31.9</td>
-<td>35 / 36 · 28.9</td>
+<td>30 / 31 · 28.8</td>
 <td>45 / 44 · 59.4</td>
 <td>47 / 46 · 54.5</td>
 </tr>
 <tr>
 <td>RT-Thread rt_ringbuffer + interrupt lock (C)</td>
 <td><code>99428a1e</code></td>
-<td>73 / 52 · 3.4</td>
-<td>57 / 42 · 2.9</td>
-<td>73 / 54 · 3.8</td>
-<td>62 / 54 · 3.4</td>
-<td>98 / 78 · 12.2</td>
-<td>96 / 82 · 12.1</td>
+<td>76 / 54 · 3.4</td>
+<td>58 / 43 · 2.9</td>
+<td>73 / 54 · 3.5</td>
+<td>54 / 47 · 3.1</td>
+<td>100 / 78 · 12.2</td>
+<td>96 / 83 · 12.1</td>
 </tr>
 <tr>
 <td><em>RT-Thread rt_ringbuffer, no lock (C)</em> ¹</td>
 <td><code>99428a1e</code></td>
-<td>56 / 35 · 3.2</td>
+<td>57 / 36 · 3.1</td>
 <td>48 / 33 · 2.7</td>
-<td>57 / 39 · 3.6</td>
-<td>39 / 34 · 3.1</td>
-<td>92 / 70 · 12.1</td>
-<td>88 / 73 · 12.0</td>
+<td>57 / 39 · 3.2</td>
+<td>39 / 33 · 2.9</td>
+<td>94 / 70 · 12.1</td>
+<td>88 / 74 · 12.0</td>
 </tr>
 <tr>
 <td>TinyUSB tu_fifo (C)</td>
 <td>0.21.0 · <code>dae3f9a3</code></td>
-<td>141 / 131 · 4.0</td>
+<td>106 / 108 · 4.0</td>
 <td>82 / 85 · 3.1</td>
-<td>101 / 100 · 4.2</td>
-<td>66 / 69 · 3.3</td>
+<td>101 / 100 · 4.0</td>
+<td>63 / 65 · 3.1</td>
 <td>138 / 131 · 12.4</td>
 <td>138 / 134 · 12.5</td>
 </tr>
@@ -475,7 +477,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>37 / 27 · 38.6</td>
 <td>30 / 26 · 34.3</td>
 <td>40 / 32 · 43.9</td>
-<td>51 / 49 · 43.9</td>
+<td>48 / 44 · 43.8</td>
 <td>57 / 61 · 73.9</td>
 <td>61 / 65 · 71.0</td>
 </tr>
@@ -485,52 +487,63 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 <td>22 / 22 · 28.6</td>
 <td>18 / 20 · 26.3</td>
 <td>29 / 25 · 33.4</td>
-<td>24 / 21 · 16.5</td>
+<td>19 / 18 · 16.4</td>
 <td>41 / 41 · 55.9</td>
-<td>43 / 41 · 50.5</td>
+<td>43 / 40 · 50.5</td>
 </tr>
 <tr>
 <td>Zephyr ring_buf (C)</td>
 <td>v4.5.0 · <code>41d10b59</code></td>
-<td>79 / 74 · 3.1</td>
+<td>76 / 71 · 3.1</td>
 <td>64 / 62 · 2.7</td>
-<td>79 / 74 · 3.7</td>
-<td>54 / 50 · 3.1</td>
+<td>79 / 74 · 3.1</td>
+<td>42 / 40 · 2.9</td>
 <td>115 / 105 · 10.5</td>
 <td>115 / 107 · 10.5</td>
 </tr>
 <tr>
 <td>Zephyr ring_buf, CONFIG_SMP (C)</td>
 <td>v4.5.0 · <code>41d10b59</code></td>
-<td>91 / 94 · 3.5</td>
+<td>88 / 90 · 3.4</td>
 <td>72 / 73 · 2.9</td>
-<td>86 / 83 · 3.9</td>
-<td>72 / 67 · 3.3</td>
+<td>86 / 83 · 3.4</td>
+<td>61 / 58 · 3.0</td>
 <td>129 / 117 · 11.1</td>
-<td>132 / 123 · 11.2</td>
+<td>131 / 123 · 11.2</td>
 </tr>
 </tbody>
 </table></div>
 <p>¹ Not interrupt-safe by its own documentation or maintainers; measured for comparison only.</p>
-<p>Records (in <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/bench/</code></a>): <code>nrf5340-rb-bench-flash-20261121T234544Z.json</code>, <code>nrf5340-rb-bench-rust-flash-20261122T001920Z.json</code>, <code>rp2350-rb-bench-flash-20261121T234741Z.json</code>, <code>rp2350-rb-bench-rust-flash-20261122T005713Z.json</code>, <code>stm32g474-rb-bench-flash-20261121T234437Z.json</code>, <code>stm32g474-rb-bench-rust-flash-20261122T001919Z.json</code>, <code>stm32h723-rb-bench-flash-20261121T234543Z.json</code>, <code>stm32h723-rb-bench-rust-flash-20261122T001919Z.json</code>, <code>stm32g0b1-rb-bench-flash-20261121T234437Z.json</code>, <code>stm32g0b1-rb-bench-rust-flash-20261122T001919Z.json</code>, <code>samd20-rb-bench-flash-20261121T234441Z.json</code>, <code>samd20-rb-bench-rust-flash-20261122T000532Z.json</code>.</p>
+<p>Records: one per board and configuration in <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/bench-v2/</code></a>, made at commit <code>d06180e914ab</code>.</p>
 <!-- /table:speed -->
 
 <p>Notes:
-- Where a library's code lies in flash can change a mean by up to 25 % on
-  some boards (pxq's ⚠ 64-byte block on the Pico 2: 7.8 to 9.8 cycles per
-  byte); 710 of the 1,002 numbers move by 0.05 % or less.
-  The comparison page shows the range over eight placements under each
-  number, and
-  <a href="report-2026-11-14-night-flags-placement.html">the 2026-11-14 report</a> and
-  <code>firmware/nrf5340-rb-bench/placement.py</code> explain how it is measured. Two
-  numbers within each other's range are not measurably different. A range
-  is a lower bound: another build can land outside it. When lwrb's code
-  changed (v3.4.0), 29 of the 666 means of the other C and C++
-  configurations landed outside the range shown before, 26 of them on the
-  nRF5340 (by up to 5 %), and pxq's ⚠ block number on the Pico 2 went from
-  3.5-5.4 to 7.8-9.8 cycles per byte
-  (<a href="report-2026-11-22-lwrb-v3.4.0-rerun.html">2026-11-22 report</a>,
-  <a href="report-2026-11-20-publication-rerun.html">2026-11-20 report</a>).
+- Where a library's code lies in flash can change a mean: every image is
+  built at eight placements (moved by 0, 4 ... 28 bytes) and run twice. 743
+  of the 1,007 numbers on the comparison page move by 0.05 % or less, the
+  largest range is 14 % (FreeRTOS stream buffer, 1-byte push on the H723:
+  197 to 225 cycles). The table shows the value at placement 0; the
+  comparison page shows the range under each number. Two numbers within
+  each other's range are not measurably different. A range is a lower
+  bound: another build can land outside it.
+- A library the compiler inlines into its caller pays no call; a library
+  compiled on its own is called, and its code lies at least 6144 bytes
+  from the caller, as it would in a firmware of some size. That distance
+  costs nothing for a single byte on the G0B1 and the G474, -2 to +6
+  cycles on the nRF5340 and the SAM D20, less than a cycle on the Pico 2
+  and 3 to 15 cycles (median 6) on the H723
+  (<a href="report-2026-11-23-bench-v2-far-call.html">report</a>). The single-byte
+  numbers of pxq ⚠ contain no call (they are inlined); most others do.
+- Before version 2 this table came from benchmark version 1, where all
+  libraries were linked into one firmware and a library's number could move
+  when another library's code changed
+  (<a href="report-2026-11-22-lwrb-v3.4.0-rerun.html">2026-11-22 report</a>). Its
+  records stay in <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/bench/</code></a> as an archived
+  series and are no longer added to. What changed per board is on the
+  <a href="compare.html">comparison page</a>: nearly nothing on the two
+  Cortex-M0+ boards, a few numbers on the nRF5340, the Pico 2 and the G474,
+  and most numbers on the H723, where placement decides most (single
+  numbers from -23 % to +27 %, the median unchanged).
 - The H723 runs at its reset clock (64 MHz) with reset-default flash wait
   states; the Pico 2 fetches code through its XIP cache from QSPI flash.
 - The Cortex-M33 and M7 issue some instruction pairs together, so they can
@@ -544,7 +557,8 @@ there is no ranking of ours. ⚠ marks the project owner's own library.</p>
 - "single-context" variants are the libraries' modes for use without an
   interrupt on the other side, measured for comparison; they are not
   interrupt-safe and not counted in the stress results.
-- Code-in-SRAM and cache-off numbers for every library are in the records.</p>
+- Cache-off numbers for every library are in the records; code-in-SRAM
+  numbers are in the archived version 1 records only.</p>
 <h2 id="model-checking-genmc-c11-memory-model">Model checking (GenMC, C11 memory model)</h2>
 <p>2026-11-08, single-byte push/pop between two threads; "+ block": the block
 and zero-copy APIs pass too.</p>

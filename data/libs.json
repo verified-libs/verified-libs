@@ -74,6 +74,27 @@
     ],
     "valid_runs": 9,
     "commit": "a7a206190337"
+   },
+   "bench2": {
+    "records": "records/bench-v2/nrf5340",
+    "commit": "d06180e914ab",
+    "passes": 2,
+    "placements": [
+     0,
+     4,
+     8,
+     12,
+     16,
+     20,
+     24,
+     28
+    ],
+    "toolchain_image": "verified-libs/toolchain:2026-11-13",
+    "opt": "-O2",
+    "far_bytes": 6144,
+    "compiler": "arm-none-eabi-gcc 14.2.1",
+    "rustc": "rustc 1.99.1",
+    "time": "2026-11-23T18:25:46Z"
    }
   },
   {
@@ -146,6 +167,27 @@
     ],
     "valid_runs": 9,
     "commit": "a7a206190337"
+   },
+   "bench2": {
+    "records": "records/bench-v2/stm32g0b1",
+    "commit": "d06180e914ab",
+    "passes": 2,
+    "placements": [
+     0,
+     4,
+     8,
+     12,
+     16,
+     20,
+     24,
+     28
+    ],
+    "toolchain_image": "verified-libs/toolchain:2026-11-13",
+    "opt": "-O2",
+    "far_bytes": 6144,
+    "compiler": "arm-none-eabi-gcc 14.2.1",
+    "rustc": "rustc 1.99.1",
+    "time": "2026-11-23T18:25:28Z"
    }
   },
   {
@@ -218,6 +260,27 @@
     ],
     "valid_runs": 27,
     "commit": "a7a206190337"
+   },
+   "bench2": {
+    "records": "records/bench-v2/stm32g474",
+    "commit": "d06180e914ab",
+    "passes": 2,
+    "placements": [
+     0,
+     4,
+     8,
+     12,
+     16,
+     20,
+     24,
+     28
+    ],
+    "toolchain_image": "verified-libs/toolchain:2026-11-13",
+    "opt": "-O2",
+    "far_bytes": 6144,
+    "compiler": "arm-none-eabi-gcc 14.2.1",
+    "rustc": "rustc 1.99.1",
+    "time": "2026-11-23T18:25:28Z"
    }
   },
   {
@@ -290,6 +353,27 @@
     ],
     "valid_runs": 13,
     "commit": "a7a206190337"
+   },
+   "bench2": {
+    "records": "records/bench-v2/stm32h723",
+    "commit": "d06180e914ab",
+    "passes": 2,
+    "placements": [
+     0,
+     4,
+     8,
+     12,
+     16,
+     20,
+     24,
+     28
+    ],
+    "toolchain_image": "verified-libs/toolchain:2026-11-13",
+    "opt": "-O2",
+    "far_bytes": 6144,
+    "compiler": "arm-none-eabi-gcc 14.2.1",
+    "rustc": "rustc 1.99.1",
+    "time": "2026-11-23T18:25:35Z"
    }
   },
   {
@@ -362,6 +446,27 @@
     ],
     "valid_runs": 8,
     "commit": "a7a206190337"
+   },
+   "bench2": {
+    "records": "records/bench-v2/samd20",
+    "commit": "d06180e914ab",
+    "passes": 2,
+    "placements": [
+     0,
+     4,
+     8,
+     12,
+     16,
+     20,
+     24,
+     28
+    ],
+    "toolchain_image": "verified-libs/toolchain:2026-11-13",
+    "opt": "-O2",
+    "far_bytes": 6144,
+    "compiler": "arm-none-eabi-gcc 14.2.1",
+    "rustc": "rustc 1.99.1",
+    "time": "2026-11-23T18:25:20Z"
    }
   },
   {
@@ -434,6 +539,27 @@
     ],
     "valid_runs": 42,
     "commit": "a7a206190337"
+   },
+   "bench2": {
+    "records": "records/bench-v2/rp2350",
+    "commit": "d06180e914ab",
+    "passes": 2,
+    "placements": [
+     0,
+     4,
+     8,
+     12,
+     16,
+     20,
+     24,
+     28
+    ],
+    "toolchain_image": "verified-libs/toolchain:2026-11-13",
+    "opt": "-O2",
+    "far_bytes": 6144,
+    "compiler": "arm-none-eabi-gcc 14.2.1",
+    "rustc": "rustc 1.99.1",
+    "time": "2026-11-23T19:40:25Z"
    }
   }
  ],
@@ -689,6 +815,134 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 57.021,
+     "pop": 40.016,
+     "block": 16.73,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       57.021,
+       59.018
+      ],
+      "pop": [
+       40.016,
+       40.024
+      ],
+      "block": [
+       16.71,
+       16.73
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 73.0,
+     "pop": 50.0,
+     "block": 27.32,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       73.0,
+       73.0
+      ],
+      "pop": [
+       50.0,
+       50.0
+      ],
+      "block": [
+       25.34,
+       27.32
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 57.026,
+     "pop": 41.022,
+     "block": 20.1,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       57.026,
+       57.026
+      ],
+      "pop": [
+       41.02,
+       41.022
+      ],
+      "block": [
+       20.1,
+       20.1
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 33.055,
+     "pop": 27.042,
+     "block": 9.28,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       33.055,
+       34.057
+      ],
+      "pop": [
+       27.037,
+       27.046
+      ],
+      "block": [
+       9.27,
+       9.3
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 71.999,
+     "pop": 48.0,
+     "block": 24.39,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       71.999,
+       74.0
+      ],
+      "pop": [
+       48.0,
+       49.0
+      ],
+      "block": [
+       24.39,
+       24.39
+      ]
+     }
+    },
+    "pico2": {
+     "push": 43.798,
+     "pop": 31.47,
+     "block": 16.45,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       43.749,
+       43.914
+      ],
+      "pop": [
+       31.47,
+       31.509
+      ],
+      "block": [
+       16.45,
+       16.45
+      ]
+     }
+    }
    }
   },
   {
@@ -915,6 +1169,134 @@
      "errors": 693938,
      "runs_with_errors": 13
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 37.031,
+     "pop": 46.024,
+     "block": 48.08,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       37.031,
+       37.031
+      ],
+      "pop": [
+       46.024,
+       46.024
+      ],
+      "block": [
+       48.08,
+       48.08
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 81.0,
+     "pop": 91.0,
+     "block": 100.94,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       81.0,
+       81.0
+      ],
+      "pop": [
+       91.0,
+       91.0
+      ],
+      "block": [
+       100.94,
+       100.94
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 42.023,
+     "pop": 39.025,
+     "block": 48.41,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       42.023,
+       42.023
+      ],
+      "pop": [
+       39.025,
+       39.025
+      ],
+      "block": [
+       48.41,
+       48.41
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 30.035,
+     "pop": 27.026,
+     "block": 26.81,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       30.035,
+       30.035
+      ],
+      "pop": [
+       27.026,
+       27.026
+      ],
+      "block": [
+       26.81,
+       26.81
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 77.0,
+     "pop": 86.0,
+     "block": 89.01,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       77.0,
+       78.0
+      ],
+      "pop": [
+       86.0,
+       87.0
+      ],
+      "block": [
+       88.02,
+       92.47
+      ]
+     }
+    },
+    "pico2": {
+     "push": 32.734,
+     "pop": 35.687,
+     "block": 40.83,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       32.734,
+       32.734
+      ],
+      "pop": [
+       35.682,
+       35.687
+      ],
+      "block": [
+       40.83,
+       40.83
+      ]
+     }
+    }
    }
   },
   {
@@ -1140,6 +1522,134 @@
      "runs": 13,
      "errors": 682312,
      "runs_with_errors": 13
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 52.032,
+     "pop": 54.027,
+     "block": 59.58,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       52.032,
+       52.032
+      ],
+      "pop": [
+       54.027,
+       54.027
+      ],
+      "block": [
+       59.58,
+       59.58
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 99.0,
+     "pop": 113.0,
+     "block": 120.94,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       99.0,
+       99.0
+      ],
+      "pop": [
+       113.0,
+       113.0
+      ],
+      "block": [
+       120.94,
+       120.94
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 56.027,
+     "pop": 48.024,
+     "block": 60.41,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       56.027,
+       56.027
+      ],
+      "pop": [
+       48.024,
+       48.024
+      ],
+      "block": [
+       60.41,
+       60.41
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 53.029,
+     "pop": 51.021,
+     "block": 50.31,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       53.029,
+       53.029
+      ],
+      "pop": [
+       51.021,
+       51.021
+      ],
+      "block": [
+       50.31,
+       50.31
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 98.0,
+     "pop": 112.0,
+     "block": 115.46,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       97.0,
+       99.0
+      ],
+      "pop": [
+       111.0,
+       112.0
+      ],
+      "block": [
+       114.46,
+       115.47
+      ]
+     }
+    },
+    "pico2": {
+     "push": 43.829,
+     "pop": 43.779,
+     "block": 50.33,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       43.829,
+       43.829
+      ],
+      "pop": [
+       43.77,
+       43.779
+      ],
+      "block": [
+       50.33,
+       50.33
+      ]
+     }
     }
    }
   },
@@ -1415,6 +1925,182 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 175.064,
+     "pop": 157.054,
+     "block": 5.87,
+     "dma_w": 374.031,
+     "dma_r": 354.078,
+     "range": {
+      "push": [
+       175.064,
+       175.064
+      ],
+      "pop": [
+       157.054,
+       157.054
+      ],
+      "block": [
+       5.85,
+       5.87
+      ],
+      "dma_w": [
+       374.031,
+       374.031
+      ],
+      "dma_r": [
+       354.078,
+       354.078
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 270.024,
+     "pop": 229.023,
+     "block": 15.21,
+     "dma_w": 511.664,
+     "dma_r": 439.363,
+     "range": {
+      "push": [
+       270.024,
+       270.024
+      ],
+      "pop": [
+       229.023,
+       229.023
+      ],
+      "block": [
+       15.21,
+       15.21
+      ],
+      "dma_w": [
+       511.664,
+       511.664
+      ],
+      "dma_r": [
+       439.363,
+       439.363
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 161.08,
+     "pop": 139.081,
+     "block": 6.94,
+     "dma_w": 420.633,
+     "dma_r": 370.676,
+     "range": {
+      "push": [
+       161.08,
+       161.08
+      ],
+      "pop": [
+       139.081,
+       139.081
+      ],
+      "block": [
+       6.94,
+       6.94
+      ],
+      "dma_w": [
+       420.633,
+       420.633
+      ],
+      "dma_r": [
+       370.676,
+       370.676
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 155.188,
+     "pop": 123.171,
+     "block": 5.9,
+     "dma_w": 316.894,
+     "dma_r": 254.049,
+     "range": {
+      "push": [
+       155.188,
+       155.188
+      ],
+      "pop": [
+       123.171,
+       123.172
+      ],
+      "block": [
+       5.9,
+       5.9
+      ],
+      "dma_w": [
+       316.894,
+       316.894
+      ],
+      "dma_r": [
+       254.049,
+       254.049
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 284.024,
+     "pop": 240.023,
+     "block": 15.37,
+     "dma_w": 516.672,
+     "dma_r": 458.812,
+     "range": {
+      "push": [
+       284.024,
+       284.024
+      ],
+      "pop": [
+       240.023,
+       240.023
+      ],
+      "block": [
+       15.37,
+       15.37
+      ],
+      "dma_w": [
+       516.672,
+       516.672
+      ],
+      "dma_r": [
+       458.812,
+       458.812
+      ]
+     }
+    },
+    "pico2": {
+     "push": 121.035,
+     "pop": 104.718,
+     "block": 4.35,
+     "dma_w": 245.367,
+     "dma_r": 225.414,
+     "range": {
+      "push": [
+       121.035,
+       121.035
+      ],
+      "pop": [
+       104.718,
+       104.718
+      ],
+      "block": [
+       4.35,
+       4.35
+      ],
+      "dma_w": [
+       245.367,
+       245.367
+      ],
+      "dma_r": [
+       225.414,
+       225.414
+      ]
+     }
+    }
    }
   },
   {
@@ -1640,6 +2326,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 40.021,
+     "pop": 42.014,
+     "block": 46.59,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       40.019,
+       41.023
+      ],
+      "pop": [
+       41.013,
+       42.015
+      ],
+      "block": [
+       46.59,
+       46.6
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 61.0,
+     "pop": 53.0,
+     "block": 71.91,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       61.0,
+       61.0
+      ],
+      "pop": [
+       53.0,
+       53.0
+      ],
+      "block": [
+       71.91,
+       71.91
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 45.031,
+     "pop": 42.021,
+     "block": 51.91,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       45.028,
+       45.031
+      ],
+      "pop": [
+       42.019,
+       42.021
+      ],
+      "block": [
+       51.91,
+       51.91
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 33.054,
+     "pop": 27.031,
+     "block": 28.8,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       33.052,
+       33.064
+      ],
+      "pop": [
+       27.024,
+       29.023
+      ],
+      "block": [
+       28.8,
+       29.31
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 60.0,
+     "pop": 51.001,
+     "block": 63.97,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       60.0,
+       60.0
+      ],
+      "pop": [
+       51.001,
+       52.0
+      ],
+      "block": [
+       63.02,
+       64.0
+      ]
+     }
+    },
+    "pico2": {
+     "push": 32.682,
+     "pop": 31.654,
+     "block": 38.83,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       32.681,
+       33.218
+      ],
+      "pop": [
+       31.654,
+       31.658
+      ],
+      "block": [
+       38.83,
+       38.83
+      ]
+     }
     }
    }
   },
@@ -1879,6 +2693,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 79.043,
+     "pop": 74.046,
+     "block": 82.11,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       79.034,
+       80.043
+      ],
+      "pop": [
+       72.031,
+       74.046
+      ],
+      "block": [
+       82.09,
+       82.11
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 122.0,
+     "pop": 131.0,
+     "block": 141.41,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       122.0,
+       122.0
+      ],
+      "pop": [
+       129.0,
+       131.0
+      ],
+      "block": [
+       140.41,
+       141.41
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 72.046,
+     "pop": 69.049,
+     "block": 77.92,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       72.037,
+       72.046
+      ],
+      "pop": [
+       69.043,
+       69.049
+      ],
+      "block": [
+       77.92,
+       77.92
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 53.098,
+     "pop": 67.05,
+     "block": 57.82,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       53.071,
+       53.098
+      ],
+      "pop": [
+       67.034,
+       68.039
+      ],
+      "block": [
+       57.82,
+       58.13
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 114.0,
+     "pop": 128.0,
+     "block": 131.46,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       113.0,
+       114.0
+      ],
+      "pop": [
+       126.0,
+       128.0
+      ],
+      "block": [
+       129.47,
+       132.94
+      ]
+     }
+    },
+    "pico2": {
+     "push": 56.127,
+     "pop": 55.957,
+     "block": 62.34,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       55.903,
+       56.127
+      ],
+      "pop": [
+       55.901,
+       55.957
+      ],
+      "block": [
+       62.34,
+       62.34
+      ]
+     }
     }
    }
   },
@@ -2181,6 +3123,230 @@
       }
      }
     },
+    "speed2": {
+     "nrf5340dk": {
+      "MPSC": {
+       "push": 66.024,
+       "pop": 69.025,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         66.024,
+         66.024
+        ],
+        "pop": [
+         69.025,
+         69.025
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 66.024,
+       "pop": 69.025,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         66.024,
+         66.024
+        ],
+        "pop": [
+         69.025,
+         69.025
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 66.024,
+       "pop": 69.025,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         66.024,
+         66.024
+        ],
+        "pop": [
+         69.025,
+         69.025
+        ]
+       }
+      }
+     },
+     "nucleo-g0b1re": {
+      "MPSC": null,
+      "SPMC": null,
+      "MPMC": null
+     },
+     "nucleo-g474re": {
+      "MPSC": {
+       "push": 60.023,
+       "pop": 60.021,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         60.023,
+         60.023
+        ],
+        "pop": [
+         60.021,
+         60.021
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 60.023,
+       "pop": 60.021,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         60.023,
+         60.023
+        ],
+        "pop": [
+         60.021,
+         60.021
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 60.023,
+       "pop": 60.021,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         60.023,
+         60.023
+        ],
+        "pop": [
+         60.021,
+         60.021
+        ]
+       }
+      }
+     },
+     "nucleo-h723zg": {
+      "MPSC": {
+       "push": 50.029,
+       "pop": 51.021,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         50.029,
+         50.029
+        ],
+        "pop": [
+         51.021,
+         51.021
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 50.029,
+       "pop": 51.021,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         50.029,
+         50.029
+        ],
+        "pop": [
+         51.021,
+         51.021
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 50.029,
+       "pop": 51.021,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         50.029,
+         50.029
+        ],
+        "pop": [
+         51.021,
+         51.021
+        ]
+       }
+      }
+     },
+     "sam-d20-xpro": {
+      "MPSC": null,
+      "SPMC": null,
+      "MPMC": null
+     },
+     "pico2": {
+      "MPSC": {
+       "push": 45.82,
+       "pop": 47.816,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         45.82,
+         45.82
+        ],
+        "pop": [
+         47.816,
+         47.82
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 45.82,
+       "pop": 47.816,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         45.82,
+         45.82
+        ],
+        "pop": [
+         47.816,
+         47.82
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 45.82,
+       "pop": 47.816,
+       "block": null,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         45.82,
+         45.82
+        ],
+        "pop": [
+         47.816,
+         47.82
+        ]
+       }
+      }
+     }
+    },
     "other_code": true
    },
    "contract": {
@@ -2394,6 +3560,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 128.079,
+     "pop": 129.03,
+     "block": 3.55,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       128.078,
+       130.076
+      ],
+      "pop": [
+       126.036,
+       130.036
+      ],
+      "block": [
+       3.53,
+       3.59
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 165.0,
+     "pop": 157.0,
+     "block": 12.4,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       163.0,
+       165.0
+      ],
+      "pop": [
+       155.0,
+       157.0
+      ],
+      "block": [
+       12.38,
+       12.4
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 98.086,
+     "pop": 88.037,
+     "block": 3.52,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       98.086,
+       98.093
+      ],
+      "pop": [
+       88.031,
+       88.037
+      ],
+      "block": [
+       3.49,
+       3.56
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 69.142,
+     "pop": 67.061,
+     "block": 3.13,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       69.142,
+       70.154
+      ],
+      "pop": [
+       67.049,
+       67.076
+      ],
+      "block": [
+       3.13,
+       3.23
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 167.0,
+     "pop": 159.0,
+     "block": 12.39,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       165.0,
+       167.0
+      ],
+      "pop": [
+       157.0,
+       159.0
+      ],
+      "block": [
+       12.39,
+       12.41
+      ]
+     }
+    },
+    "pico2": {
+     "push": 83.441,
+     "pop": 83.363,
+     "block": 2.8,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       83.441,
+       83.979
+      ],
+      "pop": [
+       82.991,
+       84.213
+      ],
+      "block": [
+       2.79,
+       2.8
+      ]
+     }
     }
    }
   },
@@ -2669,6 +3963,182 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 93.059,
+     "pop": 90.02,
+     "block": 3.73,
+     "dma_w": 237.0,
+     "dma_r": 226.5,
+     "range": {
+      "push": [
+       91.063,
+       95.059
+      ],
+      "pop": [
+       89.019,
+       90.02
+      ],
+      "block": [
+       3.73,
+       3.73
+      ],
+      "dma_w": [
+       237.0,
+       237.0
+      ],
+      "dma_r": [
+       226.5,
+       226.5
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 111.0,
+     "pop": 109.0,
+     "block": 12.45,
+     "dma_w": 287.5,
+     "dma_r": 274.5,
+     "range": {
+      "push": [
+       110.0,
+       111.0
+      ],
+      "pop": [
+       109.0,
+       109.0
+      ],
+      "block": [
+       12.45,
+       12.45
+      ],
+      "dma_w": [
+       282.5,
+       287.5
+      ],
+      "dma_r": [
+       268.5,
+       274.5
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 81.067,
+     "pop": 80.023,
+     "block": 3.88,
+     "dma_w": 218.568,
+     "dma_r": 204.046,
+     "range": {
+      "push": [
+       81.06,
+       81.067
+      ],
+      "pop": [
+       80.02,
+       80.023
+      ],
+      "block": [
+       3.71,
+       3.91
+      ],
+      "dma_w": [
+       218.568,
+       218.572
+      ],
+      "dma_r": [
+       204.046,
+       204.055
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 54.107,
+     "pop": 52.043,
+     "block": 3.11,
+     "dma_w": 139.03,
+     "dma_r": 144.03,
+     "range": {
+      "push": [
+       54.104,
+       56.114
+      ],
+      "pop": [
+       52.043,
+       52.058
+      ],
+      "block": [
+       3.0,
+       3.11
+      ],
+      "dma_w": [
+       139.03,
+       158.264
+      ],
+      "dma_r": [
+       144.03,
+       144.272
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 111.0,
+     "pop": 108.999,
+     "block": 12.44,
+     "dma_w": 279.0,
+     "dma_r": 268.0,
+     "range": {
+      "push": [
+       111.0,
+       112.0
+      ],
+      "pop": [
+       108.0,
+       111.0
+      ],
+      "block": [
+       12.43,
+       12.45
+      ],
+      "dma_w": [
+       278.0,
+       281.0
+      ],
+      "dma_r": [
+       268.0,
+       272.0
+      ]
+     }
+    },
+    "pico2": {
+     "push": 66.098,
+     "pop": 63.56,
+     "block": 2.9,
+     "dma_w": 163.5,
+     "dma_r": 153.0,
+     "range": {
+      "push": [
+       66.098,
+       66.146
+      ],
+      "pop": [
+       63.559,
+       63.601
+      ],
+      "block": [
+       2.9,
+       2.9
+      ],
+      "dma_w": [
+       163.5,
+       163.5
+      ],
+      "dma_r": [
+       153.0,
+       153.0
+      ]
+     }
+    }
    }
   },
   {
@@ -2896,6 +4366,134 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 221.084,
+     "pop": 217.047,
+     "block": 6.13,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       221.084,
+       221.084
+      ],
+      "pop": [
+       217.047,
+       217.047
+      ],
+      "block": [
+       6.13,
+       6.13
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 271.0,
+     "pop": 252.0,
+     "block": 13.56,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       271.0,
+       271.0
+      ],
+      "pop": [
+       252.0,
+       252.0
+      ],
+      "block": [
+       13.56,
+       13.56
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 190.097,
+     "pop": 174.054,
+     "block": 6.39,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       190.097,
+       190.097
+      ],
+      "pop": [
+       174.054,
+       174.054
+      ],
+      "block": [
+       6.39,
+       6.39
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 119.688,
+     "pop": 111.086,
+     "block": 4.38,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       119.688,
+       119.688
+      ],
+      "pop": [
+       111.086,
+       111.086
+      ],
+      "block": [
+       4.38,
+       4.38
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 290.0,
+     "pop": 266.0,
+     "block": 13.9,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       290.0,
+       290.0
+      ],
+      "pop": [
+       266.0,
+       266.0
+      ],
+      "block": [
+       13.9,
+       13.9
+      ]
+     }
+    },
+    "pico2": {
+     "push": 196.664,
+     "pop": 189.703,
+     "block": 5.38,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       196.323,
+       196.888
+      ],
+      "pop": [
+       188.859,
+       189.703
+      ],
+      "block": [
+       5.38,
+       5.38
+      ]
+     }
+    }
    }
   },
   {
@@ -3080,7 +4678,135 @@
     }
    },
    "stress": {},
-   "smp": {}
+   "smp": {},
+   "speed2": {
+    "nrf5340dk": {
+     "push": 38.041,
+     "pop": 37.029,
+     "block": 44.09,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       38.041,
+       38.041
+      ],
+      "pop": [
+       37.029,
+       37.029
+      ],
+      "block": [
+       44.09,
+       44.09
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 87.0,
+     "pop": 80.0,
+     "block": 98.41,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       87.0,
+       87.0
+      ],
+      "pop": [
+       80.0,
+       80.0
+      ],
+      "block": [
+       98.41,
+       98.41
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 40.035,
+     "pop": 36.031,
+     "block": 43.94,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       40.035,
+       40.035
+      ],
+      "pop": [
+       36.031,
+       36.031
+      ],
+      "block": [
+       43.94,
+       43.94
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 28.047,
+     "pop": 26.024,
+     "block": 24.82,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       28.047,
+       28.047
+      ],
+      "pop": [
+       26.024,
+       26.024
+      ],
+      "block": [
+       24.82,
+       24.82
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 84.0,
+     "pop": 76.0,
+     "block": 90.95,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       83.998,
+       84.0
+      ],
+      "pop": [
+       76.0,
+       76.0
+      ],
+      "block": [
+       90.46,
+       90.95
+      ]
+     }
+    },
+    "pico2": {
+     "push": 34.695,
+     "pop": 31.598,
+     "block": 39.84,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       34.695,
+       34.695
+      ],
+      "pop": [
+       31.597,
+       31.602
+      ],
+      "block": [
+       39.84,
+       39.84
+      ]
+     }
+    }
+   }
   },
   {
    "name": "EmbeddedArtistry cbuf threadsafe",
@@ -3306,6 +5032,134 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 54.012,
+     "pop": 44.017,
+     "block": 54.59,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       52.012,
+       54.018
+      ],
+      "pop": [
+       44.011,
+       44.021
+      ],
+      "block": [
+       54.58,
+       54.59
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 74.0,
+     "pop": 60.0,
+     "block": 81.91,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       74.0,
+       74.0
+      ],
+      "pop": [
+       60.0,
+       60.0
+      ],
+      "block": [
+       81.91,
+       81.91
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 56.022,
+     "pop": 46.026,
+     "block": 58.41,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       56.022,
+       56.023
+      ],
+      "pop": [
+       46.026,
+       46.027
+      ],
+      "block": [
+       58.41,
+       58.41
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 37.03,
+     "pop": 33.039,
+     "block": 31.82,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       37.024,
+       37.051
+      ],
+      "pop": [
+       32.021,
+       33.039
+      ],
+      "block": [
+       31.81,
+       31.82
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 75.0,
+     "pop": 59.0,
+     "block": 74.99,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       74.999,
+       75.0
+      ],
+      "pop": [
+       57.0,
+       59.0
+      ],
+      "block": [
+       72.52,
+       74.99
+      ]
+     }
+    },
+    "pico2": {
+     "push": 40.703,
+     "pop": 33.673,
+     "block": 43.83,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       40.703,
+       40.751
+      ],
+      "pop": [
+       33.634,
+       33.673
+      ],
+      "block": [
+       43.83,
+       43.83
+      ]
+     }
+    }
    }
   },
   {
@@ -3490,7 +5344,135 @@
     }
    },
    "stress": {},
-   "smp": {}
+   "smp": {},
+   "speed2": {
+    "nrf5340dk": {
+     "push": 25.022,
+     "pop": 29.013,
+     "block": 33.58,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       25.022,
+       25.022
+      ],
+      "pop": [
+       29.013,
+       29.013
+      ],
+      "block": [
+       33.58,
+       33.58
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 46.0,
+     "pop": 47.0,
+     "block": 61.44,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       46.0,
+       46.0
+      ],
+      "pop": [
+       47.0,
+       47.0
+      ],
+      "block": [
+       61.44,
+       61.44
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 32.021,
+     "pop": 34.011,
+     "block": 38.92,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       32.021,
+       32.021
+      ],
+      "pop": [
+       34.011,
+       34.011
+      ],
+      "block": [
+       38.92,
+       38.92
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 22.035,
+     "pop": 21.019,
+     "block": 19.31,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       22.035,
+       22.035
+      ],
+      "pop": [
+       21.019,
+       21.019
+      ],
+      "block": [
+       19.31,
+       19.31
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 47.0,
+     "pop": 48.0,
+     "block": 54.52,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       47.0,
+       47.0
+      ],
+      "pop": [
+       48.0,
+       48.0
+      ],
+      "block": [
+       54.52,
+       54.52
+      ]
+     }
+    },
+    "pico2": {
+     "push": 25.541,
+     "pop": 27.534,
+     "block": 33.33,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       25.541,
+       25.541
+      ],
+      "pop": [
+       27.534,
+       27.541
+      ],
+      "block": [
+       33.33,
+       33.33
+      ]
+     }
+    }
+   }
   },
   {
    "name": "ETL queue_spsc_atomic",
@@ -3715,6 +5697,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 24.026,
+     "pop": 31.024,
+     "block": 22.59,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       24.026,
+       24.026
+      ],
+      "pop": [
+       31.024,
+       31.024
+      ],
+      "block": [
+       22.59,
+       22.59
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 54.0,
+     "pop": 51.0,
+     "block": 40.04,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       54.0,
+       54.0
+      ],
+      "pop": [
+       51.0,
+       51.0
+      ],
+      "block": [
+       40.04,
+       40.04
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 30.021,
+     "pop": 27.017,
+     "block": 23.86,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       30.021,
+       30.021
+      ],
+      "pop": [
+       27.017,
+       27.017
+      ],
+      "block": [
+       23.86,
+       23.86
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 33.026,
+     "pop": 32.025,
+     "block": 26.05,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       33.026,
+       33.026
+      ],
+      "pop": [
+       32.025,
+       32.025
+      ],
+      "block": [
+       26.05,
+       26.05
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 57.0,
+     "pop": 53.0,
+     "block": 37.65,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       57.0,
+       57.0
+      ],
+      "pop": [
+       53.0,
+       53.0
+      ],
+      "block": [
+       37.65,
+       37.65
+      ]
+     }
+    },
+    "pico2": {
+     "push": 24.545,
+     "pop": 25.584,
+     "block": 22.27,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       24.545,
+       24.545
+      ],
+      "pop": [
+       25.583,
+       25.59
+      ],
+      "block": [
+       22.27,
+       22.27
+      ]
+     }
     }
    }
   },
@@ -3942,6 +6052,134 @@
      "errors": 677006,
      "runs_with_errors": 13
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 33.025,
+     "pop": 38.021,
+     "block": 27.56,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       33.025,
+       33.025
+      ],
+      "pop": [
+       38.021,
+       38.021
+      ],
+      "block": [
+       27.56,
+       27.56
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 73.0,
+     "pop": 68.0,
+     "block": 53.58,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       73.0,
+       73.0
+      ],
+      "pop": [
+       68.0,
+       68.0
+      ],
+      "block": [
+       53.58,
+       53.58
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 40.028,
+     "pop": 45.016,
+     "block": 31.91,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       40.028,
+       40.028
+      ],
+      "pop": [
+       45.016,
+       45.016
+      ],
+      "block": [
+       31.91,
+       31.91
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 39.025,
+     "pop": 40.026,
+     "block": 28.36,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       39.025,
+       39.025
+      ],
+      "pop": [
+       40.026,
+       40.026
+      ],
+      "block": [
+       28.36,
+       28.36
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 73.0,
+     "pop": 68.0,
+     "block": 53.19,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       73.0,
+       73.0
+      ],
+      "pop": [
+       68.0,
+       68.0
+      ],
+      "block": [
+       53.19,
+       53.19
+      ]
+     }
+    },
+    "pico2": {
+     "push": 33.822,
+     "pop": 31.812,
+     "block": 27.25,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       33.822,
+       33.822
+      ],
+      "pop": [
+       31.812,
+       31.818
+      ],
+      "block": [
+       27.25,
+       27.25
+      ]
+     }
+    }
    }
   },
   {
@@ -4167,6 +6405,134 @@
      "runs": 13,
      "errors": 960136,
      "runs_with_errors": 13
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 80.025,
+     "pop": 80.021,
+     "block": 51.73,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       80.025,
+       80.025
+      ],
+      "pop": [
+       80.021,
+       80.021
+      ],
+      "block": [
+       51.73,
+       51.73
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 115.0,
+     "pop": 110.0,
+     "block": 92.55,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       115.0,
+       117.0
+      ],
+      "pop": [
+       110.0,
+       112.0
+      ],
+      "block": [
+       92.55,
+       94.55
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 79.03,
+     "pop": 80.02,
+     "block": 61.45,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       79.027,
+       79.03
+      ],
+      "pop": [
+       80.017,
+       80.02
+      ],
+      "block": [
+       61.45,
+       61.52
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 75.047,
+     "pop": 72.029,
+     "block": 61.86,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       73.047,
+       75.058
+      ],
+      "pop": [
+       70.031,
+       72.03
+      ],
+      "block": [
+       60.36,
+       62.36
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 108.0,
+     "pop": 104.0,
+     "block": 89.09,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       108.0,
+       110.0
+      ],
+      "pop": [
+       104.0,
+       106.0
+      ],
+      "block": [
+       87.63,
+       91.11
+      ]
+     }
+    },
+    "pico2": {
+     "push": 62.679,
+     "pop": 60.664,
+     "block": 50.85,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       62.678,
+       63.677
+      ],
+      "pop": [
+       60.664,
+       61.661
+      ],
+      "block": [
+       50.85,
+       51.35
+      ]
+     }
     }
    }
   },
@@ -4394,6 +6760,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 307.152,
+     "pop": 257.087,
+     "block": 5.42,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       304.146,
+       307.152
+      ],
+      "pop": [
+       253.09,
+       259.092
+      ],
+      "block": [
+       5.37,
+       5.42
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 373.0,
+     "pop": 325.0,
+     "block": 13.22,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       357.0,
+       373.0
+      ],
+      "pop": [
+       313.0,
+       325.0
+      ],
+      "block": [
+       13.0,
+       13.22
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 325.097,
+     "pop": 273.006,
+     "block": 6.52,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       310.089,
+       354.068
+      ],
+      "pop": [
+       273.006,
+       300.992
+      ],
+      "block": [
+       6.34,
+       6.75
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 224.212,
+     "pop": 172.126,
+     "block": 4.56,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       196.921,
+       225.219
+      ],
+      "pop": [
+       155.631,
+       173.127
+      ],
+      "block": [
+       4.48,
+       4.56
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 359.0,
+     "pop": 322.0,
+     "block": 12.99,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       359.0,
+       359.0
+      ],
+      "pop": [
+       315.0,
+       322.0
+      ],
+      "block": [
+       12.92,
+       12.99
+      ]
+     }
+    },
+    "pico2": {
+     "push": 209.405,
+     "pop": 171.801,
+     "block": 3.97,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       208.742,
+       209.986
+      ],
+      "pop": [
+       170.554,
+       171.919
+      ],
+      "block": [
+       3.96,
+       3.97
+      ]
+     }
     }
    }
   },
@@ -4876,6 +7370,398 @@
       }
      }
     },
+    "speed2": {
+     "nrf5340dk": {
+      "MPSC": {
+       "push": 74.024,
+       "pop": 65.031,
+       "block": 75.23,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         74.024,
+         74.024
+        ],
+        "pop": [
+         65.031,
+         65.031
+        ],
+        "block": [
+         75.23,
+         75.23
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 74.024,
+       "pop": 65.031,
+       "block": 75.23,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         74.024,
+         74.024
+        ],
+        "pop": [
+         65.031,
+         65.031
+        ],
+        "block": [
+         75.23,
+         75.23
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 74.024,
+       "pop": 65.031,
+       "block": 75.23,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         74.024,
+         74.024
+        ],
+        "pop": [
+         65.031,
+         65.031
+        ],
+        "block": [
+         75.23,
+         75.23
+        ]
+       }
+      }
+     },
+     "nucleo-g0b1re": {
+      "MPSC": {
+       "push": 118.0,
+       "pop": 124.0,
+       "block": 131.98,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         118.0,
+         118.0
+        ],
+        "pop": [
+         124.0,
+         124.0
+        ],
+        "block": [
+         131.98,
+         131.98
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 118.0,
+       "pop": 124.0,
+       "block": 131.98,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         118.0,
+         118.0
+        ],
+        "pop": [
+         124.0,
+         124.0
+        ],
+        "block": [
+         131.98,
+         131.98
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 118.0,
+       "pop": 124.0,
+       "block": 131.98,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         118.0,
+         118.0
+        ],
+        "pop": [
+         124.0,
+         124.0
+        ],
+        "block": [
+         131.98,
+         131.98
+        ]
+       }
+      }
+     },
+     "nucleo-g474re": {
+      "MPSC": {
+       "push": 59.022,
+       "pop": 59.027,
+       "block": 66.01,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         59.022,
+         59.022
+        ],
+        "pop": [
+         59.027,
+         59.027
+        ],
+        "block": [
+         66.01,
+         66.01
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 59.022,
+       "pop": 59.027,
+       "block": 66.01,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         59.022,
+         59.022
+        ],
+        "pop": [
+         59.027,
+         59.027
+        ],
+        "block": [
+         66.01,
+         66.01
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 59.022,
+       "pop": 59.027,
+       "block": 66.01,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         59.022,
+         59.022
+        ],
+        "pop": [
+         59.027,
+         59.027
+        ],
+        "block": [
+         66.01,
+         66.01
+        ]
+       }
+      }
+     },
+     "nucleo-h723zg": {
+      "MPSC": {
+       "push": 55.046,
+       "pop": 52.039,
+       "block": 49.9,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         55.046,
+         55.046
+        ],
+        "pop": [
+         52.039,
+         52.039
+        ],
+        "block": [
+         49.9,
+         49.9
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 55.046,
+       "pop": 52.039,
+       "block": 49.9,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         55.046,
+         55.046
+        ],
+        "pop": [
+         52.039,
+         52.039
+        ],
+        "block": [
+         49.9,
+         49.9
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 55.046,
+       "pop": 52.039,
+       "block": 49.9,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         55.046,
+         55.046
+        ],
+        "pop": [
+         52.039,
+         52.039
+        ],
+        "block": [
+         49.9,
+         49.9
+        ]
+       }
+      }
+     },
+     "sam-d20-xpro": {
+      "MPSC": {
+       "push": 125.0,
+       "pop": 130.0,
+       "block": 139.5,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         125.0,
+         125.0
+        ],
+        "pop": [
+         130.0,
+         130.0
+        ],
+        "block": [
+         139.5,
+         139.5
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 125.0,
+       "pop": 130.0,
+       "block": 139.5,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         125.0,
+         125.0
+        ],
+        "pop": [
+         130.0,
+         130.0
+        ],
+        "block": [
+         139.5,
+         139.5
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 125.0,
+       "pop": 130.0,
+       "block": 139.5,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         125.0,
+         125.0
+        ],
+        "pop": [
+         130.0,
+         130.0
+        ],
+        "block": [
+         139.5,
+         139.5
+        ]
+       }
+      }
+     },
+     "pico2": {
+      "MPSC": {
+       "push": 50.908,
+       "pop": 47.851,
+       "block": 54.86,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         50.908,
+         50.908
+        ],
+        "pop": [
+         47.85,
+         47.854
+        ],
+        "block": [
+         54.86,
+         54.86
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 50.908,
+       "pop": 47.851,
+       "block": 54.86,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         50.908,
+         50.908
+        ],
+        "pop": [
+         47.85,
+         47.854
+        ],
+        "block": [
+         54.86,
+         54.86
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 50.908,
+       "pop": 47.851,
+       "block": 54.86,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         50.908,
+         50.908
+        ],
+        "pop": [
+         47.85,
+         47.854
+        ],
+        "block": [
+         54.86,
+         54.86
+        ]
+       }
+      }
+     }
+    },
     "other_code": true
    },
    "contract": {
@@ -5102,6 +7988,134 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 31.014,
+     "pop": 37.008,
+     "block": 39.73,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       31.014,
+       31.014
+      ],
+      "pop": [
+       37.008,
+       37.008
+      ],
+      "block": [
+       39.73,
+       39.73
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 61.0,
+     "pop": 63.0,
+     "block": 72.98,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       61.0,
+       61.0
+      ],
+      "pop": [
+       63.0,
+       63.0
+      ],
+      "block": [
+       72.98,
+       72.98
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 35.017,
+     "pop": 37.012,
+     "block": 43.01,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       35.017,
+       35.017
+      ],
+      "pop": [
+       37.012,
+       37.012
+      ],
+      "block": [
+       43.01,
+       43.01
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 34.031,
+     "pop": 29.008,
+     "block": 27.9,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       34.031,
+       34.031
+      ],
+      "pop": [
+       29.008,
+       29.008
+      ],
+      "block": [
+       27.9,
+       27.9
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 66.0,
+     "pop": 68.0,
+     "block": 76.05,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       66.0,
+       66.0
+      ],
+      "pop": [
+       68.0,
+       68.0
+      ],
+      "block": [
+       76.05,
+       76.05
+      ]
+     }
+    },
+    "pico2": {
+     "push": 23.406,
+     "pop": 27.442,
+     "block": 31.36,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       23.406,
+       23.406
+      ],
+      "pop": [
+       27.442,
+       27.45
+      ],
+      "block": [
+       31.36,
+       31.36
+      ]
+     }
+    }
    }
   },
   {
@@ -5327,6 +8341,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 17.019,
+     "pop": 19.019,
+     "block": 9.54,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       17.019,
+       17.019
+      ],
+      "pop": [
+       19.019,
+       19.019
+      ],
+      "block": [
+       9.54,
+       9.54
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 36.0,
+     "pop": 42.0,
+     "block": 11.77,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       36.0,
+       36.0
+      ],
+      "pop": [
+       42.0,
+       42.0
+      ],
+      "block": [
+       11.77,
+       11.77
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 23.019,
+     "pop": 26.013,
+     "block": 9.49,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       23.019,
+       23.019
+      ],
+      "pop": [
+       26.013,
+       26.013
+      ],
+      "block": [
+       9.49,
+       9.49
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 30.026,
+     "pop": 30.025,
+     "block": 6.52,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       30.026,
+       30.026
+      ],
+      "pop": [
+       30.025,
+       30.025
+      ],
+      "block": [
+       6.52,
+       6.52
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 36.0,
+     "pop": 42.001,
+     "block": 11.84,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       36.0,
+       36.0
+      ],
+      "pop": [
+       42.001,
+       42.001
+      ],
+      "block": [
+       11.84,
+       11.84
+      ]
+     }
+    },
+    "pico2": {
+     "push": 17.494,
+     "pop": 17.49,
+     "block": 9.37,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       17.494,
+       17.494
+      ],
+      "pop": [
+       17.489,
+       17.494
+      ],
+      "block": [
+       9.37,
+       9.37
+      ]
+     }
     }
    }
   },
@@ -5602,6 +8744,182 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 55.015,
+     "pop": 58.014,
+     "block": 4.47,
+     "dma_w": 240.0,
+     "dma_r": 235.502,
+     "range": {
+      "push": [
+       55.015,
+       55.021
+      ],
+      "pop": [
+       58.014,
+       58.019
+      ],
+      "block": [
+       4.47,
+       4.47
+      ],
+      "dma_w": [
+       240.0,
+       240.0
+      ],
+      "dma_r": [
+       235.501,
+       235.502
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 65.0,
+     "pop": 67.0,
+     "block": 13.61,
+     "dma_w": 335.0,
+     "dma_r": 325.5,
+     "range": {
+      "push": [
+       65.0,
+       65.0
+      ],
+      "pop": [
+       67.0,
+       67.0
+      ],
+      "block": [
+       13.61,
+       13.71
+      ],
+      "dma_w": [
+       335.0,
+       342.0
+      ],
+      "dma_r": [
+       325.5,
+       335.0
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 54.024,
+     "pop": 57.019,
+     "block": 4.97,
+     "dma_w": 267.022,
+     "dma_r": 259.035,
+     "range": {
+      "push": [
+       54.022,
+       54.024
+      ],
+      "pop": [
+       57.017,
+       57.019
+      ],
+      "block": [
+       4.97,
+       5.11
+      ],
+      "dma_w": [
+       261.024,
+       287.999
+      ],
+      "dma_r": [
+       257.043,
+       279.517
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 47.039,
+     "pop": 44.031,
+     "block": 3.96,
+     "dma_w": 195.514,
+     "dma_r": 181.534,
+     "range": {
+      "push": [
+       47.031,
+       48.042
+      ],
+      "pop": [
+       43.034,
+       45.031
+      ],
+      "block": [
+       3.87,
+       3.96
+      ],
+      "dma_w": [
+       195.514,
+       202.0
+      ],
+      "dma_r": [
+       181.534,
+       186.034
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 65.0,
+     "pop": 69.0,
+     "block": 13.7,
+     "dma_w": 339.0,
+     "dma_r": 332.0,
+     "range": {
+      "push": [
+       65.0,
+       65.0
+      ],
+      "pop": [
+       68.0,
+       69.0
+      ],
+      "block": [
+       13.68,
+       13.75
+      ],
+      "dma_w": [
+       337.0,
+       346.0
+      ],
+      "dma_r": [
+       329.0,
+       337.5
+      ]
+     }
+    },
+    "pico2": {
+     "push": 39.663,
+     "pop": 41.614,
+     "block": 3.55,
+     "dma_w": 189.0,
+     "dma_r": 184.5,
+     "range": {
+      "push": [
+       39.663,
+       39.666
+      ],
+      "pop": [
+       41.614,
+       41.652
+      ],
+      "block": [
+       3.55,
+       3.55
+      ],
+      "dma_w": [
+       189.0,
+       189.0
+      ],
+      "dma_r": [
+       184.5,
+       184.605
+      ]
+     }
+    }
    }
   },
   {
@@ -5828,6 +9146,134 @@
      "errors": 8192,
      "runs_with_errors": 7
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 69.044,
+     "pop": 58.038,
+     "block": 8.44,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       69.044,
+       69.044
+      ],
+      "pop": [
+       58.038,
+       58.038
+      ],
+      "block": [
+       8.44,
+       8.44
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 119.999,
+     "pop": 103.0,
+     "block": 12.2,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       119.999,
+       119.999
+      ],
+      "pop": [
+       103.0,
+       103.0
+      ],
+      "block": [
+       12.2,
+       12.2
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 79.034,
+     "pop": 69.023,
+     "block": 8.94,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       79.034,
+       79.034
+      ],
+      "pop": [
+       69.023,
+       69.023
+      ],
+      "block": [
+       8.94,
+       8.94
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 60.562,
+     "pop": 58.046,
+     "block": 4.83,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       60.562,
+       60.562
+      ],
+      "pop": [
+       58.046,
+       58.046
+      ],
+      "block": [
+       4.83,
+       4.83
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 121.0,
+     "pop": 108.0,
+     "block": 12.3,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       121.0,
+       121.0
+      ],
+      "pop": [
+       108.0,
+       108.0
+      ],
+      "block": [
+       12.3,
+       12.3
+      ]
+     }
+    },
+    "pico2": {
+     "push": 66.343,
+     "pop": 53.109,
+     "block": 7.46,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       66.343,
+       66.343
+      ],
+      "pop": [
+       53.1,
+       53.109
+      ],
+      "block": [
+       7.46,
+       7.46
+      ]
+     }
+    }
    }
   },
   {
@@ -6012,7 +9458,135 @@
     }
    },
    "stress": {},
-   "smp": {}
+   "smp": {},
+   "speed2": {
+    "nrf5340dk": {
+     "push": 96.038,
+     "pop": 98.016,
+     "block": 76.96,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       96.038,
+       96.038
+      ],
+      "pop": [
+       98.016,
+       98.016
+      ],
+      "block": [
+       76.96,
+       78.45
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 103.0,
+     "pop": 99.0,
+     "block": 91.85,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       103.0,
+       103.0
+      ],
+      "pop": [
+       99.0,
+       99.0
+      ],
+      "block": [
+       91.85,
+       93.36
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 78.039,
+     "pop": 75.02,
+     "block": 66.49,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       78.039,
+       78.039
+      ],
+      "pop": [
+       75.02,
+       75.02
+      ],
+      "block": [
+       66.48,
+       66.49
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 43.092,
+     "pop": 48.054,
+     "block": 36.81,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       43.092,
+       47.106
+      ],
+      "pop": [
+       45.04,
+       48.054
+      ],
+      "block": [
+       36.78,
+       37.27
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 102.0,
+     "pop": 99.0,
+     "block": 91.06,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       102.0,
+       102.0
+      ],
+      "pop": [
+       99.0,
+       99.0
+      ],
+      "block": [
+       91.06,
+       93.02
+      ]
+     }
+    },
+    "pico2": {
+     "push": 60.172,
+     "pop": 59.604,
+     "block": 50.7,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       60.172,
+       60.172
+      ],
+      "pop": [
+       59.594,
+       59.604
+      ],
+      "block": [
+       50.7,
+       50.7
+      ]
+     }
+    }
+   }
   },
   {
    "name": "micoring SPSC mode",
@@ -6237,6 +9811,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 118.043,
+     "pop": 123.019,
+     "block": 118.41,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       118.043,
+       118.054
+      ],
+      "pop": [
+       123.014,
+       123.021
+      ],
+      "block": [
+       117.9,
+       118.41
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 127.0,
+     "pop": 132.0,
+     "block": 128.74,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       127.0,
+       127.0
+      ],
+      "pop": [
+       132.0,
+       133.0
+      ],
+      "block": [
+       128.74,
+       131.19
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 98.043,
+     "pop": 97.026,
+     "block": 96.89,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       98.043,
+       98.048
+      ],
+      "pop": [
+       97.021,
+       97.026
+      ],
+      "block": [
+       96.8,
+       96.95
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 78.111,
+     "pop": 71.046,
+     "block": 59.97,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       78.092,
+       78.111
+      ],
+      "pop": [
+       71.046,
+       71.065
+      ],
+      "block": [
+       59.91,
+       59.97
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 128.0,
+     "pop": 132.0,
+     "block": 131.39,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       128.0,
+       128.0
+      ],
+      "pop": [
+       132.0,
+       134.0
+      ],
+      "block": [
+       131.39,
+       134.85
+      ]
+     }
+    },
+    "pico2": {
+     "push": 74.478,
+     "pop": 76.836,
+     "block": 75.66,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       74.473,
+       74.594
+      ],
+      "pop": [
+       76.825,
+       76.836
+      ],
+      "block": [
+       75.66,
+       75.66
+      ]
+     }
     }
    }
   },
@@ -6464,6 +10166,134 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 51.072,
+     "pop": 66.01,
+     "block": 61.2,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       51.071,
+       51.073
+      ],
+      "pop": [
+       66.007,
+       66.013
+      ],
+      "block": [
+       61.2,
+       61.2
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 77.109,
+     "pop": 81.0,
+     "block": 88.63,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       77.078,
+       77.109
+      ],
+      "pop": [
+       81.0,
+       81.0
+      ],
+      "block": [
+       88.6,
+       88.63
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 53.082,
+     "pop": 64.015,
+     "block": 62.52,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       53.079,
+       53.082
+      ],
+      "pop": [
+       64.015,
+       64.017
+      ],
+      "block": [
+       62.52,
+       62.52
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 48.109,
+     "pop": 49.028,
+     "block": 44.44,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       48.105,
+       49.102
+      ],
+      "pop": [
+       48.028,
+       49.028
+      ],
+      "block": [
+       43.94,
+       44.44
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 77.078,
+     "pop": 82.0,
+     "block": 82.16,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       76.07,
+       77.078
+      ],
+      "pop": [
+       80.0,
+       82.0
+      ],
+      "block": [
+       81.63,
+       83.15
+      ]
+     }
+    },
+    "pico2": {
+     "push": 38.917,
+     "pop": 47.425,
+     "block": 45.95,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       38.917,
+       38.966
+      ],
+      "pop": [
+       47.368,
+       47.425
+      ],
+      "block": [
+       45.95,
+       45.95
+      ]
+     }
+    }
    }
   },
   {
@@ -6500,7 +10330,38 @@
     }
    },
    "stress": {},
-   "smp": {}
+   "smp": {},
+   "speed2": {
+    "nrf5340dk": {
+     "push": 182.116,
+     "pop": 171.037,
+     "block": 4.05,
+     "dma_w": 299.001,
+     "dma_r": 282.5,
+     "range": {
+      "push": [
+       182.084,
+       182.118
+      ],
+      "pop": [
+       171.037,
+       171.045
+      ],
+      "block": [
+       4.04,
+       4.05
+      ],
+      "dma_w": [
+       299.0,
+       299.001
+      ],
+      "dma_r": [
+       282.5,
+       282.5
+      ]
+     }
+    }
+   }
   },
   {
    "name": "polycratia spscring",
@@ -6725,6 +10586,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 19.019,
+     "pop": 24.018,
+     "block": 8.6,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       19.019,
+       19.019
+      ],
+      "pop": [
+       24.018,
+       24.018
+      ],
+      "block": [
+       8.6,
+       8.6
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 39.0,
+     "pop": 46.0,
+     "block": 11.83,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       39.0,
+       39.0
+      ],
+      "pop": [
+       46.0,
+       46.0
+      ],
+      "block": [
+       11.83,
+       11.83
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 24.018,
+     "pop": 28.016,
+     "block": 9.55,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       24.018,
+       24.018
+      ],
+      "pop": [
+       28.016,
+       28.016
+      ],
+      "block": [
+       9.55,
+       9.55
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 32.026,
+     "pop": 29.029,
+     "block": 5.11,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       32.026,
+       32.026
+      ],
+      "pop": [
+       29.029,
+       29.029
+      ],
+      "block": [
+       5.11,
+       5.11
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 39.0,
+     "pop": 49.0,
+     "block": 11.9,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       39.0,
+       39.0
+      ],
+      "pop": [
+       49.0,
+       49.0
+      ],
+      "block": [
+       11.9,
+       11.9
+      ]
+     }
+    },
+    "pico2": {
+     "push": 19.493,
+     "pop": 22.488,
+     "block": 8.4,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       19.493,
+       19.493
+      ],
+      "pop": [
+       22.488,
+       22.494
+      ],
+      "block": [
+       8.4,
+       8.4
+      ]
+     }
     }
    }
   },
@@ -7207,6 +11196,398 @@
       }
      }
     },
+    "speed2": {
+     "nrf5340dk": {
+      "MPSC": {
+       "push": 21.021,
+       "pop": 20.013,
+       "block": 3.13,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         21.021,
+         21.021
+        ],
+        "pop": [
+         20.013,
+         20.013
+        ],
+        "block": [
+         3.13,
+         3.13
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 17.019,
+       "pop": 23.023,
+       "block": 3.16,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         17.019,
+         17.019
+        ],
+        "pop": [
+         23.023,
+         23.023
+        ],
+        "block": [
+         3.14,
+         3.16
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 21.021,
+       "pop": 23.016,
+       "block": 3.26,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         21.021,
+         21.021
+        ],
+        "pop": [
+         23.016,
+         23.016
+        ],
+        "block": [
+         3.26,
+         3.26
+        ]
+       }
+      }
+     },
+     "nucleo-g0b1re": {
+      "MPSC": {
+       "push": 42.0,
+       "pop": 38.0,
+       "block": 9.4,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         42.0,
+         42.0
+        ],
+        "pop": [
+         38.0,
+         38.0
+        ],
+        "block": [
+         9.38,
+         9.4
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 35.0,
+       "pop": 45.0,
+       "block": 9.4,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         35.0,
+         35.0
+        ],
+        "pop": [
+         45.0,
+         45.0
+        ],
+        "block": [
+         9.4,
+         9.42
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 42.0,
+       "pop": 45.0,
+       "block": 9.5,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         42.0,
+         42.0
+        ],
+        "pop": [
+         45.0,
+         45.0
+        ],
+        "block": [
+         9.5,
+         9.5
+        ]
+       }
+      }
+     },
+     "nucleo-g474re": {
+      "MPSC": {
+       "push": 24.018,
+       "pop": 21.016,
+       "block": 3.26,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         24.018,
+         24.018
+        ],
+        "pop": [
+         21.016,
+         21.016
+        ],
+        "block": [
+         2.94,
+         3.27
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 20.017,
+       "pop": 26.018,
+       "block": 2.94,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         20.017,
+         20.017
+        ],
+        "pop": [
+         26.018,
+         26.018
+        ],
+        "block": [
+         2.94,
+         3.27
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 24.018,
+       "pop": 26.018,
+       "block": 3.0,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         24.018,
+         24.018
+        ],
+        "pop": [
+         26.018,
+         26.018
+        ],
+        "block": [
+         3.0,
+         3.4
+        ]
+       }
+      }
+     },
+     "nucleo-h723zg": {
+      "MPSC": {
+       "push": 33.031,
+       "pop": 16.019,
+       "block": 3.04,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         33.031,
+         33.031
+        ],
+        "pop": [
+         16.019,
+         16.019
+        ],
+        "block": [
+         2.84,
+         3.04
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 17.023,
+       "pop": 31.021,
+       "block": 3.04,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         17.023,
+         17.034
+        ],
+        "pop": [
+         31.021,
+         31.021
+        ],
+        "block": [
+         2.84,
+         3.04
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 33.015,
+       "pop": 31.01,
+       "block": 3.02,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         33.015,
+         33.03
+        ],
+        "pop": [
+         31.01,
+         31.014
+        ],
+        "block": [
+         3.0,
+         3.02
+        ]
+       }
+      }
+     },
+     "sam-d20-xpro": {
+      "MPSC": {
+       "push": 45.0,
+       "pop": 38.001,
+       "block": 9.43,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         45.0,
+         45.0
+        ],
+        "pop": [
+         38.001,
+         38.001
+        ],
+        "block": [
+         9.41,
+         9.43
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 37.0,
+       "pop": 47.0,
+       "block": 9.41,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         37.0,
+         37.0
+        ],
+        "pop": [
+         47.0,
+         47.0
+        ],
+        "block": [
+         9.41,
+         9.44
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 45.0,
+       "pop": 46.001,
+       "block": 9.53,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         45.0,
+         45.0
+        ],
+        "pop": [
+         46.001,
+         46.001
+        ],
+        "block": [
+         9.53,
+         9.55
+        ]
+       }
+      }
+     },
+     "pico2": {
+      "MPSC": {
+       "push": 21.54,
+       "pop": 18.443,
+       "block": 2.57,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         21.54,
+         21.54
+        ],
+        "pop": [
+         18.442,
+         18.446
+        ],
+        "block": [
+         2.57,
+         2.57
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 17.446,
+       "pop": 21.586,
+       "block": 2.57,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         17.446,
+         17.446
+        ],
+        "pop": [
+         21.585,
+         21.591
+        ],
+        "block": [
+         2.57,
+         2.57
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 21.54,
+       "pop": 21.588,
+       "block": 2.63,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         21.54,
+         21.54
+        ],
+        "pop": [
+         21.587,
+         21.591
+        ],
+        "block": [
+         2.63,
+         2.63
+        ]
+       }
+      }
+     }
+    },
     "other_code": true
    },
    "contract": {
@@ -7505,6 +11886,182 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 17.019,
+     "pop": 20.019,
+     "block": 3.03,
+     "dma_w": 72.5,
+     "dma_r": 68.0,
+     "range": {
+      "push": [
+       17.019,
+       17.019
+      ],
+      "pop": [
+       20.019,
+       20.019
+      ],
+      "block": [
+       3.01,
+       3.03
+      ],
+      "dma_w": [
+       72.5,
+       72.5
+      ],
+      "dma_r": [
+       68.0,
+       68.0
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 35.0,
+     "pop": 38.0,
+     "block": 9.3,
+     "dma_w": 118.0,
+     "dma_r": 109.0,
+     "range": {
+      "push": [
+       35.0,
+       35.0
+      ],
+      "pop": [
+       38.0,
+       38.0
+      ],
+      "block": [
+       9.3,
+       9.3
+      ],
+      "dma_w": [
+       118.0,
+       118.0
+      ],
+      "dma_r": [
+       109.0,
+       109.0
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 20.017,
+     "pop": 21.016,
+     "block": 3.05,
+     "dma_w": 82.009,
+     "dma_r": 71.508,
+     "range": {
+      "push": [
+       20.017,
+       20.017
+      ],
+      "pop": [
+       21.016,
+       21.016
+      ],
+      "block": [
+       2.88,
+       3.2
+      ],
+      "dma_w": [
+       82.009,
+       82.009
+      ],
+      "dma_r": [
+       71.508,
+       71.508
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 17.035,
+     "pop": 16.026,
+     "block": 2.71,
+     "dma_w": 56.01,
+     "dma_r": 60.5,
+     "range": {
+      "push": [
+       17.035,
+       17.035
+      ],
+      "pop": [
+       16.026,
+       16.026
+      ],
+      "block": [
+       2.71,
+       2.73
+      ],
+      "dma_w": [
+       56.005,
+       56.01
+      ],
+      "dma_r": [
+       60.5,
+       60.5
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 37.0,
+     "pop": 38.001,
+     "block": 9.3,
+     "dma_w": 121.0,
+     "dma_r": 111.5,
+     "range": {
+      "push": [
+       37.0,
+       37.0
+      ],
+      "pop": [
+       38.001,
+       39.0
+      ],
+      "block": [
+       9.29,
+       9.3
+      ],
+      "dma_w": [
+       121.0,
+       121.0
+      ],
+      "dma_r": [
+       111.5,
+       111.5
+      ]
+     }
+    },
+    "pico2": {
+     "push": 17.446,
+     "pop": 18.44,
+     "block": 2.51,
+     "dma_w": 62.0,
+     "dma_r": 57.5,
+     "range": {
+      "push": [
+       17.446,
+       17.446
+      ],
+      "pop": [
+       18.44,
+       18.446
+      ],
+      "block": [
+       2.51,
+       2.51
+      ],
+      "dma_w": [
+       62.0,
+       62.0
+      ],
+      "dma_r": [
+       57.5,
+       57.5
+      ]
+     }
+    }
    }
   },
   {
@@ -7737,7 +12294,183 @@
     }
    },
    "stress": {},
-   "smp": {}
+   "smp": {},
+   "speed2": {
+    "nrf5340dk": {
+     "push": 25.015,
+     "pop": 21.019,
+     "block": 3.03,
+     "dma_w": 72.5,
+     "dma_r": 68.0,
+     "range": {
+      "push": [
+       25.015,
+       25.015
+      ],
+      "pop": [
+       21.019,
+       21.019
+      ],
+      "block": [
+       3.01,
+       3.03
+      ],
+      "dma_w": [
+       72.5,
+       72.5
+      ],
+      "dma_r": [
+       68.0,
+       68.0
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 35.0,
+     "pop": 38.0,
+     "block": 9.3,
+     "dma_w": 118.0,
+     "dma_r": 109.0,
+     "range": {
+      "push": [
+       35.0,
+       35.0
+      ],
+      "pop": [
+       38.0,
+       38.0
+      ],
+      "block": [
+       9.3,
+       9.3
+      ],
+      "dma_w": [
+       118.0,
+       118.0
+      ],
+      "dma_r": [
+       109.0,
+       109.0
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 19.018,
+     "pop": 20.023,
+     "block": 3.05,
+     "dma_w": 79.009,
+     "dma_r": 74.509,
+     "range": {
+      "push": [
+       19.018,
+       19.018
+      ],
+      "pop": [
+       20.023,
+       20.023
+      ],
+      "block": [
+       2.88,
+       3.2
+      ],
+      "dma_w": [
+       79.009,
+       79.009
+      ],
+      "dma_r": [
+       74.509,
+       74.509
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 18.037,
+     "pop": 18.024,
+     "block": 2.73,
+     "dma_w": 60.505,
+     "dma_r": 62.0,
+     "range": {
+      "push": [
+       18.026,
+       18.037
+      ],
+      "pop": [
+       18.024,
+       18.024
+      ],
+      "block": [
+       2.73,
+       2.87
+      ],
+      "dma_w": [
+       60.505,
+       60.505
+      ],
+      "dma_r": [
+       62.0,
+       62.0
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 37.0,
+     "pop": 38.001,
+     "block": 9.3,
+     "dma_w": 121.0,
+     "dma_r": 111.5,
+     "range": {
+      "push": [
+       37.0,
+       37.0
+      ],
+      "pop": [
+       38.001,
+       39.0
+      ],
+      "block": [
+       9.29,
+       9.3
+      ],
+      "dma_w": [
+       121.0,
+       121.0
+      ],
+      "dma_r": [
+       111.5,
+       111.5
+      ]
+     }
+    },
+    "pico2": {
+     "push": 20.494,
+     "pop": 19.487,
+     "block": 2.51,
+     "dma_w": 62.0,
+     "dma_r": 57.5,
+     "range": {
+      "push": [
+       20.494,
+       20.494
+      ],
+      "pop": [
+       19.487,
+       19.492
+      ],
+      "block": [
+       2.51,
+       2.51
+      ],
+      "dma_w": [
+       62.0,
+       62.0
+      ],
+      "dma_r": [
+       57.5,
+       57.5
+      ]
+     }
+    }
+   }
   },
   {
    "name": "QuantumLeaps LFRB",
@@ -7962,6 +12695,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 51.016,
+     "pop": 44.012,
+     "block": 53.59,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       51.011,
+       53.014
+      ],
+      "pop": [
+       44.01,
+       44.015
+      ],
+      "block": [
+       53.59,
+       53.6
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 69.0,
+     "pop": 61.0,
+     "block": 79.91,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       69.0,
+       69.0
+      ],
+      "pop": [
+       61.0,
+       61.0
+      ],
+      "block": [
+       79.91,
+       79.91
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 46.029,
+     "pop": 46.018,
+     "block": 53.41,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       46.025,
+       46.029
+      ],
+      "pop": [
+       46.017,
+       46.018
+      ],
+      "block": [
+       53.41,
+       53.41
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 47.05,
+     "pop": 42.024,
+     "block": 42.32,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       47.04,
+       48.046
+      ],
+      "pop": [
+       42.021,
+       43.035
+      ],
+      "block": [
+       42.31,
+       42.32
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 70.0,
+     "pop": 63.0,
+     "block": 75.48,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       68.999,
+       70.0
+      ],
+      "pop": [
+       62.0,
+       63.0
+      ],
+      "block": [
+       73.48,
+       75.48
+      ]
+     }
+    },
+    "pico2": {
+     "push": 38.613,
+     "pop": 35.46,
+     "block": 43.83,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       38.564,
+       38.613
+      ],
+      "pop": [
+       35.46,
+       35.518
+      ],
+      "block": [
+       43.83,
+       43.83
+      ]
+     }
     }
    }
   },
@@ -8188,6 +13049,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 35.099,
+     "pop": 43.032,
+     "block": 41.19,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       35.099,
+       35.099
+      ],
+      "pop": [
+       43.032,
+       43.032
+      ],
+      "block": [
+       41.19,
+       41.19
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 52.156,
+     "pop": 83.0,
+     "block": 73.16,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       52.156,
+       52.156
+      ],
+      "pop": [
+       83.0,
+       83.0
+      ],
+      "block": [
+       73.16,
+       73.16
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 35.085,
+     "pop": 49.025,
+     "block": 45.5,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       35.085,
+       35.085
+      ],
+      "pop": [
+       49.025,
+       49.025
+      ],
+      "block": [
+       45.5,
+       45.5
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 31.141,
+     "pop": 39.033,
+     "block": 28.96,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       31.141,
+       31.141
+      ],
+      "pop": [
+       39.033,
+       39.033
+      ],
+      "block": [
+       28.96,
+       28.96
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 55.125,
+     "pop": 82.0,
+     "block": 69.66,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       55.125,
+       55.125
+      ],
+      "pop": [
+       82.0,
+       82.0
+      ],
+      "block": [
+       69.66,
+       69.66
+      ]
+     }
+    },
+    "pico2": {
+     "push": 26.82,
+     "pop": 36.866,
+     "block": 33.94,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       26.82,
+       26.82
+      ],
+      "pop": [
+       36.866,
+       36.871
+      ],
+      "block": [
+       33.94,
+       33.94
+      ]
+     }
     }
    }
   },
@@ -8670,6 +13659,398 @@
       }
      }
     },
+    "speed2": {
+     "nrf5340dk": {
+      "MPSC": {
+       "push": 51.018,
+       "pop": 48.021,
+       "block": 17.7,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         49.019,
+         51.022
+        ],
+        "pop": [
+         48.02,
+         48.022
+        ],
+        "block": [
+         17.7,
+         17.72
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 51.018,
+       "pop": 48.021,
+       "block": 17.7,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         49.019,
+         51.022
+        ],
+        "pop": [
+         48.02,
+         48.022
+        ],
+        "block": [
+         17.7,
+         17.72
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 51.018,
+       "pop": 48.021,
+       "block": 17.7,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         49.019,
+         51.022
+        ],
+        "pop": [
+         48.02,
+         48.022
+        ],
+        "block": [
+         17.7,
+         17.72
+        ]
+       }
+      }
+     },
+     "nucleo-g0b1re": {
+      "MPSC": {
+       "push": 65.0,
+       "pop": 64.0,
+       "block": 30.06,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         65.0,
+         65.0
+        ],
+        "pop": [
+         64.0,
+         64.0
+        ],
+        "block": [
+         27.08,
+         30.06
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 65.0,
+       "pop": 64.0,
+       "block": 30.06,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         65.0,
+         65.0
+        ],
+        "pop": [
+         64.0,
+         64.0
+        ],
+        "block": [
+         27.08,
+         30.06
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 65.0,
+       "pop": 64.0,
+       "block": 30.06,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         65.0,
+         65.0
+        ],
+        "pop": [
+         64.0,
+         64.0
+        ],
+        "block": [
+         27.08,
+         30.06
+        ]
+       }
+      }
+     },
+     "nucleo-g474re": {
+      "MPSC": {
+       "push": 52.026,
+       "pop": 51.021,
+       "block": 19.57,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         52.026,
+         52.029
+        ],
+        "pop": [
+         51.021,
+         51.021
+        ],
+        "block": [
+         19.57,
+         19.57
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 52.026,
+       "pop": 51.021,
+       "block": 19.57,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         52.026,
+         52.029
+        ],
+        "pop": [
+         51.021,
+         51.021
+        ],
+        "block": [
+         19.57,
+         19.57
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 52.026,
+       "pop": 51.021,
+       "block": 19.57,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         52.026,
+         52.029
+        ],
+        "pop": [
+         51.021,
+         51.021
+        ],
+        "block": [
+         19.57,
+         19.57
+        ]
+       }
+      }
+     },
+     "nucleo-h723zg": {
+      "MPSC": {
+       "push": 48.548,
+       "pop": 42.04,
+       "block": 11.19,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         48.547,
+         49.557
+        ],
+        "pop": [
+         42.036,
+         43.033
+        ],
+        "block": [
+         11.18,
+         11.2
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 48.548,
+       "pop": 42.04,
+       "block": 11.19,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         48.547,
+         49.557
+        ],
+        "pop": [
+         42.036,
+         43.033
+        ],
+        "block": [
+         11.18,
+         11.2
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 48.548,
+       "pop": 42.04,
+       "block": 11.19,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         48.547,
+         49.557
+        ],
+        "pop": [
+         42.036,
+         43.033
+        ],
+        "block": [
+         11.18,
+         11.2
+        ]
+       }
+      }
+     },
+     "sam-d20-xpro": {
+      "MPSC": {
+       "push": 65.0,
+       "pop": 65.0,
+       "block": 25.08,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         65.0,
+         65.0
+        ],
+        "pop": [
+         63.001,
+         65.0
+        ],
+        "block": [
+         25.06,
+         25.08
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 65.0,
+       "pop": 65.0,
+       "block": 25.08,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         65.0,
+         65.0
+        ],
+        "pop": [
+         63.001,
+         65.0
+        ],
+        "block": [
+         25.06,
+         25.08
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 65.0,
+       "pop": 65.0,
+       "block": 25.08,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         65.0,
+         65.0
+        ],
+        "pop": [
+         63.001,
+         65.0
+        ],
+        "block": [
+         25.06,
+         25.08
+        ]
+       }
+      }
+     },
+     "pico2": {
+      "MPSC": {
+       "push": 37.68,
+       "pop": 36.753,
+       "block": 17.45,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         37.679,
+         37.727
+        ],
+        "pop": [
+         36.749,
+         37.416
+        ],
+        "block": [
+         17.45,
+         17.45
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 37.68,
+       "pop": 36.753,
+       "block": 17.45,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         37.679,
+         37.727
+        ],
+        "pop": [
+         36.749,
+         37.416
+        ],
+        "block": [
+         17.45,
+         17.45
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 37.68,
+       "pop": 36.753,
+       "block": 17.45,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         37.679,
+         37.727
+        ],
+        "pop": [
+         36.749,
+         37.416
+        ],
+        "block": [
+         17.45,
+         17.45
+        ]
+       }
+      }
+     }
+    },
     "other_code": false
    },
    "contract": {
@@ -8883,6 +14264,134 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 51.018,
+     "pop": 48.021,
+     "block": 17.7,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       49.019,
+       51.022
+      ],
+      "pop": [
+       48.02,
+       48.022
+      ],
+      "block": [
+       17.7,
+       17.72
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 65.0,
+     "pop": 64.0,
+     "block": 30.06,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       65.0,
+       65.0
+      ],
+      "pop": [
+       64.0,
+       64.0
+      ],
+      "block": [
+       27.08,
+       30.06
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 52.026,
+     "pop": 51.021,
+     "block": 19.57,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       52.026,
+       52.029
+      ],
+      "pop": [
+       51.021,
+       51.021
+      ],
+      "block": [
+       19.57,
+       19.57
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 48.548,
+     "pop": 42.04,
+     "block": 11.19,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       48.547,
+       49.557
+      ],
+      "pop": [
+       42.036,
+       43.033
+      ],
+      "block": [
+       11.18,
+       11.2
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 65.0,
+     "pop": 65.0,
+     "block": 25.08,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       65.0,
+       65.0
+      ],
+      "pop": [
+       63.001,
+       65.0
+      ],
+      "block": [
+       25.06,
+       25.08
+      ]
+     }
+    },
+    "pico2": {
+     "push": 37.68,
+     "pop": 36.753,
+     "block": 17.45,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       37.679,
+       37.727
+      ],
+      "pop": [
+       36.749,
+       37.416
+      ],
+      "block": [
+       17.45,
+       17.45
+      ]
+     }
     }
    }
   },
@@ -9110,6 +14619,134 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 20.027,
+     "pop": 19.019,
+     "block": 26.08,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       20.027,
+       20.027
+      ],
+      "pop": [
+       19.019,
+       19.019
+      ],
+      "block": [
+       26.08,
+       26.08
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 45.0,
+     "pop": 44.0,
+     "block": 59.44,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       45.0,
+       45.0
+      ],
+      "pop": [
+       44.0,
+       44.0
+      ],
+      "block": [
+       59.44,
+       59.44
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 26.021,
+     "pop": 24.02,
+     "block": 31.92,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       26.021,
+       26.021
+      ],
+      "pop": [
+       24.02,
+       24.02
+      ],
+      "block": [
+       31.92,
+       31.92
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 30.036,
+     "pop": 31.019,
+     "block": 28.81,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       30.036,
+       30.036
+      ],
+      "pop": [
+       31.019,
+       31.019
+      ],
+      "block": [
+       28.81,
+       28.81
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 47.0,
+     "pop": 46.0,
+     "block": 54.5,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       47.0,
+       47.0
+      ],
+      "pop": [
+       46.0,
+       46.0
+      ],
+      "block": [
+       54.5,
+       54.5
+      ]
+     }
+    },
+    "pico2": {
+     "push": 20.544,
+     "pop": 17.495,
+     "block": 25.83,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       20.544,
+       20.544
+      ],
+      "pop": [
+       17.489,
+       17.495
+      ],
+      "block": [
+       25.83,
+       25.83
+      ]
+     }
+    }
    }
   },
   {
@@ -9336,6 +14973,134 @@
      "errors": 1641,
      "runs_with_errors": 7
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 76.066,
+     "pop": 54.108,
+     "block": 3.43,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       75.064,
+       76.073
+      ],
+      "pop": [
+       52.105,
+       54.108
+      ],
+      "block": [
+       3.42,
+       3.44
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 100.062,
+     "pop": 78.086,
+     "block": 12.15,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       98.086,
+       100.062
+      ],
+      "pop": [
+       78.086,
+       78.109
+      ],
+      "block": [
+       12.15,
+       12.18
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 73.091,
+     "pop": 54.113,
+     "block": 3.53,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       73.081,
+       73.091
+      ],
+      "pop": [
+       54.113,
+       54.113
+      ],
+      "block": [
+       3.5,
+       3.6
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 54.131,
+     "pop": 47.172,
+     "block": 3.14,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       54.131,
+       54.152
+      ],
+      "pop": [
+       47.154,
+       47.18
+      ],
+      "block": [
+       3.14,
+       3.25
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 96.039,
+     "pop": 83.07,
+     "block": 12.12,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       96.039,
+       96.055
+      ],
+      "pop": [
+       82.086,
+       83.07
+      ],
+      "block": [
+       12.12,
+       12.16
+      ]
+     }
+    },
+    "pico2": {
+     "push": 58.296,
+     "pop": 42.997,
+     "block": 2.85,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       58.296,
+       58.834
+      ],
+      "pop": [
+       42.997,
+       42.998
+      ],
+      "block": [
+       2.85,
+       2.86
+      ]
+     }
+    }
    }
   },
   {
@@ -9561,6 +15326,134 @@
      "runs": 13,
      "errors": 1852,
      "runs_with_errors": 7
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 57.066,
+     "pop": 36.108,
+     "block": 3.15,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       56.065,
+       57.073
+      ],
+      "pop": [
+       34.106,
+       36.108
+      ],
+      "block": [
+       3.14,
+       3.16
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 94.062,
+     "pop": 70.086,
+     "block": 12.07,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       92.086,
+       94.062
+      ],
+      "pop": [
+       70.086,
+       70.109
+      ],
+      "block": [
+       12.07,
+       12.11
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 57.09,
+     "pop": 39.115,
+     "block": 3.19,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       57.081,
+       57.09
+      ],
+      "pop": [
+       39.115,
+       39.115
+      ],
+      "block": [
+       3.19,
+       3.35
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 39.246,
+     "pop": 33.291,
+     "block": 2.92,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       39.129,
+       40.128
+      ],
+      "pop": [
+       33.159,
+       34.163
+      ],
+      "block": [
+       2.92,
+       3.03
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 88.039,
+     "pop": 74.07,
+     "block": 12.0,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       88.031,
+       88.055
+      ],
+      "pop": [
+       73.086,
+       74.07
+      ],
+      "block": [
+       12.0,
+       12.03
+      ]
+     }
+    },
+    "pico2": {
+     "push": 48.307,
+     "pop": 32.902,
+     "block": 2.7,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       48.15,
+       48.762
+      ],
+      "pop": [
+       32.894,
+       32.903
+      ],
+      "block": [
+       2.7,
+       2.7
+      ]
+     }
     }
    }
   },
@@ -9835,6 +15728,182 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 105.601,
+     "pop": 108.044,
+     "block": 3.96,
+     "dma_w": 200.0,
+     "dma_r": 210.25,
+     "range": {
+      "push": [
+       105.589,
+       105.601
+      ],
+      "pop": [
+       108.04,
+       108.051
+      ],
+      "block": [
+       3.93,
+       3.96
+      ],
+      "dma_w": [
+       200.0,
+       200.0
+      ],
+      "dma_r": [
+       210.25,
+       210.25
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 138.5,
+     "pop": 130.566,
+     "block": 12.39,
+     "dma_w": 237.75,
+     "dma_r": 244.75,
+     "range": {
+      "push": [
+       132.016,
+       138.5
+      ],
+      "pop": [
+       129.555,
+       130.566
+      ],
+      "block": [
+       12.38,
+       12.39
+      ],
+      "dma_w": [
+       234.25,
+       237.75
+      ],
+      "dma_r": [
+       244.75,
+       247.0
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 100.592,
+     "pop": 99.55,
+     "block": 4.04,
+     "dma_w": 183.569,
+     "dma_r": 191.302,
+     "range": {
+      "push": [
+       100.592,
+       100.598
+      ],
+      "pop": [
+       99.55,
+       99.555
+      ],
+      "block": [
+       3.97,
+       4.08
+      ],
+      "dma_w": [
+       183.569,
+       183.569
+      ],
+      "dma_r": [
+       191.302,
+       191.315
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 63.02,
+     "pop": 65.155,
+     "block": 3.11,
+     "dma_w": 147.503,
+     "dma_r": 151.763,
+     "range": {
+      "push": [
+       62.776,
+       64.01
+      ],
+      "pop": [
+       65.145,
+       67.129
+      ],
+      "block": [
+       3.1,
+       3.24
+      ],
+      "dma_w": [
+       145.274,
+       147.503
+      ],
+      "dma_r": [
+       147.786,
+       151.763
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 137.512,
+     "pop": 133.543,
+     "block": 12.48,
+     "dma_w": 234.75,
+     "dma_r": 237.5,
+     "range": {
+      "push": [
+       135.012,
+       138.012
+      ],
+      "pop": [
+       133.043,
+       135.535
+      ],
+      "block": [
+       12.44,
+       12.48
+      ],
+      "dma_w": [
+       232.5,
+       236.25
+      ],
+      "dma_r": [
+       237.5,
+       239.75
+      ]
+     }
+    },
+    "pico2": {
+     "push": 82.2,
+     "pop": 85.038,
+     "block": 3.06,
+     "dma_w": 137.0,
+     "dma_r": 141.25,
+     "range": {
+      "push": [
+       82.2,
+       82.435
+      ],
+      "pop": [
+       84.97,
+       85.038
+      ],
+      "block": [
+       3.06,
+       3.06
+      ],
+      "dma_w": [
+       137.0,
+       137.0
+      ],
+      "dma_r": [
+       141.25,
+       141.25
+      ]
+     }
     }
    }
   },
@@ -10317,6 +16386,398 @@
       }
      }
     },
+    "speed2": {
+     "nrf5340dk": {
+      "MPSC": {
+       "push": 37.023,
+       "pop": 27.025,
+       "block": 38.58,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         37.023,
+         37.023
+        ],
+        "pop": [
+         27.025,
+         27.025
+        ],
+        "block": [
+         38.58,
+         38.58
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 37.023,
+       "pop": 27.025,
+       "block": 38.58,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         37.023,
+         37.023
+        ],
+        "pop": [
+         27.025,
+         27.025
+        ],
+        "block": [
+         38.58,
+         38.58
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 37.023,
+       "pop": 27.025,
+       "block": 38.58,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         37.023,
+         37.023
+        ],
+        "pop": [
+         27.025,
+         27.025
+        ],
+        "block": [
+         38.58,
+         38.58
+        ]
+       }
+      }
+     },
+     "nucleo-g0b1re": {
+      "MPSC": {
+       "push": 57.0,
+       "pop": 61.0,
+       "block": 73.94,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         57.0,
+         57.0
+        ],
+        "pop": [
+         61.0,
+         61.0
+        ],
+        "block": [
+         73.94,
+         73.94
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 57.0,
+       "pop": 61.0,
+       "block": 73.94,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         57.0,
+         57.0
+        ],
+        "pop": [
+         61.0,
+         61.0
+        ],
+        "block": [
+         73.94,
+         73.94
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 57.0,
+       "pop": 61.0,
+       "block": 73.94,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         57.0,
+         57.0
+        ],
+        "pop": [
+         61.0,
+         61.0
+        ],
+        "block": [
+         73.94,
+         73.94
+        ]
+       }
+      }
+     },
+     "nucleo-g474re": {
+      "MPSC": {
+       "push": 40.021,
+       "pop": 32.021,
+       "block": 43.91,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         40.021,
+         40.021
+        ],
+        "pop": [
+         32.021,
+         32.021
+        ],
+        "block": [
+         43.91,
+         43.91
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 40.021,
+       "pop": 32.021,
+       "block": 43.91,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         40.021,
+         40.021
+        ],
+        "pop": [
+         32.021,
+         32.021
+        ],
+        "block": [
+         43.91,
+         43.91
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 40.021,
+       "pop": 32.021,
+       "block": 43.91,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         40.021,
+         40.021
+        ],
+        "pop": [
+         32.021,
+         32.021
+        ],
+        "block": [
+         43.91,
+         43.91
+        ]
+       }
+      }
+     },
+     "nucleo-h723zg": {
+      "MPSC": {
+       "push": 48.024,
+       "pop": 44.023,
+       "block": 43.8,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         48.024,
+         48.024
+        ],
+        "pop": [
+         44.023,
+         44.023
+        ],
+        "block": [
+         43.8,
+         43.8
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 48.024,
+       "pop": 44.023,
+       "block": 43.8,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         48.024,
+         48.024
+        ],
+        "pop": [
+         44.023,
+         44.023
+        ],
+        "block": [
+         43.8,
+         43.8
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 48.024,
+       "pop": 44.023,
+       "block": 43.8,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         48.024,
+         48.024
+        ],
+        "pop": [
+         44.023,
+         44.023
+        ],
+        "block": [
+         43.8,
+         43.8
+        ]
+       }
+      }
+     },
+     "sam-d20-xpro": {
+      "MPSC": {
+       "push": 61.0,
+       "pop": 65.0,
+       "block": 71.0,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         61.0,
+         61.0
+        ],
+        "pop": [
+         65.0,
+         65.0
+        ],
+        "block": [
+         71.0,
+         71.0
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 61.0,
+       "pop": 65.0,
+       "block": 71.0,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         61.0,
+         61.0
+        ],
+        "pop": [
+         65.0,
+         65.0
+        ],
+        "block": [
+         71.0,
+         71.0
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 61.0,
+       "pop": 65.0,
+       "block": 71.0,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         61.0,
+         61.0
+        ],
+        "pop": [
+         65.0,
+         65.0
+        ],
+        "block": [
+         71.0,
+         71.0
+        ]
+       }
+      }
+     },
+     "pico2": {
+      "MPSC": {
+       "push": 29.686,
+       "pop": 25.589,
+       "block": 34.33,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         29.686,
+         29.686
+        ],
+        "pop": [
+         25.582,
+         25.589
+        ],
+        "block": [
+         34.33,
+         34.33
+        ]
+       }
+      },
+      "SPMC": {
+       "push": 29.686,
+       "pop": 25.589,
+       "block": 34.33,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         29.686,
+         29.686
+        ],
+        "pop": [
+         25.582,
+         25.589
+        ],
+        "block": [
+         34.33,
+         34.33
+        ]
+       }
+      },
+      "MPMC": {
+       "push": 29.686,
+       "pop": 25.589,
+       "block": 34.33,
+       "dma_w": null,
+       "dma_r": null,
+       "range": {
+        "push": [
+         29.686,
+         29.686
+        ],
+        "pop": [
+         25.582,
+         25.589
+        ],
+        "block": [
+         34.33,
+         34.33
+        ]
+       }
+      }
+     }
+    },
     "other_code": false
    },
    "contract": {
@@ -10536,6 +16997,134 @@
      "runs": 13,
      "errors": 1757722,
      "runs_with_errors": 13
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 37.023,
+     "pop": 27.025,
+     "block": 38.58,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       37.023,
+       37.023
+      ],
+      "pop": [
+       27.025,
+       27.025
+      ],
+      "block": [
+       38.58,
+       38.58
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 57.0,
+     "pop": 61.0,
+     "block": 73.94,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       57.0,
+       57.0
+      ],
+      "pop": [
+       61.0,
+       61.0
+      ],
+      "block": [
+       73.94,
+       73.94
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 40.021,
+     "pop": 32.021,
+     "block": 43.91,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       40.021,
+       40.021
+      ],
+      "pop": [
+       32.021,
+       32.021
+      ],
+      "block": [
+       43.91,
+       43.91
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 48.024,
+     "pop": 44.023,
+     "block": 43.8,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       48.024,
+       48.024
+      ],
+      "pop": [
+       44.023,
+       44.023
+      ],
+      "block": [
+       43.8,
+       43.8
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 61.0,
+     "pop": 65.0,
+     "block": 71.0,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       61.0,
+       61.0
+      ],
+      "pop": [
+       65.0,
+       65.0
+      ],
+      "block": [
+       71.0,
+       71.0
+      ]
+     }
+    },
+    "pico2": {
+     "push": 29.686,
+     "pop": 25.589,
+     "block": 34.33,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       29.686,
+       29.686
+      ],
+      "pop": [
+       25.582,
+       25.589
+      ],
+      "block": [
+       34.33,
+       34.33
+      ]
+     }
     }
    }
   },
@@ -10768,6 +17357,134 @@
      "runs": 13,
      "errors": 1420595,
      "runs_with_errors": 13
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 22.019,
+     "pop": 22.019,
+     "block": 28.58,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       22.019,
+       22.019
+      ],
+      "pop": [
+       22.019,
+       22.019
+      ],
+      "block": [
+       28.58,
+       28.58
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 41.0,
+     "pop": 41.0,
+     "block": 55.94,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       41.0,
+       41.0
+      ],
+      "pop": [
+       41.0,
+       41.0
+      ],
+      "block": [
+       55.94,
+       55.94
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 29.015,
+     "pop": 25.014,
+     "block": 33.41,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       29.015,
+       29.015
+      ],
+      "pop": [
+       25.014,
+       25.014
+      ],
+      "block": [
+       33.41,
+       33.41
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 19.037,
+     "pop": 18.017,
+     "block": 16.44,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       19.037,
+       19.037
+      ],
+      "pop": [
+       18.017,
+       18.017
+      ],
+      "block": [
+       16.44,
+       16.44
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 43.0,
+     "pop": 40.001,
+     "block": 50.49,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       43.0,
+       43.0
+      ],
+      "pop": [
+       40.001,
+       40.001
+      ],
+      "block": [
+       50.49,
+       50.49
+      ]
+     }
+    },
+    "pico2": {
+     "push": 18.493,
+     "pop": 20.487,
+     "block": 26.33,
+     "dma_w": null,
+     "dma_r": null,
+     "range": {
+      "push": [
+       18.493,
+       18.493
+      ],
+      "pop": [
+       20.487,
+       20.492
+      ],
+      "block": [
+       26.33,
+       26.33
+      ]
+     }
     }
    }
   },
@@ -11043,6 +17760,182 @@
      "errors": 0,
      "runs_with_errors": 0
     }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 76.047,
+     "pop": 71.048,
+     "block": 3.08,
+     "dma_w": 82.309,
+     "dma_r": 92.033,
+     "range": {
+      "push": [
+       76.047,
+       76.047
+      ],
+      "pop": [
+       71.048,
+       71.048
+      ],
+      "block": [
+       3.08,
+       3.08
+      ],
+      "dma_w": [
+       82.309,
+       82.309
+      ],
+      "dma_r": [
+       92.033,
+       92.033
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 115.477,
+     "pop": 104.551,
+     "block": 10.5,
+     "dma_w": 137.365,
+     "dma_r": 136.152,
+     "range": {
+      "push": [
+       115.477,
+       115.477
+      ],
+      "pop": [
+       104.551,
+       104.551
+      ],
+      "block": [
+       10.5,
+       10.5
+      ],
+      "dma_w": [
+       137.365,
+       137.365
+      ],
+      "dma_r": [
+       136.152,
+       136.152
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 79.062,
+     "pop": 73.537,
+     "block": 3.15,
+     "dma_w": 89.342,
+     "dma_r": 92.333,
+     "range": {
+      "push": [
+       79.062,
+       79.062
+      ],
+      "pop": [
+       73.537,
+       73.537
+      ],
+      "block": [
+       3.15,
+       3.15
+      ],
+      "dma_w": [
+       89.342,
+       89.342
+      ],
+      "dma_r": [
+       92.333,
+       92.333
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 42.197,
+     "pop": 40.206,
+     "block": 2.86,
+     "dma_w": 68.94,
+     "dma_r": 69.672,
+     "range": {
+      "push": [
+       42.197,
+       42.197
+      ],
+      "pop": [
+       40.206,
+       40.206
+      ],
+      "block": [
+       2.85,
+       2.86
+      ],
+      "dma_w": [
+       68.94,
+       68.94
+      ],
+      "dma_r": [
+       69.672,
+       69.672
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 115.461,
+     "pop": 106.527,
+     "block": 10.5,
+     "dma_w": 130.893,
+     "dma_r": 130.664,
+     "range": {
+      "push": [
+       115.461,
+       115.461
+      ],
+      "pop": [
+       106.527,
+       106.527
+      ],
+      "block": [
+       10.5,
+       10.5
+      ],
+      "dma_w": [
+       130.893,
+       130.893
+      ],
+      "dma_r": [
+       130.664,
+       130.908
+      ]
+     }
+    },
+    "pico2": {
+     "push": 64.442,
+     "pop": 62.087,
+     "block": 2.71,
+     "dma_w": 64.844,
+     "dma_r": 68.584,
+     "range": {
+      "push": [
+       64.442,
+       64.442
+      ],
+      "pop": [
+       62.083,
+       62.087
+      ],
+      "block": [
+       2.71,
+       2.71
+      ],
+      "dma_w": [
+       64.844,
+       64.844
+      ],
+      "dma_r": [
+       68.584,
+       68.584
+      ]
+     }
+    }
    }
   },
   {
@@ -11316,6 +18209,182 @@
      "runs": 13,
      "errors": 0,
      "runs_with_errors": 0
+    }
+   },
+   "speed2": {
+    "nrf5340dk": {
+     "push": 87.55,
+     "pop": 89.544,
+     "block": 3.43,
+     "dma_w": 94.025,
+     "dma_r": 103.002,
+     "range": {
+      "push": [
+       87.55,
+       87.55
+      ],
+      "pop": [
+       89.544,
+       89.544
+      ],
+      "block": [
+       3.43,
+       3.43
+      ],
+      "dma_w": [
+       94.025,
+       94.025
+      ],
+      "dma_r": [
+       103.002,
+       103.002
+      ]
+     }
+    },
+    "nucleo-g0b1re": {
+     "push": 129.477,
+     "pop": 117.039,
+     "block": 11.12,
+     "dma_w": 154.822,
+     "dma_r": 155.098,
+     "range": {
+      "push": [
+       129.477,
+       129.477
+      ],
+      "pop": [
+       117.039,
+       117.039
+      ],
+      "block": [
+       11.12,
+       11.12
+      ],
+      "dma_w": [
+       154.822,
+       154.822
+      ],
+      "dma_r": [
+       155.098,
+       155.098
+      ]
+     }
+    },
+    "nucleo-g474re": {
+     "push": 86.058,
+     "pop": 83.044,
+     "block": 3.39,
+     "dma_w": 105.548,
+     "dma_r": 108.545,
+     "range": {
+      "push": [
+       86.058,
+       86.058
+      ],
+      "pop": [
+       83.044,
+       83.044
+      ],
+      "block": [
+       3.39,
+       3.39
+      ],
+      "dma_w": [
+       105.548,
+       105.548
+      ],
+      "dma_r": [
+       108.545,
+       108.545
+      ]
+     }
+    },
+    "nucleo-h723zg": {
+     "push": 60.717,
+     "pop": 58.23,
+     "block": 3.05,
+     "dma_w": 88.369,
+     "dma_r": 91.623,
+     "range": {
+      "push": [
+       60.717,
+       60.717
+      ],
+      "pop": [
+       58.23,
+       58.23
+      ],
+      "block": [
+       3.05,
+       3.05
+      ],
+      "dma_w": [
+       88.369,
+       88.369
+      ],
+      "dma_r": [
+       91.623,
+       91.623
+      ]
+     }
+    },
+    "sam-d20-xpro": {
+     "push": 130.965,
+     "pop": 122.52,
+     "block": 11.24,
+     "dma_w": 154.334,
+     "dma_r": 153.105,
+     "range": {
+      "push": [
+       130.965,
+       130.965
+      ],
+      "pop": [
+       122.52,
+       122.52
+      ],
+      "block": [
+       11.24,
+       11.24
+      ],
+      "dma_w": [
+       154.334,
+       154.334
+      ],
+      "dma_r": [
+       153.105,
+       153.105
+      ]
+     }
+    },
+    "pico2": {
+     "push": 72.04,
+     "pop": 72.721,
+     "block": 2.91,
+     "dma_w": 76.561,
+     "dma_r": 79.553,
+     "range": {
+      "push": [
+       72.04,
+       72.04
+      ],
+      "pop": [
+       72.717,
+       72.721
+      ],
+      "block": [
+       2.91,
+       2.91
+      ],
+      "dma_w": [
+       76.561,
+       76.561
+      ],
+      "dma_r": [
+       79.553,
+       79.553
+      ]
+     }
     }
    }
   }

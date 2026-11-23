@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Version 2 of the benchmark gives every configuration a firmware image of its own (plan, DECISIONS 2026-11-22). This is its first full run: six boards, every ...">
+<link rel="canonical" href="https://verified-libs.org/report-2026-11-23-bench-v2-first-run.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Benchmark version 2: the first full run (2026-11-23) - verified-libs">
+<meta property="og:description" content="Version 2 of the benchmark gives every configuration a firmware image of its own (plan, DECISIONS 2026-11-22). This is its first full run: six boards, every ...">
+<meta property="og:url" content="https://verified-libs.org/report-2026-11-23-bench-v2-first-run.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Benchmark version 2: the first full run (2026-11-23) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="results.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="benchmark-version-2-the-first-full-run-2026-11-23">Benchmark version 2: the first full run (2026-11-23)</h1>
+<p>Version 2 of the benchmark gives every configuration a firmware image of
+its own (<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-22-bench-image-per-library.md">plan</a>,
+DECISIONS 2026-11-22). This is its first full run: six boards, every
+configuration at eight placements, two passes, from the build at
+<code>f2348f3a0c37</code>. It started 2026-11-23 05:49 UTC and the last board ended
+07:58. Nothing of it is published; version 1's numbers are the ones on the
+site.</p>
+<h2 id="result">Result</h2>
+<ul>
+<li><strong>263 records</strong> (<code>records/bench-v2/&lt;board&gt;/&lt;adapter&gt;.json</code>), each with
+  eight images and two runs of each: 4208 runs, none without a run file.</li>
+<li><strong>Every record was rebuilt</strong> from its commit in the toolchain image it
+  names, with no board: the bytes in flash, the address, the fixed part and
+  the boot stub of all 2104 images are the same (<code>oneverify.sh</code>, 263 of
+  263).</li>
+<li><strong>The two passes agree.</strong> Of 45 216 means measured in both passes, one
+  differs: 221.400 against 221.249 cycles (one configuration, one
+  placement, blocks of 4 bytes, on the Pico 2). All others are the same to
+  the last digit.</li>
+<li><strong>The baseline</strong> (the same code at the same place in every image of a
+  board) gave the same 20 numbers in every run on five boards. On the
+  NUCLEO-H723ZG one of the 20 has two values, 10.014 and 10.024 cycles:
+  the first of its 1024 calls takes 35 cycles in the images of two
+  configurations, in both passes.</li>
+<li><strong>26 flash writes</strong>, as counted before the run.</li>
+</ul>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Bundles</th>
+<th>Flash writes</th>
+<th>Runs</th>
+<th>Records</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>4</td>
+<td>3</td>
+<td>720</td>
+<td>45</td>
+<td>56 min</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>6</td>
+<td>5</td>
+<td>688</td>
+<td>43</td>
+<td>72 min</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>6</td>
+<td>5</td>
+<td>704</td>
+<td>44</td>
+<td>45 min</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>3</td>
+<td>2</td>
+<td>704</td>
+<td>44</td>
+<td>79 min</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>12</td>
+<td>11</td>
+<td>688</td>
+<td>43</td>
+<td>73 min</td>
+</tr>
+<tr>
+<td>Raspberry Pi Pico 2 H</td>
+<td>1</td>
+<td>0</td>
+<td>704</td>
+<td>44</td>
+<td>129 min</td>
+</tr>
+</tbody>
+</table></div>
+<p>The times of the G0B1 and the SAM D20 include about 25 min in which their
+run stood still (below).</p>
+<h2 id="against-version-1">Against version 1</h2>
+<p>Push, pop and block of the 37 or 38 configurations of the comparison page,
+version 1 at placement 0 against version 2 at placement 0. "Ranges
+overlap": the lowest-to-highest ranges over the eight placements of the two
+versions share a value.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Numbers</th>
+<th>The same</th>
+<th>Ranges overlap</th>
+<th>Median of v2 / v1</th>
+<th>Lowest to highest ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>114</td>
+<td>58</td>
+<td>80</td>
+<td>1.000</td>
+<td>0.75 to 1.01</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>111</td>
+<td>99</td>
+<td>111</td>
+<td>1.000</td>
+<td>0.98 to 1.02</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>111</td>
+<td>76</td>
+<td>103</td>
+<td>1.000</td>
+<td>0.80 to 1.01</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>111</td>
+<td>8</td>
+<td>16</td>
+<td>0.865</td>
+<td>0.60 to 1.15</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>111</td>
+<td>70</td>
+<td>109</td>
+<td>1.000</td>
+<td>0.95 to 1.02</td>
+</tr>
+<tr>
+<td>Raspberry Pi Pico 2 H</td>
+<td>111</td>
+<td>61</td>
+<td>94</td>
+<td>1.000</td>
+<td>0.30 to 1.02</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>On the cores without a cache or branch predictor (G0B1, SAM D20, G474)
+  the two versions give the same numbers, or numbers inside each other's
+  placement ranges, for nearly every configuration. Where version 1 had a
+  wide range (embassy-sync Pipe and the block copies on the G474), version
+  2 sits at its fast end and no longer moves.</li>
+<li>In version 2 the ranges are narrow: a configuration's image moved by 4
+  to 28 bytes mostly measures the same.</li>
+<li><strong>NUCLEO-H723ZG (Cortex-M7): version 2 is lower for 32 of 37
+  configurations</strong>, by 3 to 17 cycles per push or pop, mostly whole cycles, with
+  the cache on and with it off (lwrb push: 49 to 38 with the cache on, 142
+  to 100 with it off). The baseline is the same in both versions, and so
+  are four configurations (pxq, jnk0le, two of ETL).
+  One is higher (FreeRTOS stream buffer, 206 to 221). <strong>The cause is the
+  distance between a call and the code it calls</strong> (next section): on this
+  core a call to code about 4 KB or more away costs 6 to 10 cycles more
+  than a call to code nearby. In version 1 a library lay about 14 KB from
+  its adapter; in version 2 it lies right behind it.</li>
+<li><strong>Pico 2: one number moved by a factor of three</strong>: pxq's 64-byte block,
+  8.27 cycles per byte in version 1 (7.82 to 9.78 over the placements),
+  2.51 in version 2 at every placement. Every other number on this board
+  is within 2 %. pxq is the project owner's library, so this one is not to
+  be shown before its cause is known. <strong>The cause is very likely where the
+  code lay in the one image of version 1</strong> (next section): two other
+  images of version 1, from the same commit, measured 2.51 as well.</li>
+<li>nRF5340: TinyUSB tu_fifo is 25 % (push) and 17 % (pop) lower in version
+  2; in version 1 it had the widest placement range on this board.</li>
+</ul>
+<h2 id="the-two-differences-from-version-1-looked-into-2026-11-23-evening">The two differences from version 1, looked into (2026-11-23, evening)</h2>
+<h3 id="nucleo-h723zg-a-far-call-costs-6-to-10-cycles">NUCLEO-H723ZG: a far call costs 6 to 10 cycles</h3>
+<p>What was compared first, without the board: the image of version 1,
+rebuilt from its record, and the images of version 2. The machine code of
+the adapters and the libraries is the same instruction for instruction, the
+stack starts at the same address, and both versions are stable when the
+code moves by 4 to 28 bytes. What differs is the distance: in version 1
+the adapters lie behind the harness and the libraries about 14 KB further
+on (lwrb: the call from the adapter to <code>lwrb_write_byte</code> spans 14 812
+bytes); in version 2 the library lies right behind its adapter (96 bytes).
+The configurations with no difference between the versions are the ones
+whose adapter lay near the harness in version 1 and calls nothing else.</p>
+<p>Then on the board: 16 images of version 2 with the library moved away from
+its adapter by a chosen number of bytes ("placement"; the layout mode of
+<code>onebundle.py</code>), everything else byte for byte the same, the fixed part
+the one of the records. Two passes, 32 runs, every number the same in both
+passes, baseline 10.014/9.02 in every run. Cycles per call, single push /
+pop:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Library moved by</th>
+<th>Cache on</th>
+<th>Cache off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lwrb</td>
+<td>0, 256, 384, 448, 512, 1024, 2048 bytes</td>
+<td>38.04 / 34.03</td>
+<td>100.0 / 100.0</td>
+</tr>
+<tr>
+<td>lwrb</td>
+<td>4096</td>
+<td>47.04 / 44.03</td>
+<td>140.0 / 126.0</td>
+</tr>
+<tr>
+<td>lwrb</td>
+<td>8192</td>
+<td>47.04 / 44.03</td>
+<td>140.0 / 126.0</td>
+</tr>
+<tr>
+<td>lwrb</td>
+<td>14 716 (the distance of version 1)</td>
+<td>47.04 / 44.03</td>
+<td>139.0 / 128.0</td>
+</tr>
+<tr>
+<td>AndersKaloer</td>
+<td>0, 448</td>
+<td>26.05 / 20.04</td>
+<td>90.1 / 87.0</td>
+</tr>
+<tr>
+<td>AndersKaloer</td>
+<td>15 396 (the distance of version 1)</td>
+<td>33.06 / 27.04</td>
+<td>120.0 / 111.0</td>
+</tr>
+<tr>
+<td>Contiki-NG</td>
+<td>0</td>
+<td>25.05 / 21.03</td>
+<td>85.0 / 87.0</td>
+</tr>
+<tr>
+<td>Contiki-NG</td>
+<td>4096</td>
+<td>33.05 / 27.03</td>
+<td>126.0 / 112.0</td>
+</tr>
+<tr>
+<td>Contiki-NG</td>
+<td>14 296 (the distance of version 1)</td>
+<td>33.05 / 28.03</td>
+<td>126.0 / 94.0</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>The step lies between 2048 and 4096 bytes and is the same from there
+  on: 6 to 10 cycles per call with the cache on, mostly 24 to 41 with it
+  off.</li>
+<li>It is not a 4 KB page boundary: at 448 bytes the library function
+  starts in the next 4 KB of flash and nothing changes.</li>
+<li>lwrb at the distance of version 1 gives 47.04; version 1 measured 47 to
+  49 over its placements. AndersKaloer: 33.06, version 1 33. So the
+  distance explains the difference where the adapter lay near the harness.
+  Contiki-NG gives 33.05 where version 1 had 38.56: in version 1 its
+  adapter lay 4.6 KB from the harness as well, a second far call, which
+  this experiment does not make.</li>
+<li>Contiki-NG's 64-byte block, which is 64 calls of one byte: 1492 to 2004
+  cycles, 8 per call.</li>
+<li>Why a far call costs more on this core was not looked into (the branch
+  predictor of the Cortex-M7 is the first suspect). The other five boards
+  show nothing like it.</li>
+<li>FreeRTOS stream buffer, the one configuration that is higher in version
+  2, is the one whose numbers follow the placement in version 2 (221 and
+  193 at alternate placements; version 1: 206). Not looked into further.</li>
+</ul>
+<p>What it means for the numbers: on the Cortex-M7 version 2 measures a
+library that lies next to its caller. In an application the library lies
+where the linker puts it, and each call across more than a few KB costs
+the 6 to 10 cycles more that version 1 happened to include, once or twice
+per operation depending on the library. Both are true numbers of the same
+code. This is one more part of "the number is the best case" (DECISIONS
+2026-11-22, point 4), and whether the page should show the far number
+beside the near one on this core is for the owner to decide.</p>
+<p>Cost: one flash write on the NUCLEO-H723ZG. The board now holds the
+experiment's images, not bundle 2 of the series (which is written again
+with the next run there, one write). Run files: lab host,
+<code>~/lab-runs/h7dist-20261123</code>. The layout:</p>
+<pre><code>adapter_lwrb 0 0x8001000 8192
+adapter_lwrb 256 0x8003000 8192
+adapter_lwrb 384 0x8005000 8192
+adapter_lwrb 448 0x8007000 8192
+adapter_lwrb 512 0x8009000 8192
+adapter_lwrb 1024 0x800b000 8192
+adapter_lwrb 2048 0x800d000 8192
+adapter_lwrb 4096 0x800f000 12288
+adapter_lwrb 8192 0x8012000 16384
+adapter_lwrb 14716 0x8016000 20480
+adapter_anders 0 0x801b000 8192
+adapter_anders 448 0x801d000 8192
+adapter_anders 15396 0x801f000 20480
+adapter_contiki 0 0x8024000 8192
+adapter_contiki 4096 0x8026000 12288
+adapter_contiki 14296 0x8029000 20480
+</code></pre>
+<h3 id="pico-2-pxqs-64-byte-block">Pico 2: pxq's 64-byte block</h3>
+<p>No board was used for this one, and no experiment was made for pxq alone.</p>
+<p>Version 1 measured this configuration in three images on 2026-11-22, all
+from the same commit: the image with the single-context and SPSC
+configurations (the one the page's number comes from), the image with the
+modes for more producers or consumers, and the image with the Rust
+libraries. The 64-byte block, cycles per call, write / read:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Image of version 1</th>
+<th>Placement 0</th>
+<th>Over the eight placements</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SPSC set</td>
+<td>742 / 316</td>
+<td>688 to 886 / 313 to 371</td>
+</tr>
+<tr>
+<td>MP set</td>
+<td>167 / 154</td>
+<td>the same at all eight</td>
+</tr>
+<tr>
+<td>Rust set</td>
+<td>167 / 154</td>
+<td>the same at all eight</td>
+</tr>
+<tr>
+<td>Version 2</td>
+<td>167 / 154</td>
+<td>the same at all eight</td>
+</tr>
+</tbody>
+</table></div>
+<p>So version 1 itself has the number of version 2, twice, and the page's
+8.27 per byte is (742 + 316) / 128 from the one image that differs. The
+machine code of the block functions is the same in the three images
+(rebuilt from the records); their addresses are not:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>SPSC set</th>
+<th>MP set</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timed</code> and <code>stat_add</code> (harness, between the timed calls)</td>
+<td>0x10000120 to 0x1000019f</td>
+<td>the same</td>
+</tr>
+<tr>
+<td>pxq <code>push_n</code></td>
+<td>0x10004130 to 0x100041b5</td>
+<td>0x10001248 to 0x100012cd</td>
+</tr>
+<tr>
+<td>pxq <code>pop_n</code></td>
+<td>0x100041b6 to 0x1000423f</td>
+<td>0x100012ce to 0x10001357</td>
+</tr>
+<tr>
+<td><code>memcpy</code></td>
+<td>0x10006108 to 0x100061f3</td>
+<td>0x10001924 to 0x10001a0f</td>
+</tr>
+</tbody>
+</table></div>
+<p>The RP2350 runs its code from external flash through a cache that is, by
+its datasheet, 16 KB and two-way: code 8 KB apart competes for the same
+two places. In the SPSC image <code>push_n</code>, <code>memcpy</code> and the harness code that
+runs between two timed calls lie 16 KB and 24 KB apart, at the same
+offsets (0x130 to 0x19f): three users of two places, so every timed call
+has to fetch some of its code from the flash again. <code>pop_n</code> shares less
+of that range, and its number is less raised. In the MP image, and in
+every image of version 2 (they are smaller than 8 KB behind the harness),
+no three of them meet. That fits in direction and in size, but it is a
+reading of the addresses, not an experiment.</p>
+<p>What it means: the 8.27 of version 1 is a number of where the code lay in
+one image, not of the library; the same holds for any code on this board
+once an image is larger than the cache's 8 KB per way, and version 2
+cannot show it. For the page, the number of version 2 has the same
+footing as every other number there.</p>
+<h2 id="what-went-wrong">What went wrong</h2>
+<ul>
+<li>The runner stopped on the G0B1 and the SAM D20 at a configuration that
+  has no numbers on a Cortex-M0+ (DNedic lockfree mpmc::Queue: no
+  compare-and-swap): its log line could not print them. The run file was
+  written first. The bundle was run again whole without that
+  configuration and without a flash write. These two boards have 43
+  records, and none for that configuration.</li>
+<li>On the Pico 2 six configurations were not finished 3 s after the reset;
+  the runner then doubles the wait for all images of such a configuration,
+  up to 48 s. The numbers are the same as with a 6 s wait the day before.</li>
+<li>The smoke test before the run tried the first two images of a bundle,
+  not one image of every configuration, and so did not meet the first
+  point.</li>
+</ul>
+<h2 id="what-a-record-of-version-2-holds">What a record of version 2 holds</h2>
+<p><code>bench_commit</code>, the toolchain image and its contents, the pinned library
+commits, the checksums of the fixed part and the boot stub, and per
+placement the image's address, size and checksums and every run of it
+(time, pass, wait, all scenarios with the cache on and off, and the
+baseline measured in the same run). <code>lab/tools/verify-build.sh</code> rebuilds
+the images of a record and compares them.</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

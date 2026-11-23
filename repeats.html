@@ -53,17 +53,19 @@ not.</p>
 cable of the board's own debug probe. Then, in a clone of the
 <a href="https://github.com/verified-libs/verified-libs/blob/main/README.md">repository</a>:</p>
 <pre><code class="language-sh">./repeat.sh --check     # tools, toolchain image and board
-./repeat.sh             # 15-25 minutes; --level full: 1-2 hours
+./repeat.sh             # 15-25 minutes; --level full: 2-4 hours
 </code></pre>
 <p><code>repeat.sh</code> builds the firmware we ran, byte for byte, runs it on your
 board, compares your results with ours and packs everything into one
 archive. Mail the archive to contact@verified-libs.org. The details are on
 <a href="reproduce.html">Reproduce</a>.</p>
-<p>Each test writes the board's flash once. Nothing else on the board is
-changed.</p>
+<p>The quick level writes the board's flash three times (one benchmark bundle,
+two stress tests); the full level once per stress mode and once per
+benchmark bundle of the board (2 to 18, listed on Reproduce). Nothing else
+on the board is changed.</p>
 <h2 id="what-happens-with-your-result">What happens with your result</h2>
 <ul>
-<li>We check that the firmware is the one we ran (<code>fw_sha256</code>) and compare
+<li>We check that the firmware is the one we ran (its checksums) and compare
   your numbers and stress verdicts with ours, the same way <code>repeat.sh</code> did.</li>
 <li>With your consent, it is listed below, under the name or handle you choose,
   or anonymously, and the archive goes into the repository.</li>

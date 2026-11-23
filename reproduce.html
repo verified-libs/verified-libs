@@ -79,14 +79,24 @@ and each level needs less trust in us than the one before.</p>
 <pre><code class="language-sh">podman build -t verified-libs/toolchain:2026-11-05 -f toolchain/Containerfile toolchain
 # records that name image 2026-11-13 (Rust and multi-producer sets, stress tests)
 # need the second image too: toolchain/README.md, &quot;2026-11-13&quot;
-lab/tools/verify-build.sh records/bench/stm32g474-rb-bench-flash-*.json
+lab/tools/verify-build.sh records/stress/stm32g474-rb-stress-*.json
+# the speed benchmark: one record per board and configuration, eight images each
+bash firmware/nrf5340-rb-bench/oneverify.sh records/bench-v2/stm32g474/*.json
 </code></pre>
 <p><code>verify-build.sh</code> takes the source of the record's commit, builds the
 firmware with the record's settings in the image the record names, and
 compares the SHA-256 of the result with the record's <code>fw_sha256</code>. It prints
 <code>MATCH</code> or <code>DIFFERS</code> per record. It never touches a board: the build steps
 are those of the lab's own run script, which is stopped before its first
-probe access.</p>
+probe access. <code>oneverify.sh</code> does the same for the records of the speed
+benchmark: it builds every image of the board and compares, per record, the
+bytes in flash of its eight images (<code>image_sha256</code>), the fixed part and the
+boot stub. It takes about two minutes per board, the first one longer
+(the pinned libraries are fetched). The images of the nRF5340 DK include
+one of Nordic's nRF5 SDK, which we may not redistribute: download the zip
+that <code>firmware/nrf5340-rb-bench/nrf5-sdk.lock</code> names and give it as
+<code>NRF5_SDK=path/to/the/zip</code> in front of the command. The other five boards
+need nothing but the tree and the image.</p>
 <p>A tree without git history (the public repository, a release archive)
 carries its commit in the file <code>EXPORTED_FROM</code>. The records are committed
 after the commit they were made at, so they name an earlier one: the file
@@ -106,20 +116,31 @@ probe and its serial port are all the tests need (the Pico 2 through the
 Raspberry Pi Debug Probe), no extra probe. Then, in a clone of the
 repository:</p>
 <pre><code class="language-sh">./repeat.sh --check            # the tools, the image and the board
-./repeat.sh                    # quick: the benchmark and two stress modes, 15-25 minutes
-./repeat.sh --level full       # every benchmark set and stress mode, 1-2 hours
+./repeat.sh                    # quick: a few benchmark configurations and two stress modes, 15-25 minutes
+./repeat.sh --level full       # every benchmark configuration, twice, and every stress mode, 2-4 hours
 </code></pre>
 <p><code>repeat.sh</code> recognises the board by its probe's USB identity (with several
-connected, choose one with <code>--board</code>). For each test it takes the source at
-the commit of our record of that test, so the firmware that runs on your
-board is byte for byte the one we ran, builds it in the toolchain image,
-runs it, compares your record with ours (the benchmark mean by mean, the
-stress test library by library against our night campaign) and packs
-everything, with the probe's firmware version, into one archive to send us
-(below). It needs Linux, git, Podman, <code>jq</code>, Python 3,
-<code>probe-rs</code> 0.32 with its udev rules (OpenOCD 0.12 for the SAM D20 Xplained
-Pro) and the toolchain image (<code>./repeat.sh --build-image</code> builds it, about
-an hour). Each test writes the board's flash once.</p>
+connected, choose one with <code>--board</code>). For each stress test it takes the
+source at the commit of our record of that test; the benchmark it builds
+from the tree as it is, which builds the images of our records byte for
+byte (level 1 checks that). So the firmware that runs on your board is the
+one we ran. It builds in the toolchain image, runs, compares your record
+with ours (the benchmark image by image and mean by mean, the stress test
+library by library against our night campaign) and packs everything, with
+the probe's firmware version, into one archive to send us (below). It needs
+Linux, git, Podman, <code>jq</code>, Python 3, <code>probe-rs</code> 0.32 with its udev rules
+(OpenOCD 0.12 for the SAM D20 Xplained Pro) and the toolchain image
+(<code>./repeat.sh --build-image</code> builds it, about an hour).</p>
+<p>Flash writes: each stress test writes the board's flash once. The benchmark
+has one image per configuration and placement, packed into bundles that
+fill the flash; one bundle is one flash write. The quick level runs up to
+six configurations of one bundle (one write), the full level every bundle
+of the board (nRF5340 DK 5, NUCLEO-G0B1RE 9, NUCLEO-G474RE 9, NUCLEO-H723ZG
+5, SAM D20 Xplained Pro 18, Pico 2 2). <code>--only bench</code> or <code>--only stress</code>
+runs one of the two. For the nRF5340 DK the benchmark also needs Nordic's
+nRF5 SDK zip, which we may not redistribute:
+<code>--nrf5-sdk PATH</code> (<code>firmware/nrf5340-rb-bench/nrf5-sdk.lock</code> names the file
+and its checksum).</p>
 <p>Only these six board models give numbers that can be compared with ours:
 the counts are cycles of a particular core, flash and bus. Results from other
 boards are welcome too (below), but as a board of their own.</p>
@@ -127,18 +148,24 @@ boards are welcome too (below), but as a board of their own.</p>
 <p>The boards are listed under <a href="method.html">Method</a>. You need
 the board, <code>probe-rs</code> 0.32 (OpenOCD 0.12 for the SAM D20 Xplained Pro), <code>jq</code>
 and the toolchain image.</p>
-<pre><code class="language-sh">git checkout &lt;the record's commit&gt;
-cd firmware/nrf5340-rb-bench
-BOARD=stm32g474 OUTDIR=$HOME/my-runs bash run.sh flash      # about 3 minutes
+<pre><code class="language-sh">cd firmware/nrf5340-rb-bench
+BUNDLE=0 bash onebuild.sh table stm32g474            # the images of bundle 0 (fetches the pinned libraries, once)
+python3 run-one.py stm32g474 $HOME/my-runs/g474 --bundle 0 --flash --passes 1 \
+    --adapter adapter_lwrb,adapter_jnk0le            # one flash write, 16 runs, about 2 minutes
+python3 onerecords.py --out $HOME/my-records $HOME/my-runs/g474
 cd ../..
-lab/tools/compare-records.py records/bench/stm32g474-rb-bench-flash-&lt;time&gt;.json \
-    $HOME/my-runs/stm32g474-rb-bench-flash-&lt;time&gt;.json
+lab/tools/compare-records.py records/bench-v2/stm32g474 $HOME/my-records/stm32g474
 </code></pre>
-<p>With more than one probe connected, set <code>PROBE=VID:PID:SERIAL</code>. <code>BOARD</code> is
+<p>With more than one probe connected, set <code>PROBE=VID:PID:SERIAL</code>. The board is
 one of <code>nrf5340</code>, <code>stm32g0b1</code>, <code>stm32g474</code>, <code>stm32h723</code>, <code>samd20</code>, <code>rp2350</code>.
-<code>SET=rust</code> and <code>SET=mp</code> run the other two benchmark sets.</p>
-<p><strong>Benchmark.</strong> <code>compare-records.py</code> first says whether the two firmwares are
-the same (<code>fw_sha256</code>), then compares every mean. The counts are cycles of
+Without <code>BUNDLE</code> and <code>--bundle</code> every bundle of the board is built and run;
+without <code>--adapter</code> every configuration of the bundles. The eight placements
+of a configuration can lie in two bundles; <code>onerecords.py</code> makes a record
+only of a whole configuration and names those it leaves out. Our records
+hold two passes (<code>--passes 2</code>).</p>
+<p><strong>Benchmark.</strong> <code>compare-records.py</code> first says, image by image, whether your
+firmware is the same as ours (the bytes in flash and the address), then
+compares every mean of every placement. The counts are cycles of
 the core, so your board's clock does not enter. In our lab the same firmware
 on the same board gives the same means run after run, so the tolerance is
 1 % (<code>--tol</code> changes it). We have one specimen of each board; whether a
