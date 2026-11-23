@@ -13,6 +13,9 @@
   var PERMISSIVE = /^(MIT|BSD-2-Clause|BSD-3-Clause|Apache-2\.0|CC0-1\.0)$/;
   var FLAGS = ["clean", "permissive", "block", "zc", "genmc", "contract", "nounsafe", "nosingle"];
   var TOPOS = ["SPSC", "MPSC", "SPMC", "MPMC"];
+  // Benchmark version 2 (one image per configuration) is shown for every board the data has it for;
+  // version 1 (all libraries in one image) is archived and only shown for a board without version 2.
+  var HAS2 = D.boards.some(function (b) { return !!b.bench2; });
   var st = { board: D.boards[0].id, w: { push: 0, pop: 0, block: 0, dma: 0 }, f: { nosingle: true }, lang: "", topo: "", cores: "", sort: "name", dir: 1 };
 
   function $(id) { return document.getElementById(id); }
@@ -72,11 +75,14 @@
   function mpMode() { return st.topo && st.topo !== "SPSC" ? st.topo : ""; }
   // The one-core contract check of the chosen producer/consumer mode (verify/contract).
   function contractOf(l) { return l.contract ? l.contract[mpMode() || "SPSC"] : null; }
+  function two() {
+    return D.boards.some(function (b) { return b.id === st.board && !!b.bench2; });
+  }
   function speedOf(l) {
-    var mode = mpMode();
-    if (!mode) return l.speed[st.board];
+    var mode = mpMode(), key = two() ? "speed2" : "speed";
+    if (!mode) return (l[key] || {})[st.board] || null;
     if (!l.mp || l.mp.modes.indexOf(mode) < 0) return null;
-    return (l.mp.speed[st.board] || {})[mode] || null;
+    return ((l.mp[key] || {})[st.board] || {})[mode] || null;
   }
 
   // Flash and RAM the configuration adds on the chosen board (of the chosen mode), or null.
@@ -259,6 +265,12 @@
         "(one caller at a time), and compared among these libraries only; the ISR stress columns are still the SPSC test" : "");
     var b = D.boards.filter(function (x) { return x.id === st.board; })[0];
     $("cmp-src").textContent = b.name + " (" + b.core + ", " + b.clock_mhz + " MHz). Speed: " +
+      (two() ? "benchmark version 2, each configuration in an image of its own (" + b.bench2.records + ", commit " + b.bench2.commit +
+        ", " + b.bench2.passes + " passes), " + b.bench2.compiler + " " + b.bench2.opt + " (Rust: " + b.bench2.rustc +
+        ", same opt-level), code in flash" + (b.bench2.far_bytes ? ", library code that is not inlined at least " + b.bench2.far_bytes +
+        " bytes from its caller" : "") + "; small numbers: lowest and highest mean with the image at " +
+        b.bench2.placements.length + " placements. No other library's code is in the image, so with a cache this is the best case" +
+        (b.size ? ". Code and RAM: " + b.size.record : "") :
       (mpMode() ? (b.mp_bench ? b.mp_bench.record : "no record of the modes on this board")
                  : b.bench.record + (b.rust_bench ? " and, for the Rust libraries, " + b.rust_bench.record : "") +
                    (b.nordic_bench ? "; for Nordic's nrf_ringbuf, " + b.nordic_bench.record : "")) + ", " +
@@ -266,7 +278,7 @@
       ", code in flash" +
       (!mpMode() && b.bench.placement ? "; small numbers: lowest and highest mean with the library code at " + b.bench.placement.shifts.length +
         " placements (moved by " + b.bench.placement.shifts[0] + " to " + b.bench.placement.shifts[b.bench.placement.shifts.length - 1] + " bytes)" : "") +
-      (b.size ? ". Code and RAM: " + b.size.record : "") +
+      (b.size ? ". Code and RAM: " + b.size.record : "")) +
       ". ISR stress: " +
       (b.stress ? b.stress.valid_runs + " valid runs, campaign " + b.stress.campaign : "no campaign") + "." +
       (D.contract ? " One-core contract check (same for every board): run of " + D.contract.date + " at commit " + D.contract.commit +
@@ -302,6 +314,7 @@
     });
     FLAGS.forEach(function (f) { $("f-" + f).addEventListener("change", function (e) { st.f[f] = e.target.checked; update(); }); });
     $("cmp-lang").addEventListener("change", function (e) { st.lang = e.target.value; update(); });
+    if ($("cmp-v2-note")) $("cmp-v2-note").hidden = !HAS2;
     $("cmp-topo").addEventListener("change", function (e) { st.topo = e.target.value; update(); });
     $("cmp-cores").addEventListener("change", function (e) { st.cores = e.target.value; update(); });
     function reset() { st.w = { push: 0, pop: 0, block: 0, dma: 0 }; st.f = { nosingle: true }; st.lang = ""; st.topo = ""; st.cores = ""; st.sort = "name"; st.dir = 1; }

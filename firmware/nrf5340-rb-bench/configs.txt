@@ -1,0 +1,60 @@
+# The configurations of the benchmark of version 2: one image each, with the
+# baseline as a control (lab/plans/2026-11-22-bench-image-per-library.md).
+# Read by onebundle.py and oneslots.py. A new configuration is a new line
+# at the end; its images get free slots in slots.txt, and no other image
+# changes.
+#   adapter: the rb_adapter the image is built from (main.c BENCH_ONE)
+#   kind:    c       C or C++
+#            rust    Rust (../rust-adapters), linked with the Rust archive
+#            nordic  Nordic's nRF5 SDK (nordic.mk): built for the nRF5340 only
+#   name:    the configuration's name in the records, as in version 1
+#
+# adapter                 kind    name
+adapter_pxq               c       pxq RingBuffer_PackedState (C++)
+adapter_lwrb              c       lwrb (C)
+adapter_anders            c       AndersKaloer Ring-Buffer (C)
+adapter_jnk0le            c       jnk0le Ringbuffer (C++)
+adapter_etl_isr           c       ETL queue_spsc_isr (C++)
+adapter_etl_atomic        c       ETL queue_spsc_atomic (C++)
+adapter_qp_lfrb           c       QuantumLeaps LFRB (C)
+adapter_ea_cbuf           c       EmbeddedArtistry cbuf threadsafe (C)
+adapter_ece               c       ece-mohammad RingBuffer (C)
+adapter_micoring          c       micoring SPSC mode (C)
+adapter_kostyk            c       kostyk348 lf_spsc (C)
+adapter_diffstorm         c       diffstorm cb (C)
+adapter_riot_tsrb         c       RIOT tsrb (C)
+adapter_contiki           c       Contiki-NG ringbuf (C)
+adapter_rigtorp           c       rigtorp SPSCQueue (C++)
+adapter_wizard97_plain    c       wizard97 as shipped (C++)
+adapter_wizard97_primask  c       wizard97 + PRIMASK macros (C++)
+adapter_polycratia        c       polycratia spscring (C++)
+adapter_rtspsc            c       rt-spsc (C++)
+adapter_tinyusb           c       TinyUSB tu_fifo (C)
+adapter_zephyr            c       Zephyr ring_buf (C)
+adapter_zephyr_smp        c       Zephyr ring_buf, CONFIG_SMP (C)
+adapter_lockfree          c       DNedic lockfree spsc::RingBuf (C++)
+adapter_etl_locked        c       ETL queue_spsc_locked (C++)
+adapter_freertos_sb       c       FreeRTOS stream buffer (C)
+adapter_nuttx_circbuf     c       NuttX circbuf (C)
+adapter_arduino_plain     c       Arduino RingBufferN as shipped (C++)
+adapter_arduino_safe      c       Arduino SafeRingBufferN (C++)
+adapter_rtthread_plain    c       RT-Thread rt_ringbuffer, no lock (C)
+adapter_rtthread_locked   c       RT-Thread rt_ringbuffer + interrupt lock (C)
+adapter_mbed_cb           c       Mbed CE CircularBuffer (C++)
+adapter_moodycamel        c       moodycamel ReaderWriterQueue (C++)
+adapter_pxq_none          c       pxq Topology::None, single-context (C++)
+adapter_micoring_sc       c       micoring default, single-context (C)
+adapter_ea_cbuf_plain     c       EmbeddedArtistry cbuf basic, single-context (C)
+adapter_etl_queue         c       ETL etl::queue, single-context (C++)
+adapter_pxq_mpsc          c       pxq Topology::MPSC (C++)
+adapter_pxq_spmc          c       pxq Topology::SPMC (C++)
+adapter_pxq_mpmc          c       pxq Topology::MPMC (C++)
+adapter_lockfree_mpmc     c       DNedic lockfree mpmc::Queue (C++)
+adapter_heapless_mpmc     rust    heapless mpmc::Queue (Rust)
+adapter_heapless          rust    heapless spsc::Queue (Rust)
+adapter_bbqueue           rust    bbqueue (Rust)
+adapter_embassy_pipe      rust    embassy-sync Pipe (Rust)
+adapter_nrf_ringbuf       nordic  Nordic nrf_ringbuf (C)
+part_nrf_atomics          nordic  part: nrf_atomic flag set + clear
+part_memcpy1              nordic  part: memcpy of 1 byte
+part_nrf_len0             nordic  part: nrf_ringbuf cpy_put/cpy_get, length 0

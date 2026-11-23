@@ -6,6 +6,9 @@
 # Usage: lab/tools/verify-build.sh RECORD.json [RECORD.json ...]
 #   Records of the benchmark (*-rb-bench-*), the ISR stress test
 #   (*-rb-stress-*) and the two-interrupt stress test (*-rb-mp-stress-*).
+#   Records of benchmark version 2 (records/bench-v2/<board>/<adapter>.json,
+#   one image per configuration) are handed to
+#   firmware/nrf5340-rb-bench/oneverify.sh, which says how they are compared.
 #
 # How: the source of the record's commit (source_commit / bench_commit) is
 # copied into a fresh directory, from git (git archive) when the repository
@@ -98,6 +101,16 @@ verify_one() {
     elif { [ -f "$REPO/EXPORTED_FROM" ] && [ "$(cut -c1-12 "$REPO/EXPORTED_FROM")" = "${commit:0:12}" ]; } \
          || { [ -f "$REPO/SAME_SOURCES" ] && grep -qx "${commit:0:12}" "$REPO/SAME_SOURCES"; }; then
         cp -a "$REPO/." "$tree/"
+    elif pub=$(jq -r --arg c "${commit:0:12}" '.series[] | select(.commit[0:12] == $c) | .public_commit' "$REPO/records/archived.json" 2>/dev/null) \
+         && [ -n "$pub" ]; then
+        # an archived series: its sources are those of the public commit it was published as
+        if git -C "$REPO" cat-file -e "$pub^{commit}" 2>/dev/null; then
+            git -C "$REPO" archive "$pub" | tar -x -C "$tree"
+            src="$commit, archived series, public commit ${pub:0:12}"
+        else
+            echo "$base: commit $commit is of an archived series (records/archived.json): this needs the history of the public repository, where it is commit ${pub:0:12}"
+            rm -rf "${tree:?}"; return 2
+        fi
     else
         echo "$base: commit $commit is not in $REPO"; rm -rf "${tree:?}"; return 2
     fi
@@ -189,7 +202,14 @@ verify_one() {
     return $r
 }
 
+# records of benchmark version 2 (one image per configuration) are rebuilt
+# board by board, by the tool beside their build: oneverify.sh
+two=()
 for rec in "$@"; do
+    if [ "$(jq -r '.schema // empty' "$rec" 2>/dev/null)" = rb-bench/2 ]; then two+=("$rec"); continue; fi
     verify_one "$rec"; note $?
 done
+if [ ${#two[@]} -gt 0 ]; then
+    VL_REPO=$REPO bash "$HERE/../../firmware/nrf5340-rb-bench/oneverify.sh" "${two[@]}"; note $?
+fi
 exit $worst

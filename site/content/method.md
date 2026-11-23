@@ -33,6 +33,31 @@ with code in flash and in SRAM. The fixed overhead of the timing call is
 measured and subtracted. Numbers are cycles, so boards with different
 clocks can be compared.
 
+Each configuration is measured in a firmware image of its own (benchmark
+version 2): the timing code is a fixed part, the same bytes in every image
+of a board, and the image holds one configuration next to it, so no number
+depends on which other libraries were built with it. Every configuration is
+built at eight placements (the image moved by 0, 4 ... 28 bytes) and each
+image is run in two passes; the pages show the value at placement 0 and the
+range over all sixteen runs. A library the compiler inlines pays no call; a
+library compiled on its own lies at least 6144 bytes from its caller, the
+same for every library
+([what the distance costs](../../reports/2026-11-23-bench-v2-far-call.md)).
+`memcpy` is in the fixed part: next to the code of an inlined library, and
+at that distance from a library compiled on its own, which so pays the
+distance once more when it copies a block with `memcpy`. Where `memcpy`
+itself lies is the same in every image and is not varied. On the three ST
+boards many numbers depend on where the code lies modulo 8 bytes; the
+range shows it
+([report](../../reports/2026-11-23-bench-v2-placement-period.md)).
+The same code and data that is in every image, the baseline, must measure
+the same in every run of a board, and is recorded with each run. Design and
+decisions:
+[plan](../../lab/plans/2026-11-22-bench-image-per-library.md),
+[DECISIONS.md](../../DECISIONS.md). In version 1, used until this replaced
+it, all libraries were linked into one firmware; its records are kept as an
+archived series ([records](../../records/README.md)).
+
 ## ISR stress test
 
 A timer interrupt and the main loop pass a byte sequence through the buffer

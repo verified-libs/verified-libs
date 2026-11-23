@@ -14,7 +14,7 @@ cable of the board's own debug probe. Then, in a clone of the
 
 ```sh
 ./repeat.sh --check     # tools, toolchain image and board
-./repeat.sh             # 15-25 minutes; --level full: 1-2 hours
+./repeat.sh             # 15-25 minutes; --level full: 2-4 hours
 ```
 
 `repeat.sh` builds the firmware we ran, byte for byte, runs it on your
@@ -22,12 +22,14 @@ board, compares your results with ours and packs everything into one
 archive. Mail the archive to contact@verified-libs.org. The details are on
 [Reproduce](../../site/content/reproduce.md).
 
-Each test writes the board's flash once. Nothing else on the board is
-changed.
+The quick level writes the board's flash three times (one benchmark bundle,
+two stress tests); the full level once per stress mode and once per
+benchmark bundle of the board (2 to 18, listed on Reproduce). Nothing else
+on the board is changed.
 
 ## What happens with your result
 
-- We check that the firmware is the one we ran (`fw_sha256`) and compare
+- We check that the firmware is the one we ran (its checksums) and compare
   your numbers and stress verdicts with ours, the same way `repeat.sh` did.
 - With your consent, it is listed below, under the name or handle you choose,
   or anonymously, and the archive goes into the repository.

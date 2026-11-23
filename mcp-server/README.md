@@ -52,7 +52,7 @@ answer carries the SHA-256 of the data file it was computed from.
 |---|---|
 | `about` | What is measured and how to read it: the tests, the boards and their records, the limits, the conflict of interest, the licence. |
 | `list_ring_buffers` | The tested configurations by name, with language, licence, documented producer/consumer modes and their group in the interrupt stress test. |
-| `compare_ring_buffers` | The comparison table for one board: filters for hard requirements, optional weights for a speed ranking. Each answer links to the same view on the website. |
+| `compare_ring_buffers` | The comparison table for one board: filters for hard requirements, optional weights for a speed ranking. Each answer links to the same view on the website. The speeds are those of benchmark version 2 (each configuration in an image of its own), as on the website; `"benchmark": "1"` gives the archived first benchmark instead, and the answer says so. |
 | `get_ring_buffer` | One configuration on every board and in every mode, with what the results page says about it in words: its notes and any published finding. |
 | `list_findings` | The published findings: what was wrong, the versions affected, where it was fixed, and the version the comparison shows. |
 

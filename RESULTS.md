@@ -27,14 +27,16 @@ code size and placement ranges.
 ## How each column was measured
 | Column | Test | Details |
 |---|---|---|
-| Speed | cycle benchmark with the core's cycle counter, timing in assembly, 1024 calls per scenario, code in flash with the cache or flash accelerator on | [benchmark](firmware/nrf5340-rb-bench/README.md) |
+| Speed | cycle benchmark with the core's cycle counter, timing in assembly, 1024 calls per scenario, each configuration in a firmware image of its own, code in flash with the cache or flash accelerator on | [benchmark](firmware/nrf5340-rb-bench/README.md) |
 | ISR stress | timer interrupt ↔ main loop on one core (and core 0 ↔ core 1 on the Pico 2), both directions, single bytes, blocks and zero-copy, random seeds and interrupt rates, and the interrupt sweep (one interrupt at every delay in a call); cache on/off, flash/SRAM; gcc -O2 in the runs shown (earlier campaigns also rotated five compiler flag sets); a run counts only if a deliberately broken control buffer is caught | [stress test](firmware/nrf5340-rb-stress/README.md), night reports below |
 | GenMC | model check of all thread interleavings under the C11 memory model (RC11), single-byte push/pop between two threads; number of executions explored in brackets. "+ block" means the library's block and zero-copy APIs pass too. Every pass has negative controls (release and acquire made relaxed) that must fail, and do | [GenMC](verify/genmc/README.md) |
 
 ## Speed on six boards
 Cells: mean cycles per call, 1-byte push / pop · 64-byte block, cycles per
 byte (mean of write and read); code in flash, cache or flash accelerator on,
-gcc -O2 (night 2026-11-21/22, commit `a7a206190337`). Clocks: nRF5340 64 MHz,
+gcc -O2 (benchmark version 2, 2026-11-23, commit `d06180e914ab`). Each
+configuration is measured in a firmware image of its own, so no number
+depends on which other libraries were built with it. Clocks: nRF5340 64 MHz,
 Pico 2 150 MHz, G474 170 MHz, H723 64 MHz, G0B1 64 MHz, SAM D20 48 MHz.
 Cycles, not time, so the clocks do not matter; wait states and the memory
 system do. The second column is the version tested: the release, where the
@@ -45,67 +47,78 @@ there is no ranking of ours. ⚠ marks the project owner's own library.
 <!-- table:speed -->
 | Library | Version · commit | nRF5340 M33 | Pico 2 M33 | G474 M4 | H723 M7 | G0B1 M0+ | SAM D20 M0+ |
 |---|---|---|---|---|---|---|---|
-| AndersKaloer Ring-Buffer (C) | `8de8fff5` | 58 / 40 · 16.7 | 44 / 31 · 16.5 | 57 / 41 · 20.1 | 33 / 27 · 9.3 | 73 / 50 · 27.3 | 72 / 48 · 24.4 |
-| *Arduino RingBufferN as shipped (C++)* ¹ | `cd91833d` | 37 / 46 · 48.1 | 33 / 36 · 40.8 | 42 / 39 · 48.4 | 36 / 34 · 26.9 | 81 / 91 · 100.9 | 78 / 87 · 93.5 |
-| Arduino SafeRingBufferN (C++) | `424e86ef` | 53 / 54 · 59.6 | 44 / 44 · 50.3 | 56 / 48 · 60.4 | 58 / 59 · 50.4 | 99 / 113 · 120.9 | 97 / 111 · 114.5 |
-| bbqueue (Rust) | 0.6.1 · `979abde4` | 175 / 157 · 5.9 | 121 / 105 · 4.4 | 161 / 139 · 7.1 | 150 / 112 · 5.8 | 270 / 229 · 15.2 | 284 / 240 · 15.4 |
-| Contiki-NG ringbuf (C) | `a3c71199` | 40 / 40 · 46.6 | 33 / 32 · 38.8 | 45 / 42 · 51.9 | 39 / 35 · 28.6 | 61 / 53 · 71.9 | 60 / 52 · 63.0 |
-| diffstorm cb (C) | v1.3 · `11e05d60` | 79 / 72 · 82.1 | 56 / 56 · 62.3 | 72 / 69 · 77.9 | 59 / 73 · 58.0 | 122 / 131 · 141.4 | 114 / 127 · 131.0 |
-| DNedic lockfree spsc::RingBuf (C++) | `ae6c4df1` | 126 / 126 · 3.5 | 83 / 83 · 2.8 | 98 / 88 · 3.8 | 72 / 70 · 3.4 | 163 / 155 · 12.4 | 167 / 159 · 12.4 |
-| ece-mohammad RingBuffer (C) | `94083a63` | 93 / 92 · 3.8 | 66 / 64 · 2.9 | 81 / 80 · 4.1 | 57 / 53 · 3.1 | 110 / 109 · 12.4 | 111 / 111 · 12.4 |
-| embassy-sync Pipe (Rust) | embassy-sync 0.8.0 · `84444a19` | 222 / 213 · 6.1 | 196 / 189 · 5.4 | 229 / 217 · 6.4 | 114 / 105 · 4.3 | 271 / 252 · 13.6 | 289 / 267 · 13.9 |
-| EmbeddedArtistry cbuf basic, single-context (C) | `9733be2e` | 38 / 37 · 44.1 | 35 / 32 · 39.8 | 40 / 36 · 43.9 | 33 / 29 · 24.9 | 87 / 80 · 98.4 | 84 / 76 · 91.4 |
-| EmbeddedArtistry cbuf threadsafe (C) | `9733be2e` | 53 / 44 · 54.6 | 41 / 34 · 43.8 | 56 / 46 · 58.4 | 38 / 31 · 31.8 | 74 / 60 · 81.9 | 75 / 58 · 73.5 |
-| ETL etl::queue, single-context (C++) | 20.49.0 · `7d604f2e` | 25 / 29 · 33.6 | 26 / 28 · 33.3 | 32 / 34 · 38.9 | 25 / 26 · 19.4 | 46 / 47 · 61.4 | 47 / 48 · 54.5 |
-| ETL queue_spsc_atomic (C++) | 20.49.0 · `7d604f2e` | 24 / 31 · 22.6 | 25 / 26 · 22.3 | 30 / 27 · 23.9 | 33 / 32 · 26.0 | 54 / 51 · 40.0 | 57 / 53 · 37.6 |
+| AndersKaloer Ring-Buffer (C) | `8de8fff5` | 57 / 40 · 16.7 | 44 / 31 · 16.4 | 57 / 41 · 20.1 | 33 / 27 · 9.3 | 73 / 50 · 27.3 | 72 / 48 · 24.4 |
+| *Arduino RingBufferN as shipped (C++)* ¹ | `cd91833d` | 37 / 46 · 48.1 | 33 / 36 · 40.8 | 42 / 39 · 48.4 | 30 / 27 · 26.8 | 81 / 91 · 100.9 | 77 / 86 · 89.0 |
+| Arduino SafeRingBufferN (C++) | `424e86ef` | 52 / 54 · 59.6 | 44 / 44 · 50.3 | 56 / 48 · 60.4 | 53 / 51 · 50.3 | 99 / 113 · 120.9 | 98 / 112 · 115.5 |
+| bbqueue (Rust) | 0.6.1 · `979abde4` | 175 / 157 · 5.9 | 121 / 105 · 4.3 | 161 / 139 · 6.9 | 155 / 123 · 5.9 | 270 / 229 · 15.2 | 284 / 240 · 15.4 |
+| Contiki-NG ringbuf (C) | `a3c71199` | 40 / 42 · 46.6 | 33 / 32 · 38.8 | 45 / 42 · 51.9 | 33 / 27 · 28.8 | 61 / 53 · 71.9 | 60 / 51 · 64.0 |
+| diffstorm cb (C) | v1.3 · `11e05d60` | 79 / 74 · 82.1 | 56 / 56 · 62.3 | 72 / 69 · 77.9 | 53 / 67 · 57.8 | 122 / 131 · 141.4 | 114 / 128 · 131.5 |
+| DNedic lockfree spsc::RingBuf (C++) | `ae6c4df1` | 128 / 129 · 3.5 | 83 / 83 · 2.8 | 98 / 88 · 3.5 | 69 / 67 · 3.1 | 165 / 157 · 12.4 | 167 / 159 · 12.4 |
+| ece-mohammad RingBuffer (C) | `94083a63` | 93 / 90 · 3.7 | 66 / 64 · 2.9 | 81 / 80 · 3.9 | 54 / 52 · 3.1 | 111 / 109 · 12.4 | 111 / 109 · 12.4 |
+| embassy-sync Pipe (Rust) | embassy-sync 0.8.0 · `84444a19` | 221 / 217 · 6.1 | 197 / 190 · 5.4 | 190 / 174 · 6.4 | 120 / 111 · 4.4 | 271 / 252 · 13.6 | 290 / 266 · 13.9 |
+| EmbeddedArtistry cbuf basic, single-context (C) | `9733be2e` | 38 / 37 · 44.1 | 35 / 32 · 39.8 | 40 / 36 · 43.9 | 28 / 26 · 24.8 | 87 / 80 · 98.4 | 84 / 76 · 91.0 |
+| EmbeddedArtistry cbuf threadsafe (C) | `9733be2e` | 54 / 44 · 54.6 | 41 / 34 · 43.8 | 56 / 46 · 58.4 | 37 / 33 · 31.8 | 74 / 60 · 81.9 | 75 / 59 · 75.0 |
+| ETL etl::queue, single-context (C++) | 20.49.0 · `7d604f2e` | 25 / 29 · 33.6 | 26 / 28 · 33.3 | 32 / 34 · 38.9 | 22 / 21 · 19.3 | 46 / 47 · 61.4 | 47 / 48 · 54.5 |
+| ETL queue_spsc_atomic (C++) | 20.49.0 · `7d604f2e` | 24 / 31 · 22.6 | 25 / 26 · 22.3 | 30 / 27 · 23.9 | 33 / 32 · 26.1 | 54 / 51 · 40.0 | 57 / 53 · 37.6 |
 | ETL queue_spsc_isr (C++) | 20.49.0 · `7d604f2e` | 33 / 38 · 27.6 | 34 / 32 · 27.2 | 40 / 45 · 31.9 | 39 / 40 · 28.4 | 73 / 68 · 53.6 | 73 / 68 · 53.2 |
-| ETL queue_spsc_locked (C++) | 20.49.0 · `7d604f2e` | 80 / 80 · 51.7 | 63 / 61 · 50.9 | 79 / 80 · 61.5 | 79 / 77 · 60.5 | 115 / 110 · 92.5 | 108 / 104 · 87.6 |
-| FreeRTOS stream buffer (C) | `89592801` | 302 / 252 · 5.3 | 208 / 170 · 4.0 | 347 / 279 · 6.5 | 206 / 150 · 4.5 | 373 / 325 · 13.2 | 359 / 322 · 13.0 |
-| heapless spsc::Queue (Rust) | 0.9.1 · `19188229` | 31 / 37 · 39.7 | 23 / 27 · 31.4 | 35 / 37 · 43.0 | 40 / 35 · 28.0 | 61 / 63 · 73.0 | 66 / 68 · 76.0 |
+| ETL queue_spsc_locked (C++) | 20.49.0 · `7d604f2e` | 80 / 80 · 51.7 | 63 / 61 · 50.9 | 79 / 80 · 61.5 | 75 / 72 · 61.9 | 115 / 110 · 92.5 | 108 / 104 · 89.1 |
+| FreeRTOS stream buffer (C) | `89592801` | 307 / 257 · 5.4 | 209 / 172 · 4.0 | 325 / 273 · 6.5 | 224 / 172 · 4.6 | 373 / 325 · 13.2 | 359 / 322 · 13.0 |
+| heapless spsc::Queue (Rust) | 0.9.1 · `19188229` | 31 / 37 · 39.7 | 23 / 27 · 31.4 | 35 / 37 · 43.0 | 34 / 29 · 27.9 | 61 / 63 · 73.0 | 66 / 68 · 76.0 |
 | jnk0le Ringbuffer (C++) | `9efa07ff` | 17 / 19 · 9.5 | 17 / 17 · 9.4 | 23 / 26 · 9.5 | 30 / 30 · 6.5 | 36 / 42 · 11.8 | 36 / 42 · 11.8 |
-| kostyk348 lf_spsc (C) | `38649b8f` | 82 / 76 · 84.6 | 58 / 55 · 65.3 | 72 / 67 · 79.4 | 58 / 53 · 56.1 | 160 / 156 · 214.6 | 164 / 162 · 227.6 |
-| lwrb (C) | v3.4.0 · `b8534fd1` | 55 / 58 · 4.5 | 40 / 42 · 3.6 | 54 / 57 · 5.2 | 49 / 44 · 3.9 | 65 / 67 · 13.6 | 65 / 69 · 13.7 |
-| Mbed CE CircularBuffer (C++) | `a4c70564` | 69 / 58 · 8.5 | 66 / 53 · 7.5 | 79 / 69 · 9.0 | 66 / 63 · 4.9 | 120 / 103 · 12.2 | 121 / 108 · 12.3 |
-| micoring default, single-context (C) | `a6f91ee2` | 97 / 98 · 75.4 | 60 / 59 · 50.7 | 78 / 75 · 66.5 | 52 / 55 · 29.0 | 103 / 99 · 91.9 | 102 / 99 · 92.0 |
-| micoring SPSC mode (C) | `a6f91ee2` | 119 / 123 · 116.4 | 74 / 77 · 75.7 | 98 / 97 · 96.8 | 79 / 71 · 60.0 | 127 / 133 · 131.2 | 127 / 132 · 131.9 |
-| moodycamel ReaderWriterQueue (C++) | `8b217669` | 51 / 66 · 61.2 | 39 / 47 · 45.9 | 53 / 64 · 62.5 | 54 / 54 · 44.0 | 77 / 81 · 88.6 | 77 / 82 · 83.2 |
-| NuttX circbuf (C) | nuttx-13.1.0 · `2b5c0de5` | 144 / 123 · 2.9 | 108 / 96 · 2.5 | 123 / 110 · 2.8 | 93 / 83 · 2.7 | 234 / 218 · 11.8 | 233 / 220 · 11.9 |
-| polycratia spscring (C++) | `9d2445a5` | 19 / 24 · 8.6 | 19 / 22 · 8.4 | 24 / 28 · 9.5 | 37 / 32 · 5.2 | 39 / 46 · 11.8 | 39 / 49 · 11.9 |
-| pxq RingBuffer_PackedState (C++) ⚠ | 1.5.0 · `eec68a93` | 17 / 20 · 3.4 | 17 / 18 · 8.3 | 20 / 21 · 3.5 | 17 / 16 · 2.9 | 35 / 38 · 9.3 | 37 / 39 · 9.3 |
-| pxq Topology::None, single-context (C++) ⚠ | 1.5.0 · `eec68a93` | 25 / 21 · 3.1 | 20 / 19 · 2.5 | 19 / 20 · 3.4 | 23 / 21 · 2.9 | 35 / 38 · 9.3 | 37 / 39 · 9.3 |
-| QuantumLeaps LFRB (C) | `0d6354a1` | 50 / 44 · 53.6 | 39 / 36 · 43.8 | 46 / 46 · 53.4 | 47 / 42 · 42.3 | 69 / 61 · 79.9 | 70 / 63 · 74.5 |
-| rigtorp SPSCQueue (C++) | `59a6a938` | 35 / 43 · 41.2 | 27 / 37 · 33.9 | 35 / 49 · 45.5 | 36 / 42 · 29.1 | 52 / 83 · 73.2 | 55 / 82 · 69.7 |
-| RIOT tsrb (C) | `9c9a6abe` | 49 / 48 · 17.7 | 38 / 37 · 17.4 | 52 / 51 · 19.6 | 55 / 50 · 11.4 | 65 / 64 · 30.1 | 65 / 65 · 25.1 |
-| rt-spsc (C++) | `5454de55` | 20 / 19 · 26.1 | 21 / 17 · 25.8 | 26 / 24 · 31.9 | 35 / 36 · 28.9 | 45 / 44 · 59.4 | 47 / 46 · 54.5 |
-| RT-Thread rt_ringbuffer + interrupt lock (C) | `99428a1e` | 73 / 52 · 3.4 | 57 / 42 · 2.9 | 73 / 54 · 3.8 | 62 / 54 · 3.4 | 98 / 78 · 12.2 | 96 / 82 · 12.1 |
-| *RT-Thread rt_ringbuffer, no lock (C)* ¹ | `99428a1e` | 56 / 35 · 3.2 | 48 / 33 · 2.7 | 57 / 39 · 3.6 | 39 / 34 · 3.1 | 92 / 70 · 12.1 | 88 / 73 · 12.0 |
-| TinyUSB tu_fifo (C) | 0.21.0 · `dae3f9a3` | 141 / 131 · 4.0 | 82 / 85 · 3.1 | 101 / 100 · 4.2 | 66 / 69 · 3.3 | 138 / 131 · 12.4 | 138 / 134 · 12.5 |
-| wizard97 + PRIMASK macros (C++) | `5cd8410c` | 37 / 27 · 38.6 | 30 / 26 · 34.3 | 40 / 32 · 43.9 | 51 / 49 · 43.9 | 57 / 61 · 73.9 | 61 / 65 · 71.0 |
-| *wizard97 as shipped (C++)* ¹ | `5cd8410c` | 22 / 22 · 28.6 | 18 / 20 · 26.3 | 29 / 25 · 33.4 | 24 / 21 · 16.5 | 41 / 41 · 55.9 | 43 / 41 · 50.5 |
-| Zephyr ring_buf (C) | v4.5.0 · `41d10b59` | 79 / 74 · 3.1 | 64 / 62 · 2.7 | 79 / 74 · 3.7 | 54 / 50 · 3.1 | 115 / 105 · 10.5 | 115 / 107 · 10.5 |
-| Zephyr ring_buf, CONFIG_SMP (C) | v4.5.0 · `41d10b59` | 91 / 94 · 3.5 | 72 / 73 · 2.9 | 86 / 83 · 3.9 | 72 / 67 · 3.3 | 129 / 117 · 11.1 | 132 / 123 · 11.2 |
+| kostyk348 lf_spsc (C) | `38649b8f` | 79 / 73 · 84.5 | 59 / 55 · 65.3 | 72 / 67 · 79.4 | 54 / 50 · 51.7 | 160 / 156 · 214.6 | 164 / 162 · 227.6 |
+| lwrb (C) | v3.4.0 · `b8534fd1` | 55 / 58 · 4.5 | 40 / 42 · 3.5 | 54 / 57 · 5.0 | 47 / 44 · 4.0 | 65 / 67 · 13.6 | 65 / 69 · 13.7 |
+| Mbed CE CircularBuffer (C++) | `a4c70564` | 69 / 58 · 8.4 | 66 / 53 · 7.5 | 79 / 69 · 8.9 | 61 / 58 · 4.8 | 120 / 103 · 12.2 | 121 / 108 · 12.3 |
+| micoring default, single-context (C) | `a6f91ee2` | 96 / 98 · 77.0 | 60 / 60 · 50.7 | 78 / 75 · 66.5 | 43 / 48 · 36.8 | 103 / 99 · 91.8 | 102 / 99 · 91.1 |
+| micoring SPSC mode (C) | `a6f91ee2` | 118 / 123 · 118.4 | 74 / 77 · 75.7 | 98 / 97 · 96.9 | 78 / 71 · 60.0 | 127 / 132 · 128.7 | 128 / 132 · 131.4 |
+| moodycamel ReaderWriterQueue (C++) | `8b217669` | 51 / 66 · 61.2 | 39 / 47 · 46.0 | 53 / 64 · 62.5 | 48 / 49 · 44.4 | 77 / 81 · 88.6 | 77 / 82 · 82.2 |
+| NuttX circbuf (C) | nuttx-13.1.0 · `2b5c0de5` | 142 / 127 · 3.0 | 108 / 96 · 2.5 | 123 / 110 · 2.8 | 91 / 87 · 2.7 | 229 / 223 · 11.8 | 231 / 218 · 11.9 |
+| polycratia spscring (C++) | `9d2445a5` | 19 / 24 · 8.6 | 19 / 22 · 8.4 | 24 / 28 · 9.6 | 32 / 29 · 5.1 | 39 / 46 · 11.8 | 39 / 49 · 11.9 |
+| pxq RingBuffer_PackedState (C++) ⚠ | 1.5.0 · `eec68a93` | 17 / 20 · 3.0 | 17 / 18 · 2.5 | 20 / 21 · 3.0 | 17 / 16 · 2.7 | 35 / 38 · 9.3 | 37 / 38 · 9.3 |
+| pxq Topology::None, single-context (C++) ⚠ | 1.5.0 · `eec68a93` | 25 / 21 · 3.0 | 20 / 19 · 2.5 | 19 / 20 · 3.0 | 18 / 18 · 2.7 | 35 / 38 · 9.3 | 37 / 38 · 9.3 |
+| QuantumLeaps LFRB (C) | `0d6354a1` | 51 / 44 · 53.6 | 39 / 35 · 43.8 | 46 / 46 · 53.4 | 47 / 42 · 42.3 | 69 / 61 · 79.9 | 70 / 63 · 75.5 |
+| rigtorp SPSCQueue (C++) | `59a6a938` | 35 / 43 · 41.2 | 27 / 37 · 33.9 | 35 / 49 · 45.5 | 31 / 39 · 29.0 | 52 / 83 · 73.2 | 55 / 82 · 69.7 |
+| RIOT tsrb (C) | `9c9a6abe` | 51 / 48 · 17.7 | 38 / 37 · 17.4 | 52 / 51 · 19.6 | 49 / 42 · 11.2 | 65 / 64 · 30.1 | 65 / 65 · 25.1 |
+| rt-spsc (C++) | `5454de55` | 20 / 19 · 26.1 | 21 / 17 · 25.8 | 26 / 24 · 31.9 | 30 / 31 · 28.8 | 45 / 44 · 59.4 | 47 / 46 · 54.5 |
+| RT-Thread rt_ringbuffer + interrupt lock (C) | `99428a1e` | 76 / 54 · 3.4 | 58 / 43 · 2.9 | 73 / 54 · 3.5 | 54 / 47 · 3.1 | 100 / 78 · 12.2 | 96 / 83 · 12.1 |
+| *RT-Thread rt_ringbuffer, no lock (C)* ¹ | `99428a1e` | 57 / 36 · 3.1 | 48 / 33 · 2.7 | 57 / 39 · 3.2 | 39 / 33 · 2.9 | 94 / 70 · 12.1 | 88 / 74 · 12.0 |
+| TinyUSB tu_fifo (C) | 0.21.0 · `dae3f9a3` | 106 / 108 · 4.0 | 82 / 85 · 3.1 | 101 / 100 · 4.0 | 63 / 65 · 3.1 | 138 / 131 · 12.4 | 138 / 134 · 12.5 |
+| wizard97 + PRIMASK macros (C++) | `5cd8410c` | 37 / 27 · 38.6 | 30 / 26 · 34.3 | 40 / 32 · 43.9 | 48 / 44 · 43.8 | 57 / 61 · 73.9 | 61 / 65 · 71.0 |
+| *wizard97 as shipped (C++)* ¹ | `5cd8410c` | 22 / 22 · 28.6 | 18 / 20 · 26.3 | 29 / 25 · 33.4 | 19 / 18 · 16.4 | 41 / 41 · 55.9 | 43 / 40 · 50.5 |
+| Zephyr ring_buf (C) | v4.5.0 · `41d10b59` | 76 / 71 · 3.1 | 64 / 62 · 2.7 | 79 / 74 · 3.1 | 42 / 40 · 2.9 | 115 / 105 · 10.5 | 115 / 107 · 10.5 |
+| Zephyr ring_buf, CONFIG_SMP (C) | v4.5.0 · `41d10b59` | 88 / 90 · 3.4 | 72 / 73 · 2.9 | 86 / 83 · 3.4 | 61 / 58 · 3.0 | 129 / 117 · 11.1 | 131 / 123 · 11.2 |
 
 ¹ Not interrupt-safe by its own documentation or maintainers; measured for comparison only.
 
-Records (in [`records/bench/`](records/README.md)): `nrf5340-rb-bench-flash-20261121T234544Z.json`, `nrf5340-rb-bench-rust-flash-20261122T001920Z.json`, `rp2350-rb-bench-flash-20261121T234741Z.json`, `rp2350-rb-bench-rust-flash-20261122T005713Z.json`, `stm32g474-rb-bench-flash-20261121T234437Z.json`, `stm32g474-rb-bench-rust-flash-20261122T001919Z.json`, `stm32h723-rb-bench-flash-20261121T234543Z.json`, `stm32h723-rb-bench-rust-flash-20261122T001919Z.json`, `stm32g0b1-rb-bench-flash-20261121T234437Z.json`, `stm32g0b1-rb-bench-rust-flash-20261122T001919Z.json`, `samd20-rb-bench-flash-20261121T234441Z.json`, `samd20-rb-bench-rust-flash-20261122T000532Z.json`.
+Records: one per board and configuration in [`records/bench-v2/`](records/README.md), made at commit `d06180e914ab`.
 <!-- /table:speed -->
 
 Notes:
-- Where a library's code lies in flash can change a mean by up to 25 % on
-  some boards (pxq's ⚠ 64-byte block on the Pico 2: 7.8 to 9.8 cycles per
-  byte); 710 of the 1,002 numbers move by 0.05 % or less.
-  The comparison page shows the range over eight placements under each
-  number, and
-  [the 2026-11-14 report](reports/2026-11-14-night-flags-placement.md) and
-  `firmware/nrf5340-rb-bench/placement.py` explain how it is measured. Two
-  numbers within each other's range are not measurably different. A range
-  is a lower bound: another build can land outside it. When lwrb's code
-  changed (v3.4.0), 29 of the 666 means of the other C and C++
-  configurations landed outside the range shown before, 26 of them on the
-  nRF5340 (by up to 5 %), and pxq's ⚠ block number on the Pico 2 went from
-  3.5-5.4 to 7.8-9.8 cycles per byte
-  ([2026-11-22 report](reports/2026-11-22-lwrb-v3.4.0-rerun.md),
-  [2026-11-20 report](reports/2026-11-20-publication-rerun.md)).
+- Where a library's code lies in flash can change a mean: every image is
+  built at eight placements (moved by 0, 4 ... 28 bytes) and run twice. 743
+  of the 1,007 numbers on the comparison page move by 0.05 % or less, the
+  largest range is 14 % (FreeRTOS stream buffer, 1-byte push on the H723:
+  197 to 225 cycles). The table shows the value at placement 0; the
+  comparison page shows the range under each number. Two numbers within
+  each other's range are not measurably different. A range is a lower
+  bound: another build can land outside it.
+- A library the compiler inlines into its caller pays no call; a library
+  compiled on its own is called, and its code lies at least 6144 bytes
+  from the caller, as it would in a firmware of some size. That distance
+  costs nothing for a single byte on the G0B1 and the G474, -2 to +6
+  cycles on the nRF5340 and the SAM D20, less than a cycle on the Pico 2
+  and 3 to 15 cycles (median 6) on the H723
+  ([report](reports/2026-11-23-bench-v2-far-call.md)). The single-byte
+  numbers of pxq ⚠ contain no call (they are inlined); most others do.
+- Before version 2 this table came from benchmark version 1, where all
+  libraries were linked into one firmware and a library's number could move
+  when another library's code changed
+  ([2026-11-22 report](reports/2026-11-22-lwrb-v3.4.0-rerun.md)). Its
+  records stay in [`records/bench/`](records/README.md) as an archived
+  series and are no longer added to. What changed per board is on the
+  [comparison page](site/content/compare.html): nearly nothing on the two
+  Cortex-M0+ boards, a few numbers on the nRF5340, the Pico 2 and the G474,
+  and most numbers on the H723, where placement decides most (single
+  numbers from -23 % to +27 %, the median unchanged).
 - The H723 runs at its reset clock (64 MHz) with reset-default flash wait
   states; the Pico 2 fetches code through its XIP cache from QSPI flash.
 - The Cortex-M33 and M7 issue some instruction pairs together, so they can
@@ -119,7 +132,8 @@ Notes:
 - "single-context" variants are the libraries' modes for use without an
   interrupt on the other side, measured for comparison; they are not
   interrupt-safe and not counted in the stress results.
-- Code-in-SRAM and cache-off numbers for every library are in the records.
+- Cache-off numbers for every library are in the records; code-in-SRAM
+  numbers are in the archived version 1 records only.
 
 ## Model checking (GenMC, C11 memory model)
 2026-11-08, single-byte push/pop between two threads; "+ block": the block

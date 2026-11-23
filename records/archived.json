@@ -1,0 +1,13 @@
+{
+ "about": "Archived series: published records that are checked against their own commit, not against the tree at hand (DECISIONS.md, 2026-11-23). To check one, take the public repository at public_commit and run lab/tools/verify-build.sh there.",
+ "series": [
+  {
+   "name": "version 1",
+   "commit": "a7a206190337",
+   "exported_from": "51f03326a3f7a3cd94e89ab44b87f8a51fbe6261",
+   "public_commit": "eae0e156aaef0baad179e4c4146dc88576b5e223",
+   "records": 215,
+   "records_sha256": "5e168c8bc8a4bdbc25a90bd75d311f13c6faec8229aa010a7f3953cca8b3a54b"
+  }
+ ]
+}

@@ -1,0 +1,14 @@
+{
+ "about": "Recorded fixes of host-side files that build no image (DECISIONS 2026-11-23, lab/tools/public-export.py). 'from' and 'to' are the git blob ids of the file before and after the fix.",
+ "fixes": [
+  {
+   "file": "firmware/nrf5340-rb-bench/run-one.py",
+   "from": "d6d4d9695c234741a672f59c3ee1af5936e6bd09",
+   "to": "110cc38d211dccbf06e9dcc7117911fbd192fb04",
+   "date": "2026-11-23",
+   "what": "The log line after a run printed the means of single/cache_on and stopped the runner when a configuration has no numbers on the core (DNedic lockfree mpmc::Queue on a Cortex-M0+). It now prints 'none'.",
+   "numbers": "The line is printed after the run file is written and only writes to run.log; nothing that is read from the board, worked out or stored is changed.",
+   "control": "2026-11-23 16:41 UTC, the first image of the bundle that was on each of the six boards, one pass, no flash write: the same image checksums, and all 56 statistics of the library and all 56 of the baseline the same as in both runs of the image's record, on every board. On the NUCLEO-G0B1RE the configuration without numbers ran through (all numbers none, no error)."
+  }
+ ]
+}

@@ -72,21 +72,73 @@ board; it does not check what a compiler for the target makes of the code (the I
 its interrupt sweep do that on the boards) or two cores. With a producer/consumer mode chosen
 above, the column shows that mode's check where one was run, "–" where none was. The negative
 control and four deliberately broken ring buffers must fail in every run, and do.</p>
+<div id="cmp-v2-note" hidden>
+<h2>The speed benchmark: one image per configuration</h2>
+<p>Every configuration is measured in a firmware image of its own, linked at a fixed address next
+to a fixed part that holds the timing code and is the same bytes in every image of a board. So
+the speed of one library does not depend on which other libraries were built with it, and adding
+or updating a library changes no other library's image or number. On a core with a cache, an
+image holding one library is the best case: in an application other code competes for the cache.
+This is version 2 of the benchmark. In version 1 all libraries were linked into one firmware; its
+numbers were shown here until this series replaced them, are no longer added to, and its records
+stay in the repository as an archived series
+(<a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md">records/README.md</a>).</p>
+<h2>What a call costs</h2>
+<p>A library whose code the compiler can see where it is used (a header-only library, a template,
+a <code>static inline</code> function) is inlined into the caller and pays no call. A library that
+is compiled on its own is called. So that every such library pays the same for it, its code lies
+at least 6144 bytes from the code that calls it, about what a library is away from its caller in
+a firmware of some size; the adapter between the timing code and the library lies next to the
+timing code. We measured both: with the library right behind its caller and at this distance. For
+a single byte the distance costs nothing on the NUCLEO-G0B1RE and the NUCLEO-G474RE, between
+-2 and +6 cycles on the nRF5340 DK and the SAM D20, less than a cycle on the Pico 2 with its
+cache on, and on the NUCLEO-H723ZG 3 to 15 cycles (median 6) with the cache on
+(<a href="https://github.com/verified-libs/verified-libs/blob/main/reports/2026-11-23-bench-v2-far-call.md">report</a>). The numbers of a configuration
+that is inlined whole contain no call at all: ETL's three queues, heapless spsc::Queue and
+mpmc::Queue, DNedic lockfree mpmc::Queue, Mbed CE CircularBuffer, polycratia spscring, rt-spsc
+and Zephyr ring_buf. Of other
+configurations a part is inlined: the single-byte push and pop of every pxq &#9888; configuration
+contain no call, its block operations do. Whether your firmware gets the same depends on how you
+build the library.</p>
 <h2>The small numbers under a speed: placement</h2>
 <p>The same machine code can take a different number of cycles depending on where it lies in
 memory (alignment of loops and branch targets to the flash accelerator's or the cache's lines, and
-to the core's fetch). To show how much, the benchmark is built eight times with the libraries'
-code moved by 0, 4, 8 ... 28 bytes, while the timing code stays where it is. The table shows the
-value at 0 and, under it, the lowest and highest mean over the eight placements when they differ
-at the precision shown. Most configurations do not move at all; a few move by 10 to 30 %. Two
-configurations whose ranges overlap are not measurably different on that board: a difference
-smaller than the range comes from the placement, and another firmware would place the code
-differently. The score uses the value at 0. The same experiment was run for the Rust libraries
-and for the MPSC, SPMC and MPMC speeds (each a firmware of its own), so their ranges are shown
-the same way; it is not a property of one language: the largest ranges are in C libraries
-(TinyUSB tu_fifo on the nRF5340, lwrb and the FreeRTOS stream buffer on the NUCLEO-G474RE) and
-in embassy-sync Pipe (Rust) on the NUCLEO-G474RE, all of them long code paths. Where a board
-shows no range, that set has not been measured at more than one placement there yet.</p>
+to the core's fetch). To show how much, each configuration is built eight times, with its image
+moved by 0, 4, 8 ... 28 bytes, and every image is run in two passes. The table shows the value at
+0 and, under it, the lowest and highest mean of all sixteen runs when they differ at the
+precision shown. Two configurations whose ranges overlap are not measurably different on that
+board: a difference smaller than the range comes from the placement, and another firmware would
+place the code differently. A range is a lower bound: another build can land outside it. The
+score uses the value at 0.</p>
+<h2>What changed from version 1, per board</h2>
+<p>The libraries, their versions and the compiler versions are those of version 1; what changed
+is what else is in the image and where the library's code lies. Counted when version 2 replaced
+version 1 (2026-11-23), over every mean on the page (push, pop and 64-byte block of every configuration and producer/consumer mode):</p>
+<table>
+<thead><tr><th>Board</th><th>Means</th><th>Same to 0.1 cycle</th><th>Within each other's range</th><th>Largest moves outside the ranges</th></tr></thead>
+<tbody>
+<tr><td>nRF5340 DK</td><td>156</td><td>114</td><td>134</td><td>TinyUSB tu_fifo push 141.1 to 105.6 and pop 130.5 to 108.0, pxq &#9888; RingBuffer_PackedState block 3.4 to 3.0 cycles per byte; the others within 5 %</td></tr>
+<tr><td>Raspberry Pi Pico 2 H</td><td>153</td><td>118</td><td>139</td><td>pxq &#9888; RingBuffer_PackedState block 8.3 to 2.5 cycles per byte; the others within 2 %</td></tr>
+<tr><td>NUCLEO-G474RE</td><td>153</td><td>134</td><td>148</td><td>five block numbers lower by 6 to 15 % (Zephyr ring_buf 3.7 to 3.1 cycles per byte)</td></tr>
+<tr><td>NUCLEO-H723ZG</td><td>153</td><td>43</td><td>64</td><td>from Contiki-NG ringbuf pop 35.0 to 27.0 (-23 %) to micoring default block 29.0 to 36.8 (+27 %); the median does not move (-0.3 %)</td></tr>
+<tr><td>NUCLEO-G0B1RE</td><td>147</td><td>137</td><td>147</td><td>none</td></tr>
+<tr><td>SAM D20 Xplained Pro</td><td>147</td><td>112</td><td>145</td><td>two, by one cycle</td></tr>
+</tbody></table>
+<p>Why they moved: in version 1 a library's code lay between the other libraries, and its
+alignment and, with a cache, what shared its cache lines came from them. TinyUSB tu_fifo on the
+nRF5340 and pxq's &#9888; block number on the Pico 2 were the two numbers that had already moved
+when another library's code changed
+(<a href="https://github.com/verified-libs/verified-libs/blob/main/reports/2026-11-22-lwrb-v3.4.0-rerun.md">2026-11-22 report</a>). The NUCLEO-H723ZG
+(Cortex-M7 with caches, at its reset clock with reset-default flash wait states) is the board
+where placement decides most: there the numbers of version 1 and version 2 are two placements of
+the same code (and, for a library that is called, the distance above), and neither is the
+library's speed to the cycle. Without a cache and with code
+that does not move by itself (the two Cortex-M0+ boards) nearly nothing changed. The version 1
+records are in <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md">records/bench/</a>
+(<code>archived.json</code> there says how to check one), the comparison is made by
+<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/tools/bench2-vs-v1.py">lab/tools/bench2-vs-v1.py</a> from
+<a href="data/libs.json">the page's data</a>, which holds both.</p>
+</div>
 <h2>Code and RAM</h2>
 <p>"Code / RAM" is what the configuration adds to a firmware on the chosen board, in bytes: flash
 (code, constants and initial values) and RAM (static data). It is measured by linking the

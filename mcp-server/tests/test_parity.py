@@ -28,7 +28,8 @@ sys.path.insert(0, os.path.dirname(HERE))
 import vlquery as q   # noqa: E402
 
 COMPARE_JS = os.path.join(ROOT, "site", "compare.js")
-DATA = q.default_data_path()
+# VL_PARITY_DATA: another libs.json to run the comparison on (e.g. one with benchmark version 2 in it)
+DATA = os.environ.get("VL_PARITY_DATA") or q.default_data_path()
 FLAG_WORDS = [f for f in q.FLAGS if f != "nosingle"] + ["single", "two"]
 
 
@@ -57,6 +58,8 @@ def fragments(D, seed=20261121, random_views=2500):
             parts.append("topo=" + rnd.choice(q.TOPOS))
         if rnd.random() < 0.3:
             parts.append("cores=" + rnd.choice(["1", "2"]))
+        if rnd.random() < 0.3:
+            parts.append("series=" + rnd.choice(["1", "1", "2", "3"]))
         if rnd.random() < 0.3:
             parts.append("lang=" + rnd.choice(["C", "C%2B%2B", "Rust"]))
         if rnd.random() < 0.6:

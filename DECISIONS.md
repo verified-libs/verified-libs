@@ -2,6 +2,131 @@
 
 Short log of what was decided and why. Newest first.
 
+## 2026-11-23: Version 2 of the benchmark is published; its method is frozen
+Decided by the owner, after a dry run of the publication
+(`lab/plans/2026-11-23-ring-buffers-finish.md`, steps 7 and 8).
+- The work of the branch `bench-per-lib` is on `main`, and the pages and
+  the data show version 2.
+- The method of version 2 is frozen at the tag `v2-method-freeze` (in the
+  project's working repository; the records name the commit their images
+  were built from). A record stands as long as the tree builds its
+  images (2026-11-22, below); a change of the method is a new decision.
+- Why the numbers of the three ST boards depend on the place of the code
+  modulo 8 bytes stays "a likely reading" in the report
+  (`reports/2026-11-23-bench-v2-placement-period.md`): good enough, no
+  experiment for it.
+
+## 2026-11-23: The pages show version 2 only; version 1 is archived
+Decided by the owner. It replaces "version 1's numbers stay on the page
+next to version 2's for a time" (2026-11-22, below).
+- **When version 2 is published, the pages and the comparison show its
+  numbers only.** Version 1 is not shown beside it.
+- **Version 1 stays findable**: its records, its tag and the report of the
+  differences are linked from a short note per board that says what
+  changed from version 1 and why. The MCP server gives version 1 on
+  request (`benchmark` argument).
+- Why: the two series differed in two places, and in both the number of
+  version 1 came from where the code happened to lie in a shared image
+  and not from the library
+  ([report](reports/2026-11-23-bench-v2-first-run.md)): the cost of a
+  call on the Cortex-M7, and one configuration's block number on the
+  Pico 2. Two tables would ask the reader to choose between a number
+  and one that is known to carry the layout. The old numbers must still
+  be there for whoever has seen them, and so that the change can be
+  checked; one of the two concerns the owner's own library.
+
+## 2026-11-23: Every library is measured with a far call
+Decided by the owner after the difference between version 1 and version 2
+on the Cortex-M7 was explained
+([report](reports/2026-11-23-bench-v2-first-run.md)): a call to code about
+4 KB or more away costs 6 to 10 cycles more there than a call to code
+nearby, and with one small image per configuration every library lay next
+to its caller.
+- **In every image the library lies far from the adapter that calls it**:
+  at least 6144 bytes (half as much again as the 4096 at which the full
+  cost was measured), plus the placement of 0 to 28 bytes. So every
+  library is measured under the same condition, and it is the condition
+  of an application, where a library lies where the linker puts it. Near
+  and far are not both measured: the second number says little more than
+  that a call costs something.
+- **The adapter stays next to the harness.** Code that the compiler puts
+  into the adapter itself (a library of headers, a Rust generic) has no
+  call and therefore pays none, as in an application; a function such a
+  library keeps out of line lies behind the gap like any other library
+  code. The pages say this, because it favours libraries of headers, the
+  owner's among them.
+- **What a far call costs on each board is stated once**, as a note, from
+  the two series (the one with the library next to its adapter, 263
+  records at `f2348f3a0c37`, was never published and is replaced; it stays
+  in the repository's history).
+- Not changed: the C library's memory functions lie in the fixed part,
+  next to the adapter and so far from a library behind the gap. Where
+  they should lie is still open (decision of 2026-11-22, "later").
+- Cost: a new series, 48 flash writes on the six boards (26 before), as
+  the images are 6 KB larger.
+
+## 2026-11-23: A fix of the runner does not cost a new series
+Decided by the owner after the first full run of benchmark version 2, in
+which the runner stopped at a log line
+([report](reports/2026-11-23-bench-v2-first-run.md)).
+- **The test sources have two kinds of host-side files.** Those that an
+  image is built from or by (the firmware sources, the pins, the build
+  scripts, the slot table) and the decoder of the result words stay bound
+  to the records as before: a change means the tree must still build the
+  same image, or the series is measured again. Three files build nothing:
+  the runner (`run-one.py`), the tool that collects run files into records
+  (`onerecords.py`) and the one that rebuilds and compares
+  (`oneverify.sh`). A fix of one of them is recorded in
+  `records/host-fixes.json` (the file before and after, what changed, why
+  no number can change, and the control run), and the records made before
+  it stand.
+- **A change of how numbers are read from the board or worked out is not
+  such a fix**, in whichever file it is: the series is measured again.
+- **After a fix of the runner one image per board is run again**, from the
+  bundle that is on the board (no flash write), and must give the record's
+  numbers.
+- Why: every record is already tied to its image by the rebuild check
+  (the bytes in flash), which no host-side fix can pass by; a series costs
+  two hours and 32 flash writes, and a rule that makes small faults too
+  dear to mend leaves them in.
+
+## 2026-11-22: The benchmark of version 2: one image per configuration
+Decided by the owner on
+[lab/plans/2026-11-22-bench-image-per-library.md](lab/plans/2026-11-22-bench-image-per-library.md),
+after the pilots on the nRF5340 and the SAM D20. It takes effect when the
+new series is measured and published; until then version 1 stands.
+- **The bytes in flash decide whether an image is the same.** The checksum
+  of the ELF file is recorded next to it, and the sources are arranged so
+  that both stay the same. Why: the bytes are what the chip runs; the ELF
+  file also changes with debug information that touches no instruction
+  (a line added elsewhere in a shared source file).
+- **Slots of 4 KB units** (8 KB for most images, 16 KB for the two
+  largest). Why: every library can double before it must move, and a full
+  benchmark is 31 flash writes on the six boards against 145.
+- **Version 1's numbers stay on the page next to version 2's** for a time
+  (replaced 2026-11-23: the pages show version 2 only, see above).
+  Why: on a chip with a cache the numbers of the new series are lower, and
+  a reader should see both and the reason.
+- **The cache-on number is the library in an image of its own**, with no
+  other code on its cache lines, and the page says so. Why: it is the same
+  kind of number for every library and no neighbour moves it; what a
+  crowded cache costs depends on the application's layout. Placements that
+  put other code on the same cache lines on purpose may be added later.
+
+Added 2026-11-23, after the tools were made and tried on the six boards:
+- **Version 1 is an archived series.** Its records stay as they are, are
+  labelled "version 1", and are checked against their own commit, not
+  against the tree at hand. Why: the tree of version 2 builds version 1's
+  images byte for byte, but two host-side files that version 1 uses had to
+  change for version 2; running version 1 again would cost 145 flash
+  writes for a series that is being replaced.
+- **`memcpy` stays at one fixed place** in every image. Whether its place
+  becomes an axis of its own is looked at later.
+- **A published run has two passes**, the second in reverse order.
+- **The first full run of version 2 may be made now.** Nothing of it is
+  published before the page data, the export check and the other tools
+  are in place.
+
 ## 2026-11-22: A record stands as long as its image does
 Decided by the owner on the proposal in
 [lab/plans/2026-11-22-same-image-rule.md](lab/plans/2026-11-22-same-image-rule.md),

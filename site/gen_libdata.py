@@ -21,6 +21,12 @@ Sources:
   SHIFT=0..28 records of the same benchmark), the lowest and highest mean per
   number, only where its shift-0 record is the record shown; the same for the
   Rust set (placement-rust.json) and the multi-producer set (placement-mp.json);
+- speed, version 2 of the benchmark (one image per configuration,
+  lab/plans/2026-11-22-bench-image-per-library.md): the records of
+  firmware/nrf5340-rb-bench/onerecords.py under records/bench-v2 (--bench2),
+  one per board and configuration. Shown next to version 1's numbers as
+  "speed2" (and "speed2" of a mode): the mean at placement 0, and as range
+  the lowest and highest mean over the record's placements and passes;
 - one-core contract check: site/data/contract.json (verify/contract/summary.py
   --json over the output of verify/contract/run.sh), per configuration and
   producer/consumer mode (CONTRACT_AS: where its name there differs);
@@ -162,6 +168,59 @@ def placement_range(figs):
     return out
 
 
+def speed_v2(rec):
+    """The page's numbers of one version 2 record: placement 0 (first pass), and the range over all
+    placements and passes."""
+    def numbers(res):
+        p64, q64 = mean(res, "block64", "push"), mean(res, "block64", "pop")
+        return {"push": mean(res, "single", "push"), "pop": mean(res, "single", "pop"),
+                "block": round((p64 + q64) / 128, 2) if p64 and q64 else None,
+                "dma_w": mean(res, "dma64", "push"), "dma_r": mean(res, "dma64", "pop")}
+    runs = [(im["place"], r["pass"], numbers(r["results"])) for im in rec["images"] for r in im["runs"]]
+    out = dict(min(runs, key=lambda x: x[:2])[2])
+    if out["push"] is None:   # not available on this core
+        return None
+    out["range"] = {k: [min(v), max(v)] for k in ("push", "pop", "block", "dma_w", "dma_r")
+                    for v in [[n[k] for _, _, n in runs if n[k] is not None]] if v and out[k] is not None}
+    return out
+
+
+def bench_v2(d):
+    """lab board -> ({record name: speed}, what the series is), from the records under d."""
+    out = {}
+    for b, fw in FW.items():
+        speeds, info = {}, None
+        for f in sorted(glob.glob(os.path.join(d, fw, "*.json"))):
+            rec = json.load(open(f))
+            if rec.get("schema") != "rb-bench/2":
+                sys.exit(f"{f}: not a record of benchmark version 2")
+            sp = speed_v2(rec)
+            if sp:
+                speeds[rec["name"]] = sp
+            times = [r["time"] for im in rec["images"] for r in im["runs"]]
+            one = {"records": f"records/bench-v2/{fw}", "commit": rec["bench_commit"], "passes": rec["passes"],
+                   "placements": [im["place"] for im in rec["images"]], "toolchain_image": rec["toolchain_image"],
+                   # -O2 is the Makefile's default, which onebuild.sh builds with; the compilers are the image's
+                   "opt": "-O2", "far_bytes": rec.get("far_bytes"),
+                   "compiler": "arm-none-eabi-gcc " + rec["toolchain"]["arm_none_eabi_gcc"].split(") ")[1].split()[0],
+                   "rustc": rec["toolchain"]["rustc"].split(" (")[0]}
+            # One series per board; after a change of a library its records are measured again at a
+            # later commit (lab/tools/bench2-changed.py), so the commits are listed, the oldest first.
+            if info and any(info[k] != one[k] for k in one if k != "commit"):
+                sys.exit(f"{f}: not of the same series as the other records of {fw} ({one})")
+            commits = (info["commits"] if info else []) + [(min(times), one["commit"])]
+            info = dict(one, time=min(times + ([info["time"]] if info else [])), commits=commits)
+        if info:
+            seen = []
+            for _, c in sorted(info.pop("commits")):
+                if c not in seen:
+                    seen.append(c)
+            info["commit"] = ", ".join(seen)
+        if speeds:
+            out[b] = (speeds, info)
+    return out
+
+
 def lock_entries():
     out = {}
     for line in open(os.path.join(ROOT, "firmware/nrf5340-rb-bench/libs.lock")):
@@ -270,6 +329,8 @@ def main():
                     help="records of the SET=rust benchmark (the Rust libraries, a firmware of their own)")
     ap.add_argument("--nordic-bench", default=os.path.expanduser("~/lab-runs/nrf5340-rb-bench-nordic-flash-*.json"),
                     help="records of the SET=nordic benchmark (Nordic's nrf_ringbuf, nRF5340 only, a firmware of its own)")
+    ap.add_argument("--bench2", default=os.path.join(ROOT, "records/bench-v2"),
+                    help="the records of benchmark version 2 (onerecords.py); shown next to version 1 where they exist")
     ap.add_argument("--placement", default=os.path.join(HERE, "data/placement.json"),
                     help="the placement experiment (firmware/nrf5340-rb-bench/placement.py --json); used for a board "
                          "only if its shift-0 record is the benchmark record shown")
@@ -291,6 +352,7 @@ def main():
     dirs = campaign_dirs(a.campaigns)
 
     boards, libs, mpspeed, sizes = [], {}, {}, {}
+    two = bench_v2(a.bench2) if os.path.isdir(a.bench2) else {}
     stress_pins = {}   # lock name -> commits the stress campaigns built (libs_pinned)
     for b in BOARD_ORDER:
         recs = sorted(f for f in glob.glob(a.bench) if os.path.basename(f).startswith(FW[b] + "-rb-bench-flash-2"))
@@ -417,6 +479,8 @@ def main():
                     t["not_counted"] = t.get("not_counted", 0) + v["not_counted"]
                 t["errors"] += v["errors"]
                 t["runs_with_errors"] += len(v["runs_with_errors"])
+        if b in two:
+            binfo["bench2"] = two[b][1]
         boards.append(binfo)
 
     hold_file = os.path.join(HERE, "data/hold.txt")   # configurations not shown for now (not in the public tree)
@@ -442,6 +506,9 @@ def main():
                            for b in boards}
             mp["size"] = {b["id"]: {mode: sizes.get(b["id"], {}).get(src.get(mode, n)) if mp["speed"][b["id"]][mode] else None
                                     for mode in mp["modes"]} for b in boards}
+            if two:
+                mp["speed2"] = {b["id"]: {mode: two.get(b["id"], ({},))[0].get(src.get(mode, n)) for mode in mp["modes"]}
+                                for b in boards}
             mp["other_code"] = bool(src)
             mp.pop("speed_from", None)
         # The stress campaign may have tested another commit of the library
@@ -466,6 +533,8 @@ def main():
                     "unsafe_by_own_docs": n in UNSAFE_BY_OWN_DOCS, "single_context": "single-context" in n,
                     "notes": [notes[k] for k in m.get("notes", [])], "findings": list(m.get("findings", [])),
                     "size": {}, **d})
+        if two:
+            out[-1]["speed2"] = {b: sp[n] for b, (sp, _) in two.items() if n in sp and b in d["speed"]}
     out.sort(key=lambda x: x["name"].lower())
     for f in findings.values():
         if not f["configurations"]:

@@ -1,9 +1,14 @@
 #!/bin/bash
 # Repeat our results on your own board, with one command.
 #
-#   ./repeat.sh                 quick: the benchmark and two stress modes, ~15-25 min
-#   ./repeat.sh --level full    every benchmark set and stress mode, ~1-2 h
+#   ./repeat.sh                 quick: up to six configurations of the benchmark and two
+#                               stress modes, ~15-25 min
+#   ./repeat.sh --level full    every configuration of the benchmark, twice, and
+#                               every stress mode, ~2-4 h
 #   ./repeat.sh --board pico2   choose a board when more than one is connected
+#   ./repeat.sh --bundle N      quick level: the benchmark bundle to take the
+#                               configurations from (default 0)
+#   ./repeat.sh --only bench    the benchmark alone (or: --only stress)
 #   ./repeat.sh --check         only check the tools and find the board
 #
 # Supported: the six boards of the lab, each through its own on-board debug
@@ -24,6 +29,11 @@
 # runs it; compares your record with ours (lab/tools/compare-records.py for
 # the benchmark, firmware/nrf5340-rb-stress/reference.py against our night
 # campaign, records/campaign, for the stress test);
+# The benchmark (version 2, records/bench-v2) is built from this tree as it
+# is: one image per configuration and placement, packed into bundles. The
+# tree builds the images of our records byte for byte (bash
+# firmware/nrf5340-rb-bench/oneverify.sh checks that without a board), and
+# the comparison says for every image whether yours is the same.
 # and packs everything into one archive to send us
 # (site/content/reproduce.md, "Send us your result").
 #
@@ -32,25 +42,36 @@
 # and the toolchain image verified-libs/toolchain:2026-11-13
 # (toolchain/README.md; --build-image builds it, about an hour). The first
 # run fetches the pinned libraries from their repositories (libs.lock).
-# Flash: each test writes the board's flash once (images are verified first
-# and not rewritten when unchanged).
+# Flash: each stress test writes the board's flash once (images are verified
+# first and not rewritten when unchanged). The benchmark writes one bundle
+# at the quick level and every bundle of the board at the full level (nRF5340
+# DK 5, NUCLEO-G0B1RE 9, NUCLEO-G474RE 9, NUCLEO-H723ZG 5, SAM D20 Xplained
+# Pro 18, Pico 2 2); a bundle that is on the board already is not written.
+# The nRF5340 DK also needs Nordic's nRF5 SDK zip, which we may not
+# redistribute: --nrf5-sdk PATH (firmware/nrf5340-rb-bench/nrf5-sdk.lock
+# names the file and its checksum).
 set -uo pipefail
 REPO=$(cd "$(dirname "$0")" && pwd)
 IMG=verified-libs/toolchain:2026-11-13
-LEVEL=quick; BOARD=; OUT=; CHECK_ONLY=0; BUILD_IMAGE=0
+LEVEL=quick; BOARD=; OUT=; CHECK_ONLY=0; BUILD_IMAGE=0; SDK=${NRF5_SDK:-}; QB=0; ONLY=
 while [ $# -gt 0 ]; do
     case $1 in
         --level) LEVEL=$2; shift ;;
         --board) BOARD=$2; shift ;;
         --out) OUT=$2; shift ;;
+        --nrf5-sdk) SDK=$2; shift ;;
+        --bundle) QB=$2; shift ;;
+        --only) ONLY=$2; shift ;;
         --check) CHECK_ONLY=1 ;;
         --build-image) BUILD_IMAGE=1 ;;
-        -h|--help) sed -n '2,32p' "$0"; exit 0 ;;
+        -h|--help) sed -n '2,50p' "$0"; exit 0 ;;
         *) echo "unknown argument $1 (--help)" >&2; exit 2 ;;
     esac
     shift
 done
 case $LEVEL in quick|full) ;; *) echo "--level quick|full" >&2; exit 2 ;; esac
+case $ONLY in ''|bench|stress) ;; *) echo "--only bench|stress" >&2; exit 2 ;; esac
+case $QB in ''|*[!0-9]*) echo "--bundle N" >&2; exit 2 ;; esac
 say() { printf '%s\n' "$*"; }
 die() { printf 'repeat.sh: %s\n' "$*" >&2; exit 2; }
 
@@ -123,6 +144,10 @@ else
     probe-rs --version 2>/dev/null | grep -q ' 0\.32\.' || say "note: probe-rs $(probe-rs --version 2>/dev/null | head -1): we use 0.32"
 fi
 ls /dev/serial/by-id/ 2>/dev/null | grep -q -- "${PROBE##*:}" || die "no serial port of probe ${PROBE##*:} in /dev/serial/by-id (the tests talk to the board over it)"
+if [ "$FWB" = nrf5340 ] && [ "$ONLY" != stress ] && [ "$(cat "$REPO/firmware/nrf5340-rb-bench/build/libs/nrf5-sdk/SHA256" 2>/dev/null)" != "$(awk '$1 == "sha256" {print $2}' "$REPO/firmware/nrf5340-rb-bench/nrf5-sdk.lock")" ]; then
+    [ -n "$SDK" ] && [ -f "$SDK" ] || die "the benchmark images of the nRF5340 DK need Nordic's nRF5 SDK zip (firmware/nrf5340-rb-bench/nrf5-sdk.lock): --nrf5-sdk PATH"
+    SDK=$(cd "$(dirname "$SDK")" && pwd)/$(basename "$SDK")
+fi
 say "board: $BOARD (probe $PROBE), level $LEVEL"
 [ "$CHECK_ONLY" = 1 ] && { say "tools and board OK"; exit 0; }
 
@@ -157,7 +182,7 @@ src_at() {   # a worktree of the commit (made once), printed
         # hard links (the build container sees only firmware/, so no symlink);
         # fetch-libs.sh in the worktree checks out that commit's pins
         if [ ! -d "$REPO/firmware/nrf5340-rb-bench/build/libs" ]; then
-            say "fetching the pinned libraries (libs.lock), once ..."
+            say "fetching the pinned libraries (libs.lock), once ..." >&2   # stdout is the path
             bash "$REPO/firmware/nrf5340-rb-bench/fetch-libs.sh" > "$OUT/logs/fetch-libs.log" 2>&1 \
                 || die "fetching the libraries failed (logs/fetch-libs.log)"
         fi
@@ -170,25 +195,41 @@ newest_after() {   # newest record matching glob, written after the marker
     find "$(dirname "$1")" -maxdepth 1 -name "$(basename "$1")" -newer "$2" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -1 | cut -d' ' -f2-
 }
 
-bench() {   # SET
-    local set=$1 key rec c w m mine pfx rc
-    key=bench; [ "$set" = mp ] && key=mp_bench
-    rec=$(jq -r --arg k "$key" '.[$k].record // empty' <<< "$bj")
-    [ -n "$rec" ] || { note "benchmark $set: no record of ours for $BOARD, skipped"; return; }
-    c=$(jq -r ".bench_commit" "$REPO/records/bench/$rec")
+bench() {   # benchmark version 2: one image per configuration and placement
+    local c w dir sel= bundles=$QB passes=1 rc
+    dir=$REPO/records/bench-v2/$FWB
+    ls "$dir"/*.json >/dev/null 2>&1 || { note "benchmark: no records of ours for $BOARD, skipped"; return; }
+    c=$(git -C "$REPO" rev-parse HEAD 2>/dev/null || cat "$REPO/EXPORTED_FROM")
     w=$(src_at "$c") || exit 2
-    pfx=${rec%%-flash-*}
-    m=$OUT/.mark-bench-$set; touch "$m"
-    say "benchmark $set at $c (ours: $rec) ..."
-    ( cd "$w/firmware/nrf5340-rb-bench" && BOARD=$FWB PROBE=$PROBE SET=$set bash run.sh flash ) > "$OUT/logs/bench-$set.log" 2>&1
+    if [ "$FWB" = nrf5340 ] && [ ! -f "$w/firmware/nrf5340-rb-bench/build/libs/nrf5-sdk/SHA256" ]; then
+        if [ -f "$REPO/firmware/nrf5340-rb-bench/build/libs/nrf5-sdk/SHA256" ]; then
+            cp -al "$REPO/firmware/nrf5340-rb-bench/build/libs/nrf5-sdk" "$w/firmware/nrf5340-rb-bench/build/libs/"
+        else
+            bash "$w/firmware/nrf5340-rb-bench/nrf5-sdk.sh" "$SDK" > "$OUT/logs/nrf5-sdk.log" 2>&1 || { note "benchmark: FAILED, the nRF5 SDK zip was not taken (logs/nrf5-sdk.log)"; return; }
+        fi
+    fi
+    if [ "$LEVEL" = full ]; then bundles=; passes=2; fi
+    say "benchmark, building the images${bundles:+ of bundle $bundles} ..."
+    ( cd "$w/firmware/nrf5340-rb-bench" && BUNDLE=$bundles bash onebuild.sh table "$FWB" ) > "$OUT/logs/bench-build.log" 2>&1 \
+        || { note "benchmark: FAILED, the build (logs/bench-build.log)"; return; }
+    if [ "$LEVEL" = quick ]; then   # up to six configurations that lie wholly (eight placements) in the bundle
+        sel=$(jq -r '[.images | group_by(.adapter)[] | select(length == 8) | .[0].adapter | select(startswith("adapter_"))] | .[0:6] | join(",")' \
+            "$w/firmware/nrf5340-rb-bench/build/v2/$FWB/bundle$QB.json")
+        [ -n "$sel" ] || { note "benchmark: FAILED, no whole configuration in bundle $QB (logs/bench-build.log)"; return; }
+    fi
+    say "benchmark, ${sel:+configurations $sel, }$passes pass(es); a bundle that is not on the board is written to it ..."
+    ( cd "$w/firmware/nrf5340-rb-bench" && PROBE=$PROBE python3 run-one.py "$FWB" "$OUT/bench-runs" --flash --passes $passes \
+        ${bundles:+--bundle $bundles} ${sel:+--adapter "$sel"} ) > "$OUT/logs/bench.log" 2>&1
     rc=$?
-    mine=$(newest_after "$HOME/lab-runs/$pfx-flash-2*.json" "$m")
-    if [ $rc -ne 0 ] || [ -z "$mine" ]; then note "benchmark $set: FAILED (exit $rc, logs/bench-$set.log)"; return; fi
-    mv "$mine" "$OUT/records/"; mine=$OUT/records/$(basename "$mine")
-    python3 "$REPO/lab/tools/compare-records.py" "$REPO/records/bench/$rec" "$mine" > "$OUT/compare-bench-$set.txt" 2>&1
-    case $? in 0) note "benchmark $set: same as ours ($(basename "$mine"))" ;;
-               1) note "benchmark $set: DIFFERS from ours, see compare-bench-$set.txt" ;;
-               *) note "benchmark $set: could not be compared, see compare-bench-$set.txt" ;; esac
+    python3 "$w/firmware/nrf5340-rb-bench/onerecords.py" --out "$OUT/records/bench-v2" "$OUT/bench-runs" > "$OUT/logs/bench-records.log" 2>&1
+    if [ $rc -ne 0 ] || ! ls "$OUT/records/bench-v2/$FWB"/*.json >/dev/null 2>&1; then
+        note "benchmark: FAILED (run-one.py exit $rc: 1 a run without a result, 2 probe or board; logs/bench.log, logs/bench-records.log)"; return
+    fi
+    note "benchmark: $(grep -o '[0-9]* runs, .* flash writes' "$OUT/bench-runs/run.log" | tail -n 1); $(tail -n 1 "$OUT/logs/bench-records.log")"
+    python3 "$REPO/lab/tools/compare-records.py" "$dir" "$OUT/records/bench-v2/$FWB" > "$OUT/compare-bench.txt" 2>&1
+    case $? in 0) note "benchmark: same as ours ($(sed -n 3p "$OUT/compare-bench.txt"))" ;;
+               1) note "benchmark: DIFFERS from ours, see compare-bench.txt" ;;
+               *) note "benchmark: could not be compared, see compare-bench.txt" ;; esac
 }
 
 stress() {   # MODE
@@ -218,11 +259,11 @@ stress() {   # MODE
 }
 
 note "verified-libs repeat on $BOARD, level $LEVEL, $STAMP; repeat.sh from $(git -C "$REPO" rev-parse --short=12 HEAD 2>/dev/null || cut -c1-12 "$REPO/EXPORTED_FROM" 2>/dev/null || echo unknown)"
-bench spsc
+[ "$ONLY" = stress ] || bench
+[ "$ONLY" = bench ] && stress() { :; }
 stress single
 stress sweep
 if [ "$LEVEL" = full ]; then
-    bench mp
     for m in block dma sweep-block sweep-dma; do stress $m; done
     [ "$FWB" = rp2350 ] && for m in smp sweep-smp; do stress $m; done
 fi

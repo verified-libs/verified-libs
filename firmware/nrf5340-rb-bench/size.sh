@@ -46,11 +46,10 @@ mkdir -p build "$OUTDIR"
 libs=$(bash fetch-libs.sh)
 work=$(mktemp -d build/sizework.XXXXXX)
 trap 'rm -rf "${work:?}"' EXIT
-python3 - main.c > "$work/sets.txt" <<'EOF'
+python3 - sets.h > "$work/sets.txt" <<'EOF'
 import re, sys
 src = open(sys.argv[1]).read()
-tab = src[src.index("const rb_adapter *libs[NLIBS] = {"):]
-tab = tab[:tab.index("#endif")]
+tab = src[src.index("#ifdef BENCH_ONLY"):src.rindex("#endif")]
 # the table's branches by their condition (the nordic set is not sized:
 # its sources come from the nRF5 SDK and may be built for Nordic chips only)
 names = {"BENCH_MP": "mp", "BENCH_RUST": "rust", "": "spsc"}

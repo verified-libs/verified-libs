@@ -130,8 +130,14 @@ def _parse_int(x):
 
 # --- State: what the page keeps in the address --------------------------------
 
+def has2(D):
+    """Does the data hold benchmark version 2 (one image per configuration) for some board?"""
+    return any(b.get("bench2") for b in D["boards"])
+
+
 def default_state(D):
-    return {"board": D["boards"][0]["id"], "w": {m: 0 for m in METRIC_IDS}, "f": {"nosingle": True},
+    return {"series": "2" if has2(D) else "1", "has2": has2(D),
+            "boards2": [b["id"] for b in D["boards"] if b.get("bench2")], "board": D["boards"][0]["id"], "w": {m: 0 for m in METRIC_IDS}, "f": {"nosingle": True},
             "lang": "", "topo": "", "cores": "", "sort": "name", "dir": 1}
 
 
@@ -221,15 +227,22 @@ def contract_of(lib, st):
     return c.get(mp_mode(st) or "SPSC") if c else None
 
 
+def two(st):
+    """Is the view one of benchmark version 2? The page shows it for every board that has it; version 1
+    (archived) is shown for a board without it, and where the server's `benchmark` argument asks for it
+    (st["series"] == "1", which the page's address cannot say)."""
+    return st.get("series") != "1" and st["board"] in st.get("boards2", ())
+
+
 def speed_of(lib, st):
     """The speeds that apply to the chosen use: those of the mode, or the SPSC ones."""
-    mode = mp_mode(st)
+    mode, key = mp_mode(st), "speed2" if two(st) else "speed"
     if not mode:
-        return lib["speed"].get(st["board"])
+        return (lib.get(key) or {}).get(st["board"]) or None
     mp = lib.get("mp")
     if not mp or mode not in mp["modes"]:
         return None
-    return (mp["speed"].get(st["board"]) or {}).get(mode) or None
+    return ((mp.get(key) or {}).get(st["board"]) or {}).get(mode) or None
 
 
 def size_of(lib, st):
@@ -490,6 +503,16 @@ def source_text(D, st):
     """Which records the numbers of this view come from (the line under the table)."""
     b, mode = board_of(D, st), mp_mode(st)
     bench, rust = b["bench"], b.get("rust_bench")
+    if two(st):
+        b2 = b["bench2"]
+        t = (b["name"] + " (" + b["core"] + ", " + js_str(b["clock_mhz"]) + " MHz). Speed: " +
+             "benchmark version 2, each configuration in an image of its own (" + js_str(b2["records"]) + ", commit " +
+             b2["commit"] + ", " + js_str(b2["passes"]) + " passes), " + b2["compiler"] + " " + b2["opt"] + " (Rust: " + b2["rustc"] +
+             ", same opt-level), code in flash" + (", library code that is not inlined at least " + js_str(b2["far_bytes"]) +
+             " bytes from its caller" if b2.get("far_bytes") else "") + "; small numbers: lowest and highest mean " +
+             "with the image at " + str(len(b2["placements"])) + " placements. No other library's code is in the image, " +
+             "so with a cache this is the best case")
+        return _source_tail(D, b, t)
     if mode:
         speed = b["mp_bench"]["record"] if b.get("mp_bench") else "no record of the modes on this board"
     else:
@@ -503,6 +526,10 @@ def source_text(D, st):
     if not mode and pl:
         t += ("; small numbers: lowest and highest mean with the library code at " + str(len(pl["shifts"])) +
               " placements (moved by " + js_str(pl["shifts"][0]) + " to " + js_str(pl["shifts"][-1]) + " bytes)")
+    return _source_tail(D, b, t)
+
+
+def _source_tail(D, b, t):
     if b.get("size"):
         t += ". Code and RAM: " + b["size"]["record"]
     t += ". ISR stress: "

@@ -112,6 +112,13 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
                     "board": {"type": "string", "enum": boards,
                               "description": "The board whose numbers are shown; pick the one closest to the user's core. "
                                              + board_text + f". Default: {boards[0]}."},
+                    "benchmark": {"type": "string", "enum": ["2", "1"], "default": "2",
+                                  "description": "Which benchmark the speeds come from. '2' (what the website shows): each "
+                                                 "configuration in a firmware image of its own. '1': the archived "
+                                                 "first benchmark, all libraries in one image; no longer added to "
+                                                 "and not shown on the website, so use it only when asked for the "
+                                                 "old numbers. The source line of the answer says which one a view "
+                                                 "shows."},
                     "topology": {"type": "string", "enum": ["any"] + q.TOPOS, "default": "any",
                                  "description": "Producers and consumers. 'any' and 'SPSC' show one-producer-one-consumer "
                                                 "speeds. MPSC, SPMC or MPMC keep only the libraries that document such a "
@@ -301,8 +308,10 @@ def _flag(args, key):
 
 def state_from_args(D, args):
     """The page's state for a compare_ring_buffers call. Raises ToolError on a bad argument."""
-    _check_args(args, ["board", "topology", "cores", "language", "require", "include_single_context", "weights", "sort", "reverse"])
+    _check_args(args, ["board", "benchmark", "topology", "cores", "language", "require", "include_single_context", "weights", "sort", "reverse"])
     st = q.default_state(D)
+    if _choice(args, "benchmark", ["2", "1"], "2") == "1":
+        st["series"] = "1"
     boards = [b["id"] for b in D["boards"]]
     st["board"] = _choice(args, "board", boards, boards[0])
     topo = _choice(args, "topology", ["any"] + q.TOPOS, "any")
@@ -371,6 +380,9 @@ def tool_compare(D, prov, args):
                     "eight positions in memory; differences inside it mean nothing. code_bytes: flash and RAM the "
                     "configuration adds.")
     out["sources"] = q.source_text(D, st)
+    if st.get("series") == "1":
+        out["archived"] = ("These speeds are benchmark version 1, an archived series. The website shows version 2; "
+                           "the link below leads to the same view with version 2's speeds.")
     out["same_view_on_the_site"] = q.view_url(st)
     out["data"] = prov
     return out

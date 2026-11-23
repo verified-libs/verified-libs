@@ -138,7 +138,7 @@ build/$(VAR3)/fw.elf: $(OBJS) $(LINK_DEPS) $(LIBC_A) $(LD_VAR3)
 	arm-none-eabi-objdump -d -C $@ > build/$(VAR3)/fw.lst
 endif
 
-build/main.o: main.c bench.h $(wildcard $(COMMON)/*.h)
+build/main.o: main.c bench.h sets.h $(wildcard $(COMMON)/*.h)
 	arm-none-eabi-gcc $(CFLAGS) -c $< -o $@
 build/startup.o: $(COMMON)/startup.c
 	arm-none-eabi-gcc $(CFLAGS) -fno-lto -fno-tree-loop-distribute-patterns -c $< -o $@
@@ -172,7 +172,88 @@ build/size/%.elf: $(OBJS) $(LINK_DEPS) $(LIBC_A) $(LD_FLASH) size_none.c
 	arm-none-eabi-g++ $(LDBASE) -T $(LD_FLASH) -Wl,-u,memcpy -Wl,-u,memmove -Wl,-u,memset -Wl,-Map=build/size/$*.map \
 	    build/size/main_$*.o build/size/none.o -Wl,--start-group build/size/objs_$*.a -Wl,--end-group $(LINK_TAIL) -o $@
 
+# One image per configuration (lab/plans/2026-11-22-bench-image-per-library.md;
+# built by onebundle.py): the harness, the baseline and the configuration
+# ONE (an adapter's name), FAR + PLACE bytes between the configuration's
+# adapter and the library (as SHIFT, for main.c only: the objects are built
+# once), linked
+# for the flash region SLOT_BASE/SLOT_LEN. Only what the configuration needs
+# is linked (the objects come from an archive).
+#   make one ONE=adapter_lwrb PLACE=4 SLOT_BASE=0x1000 SLOT_LEN=8192
+#   ONE_RUST=1    the configuration is Rust code: link the Rust archive
+#   ONE_NORDIC=1  it is Nordic's (nordic.mk; BOARD=nrf5340 only)
+# The fixed part is the same code at the same offsets in every image of a
+# board: the vector table, the harness, the C library's memory functions
+# (all of them in every image, used or not), main.c's other code with the
+# baseline, and the start-up code; memcpy starts on a 32-byte boundary (for
+# Cortex-M0+ newlib has it in the object memcpy-stub, for the other cores in
+# memcpy: both are named). Then
+# the configuration's adapter (for a Rust configuration: its functions of
+# ../rust-adapters, by their prefixes), FAR + PLACE bytes, and everything
+# else: the library.
+# FAR (DECISIONS 2026-11-23, "far call"): every library lies at least FAR
+# bytes from the adapter that calls it, as a library does in an application
+# that is larger than a test image. On the Cortex-M7 a call across about
+# 4 KB or more costs 6 to 10 cycles more than a call to code nearby
+# (reports/2026-11-23-bench-v2-first-run.md); with the library next to its
+# adapter some configurations would pay that and others not, by the size of
+# their code. Code that the compiler puts into the adapter itself (a library
+# of headers) has no call and stays where the adapter is. 6144: half as
+# much again as the 4096 at which the full cost was measured.
+# onebundle.py checks that every function of the adapter's table lies
+# before the gap. So the baseline and memcpy do not move with
+# the size of the library (they did in version 1, where memcpy lay behind
+# all libraries), and onebundle.py checks that they do not.
+ifneq ($(ONE),)
+PLACE ?= 0
+FAR ?= 6144
+ONE_NEAR = *(.text.bench_adapter*) *libvl_rust_adapters.a:*(.text.hl_* .text.hlm_* .text.bbq_* .text.emb_*) _bench_near_end = .;
+OD = build/one/$(ONE)-p$(PLACE)-$(SLOT_BASE)
+ONE_OBJS = $(filter-out build/main.o build/startup.o,$(OBJS)) $(RUST_OBJS)
+ifeq ($(ONE_NORDIC),1)   # an archive of its own: the other images' archive is the same with and without it
+ifneq ($(SET),nordic)
+include nordic.mk
+build/nordic_parts.o: adapters_nordic/parts_nrf_ringbuf.c | build
+	$(CC_LIB) $(CFLAGS) $(NRF5_I) -c $< -o $@
+endif
+ONE_NORDIC_A = build/one/nordic.a
+build/one/nordic.a: $(NORDIC_OBJS) build/nordic_parts.o
+	mkdir -p build/one
+	rm -f $@
+	arm-none-eabi-ar rcs $@ $^
+endif
+# the C library's memory functions are named to the linker for every image
+# (RUST_MEMSYMS, ../common/rust.mk), and the C library comes before the
+# Rust archive, so that they are newlib's for C and Rust code alike
+ONE_U    = $(addprefix -Wl$(comma)-u$(comma),$(RUST_MEMSYMS))
+ONE_TAIL = $(LIBC_A) -Wl,-lc_nano $(if $(filter 1,$(ONE_RUST)),$(RUST_LIB))
+ONE_FIXED = . = ALIGN(32); *libc_a-memcpy.o(.text*) *libc_a-memcpy-stub.o(.text*) *libc_a-memmove.o(.text*) *libc_a-memset.o(.text*) *libc_a-memcmp.o(.text*) \
+            *libc_a-aeabi_mem*.o(.text*) *main.o(.text.bench_adapter*) *main.o(.text*) *main.o(.rodata*) *startup.o(.text*) \
+            *startup.o(.rodata*) _bench_fixed_end = .;
+one: $(OD)/fw.elf
+build/one/objs.a: $(ONE_OBJS)
+	mkdir -p build/one
+	rm -f $@
+	arm-none-eabi-ar rcs $@ $^
+$(OD)/fw.elf: build/one/objs.a $(ONE_NORDIC_A) build/startup.o main.c bench.h $(wildcard $(COMMON)/*.h) $(LIBC_A) $(LD_FLASH) \
+              $(if $(filter 1,$(ONE_RUST)),$(RUST_LIB))
+	mkdir -p $(OD)
+	sed -E -e 's/^([[:space:]]*FLASH[[:space:]]+\(rx\)[[:space:]]*:[[:space:]]*)ORIGIN = [^,]+, LENGTH = [^[:space:]]+/\1ORIGIN = $(SLOT_BASE), LENGTH = $(SLOT_LEN)/' \
+	    -e 's/\*\(\.text\.time_call\) \*\(\.text\.bench_adapter\*\)/*(.text.time_call) $(ONE_FIXED) $(ONE_NEAR)/' $(LD_FLASH) > $(OD)/slot.ld
+	grep -q 'ORIGIN = $(SLOT_BASE), LENGTH = $(SLOT_LEN)' $(OD)/slot.ld || { echo "$(LD_FLASH): no FLASH region to move" >&2; exit 1; }
+	grep -qF '_bench_near_end = .;' $(OD)/slot.ld || { echo "$(LD_FLASH): no place for the adapter" >&2; exit 1; }
+	grep -qF '*libc_a-memcpy.o(.text*)' $(OD)/slot.ld || { echo "$(LD_FLASH): no place for the fixed part" >&2; exit 1; }
+	arm-none-eabi-gcc $(CFLAGS) -DBENCH_ONE=$(ONE) -DBENCH_SHIFT=$(shell expr $(FAR) + $(PLACE)) -c main.c -o $(OD)/main.o
+	arm-none-eabi-g++ $(LDBASE) -Wl,-n -T $(OD)/slot.ld -Wl,-Map=$(OD)/fw.map $(ONE_U) \
+	    $(OD)/main.o build/startup.o -Wl,--start-group build/one/objs.a $(ONE_NORDIC_A) -Wl,--end-group $(ONE_TAIL) -o $@
+.PHONY: one
+endif
+
+# onebundle.py reads the board's variables
+print-%:
+	@echo '$($*)'
+
 clean:
-	rm -rf build/*.o build/flash build/sram build/ccm build/itcm build/size build/.board build/rust
+	rm -rf build/*.o build/flash build/sram build/ccm build/itcm build/size build/one build/.board build/rust
 
 .PHONY: all clean

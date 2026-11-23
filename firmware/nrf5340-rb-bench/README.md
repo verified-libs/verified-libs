@@ -323,3 +323,33 @@ for the device and SoftDevice headers. Records: `nrf5340-rb-bench-nordic-*`.
 The stress test has the same option (`NORDIC=1`, library 40, records
 `nrf5340-rb-nordic-stress-*`). Without these options both firmwares are
 unchanged.
+
+## One image per configuration (version 2, 2026-11-23)
+
+The speed numbers of the pages come from this (records in
+`records/bench-v2/`); what is described above is version 1, whose records
+are archived. The design and what has been tried are in
+[lab/plans/2026-11-22-bench-image-per-library.md](../../lab/plans/2026-11-22-bench-image-per-library.md),
+what the distance between a library and its caller costs in
+[reports/2026-11-23-bench-v2-far-call.md](../../reports/2026-11-23-bench-v2-far-call.md).
+
+In version 1 all libraries of a set are in one image. In version 2 an image
+holds the harness, the baseline and one configuration at one placement, so
+a change in one library changes that library's images only. All images of a
+board lie in flash at once, each in its slot, and a boot stub
+(`../common/benchboot.c`) starts the one the host selects.
+
+```
+bash onebuild.sh table [BOARD...]                 # every image of slots.txt, and the bundles (build/v2/<board>)
+python3 run-one.py BOARD OUTDIR --bundle 0        # run a bundle that is on the board; --flash writes it (one flash write)
+python3 onerecords.py --out DIR OUTDIR...         # run files -> one record per board and configuration
+bash oneverify.sh RECORD...                       # rebuild a record's images and compare (no board)
+```
+
+`configs.txt` names the configurations, `slots.txt` the slot of every image
+(`oneslots.py` writes it; lines are only added, or those of one changed
+configuration replaced). Each tool says more at its top.
+
+Pico 2: a bundle of more than about 1 MB is written with
+`lab/tools/pico2-write.py BUNDLE.elf` before `run-one.py` (the tool says
+why); the runner then finds it on the board.

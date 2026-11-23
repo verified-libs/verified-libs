@@ -41,22 +41,28 @@
 #include "bench.h"
 
 #define RUNS 1024u
-#ifdef BENCH_ONLY   /* size.sh: a firmware with one configuration, to measure what it adds; never run */
-#define NLIBS 1u
-extern const rb_adapter adapter_none;   /* size_none.c: no library at all */
-#elif defined(BENCH_MP)   /* SET=mp: the modes for more than one producer or consumer */
-#define NLIBS 10u
-#elif defined(BENCH_RUST)   /* SET=rust: the Rust libraries (../rust-adapters) */
-#define NLIBS 5u
-#elif defined(BENCH_NORDIC)   /* SET=nordic: nrf_ringbuf, nRF5340 only (Nordic's licence) */
-#define NLIBS 6u
-extern const rb_adapter adapter_nrf_ringbuf, part_nrf_atomics, part_memcpy1, part_nrf_len0;
+#ifdef BENCH_ONE    /* one image per configuration: the baseline as a control, and that configuration
+                     * (lab/plans/2026-11-22-bench-image-per-library.md); started by ../common/benchboot.c.
+                     * The configuration's name comes from the build and is the only library name the
+                     * image is built from: no list of libraries is read here (bench.h leaves its own
+                     * out), so a new library changes neither the bytes nor the debug information of
+                     * another library's image. */
+#define NLIBS 2u
+extern const rb_adapter BENCH_ONE;
+#define BENCH_LIBS &adapter_baseline, &BENCH_ONE
+#include "board_uart.h"         /* only for BOARD_SELECT_ADDR, on the board that has one (RP2350) */
+#include "../common/select.h"
+VL_SELECT_DEFINE
 #else
-#define NLIBS 37u
+#include "sets.h"   /* version 1: the sets of libraries that share an image, and size.sh's single one */
 #endif
 #define NSCEN 7u
 #define RESULT_MAGIC 0x564C4235u /* "VLB5" */
+#ifdef BENCH_ONE
+#define RESULT_VERSION 7u        /* 7: as 6, then the image's place in flash and the host's run number */
+#else
 #define RESULT_VERSION 6u        /* 6: clock_hz, board_id, overhead, empty call */
+#endif
 
 struct stat { uint32_t min, max, sum, first, count; };
 struct series { struct stat push, pop; };
@@ -68,6 +74,10 @@ struct results {
     uint32_t dwt_stalls;   /* timed calls where the cycle counter did not advance */
     uint32_t board_id, read_overhead;
     uint32_t empty_call_min; /* raw cycles of an empty call (calibration) */
+#ifdef BENCH_ONE
+    uint32_t image_base;     /* the vector table this image runs from (VTOR, set by the boot stub) */
+    uint32_t nonce;          /* the fourth selection word: the host's number for this start */
+#endif
 };
 __attribute__((section(".results")))
 volatile struct results results;
@@ -241,42 +251,14 @@ int main(void)
     results.board_id = BOARD_ID;
     results.read_overhead = BOARD_READ_OVERHEAD;
     results.dwt_stalls = board_counter_running() ? 0u : 0xFFFFFFFFu;
+#ifdef BENCH_ONE
+    results.image_base = *(volatile uint32_t *)0xE000ED08u;
+    results.nonce = SEL[3];
+#endif
     board_cache(1);
     results.empty_call_min = empty_call_min();
 
-    const rb_adapter *libs[NLIBS] = {
-#ifdef BENCH_ONLY
-        &BENCH_ONLY };
-#elif defined(BENCH_MP)
-        /* each mode next to the library's SPSC configuration, timed in the
-         * same firmware; tsrb and wizard97 + PRIMASK are the same code in
-         * every mode (stress test of the modes: ../rb-mp-stress) */
-        &adapter_baseline, &adapter_pxq, &adapter_pxq_mpsc, &adapter_pxq_spmc, &adapter_pxq_mpmc,
-        &adapter_lockfree, &adapter_lockfree_mpmc, &adapter_riot_tsrb, &adapter_wizard97_primask,
-        &adapter_heapless_mpmc };
-#elif defined(BENCH_RUST)
-        /* a firmware of their own: the SPSC set fills the SAM D20's RAM;
-         * baseline and pxq as a reference against that set */
-        &adapter_baseline, &adapter_pxq, &adapter_heapless, &adapter_bbqueue, &adapter_embassy_pipe };
-#elif defined(BENCH_NORDIC)
-        /* a firmware of its own, for the nRF5340 only; baseline and pxq as
-         * a reference against the SPSC set */
-        &adapter_baseline, &adapter_pxq, &adapter_nrf_ringbuf,
-        /* where nrf_ringbuf's single-byte cycles go (adapters_nordic/parts_nrf_ringbuf.c) */
-        &part_nrf_atomics, &part_memcpy1, &part_nrf_len0 };
-#else
-        &adapter_baseline, &adapter_pxq, &adapter_lwrb, &adapter_anders,
-        &adapter_jnk0le, &adapter_etl_isr, &adapter_etl_atomic,
-        &adapter_qp_lfrb, &adapter_ea_cbuf, &adapter_ece, &adapter_micoring,
-        &adapter_kostyk, &adapter_diffstorm, &adapter_riot_tsrb, &adapter_contiki,
-        &adapter_rigtorp, &adapter_wizard97_plain, &adapter_wizard97_primask,
-        &adapter_polycratia, &adapter_rtspsc, &adapter_tinyusb,
-        &adapter_zephyr, &adapter_zephyr_smp, &adapter_lockfree, &adapter_etl_locked,
-        &adapter_freertos_sb, &adapter_nuttx_circbuf, &adapter_arduino_plain, &adapter_arduino_safe,
-        &adapter_rtthread_plain, &adapter_rtthread_locked, &adapter_mbed_cb, &adapter_moodycamel,
-        /* single-context variants */
-        &adapter_pxq_none, &adapter_micoring_sc, &adapter_ea_cbuf_plain, &adapter_etl_queue };
-#endif
+    const rb_adapter *libs[NLIBS] = { BENCH_LIBS };
     for (uint32_t l = 0; l < NLIBS; l++) {
         memset((void *)&results.lib[l], 0, sizeof results.lib[l]);
         errors = &results.lib[l].errors;

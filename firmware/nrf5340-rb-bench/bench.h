@@ -36,6 +36,10 @@ typedef struct {
     rb_op dma_wr_acquire, dma_wr_commit, dma_rd_acquire, dma_rd_release;
 } rb_adapter;
 
+/* The adapters. Not read by an image of one configuration (main.c
+ * BENCH_ONE), which names its own; the adapters' own files read the list
+ * (it gives the C++ ones their external linkage). */
+#ifndef BENCH_ONE
 extern const rb_adapter adapter_pxq;
 extern const rb_adapter adapter_lwrb;
 extern const rb_adapter adapter_anders;
@@ -78,6 +82,7 @@ extern const rb_adapter adapter_heapless, adapter_heapless_mpmc, adapter_bbqueue
 extern const rb_adapter adapter_micoring_sc;
 extern const rb_adapter adapter_ea_cbuf_plain;
 extern const rb_adapter adapter_etl_queue;
+#endif
 
 #ifdef BENCH_NO_ALIGN   /* size probe: no padding between the adapter functions */
 #define BENCH_ALIGN __attribute__((noinline))

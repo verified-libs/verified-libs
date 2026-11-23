@@ -1,0 +1,36 @@
+# Pilot on the SAM D20 (step 4 of lab/plans/2026-11-22-bench-image-per-library.md):
+# 31 slots of 8 KB fill the one 256 KB segment behind the 4 KB boot stub.
+# Three configurations at the eight placements, three more at placement 0,
+# and lwrb at placement 0 at four more addresses up to the end of flash.
+# <adapter> <placement> <slot address> <slot bytes>
+adapter_pxq 0 0x1000 8192
+adapter_pxq 4 0x3000 8192
+adapter_pxq 8 0x5000 8192
+adapter_pxq 12 0x7000 8192
+adapter_pxq 16 0x9000 8192
+adapter_pxq 20 0xb000 8192
+adapter_pxq 24 0xd000 8192
+adapter_pxq 28 0xf000 8192
+adapter_lwrb 0 0x11000 8192
+adapter_lwrb 4 0x13000 8192
+adapter_lwrb 8 0x15000 8192
+adapter_lwrb 12 0x17000 8192
+adapter_lwrb 16 0x19000 8192
+adapter_lwrb 20 0x1b000 8192
+adapter_lwrb 24 0x1d000 8192
+adapter_lwrb 28 0x1f000 8192
+adapter_jnk0le 0 0x21000 8192
+adapter_jnk0le 4 0x23000 8192
+adapter_jnk0le 8 0x25000 8192
+adapter_jnk0le 12 0x27000 8192
+adapter_jnk0le 16 0x29000 8192
+adapter_jnk0le 20 0x2b000 8192
+adapter_jnk0le 24 0x2d000 8192
+adapter_jnk0le 28 0x2f000 8192
+adapter_qp_lfrb 0 0x31000 8192
+adapter_lockfree 0 0x33000 8192
+adapter_freertos_sb 0 0x35000 8192
+adapter_lwrb 0 0x37000 8192
+adapter_lwrb 0 0x39000 8192
+adapter_lwrb 0 0x3b000 8192
+adapter_lwrb 0 0x3d000 8192
