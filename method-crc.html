@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How the CRC libraries are measured and checked: one image per configuration and placement, every call compared with a reference, host tests and CBMC proofs.">
+<link rel="canonical" href="https://verified-libs.org/method-crc.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Method: how CRC libraries are measured and checked - verified-libs">
+<meta property="og:description" content="How the CRC libraries are measured and checked: one image per configuration and placement, every call compared with a reference, host tests and CBMC proofs.">
+<meta property="og:url" content="https://verified-libs.org/method-crc.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Method: how CRC libraries are measured and checked - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html" class=on>Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
+<main><h1 id="method-how-crc-libraries-are-measured-and-checked">Method: how CRC libraries are measured and checked</h1>
+<p>The method of one of the two kinds of library so far (<a href="kinds.html">all kinds</a>);
+the other kind's: <a href="method.html">embedded ring buffers</a>.</p>
+<p>The numbers are on the <a href="results-crc.html">results page</a>. The details and
+every run's output are in <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md"><code>kinds/crc/README.md</code></a>,
+the first series and the checks of its numbers in its
+<a href="report-2026-11-25-crc-first-series.html">report</a>; this page says
+what they add up to.</p>
+<h2 id="what-is-measured">What is measured</h2>
+<p>Twenty configurations of eight libraries: one library, one CRC and one
+implementation of it each, for three CRCs of the
+<a href="https://reveng.sourceforge.io/crc-catalogue/all.htm">CRC RevEng catalogue</a>:
+CRC-32/ISO-HDLC, CRC-16/IBM-3740 and CRC-8/SMBUS. The configurations, the
+class of each (bitwise, a table of 16, a table of 256, slicing by 4, zlib's
+braided words, a table-free byte step) and where its table lies are listed
+in <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 2 of the kind's README</a>. The same six
+boards as for the ring buffers (<a href="method.html">method</a>, "Hardware").</p>
+<p><strong>One call, timed.</strong> Each call computes the CRC of a whole message (the
+one-shot call); the board's cycle counter is read around it by the same
+timing routine as the ring-buffer benchmark (<code>time_call</code>,
+<code>firmware/common/&lt;board&gt;/board.h</code>), and the cost of reading the counter is
+subtracted.</p>
+<p><strong>Scenarios.</strong> Messages of 1, 4, 16, 64, 256 and 1024 bytes; the message
+at an 8-byte boundary and one byte after it; the cache off and on. That is
+24 scenarios. Each is 256 timed calls; one byte of the message changes
+between calls, and every call's result is compared with the reference's
+(below), outside the timed call. A record holds the minimum, maximum,
+mean, first value and count of the 256 calls per scenario.</p>
+<p><strong>One image per configuration and placement.</strong> As version 2 of the
+ring-buffer benchmark: an image holds a fixed part (the timing code,
+<code>main</code>, the reference; the same bytes in every image of a board) and one
+configuration. Each configuration is built at eight placements (its code
+moved by 0, 4 ... 28 bytes behind the fixed part), with 6144 bytes between
+the adapter and the library (a far call). Every image is run in two
+passes. A record holds the eight images and both runs of each.</p>
+<p><strong>The baseline</strong> is the reference of the configuration's CRC, timed in
+the same image with the same scenarios. It is part of the fixed part, so
+it lies at the same offset from the start of every image of a board,
+whatever the configuration and its placement.</p>
+<p><strong>What "cache on" is on each board.</strong> The image switches the board's
+cache off, runs every scenario, switches it on and runs them again
+(<code>board_cache()</code>, <code>firmware/common/&lt;board&gt;/board.h</code>). The code and the
+tables are in flash on every board, so what the switch covers differs
+(quoted from the manuals in
+<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-24-crc-flash-read-sources.md"><code>lab/plans/2026-11-24-crc-flash-read-sources.md</code></a>):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Cache on</th>
+<th>Flash wait states</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NUCLEO-G474RE, 170 MHz</td>
+<td>ART: instruction cache, a data cache of 256 bytes on DCode, prefetch (RM0440)</td>
+<td>4</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE, 64 MHz</td>
+<td>an instruction cache of two 8-byte lines and prefetch; "No data cache is available on Cortex-M0+" (RM0444)</td>
+<td>2</td>
+</tr>
+<tr>
+<td>nRF5340 DK, 64 MHz</td>
+<td>the application core's cache, 16-byte lines, instruction and data accesses to flash (nRF5340 Product Specification v1.6)</td>
+<td>no setting</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG, 64 MHz</td>
+<td>the Cortex-M7 L1 instruction and data caches, 32-byte lines</td>
+<td>7, the power-on default (RM0468 allows 0 or 1 at 64 MHz)</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro, 48 MHz</td>
+<td>the NVM controller's direct-mapped cache; the data sheet does not say whether data reads are cached</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Raspberry Pi Pico 2, 150 MHz</td>
+<td>the 16 kB XIP cache, 8-byte lines, in front of the external QSPI flash; with it off every read goes to the flash</td>
+<td>a miss is a QSPI transfer</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="what-the-same-as-the-reference-was-checked-for-and-how">What "the same as the reference" was checked for, and how</h2>
+<p><strong>The reference</strong> (<code>kinds/crc/ref_crc.c</code>) is the bitwise algorithm written
+from the catalogue's parameters. It is checked against the catalogue's
+check value and residue, against an implementation that is not ours
+(Python's <code>zlib.crc32</code> and <code>binascii.crc_hqx</code>, for CRC-32 and CRC-16), and
+four builds with one parameter wrong must each be caught (README step 1).</p>
+<p><strong>Every configuration on the host</strong> (README step 3), built plain and with
+the address and undefined-behaviour sanitizers: the check value; every
+length from 0 to 300 bytes at every start alignment from 0 to 7; every
+length cut into two calls at every point; and every input of one step of
+the CRC: all of them for CRC-8 and CRC-16, every last byte after 65536
+random states for CRC-32. Five deliberately broken adapters must each be
+caught. The Rust adapter also runs under Miri.</p>
+<p><strong>CRC-32 for every input</strong> (README step 3b), by CBMC, with the sources
+preprocessed by the boards' compiler: for one configuration of each class,
+the library's result equals the reference's for every previous CRC value
+and every message of the length given. crcany's slicing by 4 is proven in
+two parts (a lemma by CBMC, and all 2^32 values computed). zlib's braided
+code: every message of 24 bytes at offsets 0 and 1 directly, and of 40
+and 60 bytes at offset 0 in parts, where one part (that two functions
+which are affine and agree at the zero input and at every input with one
+bit set are the same function) is argued, not machine-checked. Every proof
+has a control with one wrong value that must fail. What is not covered by
+a proof is listed there: other lengths of zlib's braided loop, the C++ and
+Rust configurations, and libcrc's table built at run time.</p>
+<p><strong>On the boards</strong>, every timed call's result is compared with the
+reference's; a record is made only if every call of every run agreed
+(<code>errors</code> and <code>baseline_errors</code> 0).</p>
+<h2 id="what-is-not-measured">What is not measured</h2>
+<ul>
+<li>The boards' CRC hardware (the CRC units of the STM32 parts, for
+  example): only software is measured.</li>
+<li>Slicing by 8 or 16, and other configurations of the libraries than the
+  twenty.</li>
+<li>A table copied from flash to RAM by the application before use. libcrc
+  and CRC++ build their tables in RAM themselves; that is measured as they
+  ship it, with the building done before the timed calls. A series with
+  the tables in RAM is to follow this first publication
+  (<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>, 2026-11-25); the report's check 6
+  shows where it would matter most: with the cache off, and on the boards
+  with the slowest flash.</li>
+<li>Code run from RAM: every configuration runs from flash.</li>
+</ul>
+<h2 id="what-the-placements-show">What the placements show</h2>
+<p><strong>The measurement repeats exactly.</strong> On five of the six boards every
+number of the series is the same in both passes, to the cycle, and the
+baseline measures the same in every image of a board of one CRC. On the Pico 2, 90
+of 7680 means differ between the passes, all with the cache on, by at
+most 1.26 %; the shortest call is the same in both passes, so the
+difference lies in a few slower calls (the <a href="report-2026-11-25-crc-first-series.html">series report</a>,
+"The numbers, checked", check 1).</p>
+<p><strong>A mean includes the first call.</strong> Each scenario's mean is over its 256
+calls, the first included. The scenarios run in a fixed order: the cache
+off, then on; within each, lengths 1 to 1024 bytes, and for each length
+offset 0, then 1 (<code>kinds/crc/bench/main.c</code>, <code>run_all</code>). So the 1-byte
+figure at offset 0 with the cache on is the first scenario after the
+cache is switched on, and its first calls are the first with the cache
+on; the tables here do not use it. In the figures they do use, the first call
+adds at most 2.45 % to a mean (Pico 2, 16 bytes) and at most 0.25 % on
+the other boards (the report, check 1).</p>
+<p><strong>Where the code lies moves the numbers more than repetition does.</strong> The
+same configuration, built eight times with its code moved by 0, 4 ... 28
+bytes, gives different means. With the cache off the spread over the
+eight placements reaches 23 % on the NUCLEO-G474RE, 19 % on the
+NUCLEO-G0B1RE, 41 % on the nRF5340 DK and 447 % on the NUCLEO-H723ZG; it
+stays at 0 on the SAM D20 and below 14 % on the Pico 2. With the cache
+on it is at most 0.12 % on the nRF5340 DK, 0.23 % on the Pico 2, 2.4 % on
+the NUCLEO-H723ZG and 4.5 % on the SAM D20, but up to 23 % and 25 % on
+the NUCLEO-G474RE and NUCLEO-G0B1RE (check 7).</p>
+<p><strong>The spread repeats with a step that fits each board's flash or cache.</strong>
+On the NUCLEO-G474RE and NUCLEO-G0B1RE the numbers with the cache off
+repeat every 8 bytes, the width of their flash reads (64 bits, RM0440 3.2
+and RM0444 3.2); on the nRF5340 DK every 16 bytes, its cache line (128
+bits, nRF5340 Product Specification v1.6, 5.4.1); on the NUCLEO-H723ZG a
+configuration is slow exactly where its loop crosses a 32-byte boundary,
+the width of the flash word that its read buffer holds (256 bits, RM0468
+4.3.8), in the three configurations looked at. The NUCLEO-H723ZG runs at
+the 7 wait states it has after power-on, which RM0468 does not require at
+64 MHz (Table 16: 0 or 1); its numbers with the cache off carry them.
+"Fits" is all that is claimed: the period matches the figure in the
+manual; the mechanism was not measured. What is not explained is listed
+in the report.</p>
+<p><strong>What this means for the tables.</strong> A difference between two
+configurations is a difference only where their ranges over the eight
+placements do not overlap. Every table therefore shows the range over the
+placements, and with the cache off a single placement says little on the
+NUCLEO-H723ZG, the nRF5340 DK and the two STM32 boards with 8-byte reads.</p>
+<h2 id="for-the-next-version-of-the-method">For the next version of the method</h2>
+<p>Two changes are noted for when both kinds are measured again, not before
+(<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>, 2026-11-25):</p>
+<ul>
+<li>the NUCLEO-H723ZG with the flash wait states a user would set at its
+  clock, not the 7 it has after power-on;</li>
+<li>the median of a scenario's 256 calls beside the mean, so that a few slow
+  calls can be told from a shifted level.</li>
+</ul></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

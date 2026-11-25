@@ -4,6 +4,8 @@
 <url><loc>https://verified-libs.org/compare.html</loc></url>
 <url><loc>https://verified-libs.org/finding-diffstorm-cb-overwrite-padding.html</loc></url>
 <url><loc>https://verified-libs.org/findings.html</loc></url>
+<url><loc>https://verified-libs.org/kinds.html</loc></url>
+<url><loc>https://verified-libs.org/method-crc.html</loc></url>
 <url><loc>https://verified-libs.org/method.html</loc></url>
 <url><loc>https://verified-libs.org/repeats.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-06-first-harness.html</loc></url>
@@ -29,7 +31,11 @@
 <url><loc>https://verified-libs.org/report-2026-11-23-bench-v2-far-call.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-23-bench-v2-first-run.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-23-bench-v2-placement-period.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-24-next-kind.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-24-what-carries-over.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-25-crc-first-series.html</loc></url>
 <url><loc>https://verified-libs.org/reports.html</loc></url>
 <url><loc>https://verified-libs.org/reproduce.html</loc></url>
+<url><loc>https://verified-libs.org/results-crc.html</loc></url>
 <url><loc>https://verified-libs.org/results.html</loc></url>
 </urlset>
