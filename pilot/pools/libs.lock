@@ -1,0 +1,7 @@
+# The three libraries of the pool pilot, pinned by commit (format of
+# firmware/nrf5340-rb-bench/libs.lock: name url commit [path ...]).
+# fetch.sh fetches them outside the repository; nothing of them is copied
+# into it. ETL and RIOT are at the commits the ring-buffer trial pins.
+etl         https://github.com/ETLCPP/etl.git               7d604f2e4f7fa79ff49bf675c089656943f9171b /include/ /LICENSE
+riot        https://github.com/RIOT-OS/RIOT.git             9c9a6abec901838b1637ef9308427b50ef59ce5c /sys/memarray/ /sys/include/memarray.h /LICENSE
+threadx     https://github.com/eclipse-threadx/threadx.git  93387b0a60382a29579bbad5045c68328e3751df /common/inc/ /common/src/tx_block_allocate.c /common/src/tx_block_release.c /common/src/tx_block_pool_create.c /common/src/tx_block_pool_delete.c /ports/cortex_m4/gnu/inc/ /LICENSE.txt

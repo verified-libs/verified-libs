@@ -1,4 +1,7 @@
-# Results: embedded ring buffers (all in one place)
+# Results: embedded ring buffers
+
+The results of one of the two kinds of library so far; the other is CRC
+calculation in software ([all kinds](site/content/kinds.md), [CRC results](site/content/results-crc.md)).
 
 > **Status: published results.** Every number comes from a record under
 > [records/](records/README.md) that can be rebuilt and repeated from this

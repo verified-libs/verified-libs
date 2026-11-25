@@ -1,0 +1,26 @@
+# The Rust configuration of the CRC kind: the crc crate (mrhooray/crc-rs,
+# 3.4.0) with crc-catalog 2.4.0, both from the checkouts fetch.sh makes from
+# libs.lock and mounted at /libs in the toolchain image; cargo runs with
+# --offline and never reads crates.io. Built as a static library with a C
+# interface, as firmware/rust-adapters does for the ring buffers.
+[package]
+name = "vl-crc-rust"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+path = "src/lib.rs"
+
+[dependencies]
+crc = { path = "/libs/crc-rs" }
+
+[patch.crates-io]
+crc-catalog = { path = "/libs/crc-catalog" }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+debug = true
+lto = false

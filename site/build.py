@@ -28,6 +28,7 @@ import markdown
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from embargo_strip import strip_embargo   # noqa: E402
+import kinds_page   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "site")
@@ -83,7 +84,7 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
 """
 
-NAV = [("index", "Home"), ("results", "Results"), ("compare", "Compare"), ("method", "Method"),
+NAV = [("index", "Home"), ("kinds", "Results"), ("compare", "Compare"), ("method", "Method"),
        ("reproduce", "Reproduce"), ("repeats", "Repeats"), ("findings", "Findings"), ("reports", "Reports")]
 
 
@@ -147,19 +148,25 @@ def page(slug, title, body, nav_on, desc="", listed=True):
 
 # The front page's heading is the project's name; its browser title says more.
 # The project is a registry of more than one kind of library; ring buffers
-# are the first niche. Name both, the project first.
-INDEX_TITLE = "verified-libs: libraries tested on real hardware, first embedded ring buffers"
+# and CRC calculation in software are the kinds so far. Name the project first.
+INDEX_TITLE = "verified-libs: libraries tested on real hardware: embedded ring buffers and CRC"
 INDEX_DESC = ("An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. "
-              "The first niche: embedded ring buffer (FIFO) libraries for microcontrollers on six boards, "
-              "every number with its record and source.")
+              "Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation in software, for "
+              "microcontrollers on six boards, every number with its record and source.")
 # What a search engine shows under the page's title. Pages not named here
 # (reports, findings) get their first paragraph (describe).
 DESCRIPTIONS = {
     "index.html": INDEX_DESC,
+    "kinds.html": "The kinds of library tested so far, embedded ring buffers and CRC calculation in software: "
+                  "what is measured, how many libraries and boards, and where the results, method and records are.",
     "method.html": "How the ring buffer libraries are tested: cycle-counted benchmarks on six microcontroller boards, "
                    "interrupt stress tests with a known-bad control, model checks and contract checks.",
     "results.html": "Results for embedded ring buffer libraries on six microcontroller boards: cycles per push and pop, "
                     "code size, interrupt stress tests and model checks, each with its record.",
+    "results-crc.html": "Results for CRC libraries in software on six microcontroller boards: cycles for a short "
+                        "message and per byte, cache on and off, flash and RAM bytes, each with its record.",
+    "method-crc.html": "How the CRC libraries are measured and checked: one image per configuration and placement, "
+                       "every call compared with a reference, host tests and CBMC proofs.",
     "reproduce.html": "How to rebuild the firmware bit for bit and repeat the measurements: every number comes from a "
                       "record that names the commit, the toolchain, the flags and the pinned library versions.",
     "repeats.html": "Repeats of the tests by people outside the project, and how to send in your own.",
@@ -212,19 +219,26 @@ def main():
     # source (repo-relative) -> output file
     pagemap = {"site/content/index.md": "index.html", "site/content/method.md": "method.html",
                "site/content/reproduce.md": "reproduce.html", "site/content/repeats.md": "repeats.html",
-               "site/content/compare.html": "compare.html",
-               "RESULTS.md": "results.html"}
+               "site/content/compare.html": "compare.html", "site/content/kinds.md": "kinds.html",
+               "RESULTS.md": "results.html",
+               # the CRC kind (DECISIONS 2026-11-24: static pages first)
+               "site/content/results-crc.md": "results-crc.html", "site/content/method-crc.md": "method-crc.html"}
     for r in reports:
         pagemap[f"reports/{r}"] = "report-" + r[:-3] + ".html"
     for f in findings:
         pagemap[f"verify/findings/{f}/README.md"] = "finding-" + f + ".html"
 
+    # The overview of the kinds ("Results" in the menu) is written from the data
+    # by site/kinds_page.py; a page whose counts differ from the data is not built.
+    if open(os.path.join(SITE, "content/kinds.md")).read() != kinds_page.markdown():
+        sys.exit("build refused: site/content/kinds.md is not up to date (python3 -I site/kinds_page.py --write)")
     pages = {}
     for src, dst in pagemap.items():
         if src.endswith(".html"):   # the comparison page is built below; in pagemap only as a link target
             continue
         text = strip_embargo(open(os.path.join(ROOT, src)).read())
-        nav_on = {"index.html": "index", "method.html": "method", "results.html": "results",
+        nav_on = {"index.html": "index", "method.html": "method", "results.html": "kinds", "kinds.html": "kinds",
+                  "results-crc.html": "kinds", "method-crc.html": "method",
                   "reproduce.html": "reproduce", "repeats.html": "repeats"}.get(
             dst, "reports" if dst.startswith("report-") else "findings")
         title = INDEX_TITLE if dst == "index.html" else title_of(text, dst)

@@ -2,6 +2,56 @@
 
 Short log of what was decided and why. Newest first.
 
+## 2026-11-25: The CRC kind's results page shows ranges over the placements, cache on and off
+Decided by the owner, on the proposal for the page
+(`lab/plans/2026-11-25-crc-page-proposal.md`, with the reviewer's
+recommendation), after the checks of the first series
+([report, "The numbers, checked"](reports/2026-11-25-crc-first-series.md#the-numbers-checked-step-3)).
+- **Every number is the range over the eight placements** (min–max, first
+  pass); no placement is picked. With the cache off, placement 0 is the
+  lowest or the highest of the eight in 75 of 120 rows
+  (`site/crc_tables.py --edges --cache off`), and the series gives no reason
+  to prefer one placement (check 7).
+- **Cache off is a second table per board and CRC**, below the cache-on
+  table, with ranges. It is where the placements spread most (check 7: up
+  to 23 % on the NUCLEO-G474RE, 447 % on the NUCLEO-H723ZG) and where a
+  table's memory matters most (check 6).
+- **The NUCLEO-H723ZG is shown as measured**, with a sentence on its 7 wait
+  states (the power-on default, which the 64 MHz build keeps; RM0468's
+  Table 16 allows 0 or 1 at 64 MHz) directly above its cache-off tables
+  (check 5). Changing them changes `firmware/common`, which version 2's
+  records are held against. Running the H723 with the wait states a user
+  would set is an item for the next version of the method.
+- **The table copied to RAM is not measured before the first
+  publication**; the method page says so under "What is not measured".
+  Check 6 shows where it would matter.
+- **The median beside the mean** is an item for the next version of the
+  method. In the page's figures the first call adds at most 2.45 % to a
+  mean (check 1); the calls themselves vary more in some scenarios.
+- The 1-byte figures and a factor of the baseline are not shown (the
+  proposal, first section).
+
+## 2026-11-24: The CRC kind's records stand as long as their images do; its first publication is static pages
+Decided by the owner, on the plan for the CRC kind after its first series
+(`lab/plans/2026-11-24-crc-from-series-to-publication.md`, step 5 and
+"Later").
+- **The same-image rule (2026-11-22, below) holds for the CRC kind's
+  records** (`records/crc`) as it does for version 2's: a record of a
+  commit with other CRC test sources is exported if the ledger
+  (`records/rebuilt.json`, made by `lab/tools/image-ledger.py` from the
+  test sources of HEAD) says the tree builds its eight images byte for
+  byte, at the same addresses, with the same fixed part, boot stub,
+  toolchain image and layout. A change on the host side (the runner, the
+  record writer, the version 2 programs the kind imports, the board
+  table, the check of a record) is taken only as a recorded host fix
+  (2026-11-23, below) of the runner, the record writer or the check of a
+  record; any other host-side change means the series is measured again.
+  The tools that repeat or compare runs without making or checking a
+  record (`repeat.sh`, `crccompare.py`) are not test sources. Which files are on which side is listed in
+  `lab/tools/public-export.py`.
+- **The kind's first publication is static pages.** The comparison page
+  and the data for the MCP server come later.
+
 ## 2026-11-23: Version 2 of the benchmark is published; its method is frozen
 Decided by the owner, after a dry run of the publication
 (`lab/plans/2026-11-23-ring-buffers-finish.md`, steps 7 and 8).

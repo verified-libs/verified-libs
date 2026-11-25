@@ -1,0 +1,13 @@
+# The libraries of the CRC kind, pinned by commit (format of
+# pilot/pools/libs.lock: name url commit [path ...]). fetch.sh fetches them
+# outside the repository (default ~/vl-next/kind-crc); nothing of them is
+# copied into it. The tag each commit belongs to is in README.md.
+etl         https://github.com/ETLCPP/etl.git                 7d604f2e4f7fa79ff49bf675c089656943f9171b /include/ /LICENSE
+acecrc      https://github.com/bxparks/AceCRC.git             b0787eb4e1449b7f54bd218374d5504902ca76df /src/ /LICENSE /README.md
+zlib        https://github.com/madler/zlib.git                99623ef7097352da7993ba614161fd6a311e046e /crc32.c /crc32.h /zlib.h /zconf.h /zutil.h /LICENSE /README
+libcrc      https://github.com/lammertb/libcrc.git            32aacc558ed599d8e5d38bc8d7dd850681e5c12e /src/ /include/ /LICENSE /README.md
+zephyr      https://github.com/zephyrproject-rtos/zephyr.git  41d10b59730406bbab4ca9f1fbbe9e96aafb4966 /subsys/crc/crc8_sw.c /subsys/crc/crc16_sw.c /subsys/crc/crc32_sw.c /include/zephyr/sys/crc.h /LICENSE
+crcany      https://github.com/madler/crcany.git              8fc795d650198a3ffab4bd606ae8b3b2b0361e7d /crcadd.c /crcgen.c /crcgen.h /crc.c /crc.h /model.c /model.h /LICENSE /README.md /crcany.c
+crcpp       https://github.com/d-bahr/CRCpp.git               e7d8c93d631fc981e630658e293691b96e0d2401 /inc/ /LICENSE /README.md
+crc-rs      https://github.com/mrhooray/crc-rs.git            2c8fd9615d620b5a5f8c9556b79a4ca173d6d401 /src/ /Cargo.toml /LICENSE-MIT /LICENSE-APACHE /README.md
+crc-catalog https://github.com/akhilles/crc-catalog.git          b500ea693c552f8d946e290722a7b3ee8b9a7ee2 /src/ /Cargo.toml /LICENSES/ /LICENSE-MIT /LICENSE-APACHE /README.md

@@ -21,6 +21,17 @@ images of a record, their addresses, the fixed part and the boot stub must
 be the record's. Their entries are named by path (bench-v2/<board>/<file>)
 and hold one checksum over all of that (images_sha256).
 
+The records of the CRC kind (records/crc) are rebuilt with
+kinds/crc/bench/crcverify.sh (VL_TREE=1), board by board, if their commit
+has other CRC test sources than HEAD (recorded host fixes aside) and their
+host side stands (public-export.py, crc_host_stands; DECISIONS
+2026-11-24): the same comparisons as for version 2, and the toolchain image
+and the layout. Their entries are named crc/<board>/<file> and hold
+crc_images_digest; the ledger holds the checksum of the CRC test sources it
+was made from (sources_crc) beside that of the ring buffers' (sources). The
+libraries are copied from VL_CRC_LIBS_FROM (default ~/vl-next/kind-crc, if
+there) before they are fetched.
+
 --all   rebuild every record with an image checksum, also those the
         export takes without one, but for archived series, which
         the tree is not meant to build (a check of the whole tree; about
@@ -101,7 +112,21 @@ def main():
                 os.makedirs(os.path.dirname(os.path.join(work, name)), exist_ok=True)
                 with open(os.path.join(work, name), "w") as fh:
                     fh.write(text)
-        if not todo and not todo2:
+        todo3 = {}   # crc/<board>/<file> -> checksum over the record's images
+        for f in git("ls-tree", "-r", "--name-only", "HEAD", "--", pe.CRC_RECORDS.rstrip("/")).split("\n"):
+            if not f.endswith(".json"):
+                continue
+            text = git("show", f"HEAD:{f}")
+            rec = json.loads(text)
+            c = rec.get("bench_commit") or "unknown"
+            same = pe.source_ids(c, "crc")[0] is not None and pe.source_ids(c, "crc")[0] == pe.source_ids("HEAD", "crc")[0]
+            if every or (not same and not pe.crc_host_fixed(c) and pe.crc_host_stands(c)):
+                name = f[len("records/"):]
+                todo3[name] = pe.crc_images_digest(rec)
+                os.makedirs(os.path.dirname(os.path.join(work, name)), exist_ok=True)
+                with open(os.path.join(work, name), "w") as fh:
+                    fh.write(text)
+        if not todo and not todo2 and not todo3:
             print("nothing to rebuild: every record with an image checksum is one the export takes as it is (the sources of HEAD, a recorded host fix, or an archived series)")
             if os.path.exists(out):
                 print(f"({out} exists; the export takes it only if it was made from these sources)")
@@ -110,8 +135,37 @@ def main():
         libs = os.path.join(ROOT, "firmware/nrf5340-rb-bench/build/libs")
         if "VL_LIBS_FROM" not in env and os.path.isdir(libs):
             env["VL_LIBS_FROM"] = libs
-        print(f"rebuilding {len(todo) + len(todo2)} records from the sources of {head[:12]}", flush=True)
+        print(f"rebuilding {len(todo) + len(todo2) + len(todo3)} records from the sources of {head[:12]}", flush=True)
         records, last = {}, None
+        if todo3:
+            env3 = dict(env)
+            env3.pop("VL_LIBS_FROM", None)
+            libs3 = os.environ.get("VL_CRC_LIBS_FROM", os.path.expanduser("~/vl-next/kind-crc"))
+            if os.path.isdir(libs3):
+                env3["VL_LIBS_FROM"] = libs3
+            p = subprocess.Popen(["bash", os.path.join(ROOT, "kinds/crc/bench/crcverify.sh"),
+                                  *[os.path.join(work, n) for n in sorted(todo3)]], stdout=subprocess.PIPE, text=True, env=env3)
+            for line in p.stdout:
+                line = line.rstrip("\n")
+                print(line, flush=True)
+                m = re.match(r"^(\S+): (MATCH|DIFFERS)  (.*)$", line)
+                name = "crc/" + m.group(1) + ".json" if m else None
+                if name in todo3:
+                    last = name
+                    records[last] = {"images_sha256": todo3[last], "result": "match" if m.group(2) == "MATCH" else "differs"}
+                    if "ELF file differs" in m.group(3):
+                        records[last]["note"] = m.group(3).rsplit("; ", 1)[-1]
+                elif line.startswith("  ") and last in todo3 and not line.startswith("  kept:"):
+                    records[last]["note"] = "; ".join(filter(None, [records[last].get("note"), line.strip()]))
+                else:
+                    m = re.match(r"^(\S+): (.*)$", line)
+                    if m and "crc/" + m.group(1) + ".json" in todo3:
+                        last = "crc/" + m.group(1) + ".json"
+                        records[last] = {"images_sha256": todo3[last], "result": "not checked", "note": m.group(2)}
+            p.wait()
+            for n in todo3:
+                records.setdefault(n, {"images_sha256": todo3[n], "result": "not checked", "note": "no result from crcverify.sh"})
+            last = None
         if todo2:
             p = subprocess.Popen(["bash", os.path.join(ROOT, "firmware/nrf5340-rb-bench/oneverify.sh"),
                                   *[os.path.join(work, n) for n in sorted(todo2)]], stdout=subprocess.PIPE, text=True, env=env)
@@ -164,7 +218,7 @@ def main():
         led = {"about": "Rebuilds of the records of other commits from this tree's test sources "
                         "(lab/tools/image-ledger.py, DECISIONS 2026-11-22). match: the tree builds, byte for byte, "
                         "the image the record was measured from.",
-               "commit": head, "sources": pe.source_ids("HEAD")[0],
+               "commit": head, "sources": pe.source_ids("HEAD")[0], "sources_crc": pe.source_ids("HEAD", "crc")[0],
                "records": {n: records[n] for n in sorted(records)}}
         os.makedirs(os.path.dirname(out), exist_ok=True)
         with open(out, "w") as fh:

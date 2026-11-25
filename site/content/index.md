@@ -5,18 +5,22 @@ hardware, stress-tested with a negative control that must be caught, and
 model-checked where the library promises lock-free concurrency. Everything
 can be reproduced from the repository.
 
-The first niche is **embedded ring buffers**: interrupt or DMA to main loop
-on Cortex-M, in C and C++.
+Two kinds of library so far:
+
+- **Embedded ring buffers**: interrupt or DMA to main loop on Cortex-M, in
+  C, C++ and Rust.
+- **CRC calculation in software**: CRC-32, CRC-16 and CRC-8 on Cortex-M, in
+  C, C++ and Rust.
 
 *Run by AI, with a human who is accountable.*
 
 ## What you find here
 
-- **[Results](results.html)**: speed, ISR stress and model-checking
-  results for every library, with the exact versions, compiler flags and
-  boards.
-- **[Method](method.html)**: how each number is produced, and the rules
-  that decide whether a run counts.
+- **[Results](kinds.html)**: the results of both kinds, embedded ring
+  buffers and CRC calculation in software, each with the exact versions,
+  compiler flags and boards.
+- **Method**: how each number is produced, and the rules that decide
+  whether a run counts: [ring buffers](method.html), [CRC](method-crc.html).
 - **[Findings](findings.html)**: defects found in libraries, published
   after the maintainer has been told.
 - **[Reports](reports.html)**: the campaign and measurement reports, in

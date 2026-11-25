@@ -1,0 +1,28 @@
+# The configurations of the CRC kind's board series (step 2 of the plan, the
+# 20 of README.md), one image per configuration and placement
+# (bench/onecrc.py, slots.txt). Fields: adapter, kind (c, cpp or rust: what
+# is compiled for it), the name a record carries (the
+# adapter's own name, crc_adapter.name, and the language). The reference of the
+# configuration's CRC is the baseline in every image (bench/main.c).
+#
+# adapter                       kind  name
+adapter_etl_crc32_t256          cpp   etl crc32_t256 (C++)
+adapter_crcany_crc32_byte       c     crcany crc32iso_hdlc_byte (C)
+adapter_libcrc_crc32            c     libcrc crc_32 (C)
+adapter_rust_crc32_table1       rust  crc (Rust) Table<1>
+adapter_etl_crc32_t16           cpp   etl crc32_t16 (C++)
+adapter_zephyr_crc32_ieee       c     zephyr crc32_ieee (C)
+adapter_crcany_crc32_word       c     crcany crc32iso_hdlc_word (C)
+adapter_zlib_crc32              c     zlib crc32 (C)
+adapter_crcany_crc32_bit        c     crcany crc32iso_hdlc_bit (C)
+adapter_etl_crc16_t256          cpp   etl crc16_ccitt_t256 (C++)
+adapter_crcany_crc16_byte       c     crcany crc16ibm_3740_byte (C)
+adapter_libcrc_ccitt_ffff       c     libcrc crc_ccitt_ffff (C)
+adapter_crcpp_ccittfalse_table  cpp   crcpp CRC_16_CCITTFALSE Table (C++)
+adapter_etl_crc16_t16           cpp   etl crc16_ccitt_t16 (C++)
+adapter_zephyr_crc16_itu_t      c     zephyr crc16_itu_t (C)
+adapter_etl_crc8_t256           cpp   etl crc8_ccitt_t256 (C++)
+adapter_crcany_crc8_byte        c     crcany crc8smbus_byte (C)
+adapter_acecrc_crc8_byte        cpp   acecrc crc8_byte (C++)
+adapter_etl_crc8_t16            cpp   etl crc8_ccitt_t16 (C++)
+adapter_zephyr_crc8_ccitt       c     zephyr crc8_ccitt (C)

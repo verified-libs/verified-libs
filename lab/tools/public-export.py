@@ -57,6 +57,53 @@ byte the ones that were archived and the test sources of their commit are
 those of the commit the series was published from.
 `public-export.py --archive-digest COMMIT` prints the count and checksum
 for a new entry of that file.
+
+The records of the CRC kind (records/crc, one per board and configuration,
+kinds/crc/bench/crcrecords.py) have test sources of their own,
+CRC_TEST_SOURCES: the kind's directory but for its host tests and proofs
+(CRC_NOT_SOURCES), the board support under firmware/common, the programs of
+benchmark version 2 the kind uses by import, and the three lab files. A
+change elsewhere under firmware/ does not touch them, and a change in
+kinds/crc does not touch the ring-buffer records; a change under
+firmware/common counts for both. The export writes the CRC records'
+commits whose test sources are those of HEAD (or those but for recorded
+host fixes) to SAME_SOURCES_CRC, as SAME_SOURCES for the ring buffers
+(kinds/crc/bench/crcverify.sh reads it).
+
+A CRC record of a commit with other CRC test sources is held as a record
+of benchmark version 2 is (DECISIONS 2026-11-24, the same-image rule for
+the CRC kind): the ledger (records/rebuilt.json, entry crc/<board>/<file>)
+must be of the record as it is (one checksum over its eight images, their
+addresses, the fixed part, the boot stub, the toolchain image and the
+layout) and say that kinds/crc/bench/crcverify.sh with VL_TREE=1 builds all
+of it from the tree; and the host side must stand (crc_host_stands). The
+CRC test sources are on three sides (crc_side()):
+  image     compiled or linked into an image: the adapters, the reference,
+            the bench program, the shims, the Rust crate, the pins of the
+            libraries (libs.lock, generated.lock), the kind's Makefile,
+            firmware/common's sources and linker scripts. A change is held
+            by the rebuild.
+  built by  host files that only build images (CRC_BUILT_BY): build.sh,
+            onebuild.sh, onecrc.py, crcslots.py, configs.txt, slots.txt,
+            crcany.models, fetch.sh, .gitignore of the kind;
+            firmware/common's bundle.py and libc-objs.sh; version 2's
+            onebundle.py and oneslots.py; lab/tools/source-commit.sh. A
+            change is held by the rebuild, as an image file.
+  host      what runs the images, reads the result words and writes and
+            checks the records: run-crc.py, crcrecords.py, version 2's
+            run-one.py and decode.py, firmware/common's uart_host.py and
+            samd20/bin/probe-rs, lab/boards.conf, lab/tools/boardpower.sh,
+            and crcverify.sh, the check of a record. Every file of the
+            kind not named here is host side too. A change must lead to
+            HEAD's file by recorded host fixes, which are allowed only for
+            CRC_HOST_FIXABLE (the runner, the record writer and the check
+            of a record) and run-one.py, already in HOST_FIXABLE; any
+            other change stops every CRC record of that commit until the
+            series is measured again. A recorded fix of run-one.py counts
+            for the records of both kinds, so its entry (what it changes
+            in the numbers, and its control) must cover both.
+repeat.sh and crccompare.py measure nothing and check no record; they are
+in CRC_NOT_SOURCES with the host tests and proofs.
 """
 import hashlib
 import json
@@ -73,6 +120,24 @@ from embargo_strip import strip_embargo   # noqa: E402
 # What a record's firmware is built from and run with: firmware/ and the
 # lab files its scripts use.
 TEST_SOURCES = ["firmware", "lab/boards.conf", "lab/tools/source-commit.sh", "lab/tools/boardpower.sh"]
+# The CRC kind (records/crc): what its images are built from and run with.
+CRC_RECORDS = "records/crc/"
+CRC_TEST_SOURCES = ["kinds/crc", "firmware/common"] + ["firmware/nrf5340-rb-bench/" + n for n in (
+    "onebundle.py", "oneslots.py", "run-one.py", "decode.py")] + TEST_SOURCES[1:]
+# In kinds/crc but neither built into an image nor used to build, run or record one: host tests, proofs,
+# the comparisons of step 4, and the tools that repeat or compare runs without making or checking a record
+# (repeat.sh, crccompare.py). Every other file of the directory counts, a new one too.
+CRC_NOT_SOURCES = tuple("kinds/crc/" + n for n in (
+    "proof/", "test_crc.c", "adapters_broken.c", "ref_check.c", "ref_check.py", "cross_main.c", "cross.sh",
+    "loops.py", "sizes.py", "run.sh", "bench/test_crcrecords.py", "repeat.sh", "bench/crccompare.py"))
+# Host files of the CRC kind that only build images: a change is held by the rebuild (image-ledger.py).
+CRC_BUILT_BY = tuple("kinds/crc/" + n for n in (
+    ".gitignore", "bench/build.sh", "bench/onebuild.sh", "bench/onecrc.py", "bench/crcslots.py", "configs.txt",
+    "slots.txt", "crcany.models", "fetch.sh")) + ("firmware/common/bundle.py", "firmware/common/libc-objs.sh") + tuple(
+    "firmware/nrf5340-rb-bench/" + n for n in ("onebundle.py", "oneslots.py")) + ("lab/tools/source-commit.sh",)
+# Host files of the CRC kind a recorded fix may change without a new series: the runner, the record writer
+# and the check of a record.
+CRC_HOST_FIXABLE = ("kinds/crc/bench/run-crc.py", "kinds/crc/bench/crcrecords.py", "kinds/crc/bench/crcverify.sh")
 RECORD_COMMIT = re.compile(r'"(?:source_commit|bench_commit)":\s*"([0-9a-f]{12,40})"|"commits":\s*\[([^\]]*)\]')
 
 
@@ -89,7 +154,7 @@ HOST_FIXES = "records/host-fixes.json"
 # The host-side files a recorded fix may change without a new series: they
 # run images and write, collect and check records, and build nothing.
 HOST_FIXABLE = ("firmware/nrf5340-rb-bench/run-one.py", "firmware/nrf5340-rb-bench/onerecords.py",
-                "firmware/nrf5340-rb-bench/oneverify.sh")
+                "firmware/nrf5340-rb-bench/oneverify.sh") + CRC_HOST_FIXABLE
 # Benchmark version 2 (records/bench-v2): the host-side files its images are
 # built by. A change in one of them is held like a change in a source file:
 # the record stands if the tree still builds its images, byte for byte, at
@@ -108,6 +173,14 @@ def v2_images_digest(rec):
     return hashlib.sha256("\n".join(lines).encode()).hexdigest()
 
 
+def crc_images_digest(rec):
+    """One checksum for what a CRC record was measured from: as
+    v2_images_digest, and the toolchain image and the layout, which
+    crcverify.sh compares too."""
+    extra = [f"toolchain_image {rec.get('toolchain_image')}", f"layout {rec.get('layout')}"]
+    return hashlib.sha256("\n".join([v2_images_digest(rec)] + extra).encode()).hexdigest()
+
+
 def side(path):
     """Which side of the test a file under TEST_SOURCES is on: "image"
     (compiled or linked into an image), None (documentation), or "host"
@@ -123,20 +196,22 @@ def side(path):
 _ids = {}
 
 
-def source_ids(commit):
+def source_ids(commit, kind=None):
     """(all, host): a checksum over the test sources at commit, and over
-    their host side alone. (None, None) if the commit is not in the
-    repository."""
-    if commit not in _ids:
-        r = subprocess.run(["git", "-C", ROOT, "ls-tree", "-r", "-z", commit, "--", *TEST_SOURCES],
+    their host side alone; of the ring buffers, or with kind "crc" of the
+    CRC kind. (None, None) if the commit is not in the repository."""
+    paths, skip = (CRC_TEST_SOURCES, CRC_NOT_SOURCES) if kind == "crc" else (TEST_SOURCES, ())
+    if (commit, kind) not in _ids:
+        r = subprocess.run(["git", "-C", ROOT, "ls-tree", "-r", "-z", commit, "--", *paths],
                            capture_output=True, text=True)
         if r.returncode != 0 or not r.stdout:
-            _ids[commit] = (None, None)
+            _ids[(commit, kind)] = (None, None)
         else:
-            entries = sorted(e for e in r.stdout.split("\0") if e and side(e.split("\t", 1)[1]))
+            entries = sorted(e for e in r.stdout.split("\0") if e and side(e.split("\t", 1)[1])
+                             and not e.split("\t", 1)[1].startswith(skip))
             host = [e for e in entries if side(e.split("\t", 1)[1]) == "host"]
-            _ids[commit] = tuple(hashlib.sha256("\n".join(x).encode()).hexdigest() for x in (entries, host))
-    return _ids[commit]
+            _ids[(commit, kind)] = tuple(hashlib.sha256("\n".join(x).encode()).hexdigest() for x in (entries, host))
+    return _ids[(commit, kind)]
 
 
 def same_sources(commit):
@@ -150,14 +225,27 @@ def same_host_side(commit):
     return a is not None and a == source_ids("HEAD")[1]
 
 
-def blobs(commit):
-    """path -> (side, blob) of the test sources at commit; {} if unknown."""
-    r = subprocess.run(["git", "-C", ROOT, "ls-tree", "-r", "-z", commit, "--", *TEST_SOURCES],
+def crc_side(path):
+    """The side of a CRC test source: "image", "built by" (CRC_BUILT_BY),
+    None (documentation) or "host"."""
+    if path in CRC_BUILT_BY:
+        return "built by"
+    return side(path)
+
+
+def blobs(commit, kind=None):
+    """path -> (side, blob) of the test sources at commit (with kind "crc":
+    of the CRC kind, sides by crc_side()); {} if unknown."""
+    paths, skip, sd = (CRC_TEST_SOURCES, CRC_NOT_SOURCES, crc_side) if kind == "crc" else (TEST_SOURCES, (), side)
+    r = subprocess.run(["git", "-C", ROOT, "ls-tree", "-r", "-z", commit, "--", *paths],
                        capture_output=True, text=True)
     out = {}
     for e in (r.stdout.split("\0") if r.returncode == 0 else []):
-        if e and side(e.split("\t", 1)[1]):
-            out[e.split("\t", 1)[1]] = (side(e.split("\t", 1)[1]), e.split("\t", 1)[0].split()[2])
+        if not e:
+            continue
+        path = e.split("\t", 1)[1]
+        if sd(path) and not path.startswith(skip):
+            out[path] = (sd(path), e.split("\t", 1)[0].split()[2])
     return out
 
 
@@ -216,14 +304,58 @@ def v2_host_stands(commit):
     return True
 
 
-def ledger():
-    """Record file name -> entry of records/rebuilt.json at HEAD, if the
-    ledger was made from the test sources of HEAD; else {}."""
+def crc_fix_leads(a, b, path):
+    """True if the blob of path at a leads to its blob at b by recorded host fixes."""
+    steps = host_fixes()
+    at, seen = a[path][1], set()
+    while at != b[path][1] and at in steps.get(path, {}) and at not in seen:
+        seen.add(at)
+        at = steps[path][at]
+    return at == b[path][1]
+
+
+def crc_host_fixed(commit):
+    """True if the CRC test sources at commit are those of HEAD but for
+    recorded fixes of host files: the same files, and every one that differs
+    is host side and leads to HEAD's by the steps of host-fixes.json."""
+    a, b = blobs(commit, "crc"), blobs("HEAD", "crc")
+    if not a or set(a) != set(b):
+        return False
+    return all(a[p] == b[p] or (a[p][0] == "host" and crc_fix_leads(a, b, p)) for p in a)
+
+
+def crc_host_stands(commit):
+    """True if a CRC record of commit can stand on a rebuild of its images:
+    every host-side file is HEAD's or leads to it by recorded fixes; image
+    files and the files that only build images (CRC_BUILT_BY) may differ,
+    as the rebuild shows what they build."""
+    a, b = blobs(commit, "crc"), blobs("HEAD", "crc")
+    if not a:
+        return False
+    for path in set(a) | set(b):
+        if a.get(path) == b.get(path) or (a.get(path) or b[path])[0] in ("image", "built by"):
+            continue
+        if path not in a or path not in b or not crc_fix_leads(a, b, path):
+            return False
+    return True
+
+
+def ledger(kind=None):
+    """Record name -> entry of records/rebuilt.json at HEAD, if the ledger
+    was made from the test sources of HEAD; else {}. The ring buffers'
+    entries are held by the checksum of their sources ("sources"), the CRC
+    kind's (named crc/...) by that of the kind's ("sources_crc")."""
     r = subprocess.run(["git", "-C", ROOT, "show", f"HEAD:{LEDGER}"], capture_output=True, text=True)
     if r.returncode != 0:
         return {}
     led = json.loads(r.stdout)
-    return led.get("records", {}) if led.get("sources") == source_ids("HEAD")[0] else {}
+    if kind == "crc":
+        if led.get("sources_crc") != source_ids("HEAD", "crc")[0]:
+            return {}
+        return {n: e for n, e in led.get("records", {}).items() if n.startswith("crc/")}
+    if led.get("sources") != source_ids("HEAD")[0]:
+        return {}
+    return {n: e for n, e in led.get("records", {}).items() if not n.startswith("crc/")}
 
 
 def archived():
@@ -268,6 +400,7 @@ def main():
     bad, kept, left_out = [], 0, 0
     rec_commits = {}   # commit named by a record under records/ -> the records' (file name, fw_sha256)
     rec_files = {}     # the same commit -> the records' (path, checksum of the file)
+    crc_commits = {}   # commit named by a record under records/crc -> the records' file names
     for f in filter(None, files):
         if any(f == p or f.startswith(p + "/") for p in skip):
             left_out += 1
@@ -287,7 +420,15 @@ def main():
             bad.append((f, hits))
             continue
         kept += 1
-        if text is not None and f.startswith("records/") and f.endswith(".json"):
+        if text is not None and f.startswith(CRC_RECORDS) and f.endswith(".json"):
+            rec = json.loads(text)
+            c = rec.get("bench_commit") or "unknown"
+            try:
+                digest = crc_images_digest(rec)
+            except (KeyError, TypeError, ValueError):
+                digest = None
+            crc_commits.setdefault(c[:12], []).append((f[len("records/"):], digest))
+        elif text is not None and f.startswith("records/") and f.endswith(".json"):
             found = set()
             for one, many in RECORD_COMMIT.findall(text):
                 found.update([one[:12]] if one else re.findall(r"[0-9a-f]{12,40}", many))
@@ -341,12 +482,36 @@ def main():
                 rebuilt += 1
                 continue
             other.setdefault(c, []).append((name, why))
-    n_other = sum(len(v) for v in other.values())
+    crc_same = sorted(c for c in crc_commits if source_ids(c, "crc")[0] is not None
+                      and source_ids(c, "crc")[0] == source_ids("HEAD", "crc")[0])
+    crc_fixed = sorted(c for c in set(crc_commits) - set(crc_same) if crc_host_fixed(c))
+    crc_same = sorted(crc_same + crc_fixed)
+    crc_led, crc_rebuilt, crc_other = ledger("crc"), 0, {}   # crc_other: commit -> [(record, why not)]
+    for c in sorted(set(crc_commits) - set(crc_same)):
+        for name, digest in crc_commits[c]:
+            e = crc_led.get(name)
+            if not crc_host_stands(c):
+                why = "the host side of the CRC kind at that commit is not that of HEAD (or the commit is unknown)"
+            elif digest is None:
+                why = "the record has no image checksums"
+            elif e is None:
+                why = f"no rebuild from the sources of HEAD in {LEDGER} (lab/tools/image-ledger.py)"
+            elif e.get("images_sha256") != digest:
+                why = f"{LEDGER} holds another checksum for it"
+            elif e.get("result") != "match":
+                why = "HEAD builds another image"
+            else:
+                crc_rebuilt += 1
+                continue
+            crc_other.setdefault(c, []).append((name, why))
+    n_other = sum(len(v) for v in other.values()) + sum(len(v) for v in crc_other.values())
     print(f"{kept} files clean, {left_out} left out by path, {len(bad)} with embargoed words, "
           f"{n_other} records that cannot be rebuilt from this tree"
           + (f" ({rebuilt} of other commits whose image this tree builds)" if rebuilt else "")
           + (f", {n_fixed} records made before a recorded host fix" if n_fixed else "")
-          + "".join(f", {n} records of the archived series \"{name}\"" for name, n in sorted(n_arch.items())))
+          + "".join(f", {n} records of the archived series \"{name}\"" for name, n in sorted(n_arch.items()))
+          + (f", {sum(len(crc_commits[c]) for c in crc_same)} CRC records" if crc_commits else "")
+          + (f" ({crc_rebuilt} more of other commits whose images this tree builds)" if crc_rebuilt else ""))
     for f, hits in bad:
         print(f"  EMBARGO: {f}: {', '.join(hits)}")
     for c, recs in other.items():
@@ -357,7 +522,15 @@ def main():
             whys.setdefault(why, []).append(name)
         for why, names in whys.items():
             print(f"    {len(names)}: {why}: {', '.join(names[:8])}{' ...' if len(names) > 8 else ''}")
-    if bad or other:
+    for c, recs in sorted(crc_other.items()):
+        print(f"  RECORDS: {len(recs)} under {CRC_RECORDS} name commit {c}, whose test sources of the CRC kind "
+              f"are not those of HEAD (or the commit is unknown):")
+        whys = {}
+        for name, why in recs:
+            whys.setdefault(why, []).append(name)
+        for why, names in whys.items():
+            print(f"    {len(names)}: {why}: {', '.join(names[:8])}{' ...' if len(names) > 8 else ''}")
+    if bad or other or crc_other:
         if out:
             print(f"export refused; {out} is incomplete, delete it")
         sys.exit(1)
@@ -372,6 +545,9 @@ def main():
         # but for recorded host fixes (checked above).
         with open(os.path.join(out, "SAME_SOURCES"), "w") as fh:
             fh.write("".join(c + "\n" for c in same))
+        if crc_commits:
+            with open(os.path.join(out, "SAME_SOURCES_CRC"), "w") as fh:
+                fh.write("".join(c + "\n" for c in crc_same))
 
 
 if __name__ == "__main__":

@@ -167,3 +167,4 @@ the same in the tests, but must be proven more strongly:
 - 2026-11-04: lib-lab1 set up (Ubuntu 26.04 LTS, Ryzen 7 7840U).
 - 2026-11-05: GitHub organisation verified-libs and this repo created.
 - 2026-11-05: First niche set to embedded ring buffers; candidate list made.
+- 2026-11-25: Second kind, CRC calculation in software: first board series on six boards ([results](site/content/results-crc.md)).

@@ -165,6 +165,65 @@ It marks a library NEW if it showed errors, or did not finish, where none of
 our runs of that mode did; errors that our runs showed too are listed, not
 counted against the run.
 
+## The CRC records
+
+The records of the CRC kind (`records/crc/<board>/<adapter>.json`, one per
+board and configuration, eight images each; [`records/`](../../records/README.md))
+are checked the same two ways, with the kind's own tools. Both need the
+toolchain image `verified-libs/toolchain:2026-11-13` and fetch the
+libraries at their pins (`kinds/crc/libs.lock`).
+
+**Rebuild, without a board.**
+
+```sh
+bash kinds/crc/bench/crcverify.sh records/crc/stm32g474/*.json
+```
+
+For each record it builds every image of the board from the sources of
+the record's commit and compares, per image, the bytes in flash
+(`image_sha256`), the address, the fixed part, the boot stub, the
+toolchain and the layout of the image: `MATCH` or `DIFFERS`. In a tree
+without git history it takes the sources from the tree if the record's
+commit is in `EXPORTED_FROM` or in `SAME_SOURCES_CRC` (the commits whose
+CRC test sources the export found to be those of the tree). A record of
+another commit may still be published if this tree builds its images byte
+for byte: `records/rebuilt.json` says so for each such record (the entries
+named `crc/...`). Check that claim with `VL_TREE=1` in front of the
+command, which builds from the tree at hand instead of from the record's
+commit. Time: in our check of the 120 records (2026-11-25, on 6 CPUs)
+16 s per board of 20 records, with the libraries already at hand. Without
+`VL_LIBS_FROM` the script first fetches the libraries at their pins
+(`kinds/crc/libs.lock`), once per board: from a tree exported from this
+repository, with nothing at hand, it took 28 s per board of 20 records
+(2026-11-25, all 120 records `MATCH`).
+
+**Run it on your own board.**
+
+```sh
+kinds/crc/repeat.sh --check          # the tools, the image and the board
+kinds/crc/repeat.sh                  # quick: up to three configurations of one bundle, two passes
+kinds/crc/repeat.sh --level full     # every configuration of the board, two passes
+kinds/crc/repeat.sh --board pico2    # choose the board when more than one is connected
+```
+
+It builds the images of this tree, writes a bundle to the board, runs its
+images in two passes as our series did, makes records of your runs and
+compares them with ours image by image, and packs everything into one
+archive (below, "Send us your result"). Flash: the quick level writes one
+bundle, the full level every bundle of the board (a bundle that is
+already on the board is not written again). Time: the full level runs
+what our series ran on one board; those runs, with the flash writes and
+without the build, took from 33 minutes (NUCLEO-G474RE) to 3 h 40 min
+(Raspberry Pi Pico 2) on 2026-11-24 (NUCLEO-G0B1RE 62 minutes, nRF5340 DK
+88, NUCLEO-H723ZG 65, SAM D20 Xplained Pro 118; the
+[series report](../../reports/2026-11-25-crc-first-series.md)); the quick
+level on the Raspberry Pi Pico 2 took 34 minutes from a tree exported from
+this repository (2026-11-25: fetching and building included, the bundle
+already on the board, 48 runs; result "same as ours"). In such a tree (no
+git history) it builds and runs in a copy of the sources under its result
+directory (`src/<commit>`), so that its records name a commit that can be
+rebuilt; your tree is not written to.
+
 ## 3. Rebuild the toolchain image
 
 The image is built from [`toolchain/Containerfile`](../../toolchain/README.md):

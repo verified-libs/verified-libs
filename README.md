@@ -2,14 +2,19 @@
 
 An open registry of specialist libraries, verified on real hardware:
 measured, stress-tested and model-checked, every number with its record and
-source. The first niche is embedded ring buffer (FIFO) libraries for
-microcontrollers: speed, code size, interrupt stress tests and model checks
-on six boards.
+source. Two kinds of library so far, both for microcontrollers on six
+boards:
+
+- embedded ring buffer (FIFO) libraries: speed, code size, interrupt stress
+  tests and model checks ([results](https://verified-libs.org/results.html) ·
+  [method](https://verified-libs.org/method.html) ·
+  [compare the libraries](https://verified-libs.org/compare.html));
+- CRC calculation in software: cycles per call and per byte
+  ([results](https://verified-libs.org/results-crc.html) ·
+  [method](https://verified-libs.org/method-crc.html)).
 
 **Website: [verified-libs.org](https://verified-libs.org)** ·
-[compare the libraries](https://verified-libs.org/compare.html) ·
-[results](https://verified-libs.org/results.html) ·
-[method](https://verified-libs.org/method.html)
+[all results](https://verified-libs.org/kinds.html)
 
 Shared project repo for verified-libs: purpose, principles and the test lab.
 The libraries themselves each live in their own repo under the organisation.

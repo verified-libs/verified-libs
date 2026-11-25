@@ -8,7 +8,9 @@ measurements instead: the comparison a person gets on
 It is a small [Model Context Protocol](https://modelcontextprotocol.io)
 server over stdio. It reads one file, [`site/data/libs.json`](../site/data/libs.json)
 of this checkout (the file the website's comparison is built from), and
-nothing else: no network, no other files, no writing. Python 3.9 or newer
+nothing else: no network, no other files, no writing. Its data are the
+ring buffers'; the second kind, CRC in software, is not in that file yet
+(its numbers are on the [CRC results page](https://verified-libs.org/results-crc.html)). Python 3.9 or newer
 (tested with 3.14), standard library only; nothing to install.
 
 ## Use it
