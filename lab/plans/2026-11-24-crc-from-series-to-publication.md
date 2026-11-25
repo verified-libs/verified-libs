@@ -198,6 +198,13 @@ bundle that has to run again; step 7 none.
 Not started before the static pages are public and the kind's method is
 frozen by a tag, so that the data's shape follows pages that have been
 read from outside.
+Met on 2026-11-25: the static pages are public and the method is frozen
+at the tag `crc-method-freeze` (`DECISIONS.md`, 2026-11-25).
+Items 1 to 4 made on the branch `crc-compare` (2026-11-25), as proposed in
+[`2026-11-25-crc-compare-proposal.md`](2026-11-25-crc-compare-proposal.md):
+`site/data/crc.json`, the page `compare-crc.html` with the kind switch on
+both comparison pages, MCP server 0.3.0 with `list_crc_configurations` and
+`compare_crc`, and their tests.
 
 1. **The data.** A file of its own, `site/data/crc.json`, written from
    `records/crc` by a program under `site/`: per board and configuration

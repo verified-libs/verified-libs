@@ -2,10 +2,11 @@
 // (tests/test_parity.py). A small stand-in for the page gives the script what
 // it asks for; after each load the table is read back as text.
 //
-//   gjs page_harness.js COMPARE_JS LIBS_JSON FRAGMENTS_FILE
+//   gjs page_harness.js COMPARE_JS DATA_JSON FRAGMENTS_FILE
+//   (compare.js with libs.json, or compare-crc.js with crc.json)
 //
 // FRAGMENTS_FILE: one address fragment per line. Output: one JSON line per
-// fragment: {hash, written, header, rows, seps, count, src}, and first one
+// fragment: {hash, written, header, rows, seps, count, src, note}, and first one
 // line with the engine's order of the printable ASCII characters.
 const GLib = imports.gi.GLib;
 
@@ -36,7 +37,8 @@ function flat(n) {
 }
 
 function run(src, data, fragment) {
-  const byId = { libdata: { textContent: data } };
+  // the ring buffers' page reads #libdata, the CRC page (compare-crc.js) #crcdata
+  const byId = { libdata: { textContent: data }, crcdata: { textContent: data } };
   const document = {
     getElementById: function (id) { return byId[id] || (byId[id] = new Node("#" + id)); },
     createElement: function (tag) { return new Node(tag); },
@@ -58,7 +60,8 @@ function run(src, data, fragment) {
     hash: fragment, written: written,
     header: thead.children[0].children.map(function (th) { return th.textContent; }),
     rows: rows, seps: seps,
-    count: byId["cmp-count"].textContent, src: byId["cmp-src"].textContent
+    count: byId["cmp-count"].textContent, src: byId["cmp-src"].textContent,
+    note: byId["cmp-note"] ? byId["cmp-note"].textContent : null
   };
 }
 

@@ -1,0 +1,74 @@
+<p class="kindsw">Kind: <a href="compare.html">Ring buffers</a> | <strong>CRC</strong></p>
+<h1>Compare CRC calculation in software</h1>
+<p>Pick a CRC, a board and a message, and set weights for what you care about. There is no ranking
+of ours: without weights the rows are in the order of the configuration list, and any order is the
+result of your weights, which are stored in the address so the view can be linked. Every number
+is the range over eight placements of the code (min–max), first pass, and so is the score. Choose a
+configuration's name to mark the rows whose range overlaps its range. All numbers and how they
+were measured:
+<a href="results-crc.html">CRC results</a> and <a href="method-crc.html">Method</a>.</p>
+<noscript><p><strong>This page needs JavaScript.</strong> The same numbers are in the tables on the
+<a href="results-crc.html">CRC results</a> page.</p></noscript>
+<form class="cmp" onsubmit="return false">
+<fieldset><legend>CRC and board</legend>
+<label>CRC <select id="crc-crc"></select></label>
+<label>Numbers from <select id="crc-board"></select></label>
+</fieldset>
+<fieldset><legend>Message and cache</legend>
+<label>Message length <select id="crc-len"><option value="4">4 bytes</option><option value="16">16 bytes</option>
+<option value="64">64 bytes</option><option value="256">256 bytes</option><option value="1024">1024 bytes</option></select></label>
+<label>Start <select id="crc-off"><option value="0">at an 8-byte boundary</option><option value="1">one byte after an 8-byte boundary</option></select></label>
+<label>Cache <select id="crc-cache"><option value="on">on</option><option value="off">off</option></select></label>
+</fieldset>
+<fieldset><legend>Filters</legend>
+<label>Language <select id="crc-lang"><option value="">any</option><option value="C">C</option><option value="C++">C++</option><option value="Rust">Rust</option></select></label>
+<label>Class <select id="crc-class"><option value="">any</option></select></label>
+<label>Table <select id="crc-table"><option value="">any</option><option value="flash">in flash</option><option value="RAM">in RAM</option><option value="none">no table</option></select></label>
+</fieldset>
+<fieldset><legend>Weights (0 = ignore, 10 = most important)</legend>
+<div id="crc-weights"></div>
+<button type="button" id="crc-reset">Reset weights and choices</button>
+</fieldset>
+</form>
+<p id="cmp-note"></p>
+<p id="cmp-count" class="mute" aria-live="polite"></p>
+<div class="tw"><table id="cmp-table" class="cmp"></table></div>
+<p class="mute">A range is min–max over eight placements of the code. Two rows differ only where their
+ranges do not overlap. With a configuration chosen, "overlaps" marks the rows whose range overlaps
+its range in that column, compared as the numbers are shown: this series does not tell those rows
+apart from the chosen one. With weights, a score marked "overlaps above" overlaps the score of the
+row above it: this series does not tell the two apart. The score's marks are judged on the score
+before rounding, so two rows can show the same score without a mark when they differ by less than
+the rounding.</p>
+<p id="cmp-src" class="mute"></p>
+<h2>How the score is computed</h2>
+<p>With a weight above 0, each configuration gets a score from 0 to 100, as on the ring buffers'
+comparison: for each weighted value, the smallest value among the configurations shown divided by
+the configuration's own, then the mean weighted by your weights, times 100, shown to one decimal. The values are the
+cycles for one call at the chosen length, the cycles per byte, and the bytes of flash and RAM
+together (so a table built in RAM is not free). The cycles are ranges, so the score is a range
+too: the smallest value is the smallest lower end among the rows shown; a configuration's lowest
+score uses its own upper ends, its highest score its lower ends. Bytes are exact. The rows are
+ordered by the highest end of the score, ties in list order, and a score whose range overlaps the
+one above it is marked "overlaps above". The reference has no score and stays last. Sorting by
+name, flash or RAM bytes (the column headers) overrides the score order.</p>
+<p>The marks are judged two ways, on purpose. The score's marks ("overlaps above", and "overlaps"
+in the score column for a chosen configuration) are judged on the score before rounding, so a
+mark never says "not told apart" where the series tells two rows apart, as with different bytes;
+two rows can therefore show the same score without a mark when they differ by less than the
+rounding. The marks in the cycles and per-byte columns are judged on the numbers as shown (whole
+cycles, cycles per byte to one decimal), so that two rows that show the same number are always
+marked.</p>
+<p>What the score does not say: every row's results were checked against the reference on every
+call, so correctness is not a weight; nor are language, licence or how the library's API looks.
+Those are for you to judge, with the filters and the records.</p>
+<h2>What the columns are</h2>
+<p><strong>Cycles</strong>: the mean of 256 calls (the first call included) on a message of the
+chosen length and start. <strong>Cycles per byte</strong>: (mean at 1024 bytes − mean at 256 bytes) /
+768, at the chosen start. <strong>Flash bytes</strong>: the table in flash and the code at
+<code>-O2</code> for the board's core; <strong>RAM bytes</strong>: the table in RAM. The last row is
+the reference, the bitwise algorithm written from the catalogue's parameters and timed in the same
+images: it is the baseline, not a library. The 1-byte messages are in the records and not here: at
+an 8-byte boundary with the cache on, that scenario is the first one after the cache is switched
+on. The second pass and the minimum, maximum and first call of each scenario are in the records,
+one per row.</p>

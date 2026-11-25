@@ -28,17 +28,23 @@ Two kinds of library so far:
 
 ## For AI agents and scripts
 
-The comparison can be read without a browser:
+The comparisons can be read without a browser:
 
-- **[MCP server](../../mcp-server/README.md)**: the comparison as tools for
+- **[MCP server](../../mcp-server/README.md)**: the comparisons as tools for
   an AI agent (Model Context Protocol). It gives the same rows in the same
-  order as the [comparison page](compare.html), with the notes and published
-  findings, and it says which library the project owner wrote. It runs on
-  your own machine from a copy of the repository; there is no hosted server.
-- **[data/libs.json](data/libs.json)**: the data behind the comparison page
-  as one JSON file: every number of the page, and the records and campaigns
-  it comes from. [`site/gen_libdata.py`](../gen_libdata.py) says where each
-  field comes from. The layout follows the page and can change with it.
+  order as the comparison pages for [ring buffers](compare.html) (with the
+  notes and published findings, and which library the project owner wrote)
+  and for [CRC](compare-crc.html) (`list_crc_configurations`, `compare_crc`).
+  It runs on your own machine from a copy of the repository; there is no
+  hosted server.
+- **[data/libs.json](data/libs.json)**: the data behind the ring buffers'
+  comparison page as one JSON file: every number of the page, and the
+  records and campaigns it comes from. [`site/gen_libdata.py`](../gen_libdata.py)
+  says where each field comes from. The layout follows the page and can
+  change with it.
+- **[data/crc.json](data/crc.json)**: the data behind the CRC comparison
+  page, written from the CRC records by [`site/crc_data.py`](../crc_data.py),
+  which says where each field comes from (the file's `about`).
 
 ## Principles, in short
 

@@ -2,6 +2,24 @@
 
 Short log of what was decided and why. Newest first.
 
+## 2026-11-25: The CRC kind is published; its method is frozen
+Decided by the owner, after a dry run of the publication
+(`lab/plans/2026-11-24-crc-from-series-to-publication.md`, steps 7 and 8).
+- The CRC kind's static pages (results, method, records, repeat) are
+  public, with the overview of the kinds.
+- The CRC kind's method is frozen at the tag `crc-method-freeze` (in the
+  project's working repository): the CRC test sources of that commit
+  (`CRC_TEST_SOURCES` in `lab/tools/public-export.py`), with which the
+  first series (commit `6301058`, 120 records) was measured and repeated.
+  A change to one of those files is a new decision.
+- The precondition of the plan's section "Later" (the static pages public,
+  the kind's method frozen by a tag) is met: CRC on the comparison page and
+  in the MCP data can be started.
+- The CRC comparison has the reader's weights, as the owner asked on
+  2026-11-25, within the ranges rule: the score is a range, and a score that
+  overlaps the one above it is marked as not told apart
+  (`lab/plans/2026-11-25-crc-compare-proposal.md`, "Weights").
+
 ## 2026-11-25: The CRC kind's results page shows ranges over the placements, cache on and off
 Decided by the owner, on the proposal for the page
 (`lab/plans/2026-11-25-crc-page-proposal.md`, with the reviewer's

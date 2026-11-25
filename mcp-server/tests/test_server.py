@@ -255,5 +255,89 @@ class Answers(unittest.TestCase):
         self.assertEqual((p.returncode, p.stdout), (2, ""))
 
 
+class CRCAnswers(unittest.TestCase):
+    """The CRC tools: the rows of the page (crcquery.py, tested against site/compare-crc.js), ranges and overlaps."""
+    @classmethod
+    def setUpClass(cls):
+        import crcquery as cq
+        cls.cq = cq
+        cls.C, _ = cq.load()
+        cls.D, cls.prov = q.load()
+
+    def tool(self, name, args=None):
+        return server.call_tool(self.D, self.prov, name, args or {})
+
+    def test_compare_crc_is_the_page(self):
+        cq = self.cq
+        cases = [{}, {"board": "nucleo-h723zg", "cache": "off"}, {"crc": "CRC-8/SMBUS", "board": "pico2", "length": 1024, "offset": 1},
+                 {"crc": "CRC-16/IBM-3740", "board": "sam-d20-xpro", "language": "C++", "sort": "flash_bytes", "reverse": True},
+                 {"board": "nucleo-g0b1re", "table": "RAM"}, {"class": "table of 256", "sort": "name"},
+                 {"weights": {"cycles": 5, "bytes": 5}}, {"board": "nrf5340dk", "cache": "off", "weights": {"cycles": 3, "cycles_per_byte": 3, "bytes": 3}},
+                 {"crc": "CRC-8/SMBUS", "weights": {"bytes": 10}, "sort": "ram_bytes"}]
+        for args in cases:
+            out = self.tool("compare_crc", args)
+            url = out["same_view_on_the_site"]
+            self.assertTrue(url.startswith(q.SITE_URL + "/compare-crc.html#"), url)
+            st = cq.state_from_hash(self.C, url.split("#", 1)[1])
+            self.assertEqual(st, server.crc_state_from_args(self.C, args), args)
+            view = cq.page_view(self.C, st)
+            self.assertEqual([r["name"] for r in out["rows"]], [r[0][0] for r in view["rows"]], args)
+            self.assertEqual(out["shown"], view["count"])
+            wd = "weights" in args
+            self.assertEqual(view["header"][1] == "Score (your weights)", wd)
+            for j, (r, cells) in enumerate(zip(out["rows"], view["rows"])):
+                want = {"cycles": cells[7 + wd][0], "cycles_per_byte": cells[8 + wd][0]}
+                if wd and "score" in r:
+                    want["score"] = cells[1][0]
+                    self.assertLessEqual(r["score"]["min"], r["score"]["max"])
+                    if not st["sort"] and j > 0:
+                        self.assertEqual(r["score_not_told_apart_from_the_row_above"], cq.ABOVE_TEXT in cells[1], args)
+                self.assertEqual(r["as_on_the_page"], want)
+                self.assertLessEqual(r["cycles"]["min"], r["cycles"]["max"])
+            self.assertTrue(out["rows"][-1]["reference_baseline_not_a_library"])
+            self.assertTrue(all(r.get("record", "").startswith(server.REPO + "records/crc/") for r in out["rows"][:-1]))
+            self.assertEqual(bool(view["note"]), view["note"] in out["notes"])
+
+    def test_overlaps_are_those_the_page_marks(self):
+        """Choosing a row on the page marks the rows the tool lists in that row's 'overlaps'."""
+        cq = self.cq
+        for args in ({"board": "nucleo-g474re", "cache": "off"}, {"crc": "CRC-8/SMBUS", "board": "nucleo-h723zg", "cache": "off"}):
+            out = self.tool("compare_crc", args)
+            st = server.crc_state_from_args(self.C, args)
+            for r in out["rows"][:-1]:
+                st["row"] = next(c["adapter"] for c in self.C["configurations"] if c["name"] == r["name"])
+                view = cq.page_view(self.C, st)
+                marked = {"cycles": [x[0][0] for x in view["rows"] if "overlaps" in x[7]],
+                          "cycles_per_byte": [x[0][0] for x in view["rows"] if "overlaps" in x[8]]}
+                self.assertEqual(marked, r["overlaps"], r["name"])
+        # with weights the score column too
+        args = {"board": "nucleo-h723zg", "cache": "off", "weights": {"cycles": 5, "cycles_per_byte": 5}}
+        out = self.tool("compare_crc", args)
+        st = server.crc_state_from_args(self.C, args)
+        for r in out["rows"][:-1]:
+            st["row"] = next(c["adapter"] for c in self.C["configurations"] if c["name"] == r["name"])
+            view = cq.page_view(self.C, st)
+            self.assertEqual([x[0][0] for x in view["rows"] if "overlaps" in x[1]], r["overlaps"]["score"], r["name"])
+
+    def test_length_one_has_its_note(self):
+        out = self.tool("compare_crc", {"length": 1})
+        self.assertIsNone(out["same_view_on_the_site"])
+        self.assertIn("Length 1 is not on the page", out["notes"][0])
+
+    def test_list_and_errors(self):
+        lst = self.tool("list_crc_configurations")
+        self.assertEqual(lst["count"], len(self.C["configurations"]))
+        for bad in ({"crc": "CRC-64"}, {"length": 17}, {"offset": True}, {"class": "table of 16", "crc": "CRC-8/SMBUS",
+                    "board": "pico2", "sort": "cycles"}, {"x": 1}):
+            with self.assertRaises(server.ToolError, msg=bad):
+                self.tool("compare_crc", bad)
+
+    def test_ring_buffer_tools_name_the_crc_tools(self):
+        tools = {t["name"]: t for t in server.tool_list(self.D)}
+        self.assertIn("list_crc_configurations", tools["list_ring_buffers"]["description"])
+        self.assertIn("compare_crc", tools["compare_ring_buffers"]["description"])
+        self.assertIn("compare_crc", self.tool("about")["project"])
+
+
 if __name__ == "__main__":
     unittest.main()

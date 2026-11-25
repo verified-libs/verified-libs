@@ -29,6 +29,7 @@ import markdown
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from embargo_strip import strip_embargo   # noqa: E402
 import kinds_page   # noqa: E402
+import crc_data   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "site")
@@ -82,6 +83,7 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 .sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
 .tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
 """
 
 NAV = [("index", "Home"), ("kinds", "Results"), ("compare", "Compare"), ("method", "Method"),
@@ -173,7 +175,7 @@ DESCRIPTIONS = {
 }
 
 SITE_PAGES = {"reports.html", "findings.html"}   # pages with no markdown source
-SITE_FILES = {"data/libs.json": "data/libs.json"}   # served as they are: output path -> file under site/
+SITE_FILES = {"data/libs.json": "data/libs.json", "data/crc.json": "data/crc.json"}   # served as they are: output path -> file under site/
 MISSING = []   # (page source, link target): links to files that are not in the tree
 
 
@@ -220,6 +222,7 @@ def main():
     pagemap = {"site/content/index.md": "index.html", "site/content/method.md": "method.html",
                "site/content/reproduce.md": "reproduce.html", "site/content/repeats.md": "repeats.html",
                "site/content/compare.html": "compare.html", "site/content/kinds.md": "kinds.html",
+               "site/content/compare-crc.html": "compare-crc.html",
                "RESULTS.md": "results.html",
                # the CRC kind (DECISIONS 2026-11-24: static pages first)
                "site/content/results-crc.md": "results-crc.html", "site/content/method-crc.md": "method-crc.html"}
@@ -232,6 +235,9 @@ def main():
     # by site/kinds_page.py; a page whose counts differ from the data is not built.
     if open(os.path.join(SITE, "content/kinds.md")).read() != kinds_page.markdown():
         sys.exit("build refused: site/content/kinds.md is not up to date (python3 -I site/kinds_page.py --write)")
+    # The CRC kind's data (site/data/crc.json) is written from records/crc by site/crc_data.py.
+    if open(os.path.join(SITE, "data/crc.json")).read() != crc_data.text():
+        sys.exit("build refused: site/data/crc.json is not up to date (python3 -I site/crc_data.py --write)")
     pages = {}
     for src, dst in pagemap.items():
         if src.endswith(".html"):   # the comparison page is built below; in pagemap only as a link target
@@ -267,6 +273,15 @@ def main():
         + f'<script>{open(os.path.join(SITE, "compare.js")).read()}</script>'), "compare",
         "Compare embedded ring buffer libraries by board: speed, code size, stress test and model check results, "
         "with filters and your own weights.")
+    # The CRC kind's comparison: static controls, the data of site/data/crc.json (site/crc_data.py) and
+    # site/compare-crc.js, all inline, as for the ring buffers.
+    cdata = open(os.path.join(SITE, "data/crc.json")).read().replace("</", "<\\/")
+    pages["compare-crc.html"] = page("compare-crc", "Compare CRC calculation in software", (
+        open(os.path.join(SITE, "content/compare-crc.html")).read()
+        + f'<script type="application/json" id="crcdata">{cdata}</script>'
+        + f'<script>{open(os.path.join(SITE, "compare-crc.js")).read()}</script>'), "compare",
+        "Compare CRC libraries in software by CRC, board and message: cycles per call and per byte as ranges over "
+        "eight code placements, flash and RAM bytes, the reference as a row; no ranking.")
 
     # What the server shows for an address that does not exist (GitHub Pages serves 404.html).
     pages["404.html"] = page("404", "Page not found", (

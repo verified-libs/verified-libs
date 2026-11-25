@@ -2,6 +2,8 @@
 
 The results of one of the two kinds of library so far; the other is embedded
 ring buffers ([all kinds](kinds.md), [ring buffer results](../../RESULTS.md)).
+The same numbers by CRC, board, message and cache, with every length and both
+starts: [Compare](compare-crc.html).
 
 > **Status: the kind's first board series.** Every number comes from a
 > record under [`records/crc`](../../records/README.md) that can be rebuilt

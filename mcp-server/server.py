@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
-"""MCP server for the verified-libs ring buffer comparison.
+"""MCP server for the verified-libs comparisons: embedded ring buffers and
+CRC calculation in software.
 
-Gives an AI agent the comparison a person gets on
-https://verified-libs.org/compare.html: the same data (site/data/libs.json of
-this checkout), the same filters, the same score and the same order, computed
-by vlquery.py, a port of the page's own script that is tested against it.
+Gives an AI agent the comparisons a person gets on
+https://verified-libs.org/compare.html (ring buffers) and
+https://verified-libs.org/compare-crc.html (CRC): the same data
+(site/data/libs.json and site/data/crc.json of this checkout), the same
+filters and the same order, computed by vlquery.py and crcquery.py, ports of
+the pages' own scripts that are tested against them.
 
 Transport: stdio (one JSON-RPC 2.0 message per line), as the Model Context
-Protocol defines it. Read-only: the server reads one JSON file at start, and
-opens no network connection and no other file.
+Protocol defines it. Read-only: the server reads the two JSON files at start,
+and opens no network connection and no other file.
 
     python3 mcp-server/server.py                    serve on stdin/stdout
     python3 mcp-server/server.py --data FILE        another libs.json
+    python3 mcp-server/server.py --crc-data FILE    another crc.json
     python3 mcp-server/server.py --call TOOL [JSON] one tool call, result on stdout (no MCP client needed)
     python3 mcp-server/server.py --tools            the tool list as JSON
 
@@ -22,10 +26,11 @@ import re
 import sys
 import traceback
 
+import crcquery as cq
 import vlquery as q
 
 SERVER_NAME = "verified-libs"
-SERVER_VERSION = "0.2.0"
+SERVER_VERSION = "0.3.0"
 # Protocol revisions this server answers in. It uses only what all of them
 # have (tools over stdio), plus the optional fields each one added.
 PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"]
@@ -37,10 +42,13 @@ OWNER_NOTE = ("pxq RingBuffer_PackedState is written by Erik N (pxq.dk), who run
               "Say so whenever you mention or recommend it. How the project handles that: " + COI_URL)
 
 INSTRUCTIONS = (
-    "Measured results for embedded ring buffer libraries (C, C++, Rust) on six Cortex-M boards, from "
-    "verified-libs.org: speed in CPU cycles, code size, interrupt stress tests, model checking. Use it when a "
-    "user is choosing a ring buffer / FIFO / circular queue for a microcontroller, or asks how one behaves.\n"
-    "How to use it honestly:\n"
+    "Measured results from verified-libs.org for two kinds of library on six Cortex-M boards. Embedded ring "
+    "buffer libraries (C, C++, Rust): speed in CPU cycles, code size, interrupt stress tests, model checking; "
+    "use list_ring_buffers, compare_ring_buffers and get_ring_buffer when a user is choosing a ring buffer / "
+    "FIFO / circular queue for a microcontroller. CRC calculation in software (CRC-32, CRC-16, CRC-8): cycles per "
+    "call and per byte, flash and RAM bytes; use list_crc_configurations and compare_crc when a user is choosing "
+    "a CRC implementation. The two kinds are not compared with each other.\n"
+    "How to use the ring buffer tools honestly:\n"
     "1. Turn the user's hard requirements into filters (board or core, producers and consumers, one or two "
     "cores, language, licence, block or zero-copy API). Set weights only from what the user says matters. "
     "Without weights there is no ranking: the order is alphabetical, do not present it as one.\n"
@@ -52,7 +60,10 @@ INSTRUCTIONS = (
     "5. The numbers hold for the versions, boards, compiler and flags they name. Call 'about' once for the "
     "limits before you draw conclusions.\n"
     "6. A row with 'from_the_tests' has notes or a published finding in words: read them with "
-    "get_ring_buffer before you recommend that library.")
+    "get_ring_buffer before you recommend that library.\n"
+    "How to use the CRC tools honestly: every number is a range over eight placements of the code; two rows "
+    "differ only where their ranges do not overlap ('overlaps' names, per number, the rows that are not told "
+    "apart). The rows are in the order of the configuration list: there is no ranking, do not present one.")
 
 REQUIRE = {   # tool word -> the page's filter
     "zero_stress_errors": ("clean", "0 errors in the ISR stress test on every board tested"),
@@ -68,6 +79,29 @@ SORTS = {"name": "name", "score": "score", "license": "license", "language": "la
          "block": "block", "zero_copy": "dma", "code_size": "size", "stress_errors": "stress"}
 CORES = {"any": "", "one": "1", "two": "2"}
 MAX_DETAIL = 4
+CRC_LENGTHS = [1, 4, 16, 64, 256, 1024]
+CRC_SORTS = {"list": "", "name": "name", "flash_bytes": "flash", "ram_bytes": "ram"}
+CRC_WEIGHTS = {"cycles": "cyc", "cycles_per_byte": "pb", "bytes": "bytes"}
+CRC_NOTES = [
+    "Every number is the range (min, max) over eight placements of the code, first pass. Two rows differ only where "
+    "their ranges do not overlap; 'overlaps' names, per number, the rows whose range overlaps this row's (as the page "
+    "shows the numbers: whole cycles, cycles per byte to one decimal).",
+    "cycles: the mean of 256 calls of one CRC over a message of the given length, in CPU cycles, the first call "
+    "included. cycles_per_byte: (mean at 1024 bytes - mean at 256 bytes) / 768 at the given offset.",
+    "The rows are in the order of the configuration list (or sorted by name, flash or RAM bytes): this is not a ranking.",
+    "flash_bytes: the table in flash and the code at -O2 for the board's core; ram_bytes: the table in RAM.",
+    "The reference (baseline) is the bitwise algorithm from the catalogue's parameters, timed in the same images; it "
+    "is not a library.",
+    "The second pass and the minimum, maximum and first call of each scenario are in the record of each row.",
+]
+_CRC = {}
+
+
+def crc_data(path=None):
+    """The CRC data (site/data/crc.json), read once: (data, provenance)."""
+    if "data" not in _CRC or path:
+        _CRC["data"] = cq.load(path)
+    return _CRC["data"]
 
 
 class ToolError(Exception):
@@ -77,15 +111,19 @@ class ToolError(Exception):
 # --- Tool definitions ---------------------------------------------------------
 
 def tool_list(D, version=PROTOCOL_VERSIONS[0]):
+    C = crc_data()[0]
+    crc_boards = [b["id"] for b in C["boards"]]
+    crc_board_text = "; ".join(f"{b['id']} = {b['name']}, {b['core']}" for b in C["boards"])
     boards = [b["id"] for b in D["boards"]]
     board_text = "; ".join(f"{b['id']} = {b['name']}, {b['core']}, {b['clock_mhz']} MHz" for b in D["boards"])
     tools = [
         {
             "name": "about",
             "title": "About the comparison",
-            "description": "What verified-libs measures and how to read it: the tests, the boards and the records the "
-                           "numbers come from, the limits, the conflict of interest, the licence of the data. "
-                           "Call it once before you draw conclusions from the other tools.",
+            "description": "What verified-libs measures and how to read it, for both kinds of library (embedded ring "
+                           "buffers; CRC calculation in software): the tests, the boards and the records the numbers "
+                           "come from, the limits, the conflict of interest, the licence of the data. Call it once "
+                           "before you draw conclusions from the other tools.",
             "inputSchema": {"type": "object", "additionalProperties": False},
         },
         {
@@ -93,7 +131,8 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
             "title": "List the ring buffers",
             "description": f"The {len(D['libs'])} tested ring buffer configurations by name, with language, licence, the "
                            "producer/consumer modes they document and their group in the interrupt stress test. "
-                           "No speeds and no ranking; use compare_ring_buffers for those.",
+                           "No speeds and no ranking; use compare_ring_buffers for those. For CRC libraries: "
+                           "list_crc_configurations.",
             "inputSchema": {"type": "object", "additionalProperties": False},
         },
         {
@@ -104,7 +143,8 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
                            "the requirements, in three groups (0 stress errors, not tested, errors), with speeds in CPU "
                            "cycles, code size, stress, model-checking and contract-check results, and the link to the "
                            "same view on the site. There is no ranking unless you give weights; the score is then "
-                           "100 x sum(weight x fastest / value) / sum(weights), speed only.",
+                           "100 x sum(weight x fastest / value) / sum(weights), speed only. Ring buffers only; for "
+                           "CRC libraries: compare_crc.",
             "inputSchema": {
                 "type": "object",
                 "additionalProperties": False,
@@ -163,6 +203,57 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
                            "what was wrong, which versions are affected, where it was fixed, and which version the "
                            "comparison shows. Findings still under the notice period to the maintainer are not listed.",
             "inputSchema": {"type": "object", "additionalProperties": False},
+        },
+        {
+            "name": "list_crc_configurations",
+            "title": "List the CRC configurations",
+            "description": f"The {len(C['configurations'])} tested configurations of CRC calculation in software (one "
+                           "library, one CRC, one way of computing it) with library, language, CRC, class (bitwise, "
+                           "table of 16 or 256, slicing by 4, ...) and where the table lies. No numbers and no ranking; "
+                           "use compare_crc for those.",
+            "inputSchema": {"type": "object", "additionalProperties": False},
+        },
+        {
+            "name": "compare_crc",
+            "title": "Compare CRC configurations",
+            "description": "The comparison table of verified-libs.org/compare-crc.html for one CRC, board and message: "
+                           "every configuration of that CRC with cycles for one call and cycles per byte, flash and RAM "
+                           "bytes and the link to its record, the reference (baseline) last. Every number is a range "
+                           "over eight placements of the code; per row and number, 'overlaps' names the rows whose "
+                           "range overlaps it: those are not told apart. No ranking: the rows are in the order of the "
+                           "configuration list unless sorted by name, flash or RAM bytes.",
+            "inputSchema": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "crc": {"type": "string", "enum": C["crcs"], "description": f"Default: {C['crcs'][0]}."},
+                    "board": {"type": "string", "enum": crc_boards,
+                              "description": "The board whose numbers are shown; pick the one closest to the user's core. "
+                                             + crc_board_text + f". Default: {crc_boards[0]}."},
+                    "length": {"type": "integer", "enum": CRC_LENGTHS, "default": 16,
+                               "description": "Message length in bytes. 1 is in the data but not on the page: at offset 0 "
+                                              "with the cache on it is the first scenario after the cache is switched on."},
+                    "offset": {"type": "integer", "enum": [0, 1], "default": 0,
+                               "description": "Where the message starts: 0 at an 8-byte boundary, 1 one byte after it."},
+                    "cache": {"type": "string", "enum": ["on", "off"], "default": "on"},
+                    "language": {"type": "string", "enum": ["any"] + cq.LANGS, "default": "any"},
+                    "class": {"type": "string", "enum": ["any"] + sorted({c["class"] for c in C["configurations"]}),
+                              "default": "any"},
+                    "table": {"type": "string", "enum": ["any"] + cq.TABLES, "default": "any",
+                              "description": "Where the table lies: flash, RAM, or none (no table)."},
+                    "weights": {"type": "object", "additionalProperties": False,
+                                "properties": {k: {"type": "integer", "minimum": 0, "maximum": 10} for k in CRC_WEIGHTS},
+                                "description": "How much each value matters to the user, 0 (ignore) to 10: cycles for one "
+                                               "call at the length, cycles per byte, bytes of flash and RAM together. With "
+                                               "a weight above 0 each row gets a score range (as the page) and the rows are "
+                                               "ordered by its highest end; leave out for no ranking."},
+                    "sort": {"type": "string", "enum": list(CRC_SORTS), "default": "list",
+                             "description": "'list' (default): the order of the configuration list, or with weights the "
+                                            "score order. 'name', 'flash_bytes', 'ram_bytes': exact columns, which override "
+                                            "the score order. Cycles are ranges and not sorted."},
+                    "reverse": {"type": "boolean", "default": False},
+                },
+            },
         },
     ]
     for t in tools:
@@ -528,8 +619,10 @@ def tool_about(D, prov, args):
     return {
         "project": "verified-libs (" + SITE + "): an open registry of specialist libraries, measured on real hardware, "
                    "stress-tested with a negative control that must be caught, and model-checked where the library promises "
-                   "lock-free concurrency. Everything can be reproduced from the repository. The first niche is embedded "
-                   "ring buffers: interrupt or DMA to main loop on Cortex-M.",
+                   "lock-free concurrency. Everything can be reproduced from the repository. Two kinds of library so "
+                   "far: embedded ring buffers (interrupt or DMA to main loop on Cortex-M; the tools *_ring_buffer*) "
+                   "and CRC calculation in software (the tools list_crc_configurations and compare_crc). The rest of "
+                   "this answer is about the ring buffers; for CRC see " + SITE + "/method-crc.html.",
         "compared": f"{len(D['libs'])} configurations of ring buffer libraries in {', '.join(langs)}, on {len(D['boards'])} boards. "
                     "A configuration is a library set up one way; some libraries have two or more.",
         "tests": {
@@ -581,8 +674,138 @@ def tool_about(D, prov, args):
     }
 
 
+def tool_list_crc(D, prov, args):
+    _check_args(args, [])
+    C, cprov = crc_data()
+    return {
+        "count": len(C["configurations"]),
+        "what": "Configurations of CRC calculation in software: one library, one CRC and one way of computing it. In the "
+                "order of the configuration list; this is not a ranking.",
+        "crcs": C["crcs"],
+        "configurations": [{"name": c["name"], "library": c["library"], "language": c["lang"], "crc": c["crc"],
+                            "class": c["class"], "table": c["table"]} for c in C["configurations"]],
+        "boards": [{"id": b["id"], "name": b["name"], "core": b["core"], "clock_mhz": round(b["clock_hz"] / 1e6)}
+                   for b in C["boards"]],
+        "more": {"compare": SITE + "/compare-crc.html", "results": SITE + "/results-crc.html",
+                 "method": SITE + "/method-crc.html"},
+        "data": cprov,
+    }
+
+
+def crc_state_from_args(C, args):
+    """The CRC page's state for a compare_crc call (length 1 is allowed here, not on the page)."""
+    _check_args(args, ["crc", "board", "length", "offset", "cache", "language", "class", "table", "weights", "sort", "reverse"])
+    st = cq.default_state(C)
+    st["crc"] = _choice(args, "crc", C["crcs"], C["crcs"][0])
+    boards = [b["id"] for b in C["boards"]]
+    st["board"] = _choice(args, "board", boards, boards[0])
+    for key, choices, default, field in (("length", CRC_LENGTHS, 16, "len"), ("offset", [0, 1], 0, "off")):
+        v = args.get(key, default)
+        if isinstance(v, bool) or v not in choices:
+            raise ToolError(f"'{key}' must be one of: {', '.join(map(str, choices))}. Got {json.dumps(v)}.")
+        st[field] = str(v)
+    st["cache"] = _choice(args, "cache", ["on", "off"], "on")
+    lang = _choice(args, "language", ["any"] + cq.LANGS, "any")
+    st["lang"] = "" if lang == "any" else lang
+    classes = cq.classes_of(C, st["crc"])
+    cls = _choice(args, "class", ["any"] + sorted({c["class"] for c in C["configurations"]}), "any")
+    if cls != "any" and cls not in classes:
+        raise ToolError(f"No configuration of {st['crc']} is of the class {json.dumps(cls)}. Its classes: {', '.join(classes)}.")
+    st["cls"] = "" if cls == "any" else cls
+    tbl = _choice(args, "table", ["any"] + cq.TABLES, "any")
+    st["tbl"] = "" if tbl == "any" else tbl
+    w = args.get("weights", {})
+    if not isinstance(w, dict):
+        raise ToolError("'weights' must be an object, e.g. {\"cycles\": 5, \"bytes\": 5}.")
+    _check_args(w, list(CRC_WEIGHTS))
+    for k, v in w.items():
+        if isinstance(v, bool) or not isinstance(v, int) or not 0 <= v <= 10:
+            raise ToolError(f"Weight '{k}' must be a whole number from 0 to 10. Got {json.dumps(v)}.")
+        st["w"][CRC_WEIGHTS[k]] = v
+    st["sort"] = CRC_SORTS[_choice(args, "sort", list(CRC_SORTS), "list")]
+    st["dir"] = -1 if _flag(args, "reverse") else 1
+    return st
+
+
+def _rng(r):
+    return {"min": r[0], "max": r[1]} if r else None
+
+
+def _shown(st, r, x=None):
+    """The numbers as the page shows them (whole cycles, cycles per byte and the score to one decimal)."""
+    out = {"cycles": cq.range_text(cq.cycles_of(st, r), q.num), "cycles_per_byte": cq.range_text(cq.per_byte_of(st, r), q.dec1)}
+    if x is not None:
+        out["score"] = cq.score_text(x["score"])
+    return out
+
+
+def tool_compare_crc(D, prov, args):
+    C, cprov = crc_data()
+    st = crc_state_from_args(C, args)
+    every, rs = cq.shown(C, st)
+    base = cq.baseline_of(C, st)
+    view = cq.page_view(C, st)
+    bd = cq.board_of(C, st)
+    rows = []
+    wd, by_score = cq.weighted(st), cq.weighted(st) and not st["sort"]
+    for j, x in enumerate(rs):
+        c, r = x["c"], x["r"]
+        ov = cq.overlaps(st, rs, base, x)
+        o = {"name": c["name"], "library": c["library"], "language": c["lang"], "class": c["class"],
+             "table": c["table"], "flash_bytes": r["flash_bytes"], "ram_bytes": r["ram_bytes"]}
+        if wd:
+            o["score"] = {"min": round(x["score"][0], 2), "max": round(x["score"][1], 2)}
+        o.update({"cycles": _rng(cq.cycles_of(st, r)), "cycles_per_byte": _rng(cq.per_byte_of(st, r)),
+                  "as_on_the_page": _shown(st, r, x if wd else None),
+                  "overlaps": {"cycles": ov["cycles"], "cycles_per_byte": ov["per_byte"]}})
+        if wd:
+            o["overlaps"]["score"] = ov["score"]
+        if by_score and j > 0:
+            o["score_not_told_apart_from_the_row_above"] = cq.score_overlap(rs[j - 1]["score"], x["score"])
+        o["record"] = cq.REPO + r["record"]
+        rows.append(o)
+    if base:
+        brows = [{"c": {"name": "reference, bitwise"}, "r": base}] + rs
+        ov = cq.overlaps(st, brows, None, brows[0])
+        rows.append({"name": "reference, bitwise", "reference_baseline_not_a_library": True, "class": "bitwise",
+                     "table": "none", "cycles": _rng(cq.cycles_of(st, base)), "cycles_per_byte": _rng(cq.per_byte_of(st, base)),
+                     "as_on_the_page": _shown(st, base),
+                     "overlaps": {"cycles": ov["cycles"], "cycles_per_byte": ov["per_byte"]}})
+    out = {"crc": st["crc"],
+           "board": {"id": bd["id"], "name": bd["name"], "core": bd["core"], "clock_mhz": round(bd["clock_hz"] / 1e6)},
+           "message": {"length_bytes": int(st["len"]), "offset": int(st["off"]),
+                       "start": "at an 8-byte boundary" if st["off"] == "0" else "one byte after an 8-byte boundary",
+                       "cache": st["cache"]}}
+    if "board" not in args:
+        out["board_note"] = ("No board was given, so these are the numbers of the first board. Pass the board closest to "
+                             "the user's core: " + ", ".join(f"{b['id']} ({b['core']})" for b in C["boards"]) + ".")
+    out["shown"] = view["count"]
+    out["rows"] = rows
+    notes = list(CRC_NOTES)
+    if wd:
+        notes.insert(0, "Ordered by the score of the caller's weights (" + ", ".join(f"{k} {st['w'][m]}" for k, m in CRC_WEIGHTS.items())
+                     + "), its highest end first" + (" (but sorted by an exact column, as asked)" if st["sort"] else "") +
+                     ". The score is a range: per weighted value the smallest lower end among the rows shown divided by the "
+                     "row's own value, the weighted mean times 100; its lowest end uses the row's upper ends, its highest end "
+                     "the lower ends; bytes are exact. 'score_not_told_apart_from_the_row_above' marks a score whose range "
+                     "overlaps the one above, judged on the score before rounding (the page shows one decimal); the "
+                     "cycles and per-byte overlaps are judged as the page shows those numbers. The score does not judge correctness (every row was "
+                     "checked against the reference on every call), language, licence or API.")
+    if view["note"]:
+        notes.insert(0, view["note"])
+    if st["len"] == "1":
+        notes.insert(0, "Length 1 is not on the page: at offset 0 with the cache on, that scenario is the first one "
+                        "after the cache is switched on, so its first calls are the first with the cache on.")
+    out["notes"] = notes
+    out["source"] = view["src"]
+    out["same_view_on_the_site"] = cq.view_url(st) if st["len"] != "1" else None
+    out["data"] = cprov
+    return out
+
+
 TOOLS = {"about": tool_about, "list_ring_buffers": tool_list_libs,
-         "compare_ring_buffers": tool_compare, "get_ring_buffer": tool_get, "list_findings": tool_findings}
+         "compare_ring_buffers": tool_compare, "get_ring_buffer": tool_get, "list_findings": tool_findings,
+         "list_crc_configurations": tool_list_crc, "compare_crc": tool_compare_crc}
 
 
 def call_tool(D, prov, name, args):
@@ -647,7 +870,7 @@ class Session:
         self.version = asked if asked in PROTOCOL_VERSIONS else PROTOCOL_VERSIONS[0]
         info = {"name": SERVER_NAME, "version": SERVER_VERSION}
         if self.version >= "2025-06-18":
-            info["title"] = "verified-libs: embedded ring buffers, measured"
+            info["title"] = "verified-libs: embedded ring buffers and CRC, measured"
         if self.version >= "2025-11-25":
             info["websiteUrl"] = SITE
         return {"protocolVersion": self.version, "capabilities": {"tools": {"listChanged": False}},
@@ -701,12 +924,14 @@ def serve(session, fin, fout):
 
 
 def main(argv):
-    data_path, call, show_tools = None, None, False
+    data_path, crc_path, call, show_tools = None, None, None, False
     args = list(argv)
     while args:
         a = args.pop(0)
         if a == "--data" and args:
             data_path = args.pop(0)
+        elif a == "--crc-data" and args:
+            crc_path = args.pop(0)
         elif a == "--call" and args:
             call = (args.pop(0), args.pop(0) if args and not args[0].startswith("--") else "{}")
         elif a == "--tools":
@@ -716,6 +941,7 @@ def main(argv):
             return 2
     try:
         D, prov = q.load(data_path)
+        C, cprov = crc_data(crc_path)
     except (OSError, ValueError) as e:
         print(f"verified-libs MCP server: cannot read the data: {e}", file=sys.stderr)
         return 1
@@ -733,8 +959,9 @@ def main(argv):
             return 2
         print(json.dumps(out, ensure_ascii=False, indent=1))
         return 0
-    print(f"verified-libs MCP server {SERVER_VERSION}: {len(D['libs'])} configurations, {len(D['boards'])} boards, "
-          f"data sha256 {prov['sha256'][:12]}; waiting for an MCP client on stdin", file=sys.stderr)
+    print(f"verified-libs MCP server {SERVER_VERSION}: ring buffers {len(D['libs'])} configurations, {len(D['boards'])} boards, "
+          f"data sha256 {prov['sha256'][:12]}; CRC {len(C['configurations'])} configurations, {len(C['boards'])} boards, "
+          f"data sha256 {cprov['sha256'][:12]}; waiting for an MCP client on stdin", file=sys.stderr)
     try:
         serve(Session(D, prov), sys.stdin.buffer, sys.stdout.buffer)
     except (BrokenPipeError, KeyboardInterrupt):

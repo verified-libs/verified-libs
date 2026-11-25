@@ -76,7 +76,7 @@ The kinds are in the order they were added.
 - **Boards:** {crc['boards']}.
 - **Results:** [results page](results-crc.md)
 - **Method:** [method page](method-crc.md)
-- **Comparison page:** not on the comparison page yet.
+- **Comparison page:** [Compare](compare-crc.html)
 - **Records:** [`records/crc`](../../records/README.md)
 - **How to repeat:** [Reproduce, "The CRC records"](reproduce.md#the-crc-records)
 
