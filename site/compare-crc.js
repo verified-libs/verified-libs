@@ -4,7 +4,12 @@
 // ours: without weights the rows are in the order of the configuration list
 // (or sorted by name or an exact column, flash or RAM bytes); with the
 // reader's weights they are ordered by a score that is a range, as the
-// numbers are, and a score that overlaps the one above it is marked.
+// numbers are, and a score that overlaps the one above it is marked. The
+// board's CRC unit (role "hardware": driven by our code, not a library) is a
+// row of the same table, after the libraries of its CRC, labelled in its name
+// cell every time; with weights it is scored like any row, and the filter on
+// the kind of row leaves it out (decided 2026-11-26). Nothing on a board
+// without one, and a line that says so. The reference stays apart, last.
 // mcp-server/crcquery.py is a port of this script, tested against it.
 (function () {
   "use strict";
@@ -15,10 +20,12 @@
   var SORT_TEXT = { name: "name", flash: "flash bytes", ram: "RAM bytes" };
   var LANGS = ["C", "C++", "Rust"];
   var TABLES = ["flash", "RAM", "none"];
+  var KINDS = ["library", "hardware"];
   // The weights: cycles at the chosen length, cycles per byte, bytes (flash + RAM).
   var WEIGHTS = [{ id: "cyc", label: "Cycles, one call" }, { id: "pb", label: "Cycles per byte" },
                  { id: "bytes", label: "Bytes, flash + RAM" }];
   var st;
+  var HW_LABEL = "the board\u2019s CRC unit, driven by our code; not a library";
 
   function $(id) { return document.getElementById(id); }
   function el(tag, text, cls) {
@@ -47,8 +54,9 @@
 
   function defaults() {
     return { crc: D.crcs[0], board: D.boards[0].id, len: "16", off: "0", cache: "on",
-             lang: "", cls: "", tbl: "", sort: "", dir: 1, row: "", w: { cyc: 0, pb: 0, bytes: 0 } };
+             lang: "", cls: "", tbl: "", kind: "", sort: "", dir: 1, row: "", w: { cyc: 0, pb: 0, bytes: 0 } };
   }
+  // The rows of a CRC: its libraries in list order, then the board's CRC unit (crc.json holds them in that order).
   function configsOf(crc) { return D.configurations.filter(function (c) { return c.crc === crc; }); }
   function classesOf(crc) {
     var out = [];
@@ -70,6 +78,7 @@
       else if (k === "lang" && LANGS.indexOf(v) >= 0) st.lang = v;
       else if (k === "class") st.cls = v;
       else if (k === "table" && TABLES.indexOf(v) >= 0) st.tbl = v;
+      else if (k === "kind" && KINDS.indexOf(v) >= 0) st.kind = v;
       else if (k === "sort") {
         var s = v.replace(/^-/, "");
         if (SORTS.indexOf(s) >= 0) { st.sort = s; st.dir = v.charAt(0) === "-" ? -1 : 1; }
@@ -87,6 +96,7 @@
     if (st.lang) parts.push("lang=" + encodeURIComponent(st.lang));
     if (st.cls) parts.push("class=" + encodeURIComponent(st.cls));
     if (st.tbl) parts.push("table=" + st.tbl);
+    if (st.kind) parts.push("kind=" + st.kind);
     if (st.sort) parts.push("sort=" + (st.dir < 0 ? "-" : "") + st.sort);
     if (st.row) parts.push("row=" + encodeURIComponent(st.row));
     return "#" + parts.join("&");
@@ -139,6 +149,7 @@
       if (st.lang && x.c.lang !== st.lang) return false;
       if (st.cls && x.c["class"] !== st.cls) return false;
       if (st.tbl && tableWhere(x.c.table) !== st.tbl) return false;
+      if (st.kind && x.c.role !== st.kind) return false;
       return true;
     });
     if (weighted()) score(out);
@@ -212,6 +223,7 @@
       a.href = REPO + r.record;
       rec.appendChild(a);
       td.appendChild(rec);
+      if (c.role === "hardware") td.appendChild(el("div", HW_LABEL, "sub"));
       if (isChosen) td.appendChild(el("div", "chosen", "sub"));
       tr.appendChild(td);
       if (wd) {
@@ -220,7 +232,7 @@
         if (cs && !isChosen && scoreOverlap(cs, x.score)) sc.appendChild(el("div", "overlaps", "sub"));
         tr.appendChild(sc);
       }
-      tr.appendChild(el("td", c.library));
+      tr.appendChild(el("td", c.library == null ? "–" : c.library));
       tr.appendChild(el("td", c.lang));
       tr.appendChild(el("td", c["class"]));
       tr.appendChild(el("td", c.table));
@@ -240,13 +252,16 @@
       tb.appendChild(btr);
     }
     t.appendChild(tb);
-    $("cmp-count").textContent = rs.length + " of " + v.all.length + " configurations of " + st.crc + " shown, " +
+    $("cmp-count").textContent = rs.length + " of " + v.all.length + " rows of " + st.crc + " shown, " +
       (st.sort ? "sorted by " + SORT_TEXT[st.sort] + (st.dir < 0 ? ", descending" : "")
                : wd ? "ordered by the score of your weights, its highest end first; a score marked \u201coverlaps above\u201d is not told apart from the row above by this series"
                : "in the order of the configuration list; this is not a ranking") +
       (st.row && !chosen ? ". The chosen configuration is not shown: nothing is marked" : "") + ".";
     var bd = D.boards.filter(function (x) { return x.id === st.board; })[0];
-    $("cmp-note").textContent = st.cache === "off" && bd.note_cache_off ? bd.note_cache_off : "";
+    var hasUnit = v.all.some(function (x) { return x.c.role === "hardware"; });
+    $("cmp-note").textContent = [st.cache === "off" && bd.note_cache_off ? bd.note_cache_off : "",
+      hasUnit ? "" : "No CRC unit of the " + bd.name + " was measured for " + st.crc + ": the table holds libraries only."]
+      .filter(function (x) { return x; }).join(" ");
     $("cmp-src").textContent = bd.name + " (" + bd.core + ", " + Math.round(bd.clock_hz / 1e6) + " MHz). Records: " +
       D.source.records + ", series at commit " + D.source.commits.join(", ") + ", toolchain " + D.source.toolchain_image.join(", ") +
       ". Each number is the mean of the scenario's 256 calls, the first included, as min–max over the eight placements, first pass; " +
@@ -257,6 +272,7 @@
     WEIGHTS.forEach(function (m) { $("w-" + m.id).value = st.w[m.id]; $("wv-" + m.id).textContent = st.w[m.id]; });
     $("crc-crc").value = st.crc; $("crc-board").value = st.board; $("crc-len").value = st.len;
     $("crc-off").value = st.off; $("crc-cache").value = st.cache; $("crc-lang").value = st.lang; $("crc-table").value = st.tbl;
+    $("crc-kind").value = st.kind;
     var cs = $("crc-class");
     cs.textContent = "";
     var any = el("option", "any"); any.value = ""; cs.appendChild(any);
@@ -275,7 +291,7 @@
     var bs = $("crc-board");
     D.boards.forEach(function (b) { var o = el("option", b.name + " (" + b.core + ")"); o.value = b.id; bs.appendChild(o); });
     [["crc-crc", "crc"], ["crc-board", "board"], ["crc-len", "len"], ["crc-off", "off"], ["crc-cache", "cache"],
-     ["crc-lang", "lang"], ["crc-class", "cls"], ["crc-table", "tbl"]].forEach(function (p) {
+     ["crc-lang", "lang"], ["crc-class", "cls"], ["crc-table", "tbl"], ["crc-kind", "kind"]].forEach(function (p) {
       $(p[0]).addEventListener("change", function (e) { st[p[1]] = e.target.value; update(); });
     });
     var wbox = $("crc-weights");

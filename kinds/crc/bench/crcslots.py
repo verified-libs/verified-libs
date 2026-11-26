@@ -26,10 +26,16 @@ number in its symbol names, so the file's SHA-256 is another). If the ring
 buffers' table ever reaches FIRST_SEGMENT, or
 this kind's table the next kind's range, this program stops.
 
+A configuration of ../boards.txt exists on the boards named there only
+(onecrc.py sizes leaves it out of the other boards' sizes): its slot is
+sized for those boards, and the other boards leave it empty, as the slots
+are one table for every board.
+
 Usage: python3 -I crcslots.py assign SIZES.json...   (onecrc.py sizes, all six boards)
        python3 -I crcslots.py free ADAPTER
        python3 -I crcslots.py show
 """
+import json
 import os
 import sys
 
@@ -104,6 +110,34 @@ def show(lines, flash=None):
         print(f"  {board}: {per} segments per bundle, {len(bundles)} flash writes for all images (bundles {bundles})")
 
 
+def read_boards():
+    out = {}
+    for ln in open(os.path.join(KIND, "boards.txt")):
+        f = ln.split("#")[0].split()
+        if f:
+            out[f[0]] = set(f[1:])
+    return out
+
+
+class SizesOfAllBoards:
+    """json for oneslots.main: a configuration of boards.txt gets, on a board without it, the largest
+    size it has on its boards, so that oneslots sizes its slot for those boards."""
+    def __init__(self, paths):
+        self.d = {os.path.abspath(p): json.load(open(p)) for p in paths}
+        for a, on in read_boards().items():
+            have = [d["bytes"][a] for d in self.d.values() if d["board"] in on and a in d["bytes"]]
+            if len(have) != len(on):
+                sys.exit(f"{a}: sizes of {len(have)} of its {len(on)} boards (boards.txt)")
+            for d in self.d.values():
+                if d["board"] not in on:
+                    if a in d["bytes"]:
+                        sys.exit(f"{a}: a size for {d['board']}, which boards.txt does not name")
+                    d["bytes"][a] = max(have)
+
+    def load(self, fh):
+        return self.d[os.path.abspath(fh.name)]
+
+
 def main():
     if rb_last_segment() >= FIRST_SEGMENT:
         sys.exit(f"the ring buffers' slots reach segment {rb_last_segment()}, the CRC kind starts at {FIRST_SEGMENT}")
@@ -113,6 +147,8 @@ def main():
     if sys.argv[1:2] == ["show"]:
         show(oneslots.read())
         return
+    if sys.argv[1:2] == ["assign"]:
+        oneslots.json = SizesOfAllBoards(sys.argv[2:])
     oneslots.main()
 
 

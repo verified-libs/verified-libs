@@ -9,6 +9,11 @@ configuration list (or sorted by name or an exact column, flash or RAM bytes);
 with the reader's weights they are ordered by a score that is a range. The
 cycles are ranges over eight placements of the code; two rows differ only
 where their ranges do not overlap (compared as the page shows the numbers).
+The board's CRC unit (role "hardware": driven by our code, not a library) is a
+row of the same table, after the libraries of its CRC, labelled in its name cell
+every time; with weights it is scored like any row, and the filter on the kind
+of row leaves it out (decided 2026-11-26). Nothing on a board without one, and a
+line that says so. The reference stays apart, last.
 
 Python 3.9 or newer, standard library only.
 """
@@ -28,10 +33,12 @@ SORTS = ["name", "flash", "ram"]
 SORT_TEXT = {"name": "name", "flash": "flash bytes", "ram": "RAM bytes"}
 LANGS = ["C", "C++", "Rust"]
 TABLES = ["flash", "RAM", "none"]
+KINDS = ["library", "hardware"]
 WEIGHTS = [("cyc", "Cycles, one call"), ("pb", "Cycles per byte"), ("bytes", "Bytes, flash + RAM")]
 WEIGHT_IDS = [m for m, _ in WEIGHTS]
 ABOVE_TEXT = "overlaps above"
 BASELINE_TEXT = "Reference (baseline), not a library"
+HW_LABEL = "the board\u2019s CRC unit, driven by our code; not a library"
 
 
 def default_data_path():
@@ -44,8 +51,8 @@ def load(path=None):
     with open(path, "rb") as fh:
         raw = fh.read()
     data = json.loads(raw.decode("utf-8"))
-    if data.get("schema") != "crc-data/1":
-        raise ValueError(f"{path}: not the CRC data of site/crc_data.py (schema crc-data/1)")
+    if data.get("schema") != "crc-data/2":
+        raise ValueError(f"{path}: not the CRC data of site/crc_data.py (schema crc-data/2)")
     prov = {"file": os.path.basename(path), "sha256": hashlib.sha256(raw).hexdigest()}
     marker = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(path)))), "EXPORTED_FROM")
     if os.path.isfile(marker):
@@ -93,11 +100,16 @@ def table_where(t):
 
 def default_state(C):
     return {"crc": C["crcs"][0], "board": C["boards"][0]["id"], "len": "16", "off": "0", "cache": "on",
-            "lang": "", "cls": "", "tbl": "", "sort": "", "dir": 1, "row": "", "w": {m: 0 for m in WEIGHT_IDS}}
+            "lang": "", "cls": "", "tbl": "", "kind": "", "sort": "", "dir": 1, "row": "", "w": {m: 0 for m in WEIGHT_IDS}}
 
 
 def configs_of(C, crc):
+    """The rows of a CRC: its libraries in list order, then the board's CRC unit (crc.json holds them in that order)."""
     return [c for c in C["configurations"] if c["crc"] == crc]
+
+
+def is_hardware(c):
+    return c.get("role") == "hardware"
 
 
 def classes_of(C, crc):
@@ -156,6 +168,8 @@ def state_from_hash(C, fragment):
             st["cls"] = v
         elif k == "table" and v in TABLES:
             st["tbl"] = v
+        elif k == "kind" and v in KINDS:
+            st["kind"] = v
         elif k == "sort":
             s = v[1:] if v.startswith("-") else v
             if s in SORTS:
@@ -179,6 +193,8 @@ def hash_of(st):
         parts.append("class=" + _enc(st["cls"]))
     if st["tbl"]:
         parts.append("table=" + st["tbl"])
+    if st["kind"]:
+        parts.append("kind=" + st["kind"])
     if st["sort"]:
         parts.append("sort=" + ("-" if st["dir"] < 0 else "") + st["sort"])
     if st["row"]:
@@ -261,7 +277,8 @@ def shown(C, st):
             every.append({"c": c, "r": r, "i": i})
     out = [x for x in every if not (st["lang"] and x["c"]["lang"] != st["lang"])
            and not (st["cls"] and x["c"]["class"] != st["cls"])
-           and not (st["tbl"] and table_where(x["c"]["table"]) != st["tbl"])]
+           and not (st["tbl"] and table_where(x["c"]["table"]) != st["tbl"])
+           and not (st["kind"] and x["c"].get("role") != st["kind"])]
     if weighted(st):
         score(st, out)
     if not st["sort"] and weighted(st):
@@ -298,19 +315,29 @@ def chosen_of(st, rs):
 
 
 def overlaps(st, rs, base, x):
-    """Per metric, the names of the other rows (and the baseline) whose range overlaps x's, as shown;
+    """Per metric, the names of the other rows (the baseline included) whose range overlaps x's, as shown;
     with weights also the rows whose score overlaps x's (the baseline has no score)."""
     out = {"cycles": [], "per_byte": []}
     if weighted(st) and "score" in x:
         out["score"] = [y["c"]["name"] for y in rs if y is not x and score_overlap(x["score"], y["score"])]
     xc, xp = shown_cycles(cycles_of(st, x["r"])), shown_per_byte(per_byte_of(st, x["r"]))
-    others = [(y["c"]["name"], y["r"]) for y in rs if y is not x] + ([("reference, bitwise", base)] if base else [])
+    others = ([(y["c"]["name"], y["r"]) for y in rs if y is not x]
+              + ([("reference, bitwise", base)] if base else []))
     for name, r in others:
         if overlap(xc, shown_cycles(cycles_of(st, r))):
             out["cycles"].append(name)
         if overlap(xp, shown_per_byte(per_byte_of(st, r))):
             out["per_byte"].append(name)
     return out
+
+
+def has_unit(every):
+    """Whether the board has the CRC unit for the chosen CRC (before the filters)."""
+    return any(is_hardware(x["c"]) for x in every)
+
+
+def no_unit_text(bd, st):
+    return f"No CRC unit of the {bd['name']} was measured for {st['crc']}: the table holds libraries only."
 
 
 def header(st):
@@ -348,7 +375,7 @@ def page_view(C, st):
     rows, seps = [], []
     for j, x in enumerate(rs):
         c, r = x["c"], x["r"]
-        first = [c["name"], "record"] + (["chosen"] if x is ch else [])
+        first = [c["name"], "record"] + ([HW_LABEL] if is_hardware(c) else []) + (["chosen"] if x is ch else [])
         sc = []
         if wd:
             sc = [score_text(x["score"])]
@@ -356,20 +383,21 @@ def page_view(C, st):
                 sc.append(ABOVE_TEXT)
             if cs and x is not ch and score_overlap(cs, x["score"]):
                 sc.append("overlaps")
-        rows.append([first] + ([sc] if wd else []) + [[c["library"]], [c["lang"]], [c["class"]], [c["table"]],
+        rows.append([first] + ([sc] if wd else []) + [["–" if c["library"] is None else c["library"]], [c["lang"]], [c["class"]], [c["table"]],
                      [_nb(r["flash_bytes"])], [_nb(r["ram_bytes"])]] + numbers(r, x is ch))
     if base:
         seps.append([len(rows), BASELINE_TEXT])
         rows.append([[s] for s in ("reference, bitwise",) + (("–",) if wd else ()) + ("–", "C", "bitwise", "none", "–", "–")]
                     + numbers(base, False))
-    count = (f"{len(rs)} of {len(every)} configurations of {st['crc']} shown, "
+    count = (f"{len(rs)} of {len(every)} rows of {st['crc']} shown, "
              + ("sorted by " + SORT_TEXT[st["sort"]] + (", descending" if st["dir"] < 0 else "") if st["sort"]
                 else "ordered by the score of your weights, its highest end first; a score marked \u201coverlaps above\u201d "
                      "is not told apart from the row above by this series" if wd
                 else "in the order of the configuration list; this is not a ranking")
              + (". The chosen configuration is not shown: nothing is marked" if st["row"] and not ch else "") + ".")
     bd = board_of(C, st)
-    note = bd["note_cache_off"] if st["cache"] == "off" and bd.get("note_cache_off") else ""
+    note = " ".join(t for t in (bd["note_cache_off"] if st["cache"] == "off" and bd.get("note_cache_off") else "",
+                                "" if has_unit(every) else no_unit_text(bd, st)) if t)
     src = (f"{bd['name']} ({bd['core']}, {math.floor(bd['clock_hz'] / 1e6 + 0.5)} MHz). Records: {C['source']['records']}, "
            f"series at commit {', '.join(C['source']['commits'])}, toolchain {', '.join(C['source']['toolchain_image'])}. "
            "Each number is the mean of the scenario's 256 calls, the first included, as min–max over the eight placements, "

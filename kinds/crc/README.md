@@ -1,4 +1,4 @@
-# CRC in software: the second kind (host work)
+# CRC calculation: the second kind (host work)
 
 Work of the [plan of 2026-11-24](../../lab/plans/2026-11-24-crc-kind.md),
 for the kind chosen in the [comparison of kinds](../../reports/2026-11-24-next-kind.md):
@@ -730,3 +730,113 @@ whole account, with the checks of the numbers, is in the
   board, none left out), and [`bench/crcverify.sh`](bench/crcverify.sh)
   rebuilt all 120 byte for byte (16 s per board, with the libraries at
   hand); a record with one changed digit gave `DIFFERS`.
+
+## Step 11: the second series (the boards' CRC hardware, tables in RAM)
+
+Decided 2026-11-25 ([`DECISIONS.md`](../../DECISIONS.md), "A second CRC
+series"), planned and counted in
+[the plan](../../lab/plans/2026-11-25-crc-hw-and-ram-series.md), run on
+2026-11-25; the whole account is in the
+[series report](../../reports/2026-11-25-crc-second-series.md). Eighteen
+configurations more, numbered on from step 2 in the order of
+[`configs.txt`](configs.txt):
+
+| # | Configuration | CRC | Class | Table | Why |
+|---|---|---|---|---|---|
+| 21 | the board's CRC unit, CRC-32 | CRC-32/ISO-HDLC | hardware unit | none | The STM32 CRC unit (G474, G0B1, H723) and the RP2350's DMA sniffer, driven by our code ([`adapter_hw.c`](adapter_hw.c)); not a library |
+| 22 | the board's CRC unit, CRC-16 | CRC-16/IBM-3740 | hardware unit | none | The same, 16 bits |
+| 23 | the board's CRC unit, CRC-8 | CRC-8/SMBUS | hardware unit | none | The STM32 unit only: the sniffer has no CRC-8 |
+| 24 | ETL `crc32_t256`, table in RAM | CRC-32/ISO-HDLC | table of 256 | RAM (copied at start by the image) | Row 1 with its table in RAM |
+| 25 | crcany `crc32iso_hdlc_byte`, table in RAM | CRC-32/ISO-HDLC | table of 256 | RAM (copied at start by the image) | Row 2 with its table in RAM |
+| 26 | crc (Rust) `Table<1>`, table in RAM | CRC-32/ISO-HDLC | table of 256 | RAM (copied at start by the image) | Row 4 with its table in RAM |
+| 27 | ETL `crc32_t16`, table in RAM | CRC-32/ISO-HDLC | table of 16 | RAM (copied at start by the image) | Row 5 with its table in RAM |
+| 28 | Zephyr `crc32_ieee`, table in RAM | CRC-32/ISO-HDLC | table of 16 | RAM (copied at start by the image) | Row 6 with its table in RAM |
+| 29 | crcany `crc32iso_hdlc_word`, table in RAM | CRC-32/ISO-HDLC | slicing by 4 | RAM (copied at start by the image) | Row 7 with its table in RAM |
+| 30 | zlib `crc32`, table in RAM | CRC-32/ISO-HDLC | other: "braided" words | RAM (copied at start by the image) | Row 8 with its tables in RAM |
+| 31 | ETL `crc16_ccitt_t256`, table in RAM | CRC-16/IBM-3740 | table of 256 | RAM (copied at start by the image) | Row 10 with its table in RAM |
+| 32 | crcany `crc16ibm_3740_byte`, table in RAM | CRC-16/IBM-3740 | table of 256 | RAM (copied at start by the image) | Row 11 with its table in RAM |
+| 33 | ETL `crc16_ccitt_t16`, table in RAM | CRC-16/IBM-3740 | table of 16 | RAM (copied at start by the image) | Row 14 with its table in RAM |
+| 34 | ETL `crc8_ccitt_t256`, table in RAM | CRC-8/SMBUS | table of 256 | RAM (copied at start by the image) | Row 16 with its table in RAM |
+| 35 | crcany `crc8smbus_byte`, table in RAM | CRC-8/SMBUS | table of 256 | RAM (copied at start by the image) | Row 17 with its table in RAM |
+| 36 | AceCRC `crc8_byte`, table in RAM | CRC-8/SMBUS | table of 256 | RAM (copied at start by the image) | Row 18 with its table in RAM |
+| 37 | ETL `crc8_ccitt_t16`, table in RAM | CRC-8/SMBUS | table of 16 | RAM (copied at start by the image) | Row 19 with its table in RAM |
+| 38 | Zephyr `crc8_ccitt`, table in RAM | CRC-8/SMBUS | table of 16 | RAM (copied at start by the image) | Row 20 with its table in RAM |
+
+**A table in RAM.** The library is built as for its row in flash. Then
+[`bench/onecrc.py`](bench/onecrc.py) (`ram_archive`) renames the section
+of each table symbol named in [`ramtables.txt`](ramtables.txt) from
+`.rodata.*` to `.data.*` in a copy of the archive. The image's start-up
+code copies `.data` from flash to RAM before `main`, as for any
+initialised variable, and the build checks that every table symbol lies
+once in RAM (`ram_check`). The code is the library's own, unchanged:
+- the table's bytes stay in flash, as the initial values the start-up
+  code copies, and the same number lie in RAM;
+- the sizes of step 4 hold with the table counted twice: in flash as
+  before, and in RAM.
+
+The table symbols in RAM, read from the board images (`nm`, NUCLEO-G474RE),
+are as large as step 4's tables in flash:
+- 1024 (ETL CRC-32), 4096 (crcany CRC-32 byte and word), 1028 (Rust);
+- 64 (ETL and Zephyr tables of 16, CRC-32), 5120 (zlib: `crc_table` and
+  `crc_braid_table`);
+- 512 (ETL and crcany CRC-16), 32 (ETL CRC-16 table of 16);
+- 256 (ETL and AceCRC CRC-8), 1024 (crcany CRC-8), 16 (ETL and Zephyr
+  tables of 16, CRC-8).
+
+| Configuration | Table in flash | RAM | Code -Os: M0+ / M4 / M7 / M33 | Code -O2: M0+ / M4 / M7 / M33 |
+|---|---:|---:|---|---|
+| etl_crc32_t256_ram | 1024 | 1024 | 40 / 40 / 40 / 40 | 48 / 48 / 48 / 48 |
+| crcany_crc32_byte_ram | 4096 | 4096 | 70 / 68 / 68 / 68 | 74 / 72 / 72 / 72 |
+| rust_crc32_table1_ram | 1028 | 1028 | 318 / 254 / 246 / 254 | 188 / 222 / 226 / 222 |
+| etl_crc32_t16_ram | 64 | 64 | 56 / 60 / 60 / 60 | 64 / 68 / 68 / 68 |
+| zephyr_crc32_ieee_ram | 64 | 64 | 78 / 78 / 78 / 78 | 78 / 86 / 88 / 88 |
+| crcany_crc32_word_ram | 4096 | 4096 | 198 / 172 / 172 / 172 | 222 / 200 / 200 / 200 |
+| zlib_crc32_ram | 5120 | 5120 | 912 / 574 / 574 / 574 | 1108 / 698 / 700 / 704 |
+| etl_crc16_t256_ram | 512 | 512 | 44 / 44 / 44 / 44 | 48 / 56 / 56 / 56 |
+| crcany_crc16_byte_ram | 512 | 512 | 74 / 70 / 70 / 70 | 78 / 82 / 82 / 82 |
+| etl_crc16_t16_ram | 32 | 32 | 68 / 64 / 64 / 64 | 68 / 76 / 80 / 76 |
+| etl_crc8_t256_ram | 256 | 256 | 32 / 32 / 32 / 32 | 32 / 40 / 40 / 40 |
+| crcany_crc8_byte_ram | 1024 | 1024 | 62 / 62 / 62 / 62 | 62 / 66 / 66 / 66 |
+| acecrc_crc8_byte_ram | 256 | 256 | 42 / 42 / 42 / 42 | 42 / 46 / 48 / 48 |
+| etl_crc8_t16_ram | 16 | 16 | 56 / 60 / 60 / 60 | 56 / 68 / 76 / 68 |
+| zephyr_crc8_ccitt_ram | 16 | 16 | 58 / 58 / 58 / 58 | 62 / 74 / 84 / 76 |
+
+The code columns are step 4's for the row in flash (the same code); "Table
+in flash" is the copy the start-up code reads.
+
+**The board's CRC unit.** [`adapter_hw.c`](adapter_hw.c) is built only for
+the boards of [`boards.txt`](boards.txt), so there is no cross build of it
+(step 4). Its bytes are read from the board images at -O2 (`nm.txt`,
+placement 0): code is every function of the adapter, RAM its static state
+(the STM32 unit's control word, the sniffer's dummy target byte).
+
+| Hardware configuration | Board (core) | Table in flash | RAM | Code -O2 |
+|---|---|---:|---:|---:|
+| hw_crc32 | NUCLEO-G0B1RE (M0+) | 0 | 4 | 196 |
+| hw_crc16 | NUCLEO-G0B1RE (M0+) | 0 | 4 | 200 |
+| hw_crc8 | NUCLEO-G0B1RE (M0+) | 0 | 4 | 192 |
+| hw_crc32 | NUCLEO-G474RE (M4) | 0 | 4 | 196 |
+| hw_crc16 | NUCLEO-G474RE (M4) | 0 | 4 | 192 |
+| hw_crc8 | NUCLEO-G474RE (M4) | 0 | 4 | 188 |
+| hw_crc32 | NUCLEO-H723ZG (M7) | 0 | 4 | 212 |
+| hw_crc16 | NUCLEO-H723ZG (M7) | 0 | 4 | 212 |
+| hw_crc8 | NUCLEO-H723ZG (M7) | 0 | 4 | 208 |
+| hw_crc32 | Raspberry Pi Pico 2 H (M33) | 0 | 1 | 80 |
+| hw_crc16 | Raspberry Pi Pico 2 H (M33) | 0 | 1 | 80 |
+
+**The series, per board.**
+
+| Board | Commit | Smoke + series runs | Flash writes | Disagreeing calls | Records |
+|---|---|---|---|---|---|
+| NUCLEO-G474RE | 04a2197 | 32 + 288 | 4 | 0 | 18 |
+| NUCLEO-G0B1RE | 04a2197 (tables in RAM), 40f1958 (hardware, rerun) | 32 + 288, 16 + 48 | 4 + 1 | 0 | 15 + 3 |
+| SAM D20 Xplained Pro | 04a2197 | 16 + 240 | 7 | 0 | 15 |
+| Raspberry Pi Pico 2 | 40f1958 | 48 + 272 | 2 | 0 | 17 |
+| nRF5340 DK | 40f1958 | 16 + 240 | 2, and one erase | 0 | 15 |
+| NUCLEO-H723ZG | 40f1958 (rerun) | 16 + 288 | 1 | 0 | 18 |
+
+- All 101 records rebuild byte for byte ([`bench/crcverify.sh`](bench/crcverify.sh)).
+- Those of 04a2197 are in the ledger ([`records/rebuilt.json`](../../records/rebuilt.json))
+  with the first series'.
+- The two reruns, the erase of the nRF5340 and the checks of the boards
+  that came back from other use are in the report.

@@ -1,7 +1,7 @@
 # Method: how the embedded ring buffers are measured and tested
 
 The method of one of the two kinds of library so far ([all kinds](kinds.md));
-the other kind's: [CRC calculation in software](method-crc.md).
+the other kind's: [CRC calculation](method-crc.md).
 
 ## Hardware
 

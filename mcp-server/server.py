@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """MCP server for the verified-libs comparisons: embedded ring buffers and
-CRC calculation in software.
+CRC calculation.
 
 Gives an AI agent the comparisons a person gets on
 https://verified-libs.org/compare.html (ring buffers) and
@@ -30,7 +30,7 @@ import crcquery as cq
 import vlquery as q
 
 SERVER_NAME = "verified-libs"
-SERVER_VERSION = "0.3.0"
+SERVER_VERSION = "0.4.0"
 # Protocol revisions this server answers in. It uses only what all of them
 # have (tools over stdio), plus the optional fields each one added.
 PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"]
@@ -45,7 +45,8 @@ INSTRUCTIONS = (
     "Measured results from verified-libs.org for two kinds of library on six Cortex-M boards. Embedded ring "
     "buffer libraries (C, C++, Rust): speed in CPU cycles, code size, interrupt stress tests, model checking; "
     "use list_ring_buffers, compare_ring_buffers and get_ring_buffer when a user is choosing a ring buffer / "
-    "FIFO / circular queue for a microcontroller. CRC calculation in software (CRC-32, CRC-16, CRC-8): cycles per "
+    "FIFO / circular queue for a microcontroller. CRC calculation (CRC-32, CRC-16, CRC-8) by libraries that compute "
+    "it in software and, on the boards that have one, the board's CRC unit beside them: cycles per "
     "call and per byte, flash and RAM bytes; use list_crc_configurations and compare_crc when a user is choosing "
     "a CRC implementation. The two kinds are not compared with each other.\n"
     "How to use the ring buffer tools honestly:\n"
@@ -82,6 +83,7 @@ MAX_DETAIL = 4
 CRC_LENGTHS = [1, 4, 16, 64, 256, 1024]
 CRC_SORTS = {"list": "", "name": "name", "flash_bytes": "flash", "ram_bytes": "ram"}
 CRC_WEIGHTS = {"cycles": "cyc", "cycles_per_byte": "pb", "bytes": "bytes"}
+CRC_KINDS = {"library": "library", "hardware_unit": "hardware"}
 CRC_NOTES = [
     "Every number is the range (min, max) over eight placements of the code, first pass. Two rows differ only where "
     "their ranges do not overlap; 'overlaps' names, per number, the rows whose range overlaps this row's (as the page "
@@ -89,7 +91,13 @@ CRC_NOTES = [
     "cycles: the mean of 256 calls of one CRC over a message of the given length, in CPU cycles, the first call "
     "included. cycles_per_byte: (mean at 1024 bytes - mean at 256 bytes) / 768 at the given offset.",
     "The rows are in the order of the configuration list (or sorted by name, flash or RAM bytes): this is not a ranking.",
-    "flash_bytes: the table in flash and the code at -O2 for the board's core; ram_bytes: the table in RAM.",
+    "flash_bytes: the table in flash and the code at -O2 for the board's core; ram_bytes: the table in RAM. A table "
+    "'RAM (copied at start by the image)' is a library's table moved to RAM by our build: it counts in both.",
+    "A row with hardware_not_a_library is the board's CRC unit, driven by our code: it is not a library. It is a row of "
+    "the same table, after the libraries; with weights it is scored like any row, and where its value is the lowest the "
+    "scores are relative to it. kind 'library' leaves it out. Its bytes are our adapter code only (no table). On the "
+    "Pico 2 the unit is a DMA transfer with the sniffer, and the CPU waits for it; for CRC-32 on the STM32 unit the "
+    "final XOR is in our code. Boards without such a unit (nRF5340 DK, SAM D20; Pico 2 for CRC-8) have no such row.",
     "The reference (baseline) is the bitwise algorithm from the catalogue's parameters, timed in the same images; it "
     "is not a library.",
     "The second pass and the minimum, maximum and first call of each scenario are in the record of each row.",
@@ -121,7 +129,7 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
             "name": "about",
             "title": "About the comparison",
             "description": "What verified-libs measures and how to read it, for both kinds of library (embedded ring "
-                           "buffers; CRC calculation in software): the tests, the boards and the records the numbers "
+                           "buffers; CRC calculation): the tests, the boards and the records the numbers "
                            "come from, the limits, the conflict of interest, the licence of the data. Call it once "
                            "before you draw conclusions from the other tools.",
             "inputSchema": {"type": "object", "additionalProperties": False},
@@ -207,10 +215,12 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
         {
             "name": "list_crc_configurations",
             "title": "List the CRC configurations",
-            "description": f"The {len(C['configurations'])} tested configurations of CRC calculation in software (one "
-                           "library, one CRC, one way of computing it) with library, language, CRC, class (bitwise, "
-                           "table of 16 or 256, slicing by 4, ...) and where the table lies. No numbers and no ranking; "
-                           "use compare_crc for those.",
+            "description": f"The {sum(1 for c in C['configurations'] if c.get('role') != 'hardware')} tested "
+                           "configurations of libraries that compute a CRC in software (one library, one CRC, one way of computing "
+                           "it) with library, language, CRC, class (bitwise, table of 16 or 256, slicing by 4, ...) and "
+                           "where the table lies, and the boards' CRC units, driven by our code (not libraries; "
+                           "compare_crc shows them in the same table, labelled). No numbers and no ranking; use "
+                           "compare_crc for those.",
             "inputSchema": {"type": "object", "additionalProperties": False},
         },
         {
@@ -218,7 +228,9 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
             "title": "Compare CRC configurations",
             "description": "The comparison table of verified-libs.org/compare-crc.html for one CRC, board and message: "
                            "every configuration of that CRC with cycles for one call and cycles per byte, flash and RAM "
-                           "bytes and the link to its record, the reference (baseline) last. Every number is a range "
+                           "bytes and the link to its record; on the boards that have one the board's CRC unit after "
+                           "the libraries (hardware_not_a_library: driven by our code, not a library), and the "
+                           "reference (baseline) last. Every number is a range "
                            "over eight placements of the code; per row and number, 'overlaps' names the rows whose "
                            "range overlaps it: those are not told apart. No ranking: the rows are in the order of the "
                            "configuration list unless sorted by name, flash or RAM bytes.",
@@ -241,6 +253,9 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
                               "default": "any"},
                     "table": {"type": "string", "enum": ["any"] + cq.TABLES, "default": "any",
                               "description": "Where the table lies: flash, RAM, or none (no table)."},
+                    "kind": {"type": "string", "enum": ["any"] + list(CRC_KINDS), "default": "any",
+                             "description": "Kind of row: 'library', or 'hardware_unit' (the board's CRC unit, driven by "
+                                            "our code; not a library). 'library' gives the scores without the unit."},
                     "weights": {"type": "object", "additionalProperties": False,
                                 "properties": {k: {"type": "integer", "minimum": 0, "maximum": 10} for k in CRC_WEIGHTS},
                                 "description": "How much each value matters to the user, 0 (ignore) to 10: cycles for one "
@@ -621,7 +636,7 @@ def tool_about(D, prov, args):
                    "stress-tested with a negative control that must be caught, and model-checked where the library promises "
                    "lock-free concurrency. Everything can be reproduced from the repository. Two kinds of library so "
                    "far: embedded ring buffers (interrupt or DMA to main loop on Cortex-M; the tools *_ring_buffer*) "
-                   "and CRC calculation in software (the tools list_crc_configurations and compare_crc). The rest of "
+                   "and CRC calculation (the tools list_crc_configurations and compare_crc). The rest of "
                    "this answer is about the ring buffers; for CRC see " + SITE + "/method-crc.html.",
         "compared": f"{len(D['libs'])} configurations of ring buffer libraries in {', '.join(langs)}, on {len(D['boards'])} boards. "
                     "A configuration is a library set up one way; some libraries have two or more.",
@@ -677,13 +692,20 @@ def tool_about(D, prov, args):
 def tool_list_crc(D, prov, args):
     _check_args(args, [])
     C, cprov = crc_data()
+    libs = [c for c in C["configurations"] if c.get("role") != "hardware"]
+    hw = [c for c in C["configurations"] if c.get("role") == "hardware"]
     return {
-        "count": len(C["configurations"]),
-        "what": "Configurations of CRC calculation in software: one library, one CRC and one way of computing it. In the "
+        "count": len(libs),
+        "what": "Configurations of libraries that compute a CRC in software: one library, one CRC and one way of computing it. In the "
                 "order of the configuration list; this is not a ranking.",
         "crcs": C["crcs"],
         "configurations": [{"name": c["name"], "library": c["library"], "language": c["lang"], "crc": c["crc"],
-                            "class": c["class"], "table": c["table"]} for c in C["configurations"]],
+                            "class": c["class"], "table": c["table"]} for c in libs],
+        "hardware": {"what": "The board's CRC unit, driven by our code; not a library. Measured as the configurations are "
+                             "and shown in the same table, after the libraries of its CRC, labelled, and scored like any "
+                             "row; only on the boards that have one.",
+                     "rows": [{"name": c["name"], "crc": c["crc"],
+                               "boards": [r["board"] for r in C["rows"] if r["adapter"] == c["adapter"]]} for c in hw]},
         "boards": [{"id": b["id"], "name": b["name"], "core": b["core"], "clock_mhz": round(b["clock_hz"] / 1e6)}
                    for b in C["boards"]],
         "more": {"compare": SITE + "/compare-crc.html", "results": SITE + "/results-crc.html",
@@ -694,7 +716,8 @@ def tool_list_crc(D, prov, args):
 
 def crc_state_from_args(C, args):
     """The CRC page's state for a compare_crc call (length 1 is allowed here, not on the page)."""
-    _check_args(args, ["crc", "board", "length", "offset", "cache", "language", "class", "table", "weights", "sort", "reverse"])
+    _check_args(args, ["crc", "board", "length", "offset", "cache", "language", "class", "table", "kind", "weights", "sort",
+                       "reverse"])
     st = cq.default_state(C)
     st["crc"] = _choice(args, "crc", C["crcs"], C["crcs"][0])
     boards = [b["id"] for b in C["boards"]]
@@ -714,6 +737,8 @@ def crc_state_from_args(C, args):
     st["cls"] = "" if cls == "any" else cls
     tbl = _choice(args, "table", ["any"] + cq.TABLES, "any")
     st["tbl"] = "" if tbl == "any" else tbl
+    kind = _choice(args, "kind", ["any"] + list(CRC_KINDS), "any")
+    st["kind"] = "" if kind == "any" else CRC_KINDS[kind]
     w = args.get("weights", {})
     if not isinstance(w, dict):
         raise ToolError("'weights' must be an object, e.g. {\"cycles\": 5, \"bytes\": 5}.")
@@ -751,8 +776,11 @@ def tool_compare_crc(D, prov, args):
     for j, x in enumerate(rs):
         c, r = x["c"], x["r"]
         ov = cq.overlaps(st, rs, base, x)
-        o = {"name": c["name"], "library": c["library"], "language": c["lang"], "class": c["class"],
-             "table": c["table"], "flash_bytes": r["flash_bytes"], "ram_bytes": r["ram_bytes"]}
+        o = {"name": c["name"]}
+        if cq.is_hardware(c):
+            o.update({"hardware_not_a_library": True, "note": c.get("note")})
+        o.update({"library": c["library"], "language": c["lang"], "class": c["class"],
+                  "table": c["table"], "flash_bytes": r["flash_bytes"], "ram_bytes": r["ram_bytes"]})
         if wd:
             o["score"] = {"min": round(x["score"][0], 2), "max": round(x["score"][1], 2)}
         o.update({"cycles": _rng(cq.cycles_of(st, r)), "cycles_per_byte": _rng(cq.per_byte_of(st, r)),

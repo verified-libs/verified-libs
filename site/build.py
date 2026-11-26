@@ -150,23 +150,25 @@ def page(slug, title, body, nav_on, desc="", listed=True):
 
 # The front page's heading is the project's name; its browser title says more.
 # The project is a registry of more than one kind of library; ring buffers
-# and CRC calculation in software are the kinds so far. Name the project first.
+# and CRC calculation are the kinds so far. Name the project first.
 INDEX_TITLE = "verified-libs: libraries tested on real hardware: embedded ring buffers and CRC"
 INDEX_DESC = ("An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. "
-              "Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation in software, for "
-              "microcontrollers on six boards, every number with its record and source.")
+              "Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation (libraries that compute a CRC "
+              "in software and, on the boards that have one, the board's CRC unit beside them), for microcontrollers "
+              "on six boards, every number with its record and source.")
 # What a search engine shows under the page's title. Pages not named here
 # (reports, findings) get their first paragraph (describe).
 DESCRIPTIONS = {
     "index.html": INDEX_DESC,
-    "kinds.html": "The kinds of library tested so far, embedded ring buffers and CRC calculation in software: "
+    "kinds.html": "The kinds of library tested so far, embedded ring buffers and CRC calculation: "
                   "what is measured, how many libraries and boards, and where the results, method and records are.",
     "method.html": "How the ring buffer libraries are tested: cycle-counted benchmarks on six microcontroller boards, "
                    "interrupt stress tests with a known-bad control, model checks and contract checks.",
     "results.html": "Results for embedded ring buffer libraries on six microcontroller boards: cycles per push and pop, "
                     "code size, interrupt stress tests and model checks, each with its record.",
-    "results-crc.html": "Results for CRC libraries in software on six microcontroller boards: cycles for a short "
-                        "message and per byte, cache on and off, flash and RAM bytes, each with its record.",
+    "results-crc.html": "Results for CRC calculation on six microcontroller boards, by libraries that compute a CRC in "
+                        "software and, on four boards, the board's CRC unit beside them: cycles for a short message "
+                        "and per byte, cache on and off, flash and RAM bytes, each with its record.",
     "method-crc.html": "How the CRC libraries are measured and checked: one image per configuration and placement, "
                        "every call compared with a reference, host tests and CBMC proofs.",
     "reproduce.html": "How to rebuild the firmware bit for bit and repeat the measurements: every number comes from a "
@@ -276,11 +278,12 @@ def main():
     # The CRC kind's comparison: static controls, the data of site/data/crc.json (site/crc_data.py) and
     # site/compare-crc.js, all inline, as for the ring buffers.
     cdata = open(os.path.join(SITE, "data/crc.json")).read().replace("</", "<\\/")
-    pages["compare-crc.html"] = page("compare-crc", "Compare CRC calculation in software", (
+    pages["compare-crc.html"] = page("compare-crc", "Compare CRC calculation", (
         open(os.path.join(SITE, "content/compare-crc.html")).read()
         + f'<script type="application/json" id="crcdata">{cdata}</script>'
         + f'<script>{open(os.path.join(SITE, "compare-crc.js")).read()}</script>'), "compare",
-        "Compare CRC libraries in software by CRC, board and message: cycles per call and per byte as ranges over "
+        "Compare CRC calculation by CRC, board and message: libraries that compute a CRC in software and, on the "
+        "boards that have one, the board's CRC unit beside them; cycles per call and per byte as ranges over "
         "eight code placements, flash and RAM bytes, the reference as a row; no ranking.")
 
     # What the server shows for an address that does not exist (GitHub Pages serves 404.html).

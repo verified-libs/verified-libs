@@ -9,7 +9,9 @@ boards:
   tests and model checks ([results](https://verified-libs.org/results.html) ·
   [method](https://verified-libs.org/method.html) ·
   [compare the libraries](https://verified-libs.org/compare.html));
-- CRC calculation in software: cycles per call and per byte
+- CRC calculation, by libraries that compute a CRC in software and, on
+  the boards that have one, the board's CRC unit beside them: cycles per
+  call and per byte
   ([results](https://verified-libs.org/results-crc.html) ·
   [method](https://verified-libs.org/method-crc.html)).
 

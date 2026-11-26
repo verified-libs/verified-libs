@@ -92,6 +92,27 @@ nRF5 SDK zip, which we may not redistribute:
 `--nrf5-sdk PATH` (`firmware/nrf5340-rb-bench/nrf5-sdk.lock` names the file
 and its checksum).
 
+**The nRF5340 DK is locked after a power-on.** The application core's
+debug port opens only when UICR.APPROTECT is Unprotected and firmware
+writes CTRL-AP.APPROTECT.DISABLE after each reset (nRF5340 Product
+Specification v1.6, §8.2 "Access port protection"). Our boot stub
+(`firmware/common/benchboot.c`) does not write it and starts no image after
+a power-on, so with our bundles on it the board's debug port is locked
+after any power-on, and a write or a run fails. We recovered it on
+2026-11-25 with one command of probe-rs 0.32.0, which erases the
+application core (CTRL-AP ERASEALL; the network core is not touched):
+
+```sh
+probe-rs read --chip nRF5340_xxAA_APPONLY --allow-erase-all b32 0x00FF8000 1
+```
+
+It erases the application core's flash and UICR, and probe-rs then writes
+UICR.APPROTECT and UICR.SECUREAPPROTECT to 0x50FA50FA (Unprotected)
+itself: the command reads back 0x50FA50FA. Then, with no reset and no
+power-on in between, write the bundle and run as usual: each image opens
+the port when it starts, and it stays open until the next power-on. The
+erase removes everything on the application core, our bundles included.
+
 Only these six board models give numbers that can be compared with ours:
 the counts are cycles of a particular core, flash and bus. Results from other
 boards are welcome too (below), but as a board of their own.
@@ -196,6 +217,28 @@ commit. Time: in our check of the 120 records (2026-11-25, on 6 CPUs)
 (`kinds/crc/libs.lock`), once per board: from a tree exported from this
 repository, with nothing at hand, it took 28 s per board of 20 records
 (2026-11-25, all 120 records `MATCH`).
+
+**Which commit each record needs.** The records are of two series (the
+[records' README](../../records/README.md)):
+- The records of commit `40f1958` (the second series on the Pico 2,
+  nRF5340 DK and NUCLEO-H723ZG, and the NUCLEO-G0B1RE's CRC unit) have the
+  test sources of the published tree: the command above builds them from
+  the tree.
+- The records of `6301058` (the first series) and `04a2197` (the second
+  series on the NUCLEO-G474RE, SAM D20 and the NUCLEO-G0B1RE's tables in
+  RAM) are of earlier commits, and `records/rebuilt.json` lists them. Check
+  them with `VL_TREE=1` in front of the command:
+
+```sh
+VL_TREE=1 bash kinds/crc/bench/crcverify.sh records/crc/samd20/*.json
+```
+
+- The second series' configurations build like the first's; a table in
+  RAM is moved by the build itself (`kinds/crc/bench/onecrc.py`), and the
+  board's CRC unit is built only for the boards that have one
+  (`kinds/crc/boards.txt`).
+- Time, in our check with the libraries at hand: all 168 records of
+  `rebuilt.json` in 222 s (2026-11-25).
 
 **Run it on your own board.**
 

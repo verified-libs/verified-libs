@@ -3,7 +3,9 @@
 page, what site/crc_tables.py prints: per board, CRC, cache and
 configuration the class, the table place, flash and RAM bytes, the 16-byte
 figure and the per-byte figure (offset 0, ranges over the placements, as the
-page formats them). Also that the file is up to date (crc_data.py).
+page formats them), the board's CRC unit the last row of the same table,
+labelled in its name cell. Also that
+the file is up to date (crc_data.py).
 
 Usage: python3 -I site/test_crc_data.py      exit 0: every cell equal
 """
@@ -30,6 +32,9 @@ def main():
     fails = 0
     if open(crc_data.OUT).read() != crc_data.text():
         print("FAIL site/data/crc.json is not up to date"); fails += 1
+    roles = [c["role"] for c in data["configurations"]]
+    if roles != sorted(roles, key=lambda r: r == "hardware"):
+        print("FAIL the board's CRC units are not after the libraries in the configurations"); fails += 1
     cfg = {c["adapter"]: c for c in data["configurations"]}
     bname = {b["id"]: b for b in data["boards"]}
     ads, cls, sizes = crc_tables.kind_tables()
@@ -41,6 +46,9 @@ def main():
     for b in data["boards"]:
         for crc in data["crcs"]:
             pairs = [recs[(b["id"], crc, ad)] for ad in ads if (b["id"], crc, ad) in recs]
+            # the page prints the configurations first, then the board's CRC unit as the last row (crc_tables.table)
+            pairs = ([x for x in pairs if not crc_tables.is_hw(cls, x[1]["adapter"])]
+                     + [x for x in pairs if crc_tables.is_hw(cls, x[1]["adapter"])])
             if not pairs:
                 continue
             rows = [p[0] for p in pairs]
@@ -65,6 +73,9 @@ def main():
                         fails += 1
                     if not line.startswith(f"| {rec['name']}"):
                         print(f"FAIL {b['id']} {row['adapter']}: row order differs ({line[:60]})")
+                        fails += 1
+                    if (crc_tables.HW_LABEL in line.split("|")[1]) != (c["role"] == "hardware"):
+                        print(f"FAIL {b['id']} {row['adapter']}: the label of the board's CRC unit is wrong ({line[:90]})")
                         fails += 1
     print(f"{cells} cells of {len(data['rows'])} rows compared, cache on and off; {fails} failed")
     return 1 if fails else 0

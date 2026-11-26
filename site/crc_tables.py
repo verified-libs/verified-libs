@@ -39,7 +39,8 @@ table, each configuration linked to its record, the footnotes once at the
 end. --check PAGE: exit 1 if PAGE is not up to date.
 --cache: on (default), off, or both (two tables); the spread over the
 placements is largest with the cache off. Footnotes (NOTES) say what a
-number counts where the code makes it less than plain. No ranking: the rows are in the order of configs.txt.
+number counts where the code makes it less than plain. No ranking: the rows are in the order of configs.txt,
+the board's CRC unit (on the boards that have one, labelled in its name cell) the last row of the same table.
 """
 import glob
 import json
@@ -88,7 +89,26 @@ def kind_tables():
     for m in re.finditer(r"^\| (\w+) \| (\d+) \| (\d+) \| ([\d /]+) \| ([\d /]+) \|$", readme, re.M):
         o2 = [int(x) for x in m.group(5).split("/")]
         sizes["adapter_" + m.group(1)] = (int(m.group(2)), int(m.group(3)), dict(zip(cores, o2)))
+    # The hardware rows (step 11): bytes per board, read from the board images; RAM and code per core.
+    for m in re.finditer(r"^\| (hw_\w+) \| .+? \((M0\+|M4|M7|M33)\) \| (\d+) \| (\d+) \| (\d+) \|$", readme, re.M):
+        t, ram, code = sizes.setdefault("adapter_" + m.group(1), (int(m.group(3)), {}, {}))
+        ram[m.group(2)], code[m.group(2)] = int(m.group(4)), int(m.group(5))
     return ads, cls, sizes
+
+
+HW_CLASS = "hardware unit"
+HW_TEXT = "The board's CRC unit, driven by our code; not a library"
+HW_LABEL = "the board's CRC unit, driven by our code; not a library"   # in the name cell of its row, every time
+
+
+def is_hw(cls, ad):
+    """A hardware row (step 11 of the kind's README): the board's CRC unit, not a library."""
+    return cls.get(ad, ("", ""))[0] == HW_CLASS
+
+
+def ram_of(ram, core):
+    """RAM bytes: one number, or per core (the hardware rows)."""
+    return ram.get(core) if isinstance(ram, dict) else ram
 
 
 def per_place(rec):
@@ -196,6 +216,21 @@ def table(board, crc, rows, core, cls, sizes, place, cache, variant, out=None, l
         emit(f"Cycles, cache {cache}: the range over the eight placements (min–max), first pass.\n")
     emit("| Configuration | Class | Table | Flash bytes | RAM bytes | 16 B | per byte |")
     emit("|---|---|---|---:|---:|---:|---:|")
+    rows_of(rows_in_order(rows, cls), cls, sizes, core, place, cache, variant, emit, link)
+    emit()
+    if notes:
+        for i, (k, text) in enumerate(NOTES.items()):
+            if any(r["adapter"] == k for r in rows):
+                emit(f"[{i + 1}] {text}")
+        emit()
+
+
+def rows_in_order(rows, cls):
+    """The libraries in the order of configs.txt, then the board's CRC unit, the last row of the same table."""
+    return [r for r in rows if not is_hw(cls, r["adapter"])] + [r for r in rows if is_hw(cls, r["adapter"])]
+
+
+def rows_of(rows, cls, sizes, core, place, cache, variant, emit, link):
     for r in rows:
         pp = per_place(r)
         b16, cpb = {}, {}
@@ -209,20 +244,15 @@ def table(board, crc, rows, core, cls, sizes, place, cache, variant, out=None, l
         mark = "".join(f"[{i + 1}]" for i, k in enumerate(NOTES) if k == r["adapter"])
         tf, ram, code = sizes.get(r["adapter"], (None, None, {}))
         flash = tf + code[core] if tf is not None and core in code else None
+        ram = ram_of(ram, core)
         f0, f1 = (lambda v: f"{v:.0f}"), (lambda v: f"{v:.1f}")
         if variant == "2":
             c16, cb = cell(b16, place, f0), cell(cpb, place, f1)
         else:
             c16, cb = span(b16, f0), span(cpb, f1)
-        name = f"[{r['name']}]({link(r)})" if link else r["name"]
+        name = (f"[{r['name']}]({link(r)})" if link else r["name"]) + (f" ({HW_LABEL})" if is_hw(cls, r["adapter"]) else "")
         emit(f"| {name}{mark} | {c} | {t} | {flash if flash is not None else '?'} | {ram if ram is not None else '?'} | "
              f"{c16} | {cb} |")
-    emit()
-    if notes:
-        for i, (k, text) in enumerate(NOTES.items()):
-            if any(r["adapter"] == k for r in rows):
-                emit(f"[{i + 1}] {text}")
-        emit()
 
 
 def page_block(rdir, rel):

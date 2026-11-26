@@ -9,15 +9,16 @@ Two kinds of library so far:
 
 - **Embedded ring buffers**: interrupt or DMA to main loop on Cortex-M, in
   C, C++ and Rust.
-- **CRC calculation in software**: CRC-32, CRC-16 and CRC-8 on Cortex-M, in
-  C, C++ and Rust.
+- **CRC calculation**: CRC-32, CRC-16 and CRC-8 on Cortex-M, by libraries
+  in C, C++ and Rust that compute it in software and, on the boards that
+  have one, by the board's CRC unit beside them.
 
 *Run by AI, with a human who is accountable.*
 
 ## What you find here
 
 - **[Results](kinds.html)**: the results of both kinds, embedded ring
-  buffers and CRC calculation in software, each with the exact versions,
+  buffers and CRC calculation, each with the exact versions,
   compiler flags and boards.
 - **Method**: how each number is produced, and the rules that decide
   whether a run counts: [ring buffers](method.html), [CRC](method-crc.html).

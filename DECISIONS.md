@@ -2,6 +2,77 @@
 
 Short log of what was decided and why. Newest first.
 
+## 2026-11-26: CRC runs on several boards at once, on the proof
+Decided by the owner on the proof
+([`reports/2026-11-26-parallel-runs-proof.md`](reports/2026-11-26-parallel-runs-proof.md)):
+- **The CRC kind's runs may go on several boards at once**, through the
+  queue (`lab/tools/boardqueue.py`).
+- **The Pico 2 writes alone** until one of its writes has been timed beside
+  a neighbour's write.
+- **Version 2's runner** (`firmware/nrf5340-rb-bench/run-one.py`) is tried
+  once through the queue, with no flash write, before ring-buffer runs go
+  on several boards at once.
+- **Enqueuing a job is where the OK for a board run is given.**
+- **Power switching** only on a hub with no job running, and never on the
+  nRF5340 DK.
+
+## 2026-11-25: Board runs in parallel, after a proof; a queue per board
+Decided by the owner on the plan
+[`lab/plans/2026-11-25-parallel-board-runs.md`](lab/plans/2026-11-25-parallel-board-runs.md)
+(section 6), all five points as recommended:
+- Benchmark runs (version 2, the CRC kind) may run on several boards at
+  once once the proof of section 4 has passed and has been read. Until
+  then the rule stays one board at a time.
+- The queue as designed: a queue and a worker per board, each worker
+  holding its board's lock, a hard timeout and a flash-write budget per
+  job, a failure stopping only its own board, one ledger of flash writes.
+  Enqueuing a job is the OK for that board's run.
+- The Pico 2 writes alone (no other board writing at the same time) until
+  its part times with a neighbour writing have been measured.
+- A second SAM D20 needs a change in a frozen file
+  (`firmware/common/samd20/bin/probe-rs`: OpenOCD's ports and the choice
+  of the EDBG); that is for the next method version.
+- The published method texts say nothing about runs being one board at a
+  time, so they stay as they are. The next method version's notes get one
+  line saying that runs may overlap across boards, with the proof.
+- For the proof, the owner allows a few real flash writes per board (at
+  most 2 a board, each answering a named question), after its zero-write
+  part has passed.
+
+Why: the second CRC series took about 8 h one board at a time and would
+have taken about 3 h 10 min in parallel (the Pico 2 alone). The checks
+and stress campaigns have run all six boards at once since 2026-11-14.
+
+## 2026-11-25: A second CRC series: the boards' CRC hardware and the tables in RAM
+Decided by the owner, on the proposal
+(`lab/plans/2026-11-25-crc-hw-and-ram-series.md`), all five points as
+proposed.
+- **Hardware rows** on the NUCLEO-G474RE, NUCLEO-G0B1RE and NUCLEO-H723ZG
+  (their CRC unit, for the three CRCs) and the Raspberry Pi Pico 2 (the DMA
+  sniffer, CRC-32 and CRC-16). None on the nRF5340 DK (no unit for a
+  buffer). The SAM D20's DSU is left out: it takes word-aligned buffers
+  only and cannot compute 14 of the 24 scenarios. On the STM32 unit the
+  final XOR of CRC-32/ISO-HDLC is done by our code (the unit has no output
+  XOR); the pages say so.
+- **The tables in RAM**: a variant of each of the 15 configurations whose
+  table lies in flash, on all six boards, the table copied to RAM by the
+  start-up code.
+- **About 20 flash writes**, counted exactly before the first.
+- **The CRC test sources frozen at `crc-method-freeze` may change as listed
+  in the proposal** (new adapters, configurations, slots and the build),
+  on the condition that the 160 present images of every board are built
+  byte for byte unchanged; otherwise the work stops.
+- **On the pages**: the hardware rows set apart below the configurations,
+  labelled "the board's CRC unit, driven by our code; not a library", with
+  no score; the RAM variants as configurations of their own.
+  - *Changed by the owner on 2026-11-26:* the board's CRC unit is a row of
+    the same table, after the libraries of its CRC, labelled the same way
+    in its name cell every time, and with weights it takes part in the
+    score and the order like any row (the smallest value a score is taken
+    against included). A filter on the kind of row leaves it out; the
+    reference stays apart, last.
+
+
 ## 2026-11-25: The CRC kind is published; its method is frozen
 Decided by the owner, after a dry run of the publication
 (`lab/plans/2026-11-24-crc-from-series-to-publication.md`, steps 7 and 8).

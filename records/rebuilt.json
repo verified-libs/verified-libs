@@ -1,0 +1,683 @@
+{
+ "about": "Rebuilds of the records of other commits from this tree's test sources (lab/tools/image-ledger.py, DECISIONS 2026-11-22). match: the tree builds, byte for byte, the image the record was measured from.",
+ "commit": "77e8043e4871b78b12c2494578fa8bea6afb5bf5",
+ "sources": "079389d05f1a310ab0fdc54f7550f555ff54192ceaf8d68fcca414e9102e4ecc",
+ "sources_crc": "d1b28fdecc1a6f7fba254b19e704aa9025cff60a049acfb901022e12bea7ea88",
+ "records": {
+  "crc/nrf5340/adapter_acecrc_crc8_byte.json": {
+   "images_sha256": "6d78536a6e64f575e1935323ea1b3cba1c0556d35daa9d7d2c4bebf74fdb209e",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_crcany_crc16_byte.json": {
+   "images_sha256": "e21a107eb334b1b375236f874c180d214ad6443226bac00ee4ad2cd8610759ba",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_crcany_crc32_bit.json": {
+   "images_sha256": "cc8f38cc9cd1c673c683a42a9b5fcda7b32d35fbfc42ec2233653fc5c158a473",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_crcany_crc32_byte.json": {
+   "images_sha256": "c018887e49e02b6cb74ea53ffede2d8c4d32194c099aa3790113629235ed947f",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_crcany_crc32_word.json": {
+   "images_sha256": "9ee1121be1ce9f208b28ba8514d9e8d1d2db050e93e3a119019f0c307e4016a3",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_crcany_crc8_byte.json": {
+   "images_sha256": "8c9c7ae9c8515e3c5fd8d104db7c0d196aaabdefe218109fd956ee78ae6fb6bb",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_crcpp_ccittfalse_table.json": {
+   "images_sha256": "91cb3de467d690b24a9ba22a6c5d152fa577ab14433e75e8d6517b1e091348b1",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_etl_crc16_t16.json": {
+   "images_sha256": "6af3c5d2441c93263a9410c52105fb66ac11539e678097f045de71556ac7b3b2",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_etl_crc16_t256.json": {
+   "images_sha256": "a07ed2cf29e094ec78a0a4c5d8204c1e3e4ad65876214f66ae2cba378549116b",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_etl_crc32_t16.json": {
+   "images_sha256": "0510ca11528483f3dc2b67b6d4315877b44d76fd4a6cbb80eeec486d0f4258b4",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_etl_crc32_t256.json": {
+   "images_sha256": "7fd729d9c80f6a1bb8cfc4c98d523c2c4bbc67ca2371f6b86252110308b2a1d2",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_etl_crc8_t16.json": {
+   "images_sha256": "2fecff172be6780b904b4a968ad5458060e6b6f2dc93cc3aafd88f0dd41f39af",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_etl_crc8_t256.json": {
+   "images_sha256": "26d750a6f9d1f15e2200058b4ebc78bba1e8ce43a658bd8b697c7dbed66e7002",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_libcrc_ccitt_ffff.json": {
+   "images_sha256": "c72cf06459821200047e10517bce9120edf4a978ed474b0cdcf01e9d7b49e2eb",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_libcrc_crc32.json": {
+   "images_sha256": "98af65e7c645a9aa49274a607965cc6cba0a00abba2c308d3e981926bd1f06e4",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_rust_crc32_table1.json": {
+   "images_sha256": "9c415ceb05aad15905f8d9d048be7c6223deb19cdd537a0953d0772a8adf9e03",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_zephyr_crc16_itu_t.json": {
+   "images_sha256": "0a285d1a8a937f8fe8e911e421afde8f483662aa6df3f594481461f73943100d",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_zephyr_crc32_ieee.json": {
+   "images_sha256": "6ebbfe6482f21f5332518baf8fb0e429f59083d4e66ff4a71624e9b01e5ef6d1",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_zephyr_crc8_ccitt.json": {
+   "images_sha256": "ced304efd74e9e5e452aa68a32400f4e4a6e744ee2e812cb79fb960e57b8371a",
+   "result": "match"
+  },
+  "crc/nrf5340/adapter_zlib_crc32.json": {
+   "images_sha256": "f3d767b132e4903af898a8782d6c812c878dad700fa91659e97a3cfaa756ac85",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_acecrc_crc8_byte.json": {
+   "images_sha256": "f483c3693d67b50729ad596f866edef197222946dd81fb54790f1ad97fb3c55a",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_crcany_crc16_byte.json": {
+   "images_sha256": "8c1939cf10439602a6caa24c424ad90a18421c760d2228543bc566a19893b17f",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_crcany_crc32_bit.json": {
+   "images_sha256": "daa1f77ee454465a7c8d5c74c64316466962da3797d846b3ef5ce45c5104b325",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_crcany_crc32_byte.json": {
+   "images_sha256": "0ed50fff93fcc76bee1d18d11591a6babc93db4c602e2599f1dff2a523d810e5",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_crcany_crc32_word.json": {
+   "images_sha256": "0340a12c9c23f51daee47110c294cb191b0fc3ae1fff5cd1d1cde0d64311910f",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_crcany_crc8_byte.json": {
+   "images_sha256": "a718c33676a81b4de391ef222597a81a2d9d93869aa5cec5385432274a8a3381",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_crcpp_ccittfalse_table.json": {
+   "images_sha256": "bbb924b1448fa08547faa12fbf4896d0df23ba89dff31b6f1651c280f77b0bbe",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc16_t16.json": {
+   "images_sha256": "c13a890735d648c535ee331315c65d053c312cb16da02a2f24ffdaca54c38ec5",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc16_t256.json": {
+   "images_sha256": "a7fb41360d635d526a130ea4e4c4834249202d41e0bc7ac95adce17d0d2b3aa2",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc32_t16.json": {
+   "images_sha256": "c6d24c12773330cb86606be948145542e017a3dac3bd9dd9ed1038eccc582ad4",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc32_t256.json": {
+   "images_sha256": "558628f6d1eb70f5ac228d46af50d31ac61a94e4f3a879c1cf3529d333e60719",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc8_t16.json": {
+   "images_sha256": "535dd51ef07178cbca1e075668e8eb29d267e8c6f1819ed47bb6c5d9fe6b85d2",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc8_t256.json": {
+   "images_sha256": "7a2454644cb33df38bed239ede9811764795e4fa36165a7da0528411f349ec60",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_libcrc_ccitt_ffff.json": {
+   "images_sha256": "068324528736c3fbcae3b498aa95a3fe1b541c3459ae2ee0657e1b305d8a4749",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_libcrc_crc32.json": {
+   "images_sha256": "57933f4a0ae811add1f0f91a1ea6628042b06921b01339a84db29c70d1ceeb24",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_rust_crc32_table1.json": {
+   "images_sha256": "ef320fa92d32f370b38b22a899ba6e13e4f1f915892ec3ea8dc5a4cb65381799",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_zephyr_crc16_itu_t.json": {
+   "images_sha256": "741ce618d738555c90b6608e78d29a1cd4a735144f6b67aeaec6abb2b4eda979",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_zephyr_crc32_ieee.json": {
+   "images_sha256": "e52a8f2034db1096a90106ce4166051da9b328707c5885986891ab8c6a66cea5",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_zephyr_crc8_ccitt.json": {
+   "images_sha256": "22f69f21e2a5ba256ae43e9289c3b83d0c98f0b5f77e2f76e8478f42ffa1233c",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_zlib_crc32.json": {
+   "images_sha256": "fb3699df42cfaf83399f29a08ef526d87082849d8f82eb1fa929830ac34d5ef6",
+   "result": "match"
+  },
+  "crc/samd20/adapter_acecrc_crc8_byte.json": {
+   "images_sha256": "2bcb11152cd86ef054466b49021a65d7c77af6220776de89146021f669d609f1",
+   "result": "match"
+  },
+  "crc/samd20/adapter_acecrc_crc8_byte_ram.json": {
+   "images_sha256": "5e39933acee63772e5c74540ec9f1646023ee3c8924d98cd3b3ff49a472dd038",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc16_byte.json": {
+   "images_sha256": "7f755b948d8f755add3f74d6f9eafac7c42cc3a02ccbc2b9eeb8e5741b52288b",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc16_byte_ram.json": {
+   "images_sha256": "44d37ed84bc1458841a44cc995f8a266a7750dac688adb9c815f280ee0bacd50",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc32_bit.json": {
+   "images_sha256": "96725bedd4c313bc33e4625367c9dc1a5430025ae775f6a254ccf3db439ed9b5",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc32_byte.json": {
+   "images_sha256": "b1b46cc678ca3edeecb113b8545028239b3776f5f25c9b4d1eaf85e3d6d0095a",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc32_byte_ram.json": {
+   "images_sha256": "9017f6cd705900521d9b77ce26da43eb208c359ca5ebed7f5643e1f97303e63f",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc32_word.json": {
+   "images_sha256": "113efff91cac4c17c8c345491f12ed6d66f671e9d3d7372dadf366b4f0a03c8f",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc32_word_ram.json": {
+   "images_sha256": "4bfaa6a51af426ad33ef2b0732bedc76fa20f3bf9b344ff4cc719edf76653a74",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc8_byte.json": {
+   "images_sha256": "bf15c4c253cc8cee58d1aa1d5fdc9be02a82302cff8afcd46b5e3d6d11449adc",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcany_crc8_byte_ram.json": {
+   "images_sha256": "772fe27f54a9e7776f688d2e3401574556e0aec3bfcb0d29940d4d7e86314dbd",
+   "result": "match"
+  },
+  "crc/samd20/adapter_crcpp_ccittfalse_table.json": {
+   "images_sha256": "8df8ec326837d17799c92c042d589075d0db4be067d294ac505c82961e228e4e",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc16_t16.json": {
+   "images_sha256": "c160c335c0fd15f77aaa1dfc7eaea36c6c4eff3273f064c8f79fc2775c5ba39d",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc16_t16_ram.json": {
+   "images_sha256": "635336332ee23bc318116d71db399198651f1c75d41d61f9d225ac2982fae4d3",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc16_t256.json": {
+   "images_sha256": "dc01a9057ec7cd36b95fc868749e446c73c34b78f0d15765a19ad7535e9a21e1",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc16_t256_ram.json": {
+   "images_sha256": "429c88279c514e0867b3d8f5e088d2501eb22e6fc76e112939e66cbb42f59dae",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc32_t16.json": {
+   "images_sha256": "562fd1e64ad4651fe7d77849564d1a9806d55f866ec8013d170c6a52935383c1",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc32_t16_ram.json": {
+   "images_sha256": "bf561e817d63c6469d39edb2051927048c0bc845cd210948f6bb81aba93f480b",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc32_t256.json": {
+   "images_sha256": "b6144b028c1666f79eda694f9467827cd6ba7b57fd7a20244c2c466ef9fc4f6b",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc32_t256_ram.json": {
+   "images_sha256": "90d49f7a4cf743b1b945c63c981556b9430d8b0086f3a8bffaf0ed9b252634ad",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc8_t16.json": {
+   "images_sha256": "b6afb82cb74961ed4153132c43756c145b1fe45962e843f4931a10611ca00ba5",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc8_t16_ram.json": {
+   "images_sha256": "aa5afb1dde45cb4484d27eabc3ae26ecce4c12beb6b72d1158098732bbe9bbb2",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc8_t256.json": {
+   "images_sha256": "010abc3bfcd6aa49c6b1adb1632644c53ddca90197a0f2cd3769fe74c2f0c35c",
+   "result": "match"
+  },
+  "crc/samd20/adapter_etl_crc8_t256_ram.json": {
+   "images_sha256": "dbee5f73cfa6ed2afa89887e79e7c116311e3c9007ac2db5a524796714871776",
+   "result": "match"
+  },
+  "crc/samd20/adapter_libcrc_ccitt_ffff.json": {
+   "images_sha256": "96a1febd18bfdba34bb691539304d9b1e813ef13cda80b30548174c62a6c86cf",
+   "result": "match"
+  },
+  "crc/samd20/adapter_libcrc_crc32.json": {
+   "images_sha256": "1b39c4da87dab20ac4c074d2064a9224db678658118671710591a4f27688af25",
+   "result": "match"
+  },
+  "crc/samd20/adapter_rust_crc32_table1.json": {
+   "images_sha256": "8a880729a9f80782f7c1f99d34faf07e7b323d3d6ab8b627e1926d13e2c6e100",
+   "result": "match"
+  },
+  "crc/samd20/adapter_rust_crc32_table1_ram.json": {
+   "images_sha256": "a3367f8b5bbd6fa1d59fc02edcac3f8457741fc6f40b269990536d2815eec6e1",
+   "result": "match"
+  },
+  "crc/samd20/adapter_zephyr_crc16_itu_t.json": {
+   "images_sha256": "1861b132253b8547c73b810c4db4facd86c0c165d525c4490f66dad501b31bce",
+   "result": "match"
+  },
+  "crc/samd20/adapter_zephyr_crc32_ieee.json": {
+   "images_sha256": "f54ddd27cff723de7e8e2cc6d19baab8fa3cd70ea5a93c91f581ad3136f7089c",
+   "result": "match"
+  },
+  "crc/samd20/adapter_zephyr_crc32_ieee_ram.json": {
+   "images_sha256": "5ed4045181525ce2539537da8410faef9930a9be6b8a815962c0802846f3651f",
+   "result": "match"
+  },
+  "crc/samd20/adapter_zephyr_crc8_ccitt.json": {
+   "images_sha256": "ec768ccac2e0aadcf7b59bfd144b0cfb76544dcd9b040bc7cd75a61fa71270ad",
+   "result": "match"
+  },
+  "crc/samd20/adapter_zephyr_crc8_ccitt_ram.json": {
+   "images_sha256": "c9dfb6c36b0fec1b92a0997b54d209cbfa0f9bebd187c4b461146732672c487a",
+   "result": "match"
+  },
+  "crc/samd20/adapter_zlib_crc32.json": {
+   "images_sha256": "e27fd714cec527d2fd58e01ed4e126b012687d0fc475b88501409d22bd2bfcf9",
+   "result": "match"
+  },
+  "crc/samd20/adapter_zlib_crc32_ram.json": {
+   "images_sha256": "23d9e1fbf4d49ff60769a544d09802b8be9536cc868c33088d583a5d7343ad35",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_acecrc_crc8_byte.json": {
+   "images_sha256": "121f88575b255f0dceb65168b648ef0e47e87d2636d4ffb41908da5a641d1c86",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_acecrc_crc8_byte_ram.json": {
+   "images_sha256": "331dbebe8cd43d9380e4d41f517a2dd6ca2d86cc45020b7e8fa659e8f97eec6e",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc16_byte.json": {
+   "images_sha256": "d5ffee333ea38bf0dc2c9a67ed2aa2e76c7efabc3d9f81f452d6e00f5a08a9bb",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc16_byte_ram.json": {
+   "images_sha256": "3cc530d0844fd2bb0c5af1d78ca4682e464dc9b5af288ca4db1360e45f299a4f",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc32_bit.json": {
+   "images_sha256": "2b43b625ff684c1c28c45d80b1d06e62ca9f13695afd16b8bebd3eb8d0409228",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc32_byte.json": {
+   "images_sha256": "2f1270f2ab5e91f519860bc7167ae49df7f11e98ca9e63556c0eba57ce3af661",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc32_byte_ram.json": {
+   "images_sha256": "45cf42f848c624464152f9b1b421ae33cdc922a129dc85ecdbe77610cb9fa862",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc32_word.json": {
+   "images_sha256": "0cdca5e77e8f7b5cf3a92cf2ff6453cb89f93dc73517ba54546b8d9fcbbc0e80",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc32_word_ram.json": {
+   "images_sha256": "6e2ebeebb04950e1fba1fd23650b494ea4865b443bdf20917f1878284323a8c9",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc8_byte.json": {
+   "images_sha256": "4f943cc6c96287976a26f4c42323afedda6325716c50278e1a61d9c3859605e8",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcany_crc8_byte_ram.json": {
+   "images_sha256": "fa48487033380a7ea7bd7b5fda69a5d1b1471aa930198c009684a07edc04b936",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_crcpp_ccittfalse_table.json": {
+   "images_sha256": "28b58fe135d1bbc2f68ec84570f06f7141a2741f836dc3654c82853f5c7e831a",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc16_t16.json": {
+   "images_sha256": "be5cb925faba0d4402e9a4ba46d5798675faa5dee929fc4af237d6b488fe7f94",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc16_t16_ram.json": {
+   "images_sha256": "5028ac5ca422b955c95858e04979e88658d457b39ceccdd7e8c8c20190303dfa",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc16_t256.json": {
+   "images_sha256": "bb4eb6bed1c7de1537ef382f846bb79f807aae801d93f0489f251fddf68c3af2",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc16_t256_ram.json": {
+   "images_sha256": "277cb6bcd5a836b181cd234c81fee279f4ce09d56381838f774c8e1014b044f1",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc32_t16.json": {
+   "images_sha256": "f9d25bffab86a419dbc1c17c84964c84efa73ed36919784d0975602b3afbab42",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc32_t16_ram.json": {
+   "images_sha256": "eddc63d6b9a25dff4e62d38cb25ee5720d5431822ad705c3794f703580b60234",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc32_t256.json": {
+   "images_sha256": "0a9039a136ca40e2307fcf0cb01191f06f02614366196775e0ae165a84be9a63",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc32_t256_ram.json": {
+   "images_sha256": "55edfee021e818ebca541cf6dfeb541e9cb81e1e7bd7a1f879e4be20f6b2000b",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc8_t16.json": {
+   "images_sha256": "36aa628bd803210eafc65bb3549f42e24f21d606def65ade797ba6ab102dbe1e",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc8_t16_ram.json": {
+   "images_sha256": "8f4d237aaeba46da69aa788584a9287506dfa8ad771c624a278b48ab93662f1f",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc8_t256.json": {
+   "images_sha256": "f31aec6b1938fce4a06c5b2206c5d2ba06eacbfc9c353d3e44e1f43b47226a03",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_etl_crc8_t256_ram.json": {
+   "images_sha256": "d430af3958805a54ad30c9338942d6044185d14bf968fe1ea8f2b37424d9db4f",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_libcrc_ccitt_ffff.json": {
+   "images_sha256": "b9ca76b46668501d1b9f9369001f376955f38f13c0e5b0e4c8809f30351f54b4",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_libcrc_crc32.json": {
+   "images_sha256": "880e1064f6edfa5d638c2fd82e12006377929c038215d17cf3d3a18b9dd6a06a",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_rust_crc32_table1.json": {
+   "images_sha256": "f2e4e6b6ebe91f7c2fd3e0979a796f8618875c2f6b7adc5f251a034a14e84392",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_rust_crc32_table1_ram.json": {
+   "images_sha256": "b90a4c21417e9f0e98e526cb8afe2841709d72641fcd7c7352a7c514cf1c03c7",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_zephyr_crc16_itu_t.json": {
+   "images_sha256": "769b0e5feca1dce75d0ae44afc1ac666f8b58c993b42e57aa72169db7bdcc33d",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_zephyr_crc32_ieee.json": {
+   "images_sha256": "fc8d73ad59b19d1ecda79d4542f7d93de67265f09df6d91d84ca0be1ae952dc3",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_zephyr_crc32_ieee_ram.json": {
+   "images_sha256": "c1f7fa2b1a4a5ee72e95047a6c02a20efd23e8b1f8951d4983f1240e2064f89d",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_zephyr_crc8_ccitt.json": {
+   "images_sha256": "1b5b7895d0e92793f16478fc39286ae41973acd8af295840a6a838726d038511",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_zephyr_crc8_ccitt_ram.json": {
+   "images_sha256": "e215aa9f910066ef6442f5f8dedf3b0d5cd27f4b5997abf1233ddc063f7a7168",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_zlib_crc32.json": {
+   "images_sha256": "52bc41f8531e3ecf6196ce73e542e76ad57200b744ead784556b1271cd647b64",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_zlib_crc32_ram.json": {
+   "images_sha256": "05b43aaa12832520ba1c90eee8a22b0d912a992bbf3015a4e67b08ef378ba6ff",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_acecrc_crc8_byte.json": {
+   "images_sha256": "7f8b0d1c2c22fe062507e07913a4dc348342c844c6d51c9338437427d4f1810b",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_acecrc_crc8_byte_ram.json": {
+   "images_sha256": "9fb529cb31adea3693af0e298996a1d60628ccfecaf6759e5733594284302238",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc16_byte.json": {
+   "images_sha256": "6a5a5839b8e18e6ebb1f2124147980bbf691a58aea3e1d8742eb990961558f68",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc16_byte_ram.json": {
+   "images_sha256": "821829120d6b8650082217b49cb0c464cd41eca4251e7acf897df9795a0b0877",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc32_bit.json": {
+   "images_sha256": "ff7758712bc6d37a7d1fcf550db9f2267339467508afbd90aa715e9a5545a633",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc32_byte.json": {
+   "images_sha256": "3a46c4e8ec92dbb19c2a50d8198dd2a076672f596d7e2d28783f37b94c079049",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc32_byte_ram.json": {
+   "images_sha256": "c579cb51aebee3a227caf0f031d038daca8a5748d7016552b7e08d3a47edbb31",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc32_word.json": {
+   "images_sha256": "f8076b73cda7d802ace414061bde92c73719aca85139b3665ade327b5538143e",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc32_word_ram.json": {
+   "images_sha256": "543e523edc4c9896f39454d4f017ceb8606001537ef10751aa2a169b839a39c7",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc8_byte.json": {
+   "images_sha256": "506e472bc8eef262659ec258f9f081725f8a2fac73bcbb8aaa8023f279d07f45",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcany_crc8_byte_ram.json": {
+   "images_sha256": "009e36b3ed693ba4b8a5642d09f8fa1180427cd1be9527e917480121fde81f3b",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_crcpp_ccittfalse_table.json": {
+   "images_sha256": "6b5de0135e2792b97c254f24ce209c50df3dd5737fcdddafa68d5f4dd7892062",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc16_t16.json": {
+   "images_sha256": "340ba876419ba5964d45c9d49e4c7150fda1e87aea1b64ae50decc6e5be01d60",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc16_t16_ram.json": {
+   "images_sha256": "6bd591447434278f9868b5aa50675978a65e875b9ea5fd418508f25bddd0f700",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc16_t256.json": {
+   "images_sha256": "d57928e9a8a9bd8c3d2e800842a7dfc74cc1ef5d562ac7d847c950ea399f1781",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc16_t256_ram.json": {
+   "images_sha256": "3b6f39c2b9b73b94f32c8bfa3806a63e83f234c976fb16024601e53c92453b84",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc32_t16.json": {
+   "images_sha256": "bbd5154a0fdc1bd3c9f46ee96ac568a341f8937c5e5a28e54dac25d9267f4f16",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc32_t16_ram.json": {
+   "images_sha256": "c0dae0b4a276b0d2f8bb5546a2b63f8002cf47c85e6c6a6a9fcfc70f6477271e",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc32_t256.json": {
+   "images_sha256": "a2acabaf07eb13e9d7743cf012d4303a2d9be1061b232c7a5a482555dac241f5",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc32_t256_ram.json": {
+   "images_sha256": "ae6a432b48dc22feb3450700973ecd64df29d469ac178e4fffa5bfa9a3c64130",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc8_t16.json": {
+   "images_sha256": "97432f7a7d582f7aa1ee39f0f02658897a2687e8431f1d6631dfb92f79dc2aa7",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc8_t16_ram.json": {
+   "images_sha256": "581f8e5c8946b0aff3596f562ac66746780667f61668ec52504eb926000da389",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc8_t256.json": {
+   "images_sha256": "538148f92ff23b5ccc8d6e7820cb09c0a0a8557e601a1f6b4fc44b5a7370065e",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_etl_crc8_t256_ram.json": {
+   "images_sha256": "b3f055326c49a7126c0f3feb556b26a166598370fa0cb3faa772e74462c48de3",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_hw_crc16.json": {
+   "images_sha256": "c5da3e59a6def2c7fc3b45d5a2b4c4931e9d43de6029583aff61c1c62e1b8349",
+   "result": "match",
+   "note": "ELF file differs at placements [0, 4, 8, 12, 16, 20, 24, 28] (flash bytes the same)"
+  },
+  "crc/stm32g474/adapter_hw_crc32.json": {
+   "images_sha256": "4541b403fcb9036285a8acd0039ca113a03d2b4cdac55b399496833164a668cc",
+   "result": "match",
+   "note": "ELF file differs at placements [0, 4, 8, 12, 16, 20, 24, 28] (flash bytes the same)"
+  },
+  "crc/stm32g474/adapter_hw_crc8.json": {
+   "images_sha256": "d8ed88ac33f6897cf15b8f47cdce4e8f04cb2321d6f3dee25dd3559dbb33b257",
+   "result": "match",
+   "note": "ELF file differs at placements [0, 4, 8, 12, 16, 20, 24, 28] (flash bytes the same)"
+  },
+  "crc/stm32g474/adapter_libcrc_ccitt_ffff.json": {
+   "images_sha256": "ed71b021f990d739e172ab51dc94cb9ab32898124801c9f4d27ecf797605de7c",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_libcrc_crc32.json": {
+   "images_sha256": "f650a1441e53c74085d0c1f69ad3a02ecc75b45cda238addedf98b8c663e503a",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_rust_crc32_table1.json": {
+   "images_sha256": "acdf11513746626869cb5bd2e9e6d415edb6f1b0a110934b75a9e93d5b9e9c46",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_rust_crc32_table1_ram.json": {
+   "images_sha256": "be48d066e3615d5e7207023e4dd9a81cfa7bd848c13ee50e9499898ecc4d06bb",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_zephyr_crc16_itu_t.json": {
+   "images_sha256": "3f7e18f216fc464f77d4164881f1137e02c64d54366512e60bfd653bf0349408",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_zephyr_crc32_ieee.json": {
+   "images_sha256": "de60273da50b3991e880dfc6c72ee24901f596a0f320a01d360441be9c61105e",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_zephyr_crc32_ieee_ram.json": {
+   "images_sha256": "20cb0981b1e51b652b349717e1ae5ff5dd890cad5a8e3e1f3cf5accf01404a44",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_zephyr_crc8_ccitt.json": {
+   "images_sha256": "8bb4c786ee6333df2571ddee79394ce082dda25c6c2a21ed9e6a631d9ba8b101",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_zephyr_crc8_ccitt_ram.json": {
+   "images_sha256": "45ff8c67614b4655e5b3ee10f01779a4679677c73a2f536482b114f1738ecf44",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_zlib_crc32.json": {
+   "images_sha256": "9c535fa4996b5eaaf54a4caa82c4a3acdf10774255c88e10abb2275ea7b75aec",
+   "result": "match"
+  },
+  "crc/stm32g474/adapter_zlib_crc32_ram.json": {
+   "images_sha256": "d1bdd42979254c1d007a55ce25ca6a9e6c83e1019527f8639ffaca6fcb2c6d14",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_acecrc_crc8_byte.json": {
+   "images_sha256": "f9067c8cb92a13be9f22c8c37c5e5ddc18f594f1ab6b16476b65b993f0c84938",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_crcany_crc16_byte.json": {
+   "images_sha256": "fc69e8f90bc03b2cf4beeb3bdaefcfe2d0cc4777b8547a0eb50625aa3cbd2aaa",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_crcany_crc32_bit.json": {
+   "images_sha256": "f44e63a933db1b236756552bbb6f8a4946f5916a56b22a89c7d5eaaa9050a399",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_crcany_crc32_byte.json": {
+   "images_sha256": "c44d3d378285c239eec71e056427e540c8a483ddff5993a73798ec71d6afd42b",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_crcany_crc32_word.json": {
+   "images_sha256": "f9d06e4c9040130d1c6da2b931adf05b9dcc71aeb6326d329f9edd5f50fa45b4",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_crcany_crc8_byte.json": {
+   "images_sha256": "0354964d11129902323b865b96a353409723465191265865f5b9f9dd24ad17e1",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_crcpp_ccittfalse_table.json": {
+   "images_sha256": "c8e21b6bf7a40b993ccda6e1d0dcb88a834cb8acea5fc05b117ecdf088992e6c",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_etl_crc16_t16.json": {
+   "images_sha256": "ee9a1b5fe2913384894d6e3ea60e89a2b98d3ff2c281e0ad2819b48cf7fe8047",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_etl_crc16_t256.json": {
+   "images_sha256": "78c60d16c3601215af83e52ba62d16fc5a8c871aabea6c6f49228d3a3af21bed",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_etl_crc32_t16.json": {
+   "images_sha256": "e9c25eeadf3b1b210ef94d9fcbc2eb19e17380247692021e9c987fdaa20e1f39",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_etl_crc32_t256.json": {
+   "images_sha256": "3606d1deda897f02ef39433fa9e20d48ab91cd96bce16994dc77981481812af6",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_etl_crc8_t16.json": {
+   "images_sha256": "da11d97390b1625f9b0a45e407c926b93440d567e24f65ff461ae2225a60e111",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_etl_crc8_t256.json": {
+   "images_sha256": "7abeaad17404bbd9d3463e3c2d568c5a8d54ae1dd95519df2a55357a9140f7da",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_libcrc_ccitt_ffff.json": {
+   "images_sha256": "b46525685c5d043c0fe4f23344870850ca68978ed4a771e4f3c3fc153465bb95",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_libcrc_crc32.json": {
+   "images_sha256": "cb2fd7f1998f346990c4b60ebca325a0a801253f1199c476a5164ad5fe30aada",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_rust_crc32_table1.json": {
+   "images_sha256": "7a181e45114ec47626c31b240cf80c9b96c894023ae14395697bc7fb5b3780a0",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_zephyr_crc16_itu_t.json": {
+   "images_sha256": "fb81177bee33011e51408df402083b3b6137911627a377d634d9250f17156c05",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_zephyr_crc32_ieee.json": {
+   "images_sha256": "d91d996f7057dcbf194eaea4734bd8cba6222914be3ac2cb2a226b3ef60d5fd7",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_zephyr_crc8_ccitt.json": {
+   "images_sha256": "793280737ba2d977979c5fab83cf5b4ca9ac2c84b34cd41f8b2350ab95a9ea18",
+   "result": "match"
+  },
+  "crc/stm32h723/adapter_zlib_crc32.json": {
+   "images_sha256": "f2d41e27b9ff787721c17c3dcf509f8953be7ac8db3642ce497fafc9455181de",
+   "result": "match"
+  }
+ }
+}

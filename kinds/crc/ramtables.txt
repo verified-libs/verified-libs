@@ -1,0 +1,22 @@
+# The configurations with the table in RAM (DECISIONS 2026-11-25): the same
+# code as the configuration named second, with the input section of every
+# symbol named after it moved from .rodata to .data in the image's copy of the
+# object that holds it (bench/onecrc.py), so the board's start-up code copies
+# it to RAM before main, as every initialised variable. Every image is checked
+# for each symbol lying in RAM. Symbols as arm-none-eabi-nm -C names them.
+# configuration                 code of                    table symbols (one per line part, separated by " | ")
+adapter_etl_crc32_t256_ram      adapter_etl_crc32_t256     etl::private_crc::crc_table<unsigned long, 32u, 8u, (unsigned char)255, 79764919ul, true, 256u>::table
+adapter_crcany_crc32_byte_ram   adapter_crcany_crc32_byte  table_word
+adapter_rust_crc32_table1_ram   adapter_rust_crc32_table1  vl_crc_rust::CRC32
+adapter_etl_crc32_t16_ram       adapter_etl_crc32_t16      etl::private_crc::crc_table<unsigned long, 32u, 4u, (unsigned char)15, 79764919ul, true, 16u>::table
+adapter_zephyr_crc32_ieee_ram   adapter_zephyr_crc32_ieee  table.1
+adapter_crcany_crc32_word_ram   adapter_crcany_crc32_word  table_word
+adapter_zlib_crc32_ram          adapter_zlib_crc32         crc_braid_table | crc_table
+adapter_etl_crc16_t256_ram      adapter_etl_crc16_t256     etl::private_crc::crc_table<unsigned short, 16u, 8u, (unsigned char)255, (unsigned short)4129, false, 256u>::table
+adapter_crcany_crc16_byte_ram   adapter_crcany_crc16_byte  table_byte
+adapter_etl_crc16_t16_ram       adapter_etl_crc16_t16      etl::private_crc::crc_table<unsigned short, 16u, 4u, (unsigned char)15, (unsigned short)4129, false, 16u>::table
+adapter_etl_crc8_t256_ram       adapter_etl_crc8_t256      etl::private_crc::crc_table<unsigned char, 8u, 8u, (unsigned char)255, (unsigned char)7, false, 256u>::table
+adapter_crcany_crc8_byte_ram    adapter_crcany_crc8_byte   table_word
+adapter_acecrc_crc8_byte_ram    adapter_acecrc_crc8_byte   ace_crc::crc8_byte::crc_table
+adapter_etl_crc8_t16_ram        adapter_etl_crc8_t16       etl::private_crc::crc_table<unsigned char, 8u, 4u, (unsigned char)15, (unsigned char)7, false, 16u>::table
+adapter_zephyr_crc8_ccitt_ram   adapter_zephyr_crc8_ccitt  crc8_ccitt_small_table

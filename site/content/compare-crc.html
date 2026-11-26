@@ -1,5 +1,10 @@
 <p class="kindsw">Kind: <a href="compare.html">Ring buffers</a> | <strong>CRC</strong></p>
-<h1>Compare CRC calculation in software</h1>
+<h1>Compare CRC calculation</h1>
+<p>The table holds the libraries and, on the boards that have one, the board's own CRC unit, driven
+by our code: it is not a library, and its name says so in every row. Its bytes are our adapter
+code only. On the Pico 2 the unit is a DMA transfer that computes the CRC on the way, and the CPU
+waits for it; for CRC-32 on the STM32 unit the final XOR is done in our code. With the unit shown,
+scores are relative to it where its value is the lowest; the filter "Kind of row" takes it out.</p>
 <p>Pick a CRC, a board and a message, and set weights for what you care about. There is no ranking
 of ours: without weights the rows are in the order of the configuration list, and any order is the
 result of your weights, which are stored in the address so the view can be linked. Every number
@@ -24,6 +29,7 @@ were measured:
 <label>Language <select id="crc-lang"><option value="">any</option><option value="C">C</option><option value="C++">C++</option><option value="Rust">Rust</option></select></label>
 <label>Class <select id="crc-class"><option value="">any</option></select></label>
 <label>Table <select id="crc-table"><option value="">any</option><option value="flash">in flash</option><option value="RAM">in RAM</option><option value="none">no table</option></select></label>
+<label>Kind of row <select id="crc-kind"><option value="">any</option><option value="library">library</option><option value="hardware">the board's CRC unit</option></select></label>
 </fieldset>
 <fieldset><legend>Weights (0 = ignore, 10 = most important)</legend>
 <div id="crc-weights"></div>
@@ -42,15 +48,20 @@ before rounding, so two rows can show the same score without a mark when they di
 the rounding.</p>
 <p id="cmp-src" class="mute"></p>
 <h2>How the score is computed</h2>
-<p>With a weight above 0, each configuration gets a score from 0 to 100, as on the ring buffers'
-comparison: for each weighted value, the smallest value among the configurations shown divided by
-the configuration's own, then the mean weighted by your weights, times 100, shown to one decimal. The values are the
+<p>With a weight above 0, each row gets a score from 0 to 100, as on the ring buffers'
+comparison: for each weighted value, the smallest value among the rows shown divided by
+the row's own, then the mean weighted by your weights, times 100, shown to one decimal. The rows
+are the libraries and, on the boards that have one, the board's CRC unit, scored like any row: with
+it shown, a score is relative to the unit's value wherever that value is the lowest. Choose
+"library" under "Kind of row" for the scores among the libraries only. On the nRF5340 DK and the
+SAM D20, and on the Pico 2 for CRC-8, no unit was measured, and a line above the table says so. The values are the
 cycles for one call at the chosen length, the cycles per byte, and the bytes of flash and RAM
 together (so a table built in RAM is not free). The cycles are ranges, so the score is a range
-too: the smallest value is the smallest lower end among the rows shown; a configuration's lowest
+too: the smallest value is the smallest lower end among the rows shown; a row's lowest
 score uses its own upper ends, its highest score its lower ends. Bytes are exact. The rows are
 ordered by the highest end of the score, ties in list order, and a score whose range overlaps the
-one above it is marked "overlaps above". The reference has no score and stays last. Sorting by
+one above it is marked "overlaps above". The reference has no score, is never the smallest value
+a score is taken against, and stays apart as the last row. Sorting by
 name, flash or RAM bytes (the column headers) overrides the score order.</p>
 <p>The marks are judged two ways, on purpose. The score's marks ("overlaps above", and "overlaps"
 in the score column for a chosen configuration) are judged on the score before rounding, so a
@@ -66,9 +77,14 @@ Those are for you to judge, with the filters and the records.</p>
 <p><strong>Cycles</strong>: the mean of 256 calls (the first call included) on a message of the
 chosen length and start. <strong>Cycles per byte</strong>: (mean at 1024 bytes − mean at 256 bytes) /
 768, at the chosen start. <strong>Flash bytes</strong>: the table in flash and the code at
-<code>-O2</code> for the board's core; <strong>RAM bytes</strong>: the table in RAM. The last row is
-the reference, the bitwise algorithm written from the catalogue's parameters and timed in the same
-images: it is the baseline, not a library. The 1-byte messages are in the records and not here: at
+<code>-O2</code> for the board's core; <strong>RAM bytes</strong>: the table in RAM. A table "RAM
+(copied at start by the image)" is a library's table that our build moved from flash to RAM; it
+counts in both, as its bytes stay in flash for the start-up code to copy. libcrc and CRC++ build
+theirs in RAM themselves. After the libraries, on the boards that have one, is the board's
+CRC unit (the STM32 CRC unit or the RP2350's DMA sniffer), driven by our code: it is not a
+library, its class is "hardware unit", it has no table, and its bytes are those of our adapter
+code. The last row, apart, is the reference, the bitwise algorithm written from the catalogue's
+parameters and timed in the same images: it is the baseline, not a library. The 1-byte messages are in the records and not here: at
 an 8-byte boundary with the cache on, that scenario is the first one after the cache is switched
 on. The second pass and the minimum, maximum and first call of each scenario are in the records,
 one per row.</p>

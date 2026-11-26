@@ -17,13 +17,15 @@ The kinds are in the order they were added.
 - **Records:** [`records/`](../../records/README.md)
 - **How to repeat:** [Reproduce](reproduce.md)
 
-## CRC calculation in software
+## CRC calculation
 
 - **What is measured:** cycles of one call that computes a CRC, for messages
   of 1 to 1024 bytes, with the cache off and on, and the bytes of flash and
-  RAM a configuration takes; every call's result is checked against a
-  reference.
-- **Libraries:** 8, in 20 configurations, for 3 CRCs.
+  RAM it takes; by libraries that compute the CRC in software and, on the
+  boards that have one, by the board's CRC unit as a row beside them. Every
+  call's result is checked against a reference.
+- **Libraries:** 8, in 35 configurations, for 3 CRCs.
+- **The board's CRC unit:** on 4 boards, driven by our code (not a library), a row beside the libraries.
 - **Boards:** 6.
 - **Results:** [results page](results-crc.md)
 - **Method:** [method page](method-crc.md)

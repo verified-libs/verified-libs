@@ -26,3 +26,26 @@ adapter_crcany_crc8_byte        c     crcany crc8smbus_byte (C)
 adapter_acecrc_crc8_byte        cpp   acecrc crc8_byte (C++)
 adapter_etl_crc8_t16            cpp   etl crc8_ccitt_t16 (C++)
 adapter_zephyr_crc8_ccitt       c     zephyr crc8_ccitt (C)
+#
+# The second series (DECISIONS 2026-11-25, lab/plans/2026-11-25-crc-hw-and-ram-series.md):
+# the boards' CRC hardware, driven by our code (adapter_hw.c; only on the boards of
+# boards.txt), and the configurations whose table lies in flash with the table in RAM
+# (the same code; ramtables.txt names the table, bench/onecrc.py moves it to .data).
+adapter_hw_crc32                c     the board's CRC unit, CRC-32 (our code)
+adapter_hw_crc16                c     the board's CRC unit, CRC-16 (our code)
+adapter_hw_crc8                 c     the board's CRC unit, CRC-8 (our code)
+adapter_etl_crc32_t256_ram      cpp   etl crc32_t256 (C++), table in RAM
+adapter_crcany_crc32_byte_ram   c     crcany crc32iso_hdlc_byte (C), table in RAM
+adapter_rust_crc32_table1_ram   rust  crc (Rust) Table<1>, table in RAM
+adapter_etl_crc32_t16_ram       cpp   etl crc32_t16 (C++), table in RAM
+adapter_zephyr_crc32_ieee_ram   c     zephyr crc32_ieee (C), table in RAM
+adapter_crcany_crc32_word_ram   c     crcany crc32iso_hdlc_word (C), table in RAM
+adapter_zlib_crc32_ram          c     zlib crc32 (C), table in RAM
+adapter_etl_crc16_t256_ram      cpp   etl crc16_ccitt_t256 (C++), table in RAM
+adapter_crcany_crc16_byte_ram   c     crcany crc16ibm_3740_byte (C), table in RAM
+adapter_etl_crc16_t16_ram       cpp   etl crc16_ccitt_t16 (C++), table in RAM
+adapter_etl_crc8_t256_ram       cpp   etl crc8_ccitt_t256 (C++), table in RAM
+adapter_crcany_crc8_byte_ram    c     crcany crc8smbus_byte (C), table in RAM
+adapter_acecrc_crc8_byte_ram    cpp   acecrc crc8_byte (C++), table in RAM
+adapter_etl_crc8_t16_ram        cpp   etl crc8_ccitt_t16 (C++), table in RAM
+adapter_zephyr_crc8_ccitt_ram   c     zephyr crc8_ccitt (C), table in RAM

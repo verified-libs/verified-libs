@@ -21,6 +21,8 @@ extern const crc_adapter adapter_zephyr_crc32_ieee, adapter_zephyr_crc16_itu_t, 
 extern const crc_adapter adapter_acecrc_crc8_byte;
 extern const crc_adapter adapter_crcpp_ccittfalse_table;
 extern const crc_adapter adapter_rust_crc32_table1;
+/* the boards' CRC hardware, driven by our code (adapter_hw.c; boards.txt names the boards) */
+extern const crc_adapter adapter_hw_crc32, adapter_hw_crc16, adapter_hw_crc8;
 /* host test only: zlib with the boards' word size (adapter_zlib.c, ZLIB_W4) */
 extern const crc_adapter adapter_zlib_crc32_w4;
 /* deliberately broken, host test only (adapters_broken.c) */

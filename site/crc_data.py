@@ -34,11 +34,18 @@ ABOUT = {
               "note_cache_off: the sentence the results page puts above the board's cache-off tables "
               "(site/crc_tables.py, BEFORE_OFF), or null",
     "crcs": "the CRCs in the order of kinds/crc/configs.txt",
-    "configurations": "per adapter, in the order of kinds/crc/configs.txt: its language (column 2: C, C++ or Rust) and library (column 3), "
-                      "the name the record carries, its CRC, and class and table place (step 2 of kinds/crc/README.md, "
-                      "as site/crc_tables.py reads it)",
+    "configurations": "per adapter, in the order of kinds/crc/configs.txt with the board's CRC units last: its language "
+                      "(column 2: C, C++ or Rust) and library (column 3), "
+                      "the name the record carries, its CRC, and class and table place (steps 2 and 11 of kinds/crc/README.md, "
+                      "as site/crc_tables.py reads it); role: 'library', or 'hardware' for the board's CRC unit, driven by "
+                      "our code and not a library (its library is null and its note says so, in its name cell every time); "
+                      "a hardware row is a row of the same table, after the libraries of its CRC, and with weights it is "
+                      "scored like any row (decided 2026-11-26, DECISIONS.md 2026-11-25); a filter on the kind of row "
+                      "leaves it out. table 'RAM (copied at start by the image)': a library's table moved from flash to RAM "
+                      "by our build (step 11), told apart from libraries that build their table in RAM themselves",
     "rows": "per board and configuration: flash_bytes (the table in flash plus the code at -O2 for the board's core) "
-            "and ram_bytes (step 4 of kinds/crc/README.md, as site/crc_tables.py), the record's path, cycles and per_byte",
+            "and ram_bytes (steps 4 and 11 of kinds/crc/README.md, as site/crc_tables.py; a table copied to RAM counts in "
+            "both), the record's path, cycles and per_byte; hardware rows only on the boards that have the unit",
     "baseline": "per board and CRC: the reference of that CRC, timed in the same images (the records' baseline), "
                 "cycles and per_byte over all images of the board's configurations of that CRC",
     "cycles": "cycles[cache][offset][length]: [min, max] over the eight placements, first pass, of the mean of the "
@@ -95,8 +102,12 @@ def build():
             continue
         crcs += [any_rec["crc"]] if any_rec["crc"] not in crcs else []
         c, t = cls.get(ad, (None, None))
-        configs.append({"adapter": ad, "name": any_rec["name"], "lang": LANG[lib[ad][0]], "library": lib[ad][1],
-                        "crc": any_rec["crc"], "class": c, "table": t})
+        hw = crc_tables.is_hw(cls, ad)
+        configs.append(dict({"adapter": ad, "name": any_rec["name"], "lang": LANG[lib[ad][0]],
+                             "library": None if hw else lib[ad][1], "crc": any_rec["crc"], "class": c, "table": t,
+                             "role": "hardware" if hw else "library"},
+                            **({"note": crc_tables.HW_TEXT} if hw else {})))
+    configs = [c for c in configs if c["role"] == "library"] + [c for c in configs if c["role"] == "hardware"]
     rows, base = [], {}
     for b in boards:
         for c in configs:
@@ -108,15 +119,16 @@ def build():
             pp = crc_tables.per_place(r)
             row = {"board": b["id"], "adapter": c["adapter"],
                    "flash_bytes": tf + code[core] if tf is not None and core in code else None,
-                   "ram_bytes": ram, "record": path}
+                   "ram_bytes": crc_tables.ram_of(ram, core), "record": path}
             row.update(ranges({p: x["results"] for p, x in pp.items()}))
             rows.append(row)
-            base.setdefault((b["id"], c["crc"]), {}).update(
-                {(c["adapter"], p): x["baseline"] for p, x in pp.items()})
+            if c["role"] == "library":   # the baseline over the libraries' images, as the page shows it beside them
+                base.setdefault((b["id"], c["crc"]), {}).update(
+                    {(c["adapter"], p): x["baseline"] for p, x in pp.items()})
     baseline = []
     for (bid, crc), per in base.items():
         baseline.append(dict({"board": bid, "crc": crc}, **ranges(per)))
-    return {"schema": "crc-data/1",
+    return {"schema": "crc-data/2",
             "about": ABOUT,
             "source": {"records": "records/crc", "commits": sorted({r["bench_commit"] for r, _ in recs.values()}),
                        "toolchain_image": sorted({r["toolchain_image"] for r, _ in recs.values()})},

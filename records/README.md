@@ -49,14 +49,24 @@ sources are taken from the public commit the series was published as.
 ## The CRC records (`crc/`)
 
 `crc/<board>/<adapter>.json`: the CRC kind's benchmark, one record per
-board and configuration (20 configurations, [`kinds/crc`](../kinds/crc/README.md)),
+board and configuration ([`kinds/crc`](../kinds/crc/README.md)),
 made by [`kinds/crc/bench/crcrecords.py`](../kinds/crc/bench/crcrecords.py)
 from the run files of `kinds/crc/bench/run-crc.py`. Schema `crc-bench/1`.
 [`kinds/crc/bench/crcverify.sh`](../kinds/crc/bench/crcverify.sh) rebuilds
-a record's eight images and compares them. The 120 records here are of
-the kind's first series (commit `6301058`, 2026-11-24 to 2026-11-25, six
-boards, two passes; the [report](../reports/2026-11-25-crc-first-series.md)),
-and all 120 were rebuilt byte for byte from that commit. Fields:
+a record's eight images and compares them. The 221 records here are of two
+series, six boards, two passes each:
+- the first series, 120 records of the 20 configurations of step 2 (commit
+  `6301058`, 2026-11-24 to 2026-11-25; the
+  [report](../reports/2026-11-25-crc-first-series.md));
+- the second series, 101 records of the 18 configurations of step 11 (the
+  tables in RAM, and the board's CRC unit on the four boards that have
+  one). Its commits are `04a2197` (NUCLEO-G474RE, the NUCLEO-G0B1RE's
+  tables in RAM, SAM D20) and `40f1958` (the rest). The account is in the
+  [report](../reports/2026-11-25-crc-second-series.md).
+
+Every record was rebuilt byte for byte from its commit. The records of
+`6301058` and `04a2197` also rebuild from this tree's sources, and
+[`rebuilt.json`](rebuilt.json) says so (`lab/tools/image-ledger.py`). Fields:
 
 | Field | What it holds |
 |---|---|

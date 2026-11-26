@@ -1,0 +1,11 @@
+# The configurations that exist on some boards only (bench/onecrc.py builds a
+# configuration on the boards named here, every other configuration on every
+# board; bench/crcslots.py gives it a slot sized for those boards). Fields:
+# adapter, then the board directories under firmware/common.
+# The boards' CRC hardware (adapter_hw.c): the STM32 CRC unit on the three
+# NUCLEO boards for the three CRCs, the RP2350's DMA sniffer for CRC-32 and
+# CRC-16 (no 8-bit CRC); none on the nRF5340 DK; the SAM D20's DSU left out
+# (DECISIONS 2026-11-25).
+adapter_hw_crc32   stm32g474 stm32g0b1 stm32h723 rp2350
+adapter_hw_crc16   stm32g474 stm32g0b1 stm32h723 rp2350
+adapter_hw_crc8    stm32g474 stm32g0b1 stm32h723

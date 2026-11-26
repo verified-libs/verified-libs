@@ -273,7 +273,9 @@ class CRCAnswers(unittest.TestCase):
                  {"crc": "CRC-16/IBM-3740", "board": "sam-d20-xpro", "language": "C++", "sort": "flash_bytes", "reverse": True},
                  {"board": "nucleo-g0b1re", "table": "RAM"}, {"class": "table of 256", "sort": "name"},
                  {"weights": {"cycles": 5, "bytes": 5}}, {"board": "nrf5340dk", "cache": "off", "weights": {"cycles": 3, "cycles_per_byte": 3, "bytes": 3}},
-                 {"crc": "CRC-8/SMBUS", "weights": {"bytes": 10}, "sort": "ram_bytes"}]
+                 {"crc": "CRC-8/SMBUS", "weights": {"bytes": 10}, "sort": "ram_bytes"},
+                 {"board": "nucleo-g474re", "kind": "library", "weights": {"cycles_per_byte": 10}},
+                 {"board": "nucleo-h723zg", "kind": "hardware_unit", "class": "hardware unit"}]
         for args in cases:
             out = self.tool("compare_crc", args)
             url = out["same_view_on_the_site"]
@@ -326,11 +328,44 @@ class CRCAnswers(unittest.TestCase):
 
     def test_list_and_errors(self):
         lst = self.tool("list_crc_configurations")
-        self.assertEqual(lst["count"], len(self.C["configurations"]))
+        hw = [c for c in self.C["configurations"] if c["role"] == "hardware"]
+        self.assertEqual(lst["count"], len(self.C["configurations"]) - len(hw))
+        self.assertEqual(len(lst["configurations"]), lst["count"])
+        self.assertEqual([h["name"] for h in lst["hardware"]["rows"]], [c["name"] for c in hw])
+        self.assertEqual(sorted(lst["hardware"]["rows"][2]["boards"]), ["nucleo-g0b1re", "nucleo-g474re", "nucleo-h723zg"])
         for bad in ({"crc": "CRC-64"}, {"length": 17}, {"offset": True}, {"class": "table of 16", "crc": "CRC-8/SMBUS",
                     "board": "pico2", "sort": "cycles"}, {"x": 1}):
             with self.assertRaises(server.ToolError, msg=bad):
                 self.tool("compare_crc", bad)
+
+    def test_hardware_row_in_the_table(self):
+        """The board's CRC unit (decided 2026-11-26): after the libraries, before the reference, labelled, with a
+        score like any row and the smallest value the scores are taken against where it is lowest; kind 'library'
+        gives the scores without it; none where the board has no unit."""
+        args = {"crc": "CRC-8/SMBUS", "board": "nucleo-g474re", "weights": {"cycles_per_byte": 10}}
+        out = self.tool("compare_crc", args)
+        hw = [r for r in out["rows"] if r.get("hardware_not_a_library")]
+        self.assertEqual([r["name"] for r in hw], ["the board's CRC unit, CRC-8 (our code)"])
+        self.assertEqual(hw[0]["note"], "The board's CRC unit, driven by our code; not a library")
+        self.assertIsNone(hw[0]["library"])
+        self.assertTrue(out["rows"][-1]["reference_baseline_not_a_library"])
+        self.assertTrue(all("score" in r for r in out["rows"][:-1]))
+        # the unit's 2.2 cycles per byte is the lowest: its score is 100 and the libraries' are relative to it
+        self.assertEqual(out["rows"][0], hw[0])
+        self.assertGreaterEqual(hw[0]["score"]["max"], 99.99)
+        libs = self.tool("compare_crc", dict(args, kind="library"))
+        self.assertFalse([r for r in libs["rows"] if r.get("hardware_not_a_library")])
+        self.assertGreaterEqual(max(r["score"]["max"] for r in libs["rows"][:-1]), 99.99)
+        self.assertLess(max(r["score"]["max"] for r in out["rows"][1:-1]), 50)
+        only = self.tool("compare_crc", dict(args, kind="hardware_unit"))
+        self.assertEqual([r["name"] for r in only["rows"][:-1]], [hw[0]["name"]])
+        # without weights: in list order, after the libraries
+        plain = self.tool("compare_crc", {"crc": "CRC-8/SMBUS", "board": "nucleo-g474re"})
+        self.assertEqual(plain["rows"][-2]["name"], hw[0]["name"])
+        for board, crc in (("nrf5340dk", "CRC-32/ISO-HDLC"), ("sam-d20-xpro", "CRC-16/IBM-3740"), ("pico2", "CRC-8/SMBUS")):
+            out = self.tool("compare_crc", {"crc": crc, "board": board})
+            self.assertFalse([r for r in out["rows"] if r.get("hardware_not_a_library")], board)
+            self.assertTrue(any("libraries only" in n for n in out["notes"]), board)
 
     def test_ring_buffer_tools_name_the_crc_tools(self):
         tools = {t["name"]: t for t in server.tool_list(self.D)}

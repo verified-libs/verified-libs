@@ -11,7 +11,9 @@ One block per kind, the same fields in the same order, no ranking. The counts:
   - CRC: the records under records/crc (schema crc-bench/1): configurations
     = the distinct adapters, libraries = the distinct libraries of those
     adapters (third column of kinds/crc/configs.txt), CRCs = the distinct
-    "crc", boards = the distinct "board".
+    "crc", boards = the distinct "board"; the board's CRC unit (the class of
+    step 11 of kinds/crc/README.md, site/crc_tables.py) is not a library and
+    is counted apart, by the boards that have one.
 
 Usage: python3 -I site/kinds_page.py [--write | --check]
   (no argument: print the page; --write: write site/content/kinds.md;
@@ -36,13 +38,20 @@ def crc_counts():
         f = line.split()
         if f and not f[0].startswith("#"):
             lib_of[f[0]] = f[2]
-    ads, crcs, boards = set(), set(), set()
+    import sys
+    sys.path.insert(0, os.path.join(ROOT, "site"))
+    import crc_tables
+    _, cls, _ = crc_tables.kind_tables()
+    ads, crcs, boards, hw_boards = set(), set(), set(), set()
     for f in glob.glob(os.path.join(ROOT, "records/crc/*/*.json")):
         r = json.load(open(f))
         if r.get("schema") == "crc-bench/1":
+            if crc_tables.is_hw(cls, r["adapter"]):
+                hw_boards.add(r["board"])
+                continue
             ads.add(r["adapter"]); crcs.add(r["crc"]); boards.add(r["board"])
     return {"libraries": len({lib_of.get(a, a) for a in ads}), "configurations": len(ads),
-            "crcs": len(crcs), "boards": len(boards)}
+            "crcs": len(crcs), "boards": len(boards), "hw_boards": len(hw_boards)}
 
 
 def markdown():
@@ -66,13 +75,15 @@ The kinds are in the order they were added.
 - **Records:** [`records/`](../../records/README.md)
 - **How to repeat:** [Reproduce](reproduce.md)
 
-## CRC calculation in software
+## CRC calculation
 
 - **What is measured:** cycles of one call that computes a CRC, for messages
   of 1 to 1024 bytes, with the cache off and on, and the bytes of flash and
-  RAM a configuration takes; every call's result is checked against a
-  reference.
+  RAM it takes; by libraries that compute the CRC in software and, on the
+  boards that have one, by the board's CRC unit as a row beside them. Every
+  call's result is checked against a reference.
 - **Libraries:** {crc['libraries']}, in {crc['configurations']} configurations, for {crc['crcs']} CRCs.
+- **The board's CRC unit:** on {crc['hw_boards']} boards, driven by our code (not a library), a row beside the libraries.
 - **Boards:** {crc['boards']}.
 - **Results:** [results page](results-crc.md)
 - **Method:** [method page](method-crc.md)

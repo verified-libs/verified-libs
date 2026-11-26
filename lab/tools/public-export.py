@@ -85,6 +85,8 @@ CRC test sources are on three sides (crc_side()):
             by the rebuild.
   built by  host files that only build images (CRC_BUILT_BY): build.sh,
             onebuild.sh, onecrc.py, crcslots.py, configs.txt, slots.txt,
+            boards.txt and ramtables.txt (which boards a configuration is
+            built for, and which tables onecrc.py moves to RAM),
             crcany.models, fetch.sh, .gitignore of the kind;
             firmware/common's bundle.py and libc-objs.sh; version 2's
             onebundle.py and oneslots.py; lab/tools/source-commit.sh. A
@@ -133,7 +135,7 @@ CRC_NOT_SOURCES = tuple("kinds/crc/" + n for n in (
 # Host files of the CRC kind that only build images: a change is held by the rebuild (image-ledger.py).
 CRC_BUILT_BY = tuple("kinds/crc/" + n for n in (
     ".gitignore", "bench/build.sh", "bench/onebuild.sh", "bench/onecrc.py", "bench/crcslots.py", "configs.txt",
-    "slots.txt", "crcany.models", "fetch.sh")) + ("firmware/common/bundle.py", "firmware/common/libc-objs.sh") + tuple(
+    "slots.txt", "crcany.models", "fetch.sh", "boards.txt", "ramtables.txt")) + ("firmware/common/bundle.py", "firmware/common/libc-objs.sh") + tuple(
     "firmware/nrf5340-rb-bench/" + n for n in ("onebundle.py", "oneslots.py")) + ("lab/tools/source-commit.sh",)
 # Host files of the CRC kind a recorded fix may change without a new series: the runner, the record writer
 # and the check of a record.

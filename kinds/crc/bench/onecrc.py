@@ -40,6 +40,14 @@ off, and so in fewer positions (check() prints which). (In version 2's ring-buff
 images the placement bytes lie behind the adapter, with FAR, and the adapter
 does not move.)
 
+The second series (DECISIONS 2026-11-25): a configuration of ../boards.txt
+is built on the boards named there only (the boards' CRC hardware,
+adapter_hw.c); a configuration of ../ramtables.txt is the code of another
+configuration with the input sections of its table symbols renamed from
+.rodata to .data in the image's copies of the objects that define them, so
+that the board's start-up code copies the table to RAM; its image is checked
+for every such symbol lying in RAM.
+
 Checked for every image: it fits its slot; the fixed part is the same as in
 every other image of the board and holds memcpy (on a 32-byte boundary),
 memmove, memset, memcmp, time_call, main and the reference; the selection
@@ -83,7 +91,7 @@ MEMSYMS = ("memcpy memmove memset memcmp __aeabi_memcpy __aeabi_memcpy4 __aeabi_
 RUST_TARGET = {"cortex-m0plus": "thumbv6m-none-eabi", "cortex-m4": "thumbv7em-none-eabi",
                "cortex-m7": "thumbv7em-none-eabi", "cortex-m33": "thumbv8m.main-none-eabi"}
 
-OWN_C = ["adapter_zlib.c", "adapter_libcrc.c", "adapter_zephyr.c", "adapter_crcany.c", "adapter_rust.c"]
+OWN_C = ["adapter_zlib.c", "adapter_libcrc.c", "adapter_zephyr.c", "adapter_crcany.c", "adapter_rust.c", "adapter_hw.c"]
 OWN_CXX = ["adapter_etl.cpp", "adapter_acecrc.cpp", "adapter_crcpp.cpp"]
 LIB_C = [f"{LIBS}/zlib/crc32.c", f"{LIBS}/libcrc/src/crc32.c", f"{LIBS}/libcrc/src/crcccitt.c",
          f"{LIBS}/zephyr/subsys/crc/crc32_sw.c", f"{LIBS}/zephyr/subsys/crc/crc16_sw.c",
@@ -98,6 +106,36 @@ FIXED = (". = ALIGN(32); *libc_a-memcpy.o(.text*) *libc_a-memcpy-stub.o(.text*) 
 # Not the strings (.rodata.str*): the linker merges equal strings of all objects into the first such
 # section it places, so another configuration's names would land in the fixed part. They are only names.
 NEAR = "KEEP(*(.bench_place)) _bench_near_start = .; *adapter_*.o(.text*) _bench_near_end = .;"
+
+
+def read_boards():
+    """boards.txt: {adapter: set of boards} for the configurations that exist on some boards only."""
+    out = {}
+    for n, ln in enumerate(open(os.path.join(KIND, "boards.txt")), 1):
+        f = ln.split("#")[0].split()
+        if f:
+            if len(f) < 2 or f[0] in out:
+                sys.exit(f"boards.txt:{n}: an adapter (once) and its boards expected")
+            out[f[0]] = set(f[1:])
+    return out
+
+
+def read_ramtables():
+    """ramtables.txt: {configuration: (the configuration whose code it is, [table symbols])}."""
+    out = {}
+    for n, ln in enumerate(open(os.path.join(KIND, "ramtables.txt")), 1):
+        ln = ln.split("#", 1)[0] if ln.lstrip().startswith("#") else ln
+        f = ln.split(None, 2)
+        if not f:
+            continue
+        if len(f) != 3 or f[0] in out:
+            sys.exit(f"ramtables.txt:{n}: configuration (once), the configuration of its code and the table symbols expected")
+        out[f[0]] = (f[1], [x.strip() for x in f[2].split(" | ") if x.strip()])
+    return out
+
+
+def on_board(adapter, board, boards):
+    return adapter not in boards or board in boards[adapter]
 
 
 def read_configs():
@@ -122,6 +160,59 @@ def read_slots():
             if len(f) != 5:
                 sys.exit(f"slots.txt:{n}: five fields expected")
             out.append((f[0], int(f[1]), int(f[2]), int(f[3], 0), int(f[4], 0)))
+    return out
+
+
+def ram_archive(src, dst, names, work):
+    """A copy of the archive src at dst in which every member that defines one of names (as
+    arm-none-eabi-nm -C names it) has that symbol's input section renamed from .rodata.* to .data.*.
+    Returns the names found."""
+    found = set()
+    tmp = f"{work}.x"
+    shutil.rmtree(tmp, ignore_errors=True)
+    os.makedirs(tmp)
+    shutil.copyfile(src, dst)
+    members = ob.sh(["arm-none-eabi-ar", "t", src]).split()
+    if len(set(members)) != len(members):
+        sys.exit(f"{src}: two members of one name")
+    ob.sh(["arm-none-eabi-ar", "x", "--output", tmp, src])
+    changed = []
+    for m in members:
+        obj = f"{tmp}/{m}"
+        ren = {}
+        for ln in ob.sh(["arm-none-eabi-objdump", "-t", "-C", obj]).splitlines():
+            if "\t" not in ln:
+                continue
+            left, right = ln.split("\t", 1)
+            sec, rest = left.split()[-1], right.split(None, 1)
+            if len(rest) == 2 and rest[1] in names and sec != "*UND*":
+                if not sec.startswith(".rodata."):
+                    sys.exit(f"{src}({m}): {rest[1]} is in {sec}, not a section of its own under .rodata")
+                ren[sec] = ".data." + sec[len(".rodata."):]
+                found.add(rest[1])
+        if ren:
+            ob.sh(["arm-none-eabi-objcopy"] + [a for o, n in sorted(ren.items())
+                                               for a in ("--rename-section", f"{o}={n},alloc,load,data,contents")] + [obj])
+            changed.append(obj)
+    if changed:
+        ob.sh(["arm-none-eabi-ar", "r", dst] + changed)
+    shutil.rmtree(tmp)
+    return found
+
+
+def ram_objects(board, objs, work, cfg, code, names, kind):
+    """The archives a configuration with its table in RAM links: copies with the table sections renamed."""
+    d = f"{work}/ram/{cfg}"
+    os.makedirs(d, exist_ok=True)
+    out = dict(objs)
+    found = ram_archive(objs["lib"], f"{d}/objs.a", names, f"{d}/lib")
+    if kind == "rust":
+        out["rust"] = f"{d}/libvl_crc_rust.a"
+        found |= ram_archive(objs["rust"], out["rust"], names, f"{d}/rust")
+    out["lib"] = f"{d}/objs.a"
+    missing = [n for n in names if n not in found]
+    if missing:
+        sys.exit(f"{board.name}: {cfg}: no object defines {', '.join(missing)} (ramtables.txt)")
     return out
 
 
@@ -216,7 +307,7 @@ def link_one(board, objs, j, work):
         sys.exit(f"{board.ld}: no FLASH region or no place for the fixed part")
     with open(f"{od}/slot.ld", "w") as fh:
         fh.write(ld)
-    ob.sh(["arm-none-eabi-gcc"] + cflags + [f"-DBENCH_CRC={j['adapter']}", f"-DBENCH_REF={ref_of(j['adapter'])}",
+    ob.sh(["arm-none-eabi-gcc"] + cflags + [f"-DBENCH_CRC={j.get('code', j['adapter'])}", f"-DBENCH_REF={ref_of(j['adapter'])}",
            f"-DBENCH_PLACE={j['place']}", f"-DBENCH_SHIFT={FAR}", "-c", f"{HERE}/main.c", "-o", f"{od}/main.o"])
     us = [f"-Wl,-u,{s}" for s in MEMSYMS + ["adapter_ref32", "adapter_ref16", "adapter_ref8"]]
     ob.sh(["arm-none-eabi-g++"] + board.arch.split() + [OPT, "-nostartfiles", "--specs=nano.specs",
@@ -275,16 +366,17 @@ def check(board, j, elf, syms, state):
         sys.exit(f"{elf}: the result block {res}, expected {4 * RESULT_WORDS} bytes at {board.rbase:#x}")
     # the adapter's functions before the gap: the words of its descriptor (crc.h crc_adapter) that point
     # to a function (init and crc; the streaming calls are NULL in these images)
-    desc = [(a, s) for a, s, t, n in syms if n == j["adapter"] and s]
+    code = j.get("code", j["adapter"])
+    desc = [(a, s) for a, s, t, n in syms if n == code and s]
     if len(desc) != 1:
-        sys.exit(f"{elf}: no descriptor {j['adapter']}")
+        sys.exit(f"{elf}: no descriptor {code}")
     w = words_of(elf, desc[0][0], desc[0][1] // 4)
     funcs_at = {a for a, s, t, n in syms if t in "tTwW"}
     if w is None:
-        sys.exit(f"{elf}: the descriptor {j['adapter']} is not in a loaded segment")
+        sys.exit(f"{elf}: the descriptor {code} is not in a loaded segment")
     fns = [x & ~1 for x in w if x & 1 and (x & ~1) in funcs_at]
     if not fns:
-        sys.exit(f"{elf}: the descriptor {j['adapter']} names no function")
+        sys.exit(f"{elf}: the descriptor {code} names no function")
     j["adapter_functions"] = len(fns)
     late = [f for f in fns if not start[0] <= f < near[0]]
     if late:
@@ -309,10 +401,31 @@ def check(board, j, elf, syms, state):
     j["far_code_bytes"] = (max(a + (s or 0) for a, s, t, n in syms if t in "tTwW" and a >= min(behind)) - min(behind)) if behind else 0
 
 
+def ram_check(board, j, elf):
+    """Every table symbol of a configuration of ramtables.txt lies in RAM, once."""
+    names = j.get("ram_tables")
+    if not names:
+        return
+    at = {}
+    for ln in ob.sh(["arm-none-eabi-nm", "-n", "-S", "-C", elf]).splitlines():
+        f = ln.split(None, 3)
+        if len(f) == 4 and f[3] in names:
+            at.setdefault(f[3], []).append(int(f[0], 16))
+    for n in names:
+        a = at.get(n, [])
+        if len(a) != 1 or not board.rbase <= a[0] < board.rbase + board.rlen:
+            sys.exit(f"{elf}: {n} at {[hex(x) for x in a]}, not once in RAM ({board.rbase:#x}, {board.rlen} bytes)")
+    j["ram_tables_at"] = {n: f"{at[n][0]:#010x}" for n in names}
+
+
 def build(board, jobs, out, work):
     objs = objects(board, work)
+    ram = {}
+    for j in jobs:
+        if "code" in j and j["adapter"] not in ram:
+            ram[j["adapter"]] = ram_objects(board, objs, work, j["adapter"], j["code"], j["ram_tables"], j["kind"])
     with ThreadPoolExecutor(max_workers=os.cpu_count() or 2) as pool:
-        elfs = list(pool.map(lambda j: link_one(board, objs, j, work), jobs))
+        elfs = list(pool.map(lambda j: link_one(board, ram.get(j["adapter"], objs), j, work), jobs))
     state = {}
     for j, src in zip(jobs, elfs):
         d = f"{out}/img/{j['adapter']}-p{j['place']}"
@@ -324,6 +437,7 @@ def build(board, jobs, out, work):
             sys.exit(f"{elf}: {len(img)} bytes, its slot has {j['slot_bytes']}")
         syms = ob.symbols(elf)
         check(board, j, elf, syms, state)
+        ram_check(board, j, elf)
         ob.sh(["sh", "-c", f"arm-none-eabi-nm -S --size-sort -C {elf} > {d}/nm.txt"])
         j.update(bytes=len(img), elf=elf, sha256=ob.sha256(open(elf, "rb").read()), image_sha256=ob.sha256(img))
     for a in sorted({j["adapter"] for j in jobs if j["place_slack"]}):
@@ -362,13 +476,27 @@ def main():
     work = os.path.join(KIND, "build/one", bname)
     shutil.rmtree(work, ignore_errors=True)
     os.makedirs(out, exist_ok=True)
-    configs = read_configs()
+    boards = read_boards()
+    rams = read_ramtables()
+    every = read_configs()
+    for a in list(boards) + list(rams):
+        if a not in {c[0] for c in every}:
+            sys.exit(f"{a} (boards.txt or ramtables.txt) is not in configs.txt")
+    for a, (code, _) in rams.items():
+        if code not in {c[0] for c in every} or code in rams:
+            sys.exit(f"ramtables.txt: {a}: {code} is not a configuration of its own in configs.txt")
+    configs = [c for c in every if on_board(c[0], bname, boards)]
     kinds = {a: k for a, k, _ in configs}
     names = {a: n for a, _, n in configs}
 
+    def ram_fields(j):
+        if j["adapter"] in rams:
+            j["code"], j["ram_tables"] = rams[j["adapter"]]
+        return j
+
     if mode == "sizes":
-        jobs = [{"adapter": a, "kind": k, "name": n, "place": SIZES_PLACE, "base": board.fbase + BOOT_LEN,
-                 "slot_bytes": min(board.flen, SEG) - BOOT_LEN} for a, k, n in configs]
+        jobs = [ram_fields({"adapter": a, "kind": k, "name": n, "place": SIZES_PLACE, "base": board.fbase + BOOT_LEN,
+                            "slot_bytes": min(board.flen, SEG) - BOOT_LEN}) for a, k, n in configs]
         info = build(board, jobs, f"{out}/sizes", work)
         with open(f"{out}/sizes.json", "w") as fh:
             json.dump({"board": bname, "flash_bytes": board.flen, "place": SIZES_PLACE, "far_bytes": FAR,
@@ -389,22 +517,24 @@ def main():
                     sys.exit(f"{layout}:{n}: four fields expected")
                 if f[0] not in kinds:
                     sys.exit(f"{layout}:{n}: {f[0]} is not in configs.txt")
-                jobs.append({"adapter": f[0], "kind": kinds[f[0]], "name": names[f[0]], "place": int(f[1]),
-                             "base": int(f[2], 0), "slot_bytes": int(f[3], 0)})
+                jobs.append(ram_fields({"adapter": f[0], "kind": kinds[f[0]], "name": names[f[0]], "place": int(f[1]),
+                                        "base": int(f[2], 0), "slot_bytes": int(f[3], 0)}))
         groups = {"bundle": jobs}
     else:
         numbered = {}
         for a, place, seg, off, length in read_slots():
-            if a not in kinds:
+            if a not in {c[0] for c in every}:
                 sys.exit(f"slots.txt: {a} is not in configs.txt")
+            if a not in kinds:
+                continue                       # a configuration of other boards (boards.txt)
             if off % UNIT or length % UNIT or off < BOOT_LEN or off + length > SEG:
                 sys.exit(f"slots.txt: {a} p{place}: not a slot on {UNIT}-byte boundaries behind the first "
                          f"{BOOT_LEN} bytes of a segment")
             b = seg // board.per_bundle
             if only is None or b in only:
-                numbered.setdefault(b, []).append(
+                numbered.setdefault(b, []).append(ram_fields(
                     {"adapter": a, "kind": kinds[a], "name": names[a], "place": place, "segment": seg, "offset": off,
-                     "base": board.fbase + (seg % board.per_bundle) * SEG + off, "slot_bytes": length})
+                     "base": board.fbase + (seg % board.per_bundle) * SEG + off, "slot_bytes": length}))
         if not numbered:
             sys.exit("no images in the slots asked for (crcslots.py assign first)")
         if only and set(only) - set(numbered):
