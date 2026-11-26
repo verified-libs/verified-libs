@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The second series of the CRC kind measured two things the first did not. One is the boards&#x27; CRC hardware, driven by our code: the STM32 CRC unit on the ...">
+<link rel="canonical" href="https://verified-libs.org/report-2026-11-25-crc-second-series.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CRC: the second board series (the boards&#x27; CRC hardware, tables in RAM) - verified-libs">
+<meta property="og:description" content="The second series of the CRC kind measured two things the first did not. One is the boards&#x27; CRC hardware, driven by our code: the STM32 CRC unit on the ...">
+<meta property="og:url" content="https://verified-libs.org/report-2026-11-25-crc-second-series.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>CRC: the second board series (the boards&#x27; CRC hardware, tables in RAM) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="crc-the-second-board-series-the-boards-crc-hardware-tables-in-ram">CRC: the second board series (the boards' CRC hardware, tables in RAM)</h1>
+<p>The second series of the CRC kind measured two things the first did not. One
+is <strong>the boards' CRC hardware, driven by our code</strong>: the STM32 CRC unit on the
+NUCLEO-G474RE, NUCLEO-G0B1RE and NUCLEO-H723ZG, and the RP2350's DMA sniffer
+on the Pico 2. The other is <strong>the fifteen configurations with a table in
+flash, with that table copied to RAM</strong> by the image at start. It was decided
+on 2026-11-25 (<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>, "A second CRC series"),
+planned and counted in
+<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-25-crc-hw-and-ram-series.md"><code>lab/plans/2026-11-25-crc-hw-and-ram-series.md</code></a>,
+and run on 2026-11-25 from 11:45 to 21:58 UTC. Every number below is computed
+from the records under <a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc"><code>records/crc</code></a>; every record was
+rebuilt from its commit and matched (<code>kinds/crc/bench/crcverify.sh</code>).</p>
+<h2 id="what-was-measured">What was measured</h2>
+<ul>
+<li><strong>18 new configurations</strong> (<code>kinds/crc/configs.txt</code>, after "# The second
+  series"):</li>
+<li><code>adapter_hw_crc32</code>, <code>adapter_hw_crc16</code> and <code>adapter_hw_crc8</code>
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>kinds/crc/adapter_hw.c</code></a>), built only for
+    the boards that have the unit (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/boards.txt"><code>kinds/crc/boards.txt</code></a>).
+    The RP2350's sniffer has no CRC-8 mode, and the SAM D20's DSU and the
+    nRF5340 are left out (the plan says why).</li>
+<li>Fifteen <code>*_ram</code> configurations, one per configuration whose table lies in
+    flash. The table's section is renamed from <code>.rodata.*</code> to <code>.data.*</code> in a
+    copy of the library's archive (<code>kinds/crc/bench/onecrc.py</code>,
+    <code>ram_archive</code>), so the image's start-up code copies it to RAM. The build
+    checks that every table symbol lies once in RAM
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/ramtables.txt"><code>kinds/crc/ramtables.txt</code></a>, <code>ram_check</code>).</li>
+<li><strong>The same method as the first series</strong>: 8 placements, 2 passes, 24
+  scenarios of 256 calls, the reference timed in the same image, the method
+  frozen at <code>crc-method-freeze</code> except the changes listed in the decision.</li>
+<li><strong>The 160 images per board of the first series</strong> rebuild byte for byte
+  from the second series' tree (<code>VL_TREE=1</code> crcverify, 20 of 20 per board),
+  so the first series' records stand beside the new ones.</li>
+</ul>
+<h2 id="the-series-per-board">The series, per board</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Commit</th>
+<th>Smoke + series runs</th>
+<th>Flash writes</th>
+<th>Disagreeing calls</th>
+<th>Retries</th>
+<th>Records (crcverify MATCH)</th>
+<th>Time (UTC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>04a2197</td>
+<td>32 + 288</td>
+<td>1 + 3</td>
+<td>0</td>
+<td>0</td>
+<td>18 (2 + 18)</td>
+<td>11:45–12:17</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE, table in RAM</td>
+<td>04a2197</td>
+<td>32 + 288</td>
+<td>1 + 3</td>
+<td>0</td>
+<td>1 + 1</td>
+<td>15 (15)</td>
+<td>12:19–13:18</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>04a2197</td>
+<td>16 + 240</td>
+<td>1 + 6</td>
+<td>0</td>
+<td>2 + 2</td>
+<td>15 (1 + 15)</td>
+<td>13:19–14:54</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE, hardware (rerun)</td>
+<td>40f1958</td>
+<td>16 + 48</td>
+<td>1 + 0</td>
+<td>0</td>
+<td>1 + 1</td>
+<td>3 (1 + 3)</td>
+<td>15:02–15:14</td>
+</tr>
+<tr>
+<td>Raspberry Pi Pico 2 H</td>
+<td>40f1958</td>
+<td>48 + 272</td>
+<td>1 + 1</td>
+<td>0</td>
+<td>3 + 3</td>
+<td>17 (3 + 17)</td>
+<td>16:14–20:01</td>
+</tr>
+<tr>
+<td>nRF5340 DK</td>
+<td>40f1958</td>
+<td>16 + 240</td>
+<td>1 + 1, and one erase</td>
+<td>0</td>
+<td>1 + 4</td>
+<td>15 (1 + 15)</td>
+<td>20:03–21:02</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG (rerun)</td>
+<td>40f1958</td>
+<td>16 + 288</td>
+<td>0 + 1</td>
+<td>0</td>
+<td>0 + 14</td>
+<td>18 (1 + 18)</td>
+<td>21:03–21:58</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Records:</strong> 101 in all.</li>
+<li>The records of 04a2197 (48) were made before the fix below. Their images
+    are byte-identical at 40f1958 (the 1768 images of all six boards
+    compared by SHA-256: only the 24 hardware images of the NUCLEO-G0B1RE
+    differ).</li>
+<li>They are taken by the export through the ledger
+    <a href="https://github.com/verified-libs/verified-libs/blob/main/records/rebuilt.json"><code>records/rebuilt.json</code></a>, with the 120 records
+    of the first series.</li>
+<li><strong>Flash writes:</strong> 23 and one erase, against 21 counted. The two more are
+  the two reruns.</li>
+<li><strong>Pico 2 writes:</strong> the bundles were written in parts of at most 250 units,
+  as in the first series.</li>
+</ul>
+<h2 id="the-two-reruns">The two reruns</h2>
+<p><strong>The NUCLEO-G0B1RE's hardware rows (a defect in our adapter).</strong>
+- <em>The first run</em> (04a2197) gave 25.5 cycles per byte with the cache on.
+  That is slower than several tables on the same board (crcany's
+  slicing by 4 with its table in RAM: 10.25), with errors 0: the values
+  were right, the time was not the unit's.
+- <em>The cause:</em> the adapter's word loop copies each word with
+  <code>__builtin_memcpy(&amp;w, p, 4)</code>. On the Cortex-M0+, which has no unaligned
+  loads, gcc -O2 could not assume <code>p</code> aligned (the loop aligns it first). So
+  it called newlib's <code>memcpy</code> for every word (<code>bl memcpy</code> in the image).
+- <em>The fix:</em> commit 40f1958 adds <code>__builtin_assume_aligned(p, 4)</code>. On the
+  M4 the code is the same as before.
+- <em>The rerun:</em> 2.00 cycles per byte with the cache on.
+- <em>The first run's files</em> are kept as superseded and make no record.
+- <em>A scan of every image of all six boards</em> (functions reachable from the
+  timed call, looking for library helpers) found no second case in our
+  code.</p>
+<p><strong>The NUCLEO-H723ZG (an option bit found set).</strong>
+- <em>What was found:</em> the board came back from other use with unknown
+  software on it. FLASH_OPTSR2_CUR read 0x00000004, that is CPUFREQ_BOOST =
+  1; its factory value is 0 (RM0468 Rev 3, table 18 "Option byte
+  organization"). The other option registers were at their factory values.
+  The first series recorded no option bytes, so it is not known whether
+  the bit was set then.
+- <em>The decision:</em> the owner decided that measurements made with wrong
+  settings are made again.
+- <em>Setting it back:</em> the bit was set back to 0 through the probe (RM0468
+  §4.4.3: unlock, OPTSR2_PRG = 0, OPTSTART, OPT_BUSY clear, OPTLOCK). Every
+  _CUR register was read before, after, and after a power cycle; RDP was
+  never written.
+- <em>The rerun with the bit at 0:</em> all 864 means (18 configurations, 24
+  scenarios, results and baseline) are identical to the run with the bit
+  at 1.
+- <em>What follows:</em> at the images' 64 MHz the bit changes no number. The
+  run with the bit set is kept as superseded and makes no record.</p>
+<h2 id="the-boards-that-came-back">The boards that came back</h2>
+<p>The NUCLEO-H723ZG, the Pico 2 and the nRF5340 DK had unknown software put
+on them while away. The series takes as ours only what it wrote. The
+first series' bundles on these three boards are treated as gone, which
+matters only for a rerun of the first series.</p>
+<ul>
+<li><strong>nRF5340 DK: locked, then erased.</strong></li>
+<li><em>What happened:</em> the first write found the application core's debug
+    port locked. probe-rs offered to erase the chip and was not allowed to.
+    The port stayed locked after a power cycle.</li>
+<li><em>Why it can lock:</em> the port opens only when UICR.APPROTECT is
+    Unprotected and firmware writes CTRL-AP.APPROTECT.DISABLE after each
+    reset (nRF5340 Product Specification v1.6, §8.2 "Access port
+    protection"). Our boot stub runs no image after a power-on, so nothing
+    opens it. Whether that or the other software locked this board is not
+    known.</li>
+<li><em>The erase:</em> one CTRL-AP ERASEALL of the application core
+    (<code>probe-rs ... --allow-erase-all</code>, one command). probe-rs then wrote
+    both UICR words to 0x50FA50FA itself.</li>
+<li><em>Then:</em> bundle 27 was written with no reset before it, and the first
+    image opened the port. UICR and the results block were read back
+    after the smoke.</li>
+<li><em>Not touched:</em> the network core. It is held in Force-OFF after every
+    application-core reset and our firmware never releases it (§4.10.7), so
+    it cannot run during a measurement.</li>
+<li><strong>NUCLEO-H723ZG:</strong></li>
+<li>the option bit above;</li>
+<li>the boot region read back as the build's <code>boot.bin</code>.</li>
+<li><strong>Pico 2: the OTP read back raw.</strong></li>
+<li>The critical flags, the boot configuration page and the boot keys are
+    all unprogrammed (0).</li>
+<li>Lock words are set only for pages 0, 1, 2, 62 and 63, the defaults of
+    a blank device (RP2350 datasheet RP-008373-DS-2, §13.4 and §13.5).</li>
+</ul>
+<h2 id="the-baseline-against-the-first-series">The baseline against the first series</h2>
+<p>The baseline (the bitwise reference, timed in every image) is the same
+code in both series. Its means in this series are identical to the first
+series' on every board, in all 72 scenarios (24 per CRC, three CRCs),
+to the third decimal. This holds also on the three boards that came back.</p>
+<h2 id="retries">Retries</h2>
+<p>A run whose image has not finished at the first look is repeated with
+twice the wait (<code>kinds/crc/bench/run-crc.py</code>). The wait is kept per
+configuration, so a retry comes at the first image of a configuration that
+a run reaches.</p>
+<ul>
+<li>Every retry of this series is of that kind: at p0, or at p4 where the
+  H723 rerun reached a configuration first in bundle 28.</li>
+<li>The H723's two series runs today had 14 each, 10 after 5 s and 4 after
+  10 s; the first series had 18 in 320 runs.</li>
+<li>The logs show which images were retried and after which wait. They do
+  not show why one configuration needs more than 5 s and another does not;
+  that is not explained here.</li>
+</ul>
+<h2 id="the-hardware-rows">The hardware rows</h2>
+<p>What a hardware row is:
+- The board's CRC unit, driven by our code
+  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>kinds/crc/adapter_hw.c</code></a>); not a library.
+- <strong>The STM32 unit:</strong> the clock is enabled once, then CR, POL and INIT are
+  set. The message is fed as bytes up to a word boundary, then words with
+  their bytes swapped, then the last bytes. For CRC-32 the unit has no
+  final XOR, so our code XORs the result with 0xFFFFFFFF.
+- <strong>The RP2350:</strong> a DMA transfer of the message to a dummy byte, with the
+  sniffer computing CRC-32 or CRC-16 on the way.</p>
+<p>Cycles, offset 0 unless named; each the range over the eight placements,
+first pass:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Unit</th>
+<th>CRC</th>
+<th>16 B on, offset 0 / 1</th>
+<th>per byte on</th>
+<th>16 B off, offset 0 / 1</th>
+<th>per byte off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raspberry Pi Pico 2 H</td>
+<td>DMA sniffer</td>
+<td>CRC-32/ISO-HDLC</td>
+<td>50–51 / 50–51</td>
+<td>1.25</td>
+<td>1081 / 1081</td>
+<td>1.18</td>
+</tr>
+<tr>
+<td>Raspberry Pi Pico 2 H</td>
+<td>DMA sniffer</td>
+<td>CRC-16/IBM-3740</td>
+<td>51–52 / 51–52</td>
+<td>1.25</td>
+<td>764–905 / 764–905</td>
+<td>1.38</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>CRC unit</td>
+<td>CRC-32/ISO-HDLC</td>
+<td>96 / 118</td>
+<td>2.25</td>
+<td>184–188 / 221–227</td>
+<td>4.25–4.50</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>CRC unit</td>
+<td>CRC-16/IBM-3740</td>
+<td>96 / 118</td>
+<td>2.25</td>
+<td>184–188 / 221–227</td>
+<td>4.25–4.50</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>CRC unit</td>
+<td>CRC-8/SMBUS</td>
+<td>96 / 118</td>
+<td>2.25</td>
+<td>184–188 / 221–227</td>
+<td>4.25–4.50</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>CRC unit</td>
+<td>CRC-32/ISO-HDLC</td>
+<td>55 / 71–72</td>
+<td>1.50</td>
+<td>130–218 / 146–289</td>
+<td>1.50–6.50</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>CRC unit</td>
+<td>CRC-16/IBM-3740</td>
+<td>55 / 71–72</td>
+<td>1.50</td>
+<td>130–218 / 146–289</td>
+<td>1.50–6.50</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>CRC unit</td>
+<td>CRC-8/SMBUS</td>
+<td>55 / 71–72</td>
+<td>1.50</td>
+<td>130–218 / 146–289</td>
+<td>1.50–6.50</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>CRC unit</td>
+<td>CRC-32/ISO-HDLC</td>
+<td>128 / 167–168</td>
+<td>2.00</td>
+<td>156–158 / 211–213</td>
+<td>3.00–3.50</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>CRC unit</td>
+<td>CRC-16/IBM-3740</td>
+<td>129 / 168–169</td>
+<td>2.00</td>
+<td>157–159 / 212–214</td>
+<td>3.00–3.50</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>CRC unit</td>
+<td>CRC-8/SMBUS</td>
+<td>128–131 / 167–171</td>
+<td>2.00</td>
+<td>157–159 / 212–214</td>
+<td>3.00–3.50</td>
+</tr>
+</tbody>
+</table></div>
+<p>What the rows show, as facts of these runs:</p>
+<ul>
+<li>With the cache on, the three CRCs cost the same on each STM32 board, at
+  2.25 (G474), 2.00 (G0B1) and 1.50 (H723) cycles per byte. The Pico 2's
+  sniffer costs 1.25.</li>
+<li><strong>Against the lowest library on the same board and CRC, cache on, per
+  byte:</strong></li>
+<li>Pico 2 CRC-32: 1.25 against 5.50 (crcany word, table in RAM).</li>
+<li>G474 CRC-32: 2.25 against 6.00 (the same).</li>
+<li>H723 CRC-32: 1.50 against 2.75 (crcany word).</li>
+<li>G0B1 CRC-32: 2.00 against 10.00–10.50 (crcany word, table in RAM).</li>
+<li><strong>With the cache off, on the H723,</strong> the unit's per-byte range
+  (1.50–6.50) overlaps the lowest CRC-8 library's (AceCRC with its table in
+  RAM, 5.00–25.00). By the overlap rule the two are not told apart there.</li>
+<li><strong>The Pico 2's cache-off rows</strong> cost 764–1081 cycles for 16 bytes, but
+  1.18–1.38 per byte. Where the fixed cost goes was not measured.</li>
+</ul>
+<h2 id="table-in-ram-against-table-in-flash">Table in RAM against table in flash</h2>
+<p>For each of the fifteen configurations, per byte at offset 0, the range
+over the eight placements (first pass). Under the owner's overlap rule
+(DECISIONS 2026-11-25), a difference is a difference only where the ranges
+do not overlap. "Same" means the ranges overlap. Three decimals are shown
+where two would hide a difference that the unrounded ranges show.</p>
+<h3 id="nrf5340-dk">nRF5340 DK</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Class</th>
+<th>per byte, cache on: flash / RAM</th>
+<th></th>
+<th>per byte, cache off: flash / RAM</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>etl crc32_t256 (C++)</td>
+<td>table of 256</td>
+<td>10.0000 / 10.0000</td>
+<td>RAM lower</td>
+<td>36.00–43.00 / 22.00–30.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_byte (C)</td>
+<td>table of 256</td>
+<td>10.0000 / 10.0000</td>
+<td>RAM lower</td>
+<td>36.00–43.00 / 22.00–30.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crc (Rust) Table&lt;1&gt;</td>
+<td>table of 256</td>
+<td>8.00 / 7.25</td>
+<td>RAM lower</td>
+<td>24.50–30.75 / 15.25–16.50</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc32_t16 (C++)</td>
+<td>table of 16</td>
+<td>17.00 / 16.00</td>
+<td>RAM lower</td>
+<td>64.00–70.00 / 35.00–41.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc32_ieee (C)</td>
+<td>table of 16</td>
+<td>17.00 / 17.00</td>
+<td>same</td>
+<td>57.00–71.00 / 35.00–42.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_word (C)</td>
+<td>slicing by 4</td>
+<td>6.04–6.05 / 5.50</td>
+<td>RAM lower</td>
+<td>24.50–26.25 / 13.00–14.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zlib crc32 (C)</td>
+<td>other: "braided" words</td>
+<td>8.63–8.65 / 7.98</td>
+<td>RAM lower</td>
+<td>26.72–29.19 / 15.71–16.48</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>11.00 / 11.00</td>
+<td>same</td>
+<td>37.00–45.00 / 24.00–30.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc16ibm_3740_byte (C)</td>
+<td>table of 256</td>
+<td>10.00 / 10.00</td>
+<td>same</td>
+<td>38.00–45.00 / 22.00–31.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>17.00 / 17.00</td>
+<td>same</td>
+<td>65.00–72.00 / 41.00–44.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>7.00 / 6.00</td>
+<td>RAM lower</td>
+<td>21.00–27.00 / 6.00–19.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc8smbus_byte (C)</td>
+<td>table of 256</td>
+<td>8.00 / 7.00</td>
+<td>RAM lower</td>
+<td>27.00–29.00 / 19.00–21.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>acecrc crc8_byte (C++)</td>
+<td>table of 256</td>
+<td>7.00 / 6.00</td>
+<td>RAM lower</td>
+<td>21.00–27.00 / 6.00–19.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>17.00 / 17.00</td>
+<td>same</td>
+<td>57.00–69.00 / 33.00–43.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc8_ccitt (C)</td>
+<td>table of 16</td>
+<td>16.00 / 16.00</td>
+<td>same</td>
+<td>54.00–69.00 / 33.00–41.00</td>
+<td>RAM lower</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="raspberry-pi-pico-2-h">Raspberry Pi Pico 2 H</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Class</th>
+<th>per byte, cache on: flash / RAM</th>
+<th></th>
+<th>per byte, cache off: flash / RAM</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>etl crc32_t256 (C++)</td>
+<td>table of 256</td>
+<td>10.00 / 10.00</td>
+<td>same</td>
+<td>424.95–425.48 / 259.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_byte (C)</td>
+<td>table of 256</td>
+<td>10.00 / 10.00</td>
+<td>same</td>
+<td>425.03–425.51 / 259.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crc (Rust) Table&lt;1&gt;</td>
+<td>table of 256</td>
+<td>7.37–7.38 / 7.25</td>
+<td>RAM lower</td>
+<td>318.45–318.49 / 152.50</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc32_t16 (C++)</td>
+<td>table of 16</td>
+<td>16.48–16.52 / 16.00</td>
+<td>RAM lower</td>
+<td>725.46–725.51 / 394.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc32_ieee (C)</td>
+<td>table of 16</td>
+<td>17.00 / 17.00</td>
+<td>same</td>
+<td>725.96–725.98 / 394.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_word (C)</td>
+<td>slicing by 4</td>
+<td>5.69–5.70 / 5.50</td>
+<td>RAM lower</td>
+<td>293.30–293.72 / 132.25</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zlib crc32 (C)</td>
+<td>other: "braided" words</td>
+<td>6.69 / 6.56</td>
+<td>RAM lower</td>
+<td>321.84–326.74 / 163.31</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>11.00 / 11.00</td>
+<td>same</td>
+<td>439.51–439.99 / 286.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc16ibm_3740_byte (C)</td>
+<td>table of 256</td>
+<td>10.00 / 10.00</td>
+<td>same</td>
+<td>439.98–440.51 / 286.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>17.00 / 17.00</td>
+<td>same</td>
+<td>729.03–729.99 / 421.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>6.50 / 6.00</td>
+<td>RAM lower</td>
+<td>256.00–290.16 / 178.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc8smbus_byte (C)</td>
+<td>table of 256</td>
+<td>7.50 / 7.00</td>
+<td>RAM lower</td>
+<td>317.15–353.00 / 205.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>acecrc crc8_byte (C++)</td>
+<td>table of 256</td>
+<td>6.50 / 6.00</td>
+<td>RAM lower</td>
+<td>256.00–290.16 / 178.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>17.00 / 17.00</td>
+<td>same</td>
+<td>662.97–663.01 / 367.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc8_ccitt (C)</td>
+<td>table of 16</td>
+<td>16.00 / 16.00</td>
+<td>same</td>
+<td>636.00–636.02 / 340.00</td>
+<td>RAM lower</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="nucleo-g474re">NUCLEO-G474RE</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Class</th>
+<th>per byte, cache on: flash / RAM</th>
+<th></th>
+<th>per byte, cache off: flash / RAM</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>etl crc32_t256 (C++)</td>
+<td>table of 256</td>
+<td>14.70–14.72 / 11.00</td>
+<td>RAM lower</td>
+<td>26.97–28.95 / 23.00–24.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_byte (C)</td>
+<td>table of 256</td>
+<td>14.70–14.72 / 11.00</td>
+<td>RAM lower</td>
+<td>26.96–28.96 / 23.00–24.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crc (Rust) Table&lt;1&gt;</td>
+<td>table of 256</td>
+<td>13.20–13.22 / 9.00</td>
+<td>RAM lower</td>
+<td>19.46–22.19 / 15.25–16.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc32_t16 (C++)</td>
+<td>table of 16</td>
+<td>17.00 / 17.00</td>
+<td>same</td>
+<td>45.24–46.40 / 35.00–40.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc32_ieee (C)</td>
+<td>table of 16</td>
+<td>17.00 / 17.00</td>
+<td>same</td>
+<td>45.72–47.01 / 37.00–40.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_word (C)</td>
+<td>slicing by 4</td>
+<td>9.94–9.95 / 6.00</td>
+<td>RAM lower</td>
+<td>18.00–19.75 / 13.25–14.50</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zlib crc32 (C)</td>
+<td>other: "braided" words</td>
+<td>12.11–12.16 / 8.56–8.58</td>
+<td>RAM lower</td>
+<td>20.45–21.28 / 15.73–16.07</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>15.23–15.30 / 12.00</td>
+<td>RAM lower</td>
+<td>30.89–32.91 / 25.00–28.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc16ibm_3740_byte (C)</td>
+<td>table of 256</td>
+<td>14.23–14.30 / 11.00</td>
+<td>RAM lower</td>
+<td>27.91–33.89 / 23.00–28.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>19.00 / 19.00</td>
+<td>same</td>
+<td>48.71–49.47 / 41.00–42.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>8.00–9.45 / 8.00</td>
+<td>RAM lower</td>
+<td>20.81–21.84 / 16.00–17.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc8smbus_byte (C)</td>
+<td>table of 256</td>
+<td>8.00–8.98 / 8.00</td>
+<td>RAM lower</td>
+<td>20.88–21.84 / 17.00–18.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>acecrc crc8_byte (C++)</td>
+<td>table of 256</td>
+<td>8.00–9.96 / 8.00</td>
+<td>RAM lower</td>
+<td>20.81–21.84 / 16.00–17.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>19.00 / 19.00</td>
+<td>same</td>
+<td>40.92–41.28 / 35.00–36.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc8_ccitt (C)</td>
+<td>table of 16</td>
+<td>18.00 / 18.00</td>
+<td>same</td>
+<td>35.28–38.95 / 29.00–34.00</td>
+<td>RAM lower</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="nucleo-h723zg">NUCLEO-H723ZG</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Class</th>
+<th>per byte, cache on: flash / RAM</th>
+<th></th>
+<th>per byte, cache off: flash / RAM</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>etl crc32_t256 (C++)</td>
+<td>table of 256</td>
+<td>8.00 / 8.00</td>
+<td>same</td>
+<td>18.77–34.00 / 8.00–27.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_byte (C)</td>
+<td>table of 256</td>
+<td>8.00 / 8.00</td>
+<td>same</td>
+<td>18.77–34.00 / 8.00–27.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>crc (Rust) Table&lt;1&gt;</td>
+<td>table of 256</td>
+<td>6.75 / 6.75</td>
+<td>same</td>
+<td>19.20–23.70 / 10.25–13.25</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc32_t16 (C++)</td>
+<td>table of 16</td>
+<td>14.00 / 14.00</td>
+<td>same</td>
+<td>40.00–54.00 / 25.00–39.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc32_ieee (C)</td>
+<td>table of 16</td>
+<td>14.00 / 14.00</td>
+<td>same</td>
+<td>39.99–54.00 / 26.00–39.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_word (C)</td>
+<td>slicing by 4</td>
+<td>2.75 / 2.75</td>
+<td>same</td>
+<td>18.37–19.75 / 7.25–10.50</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zlib crc32 (C)</td>
+<td>other: "braided" words</td>
+<td>4.93 / 4.93</td>
+<td>same</td>
+<td>20.32–22.32 / 10.00–12.07</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>7.00 / 7.00</td>
+<td>same</td>
+<td>17.53–34.00 / 7.00–27.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>crcany crc16ibm_3740_byte (C)</td>
+<td>table of 256</td>
+<td>7.00 / 7.00</td>
+<td>same</td>
+<td>17.58–34.00 / 7.00–27.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>14.00 / 14.00</td>
+<td>same</td>
+<td>40.00–54.00 / 27.00–40.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>5.00 / 5.00</td>
+<td>same</td>
+<td>15.04–34.00 / 5.00–25.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>crcany crc8smbus_byte (C)</td>
+<td>table of 256</td>
+<td>5.00 / 5.00</td>
+<td>same</td>
+<td>15.08–34.00 / 5.00–26.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>acecrc crc8_byte (C++)</td>
+<td>table of 256</td>
+<td>5.00 / 5.00</td>
+<td>same</td>
+<td>15.04–34.00 / 5.00–25.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>14.00 / 14.00</td>
+<td>same</td>
+<td>40.00–54.00 / 26.00–39.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc8_ccitt (C)</td>
+<td>table of 16</td>
+<td>13.00 / 13.00</td>
+<td>same</td>
+<td>40.00–54.00 / 26.00–39.00</td>
+<td>RAM lower</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="nucleo-g0b1re">NUCLEO-G0B1RE</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Class</th>
+<th>per byte, cache on: flash / RAM</th>
+<th></th>
+<th>per byte, cache off: flash / RAM</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>etl crc32_t256 (C++)</td>
+<td>table of 256</td>
+<td>15.00 / 13.00</td>
+<td>RAM lower</td>
+<td>21.00–25.00 / 19.00–21.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_byte (C)</td>
+<td>table of 256</td>
+<td>15.00 / 13.00</td>
+<td>RAM lower</td>
+<td>21.00–25.00 / 19.00–21.00</td>
+<td>same</td>
+</tr>
+<tr>
+<td>crc (Rust) Table&lt;1&gt;</td>
+<td>table of 256</td>
+<td>13.75–14.25 / 11.00–11.25</td>
+<td>RAM lower</td>
+<td>17.75 / 14.75</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc32_t16 (C++)</td>
+<td>table of 16</td>
+<td>27.00–30.00 / 23.00–24.00</td>
+<td>RAM lower</td>
+<td>37.00 / 31.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc32_ieee (C)</td>
+<td>table of 16</td>
+<td>28.00–33.00 / 23.00–27.00</td>
+<td>RAM lower</td>
+<td>37.00–39.00 / 31.00–33.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_word (C)</td>
+<td>slicing by 4</td>
+<td>12.50–13.50 / 10.00–10.50</td>
+<td>RAM lower</td>
+<td>16.50–17.00 / 14.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zlib crc32 (C)</td>
+<td>other: "braided" words</td>
+<td>16.13–16.94 / 13.63–14.14</td>
+<td>RAM lower</td>
+<td>21.48–22.38 / 18.78–19.08</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>16.00 / 14.00</td>
+<td>RAM lower</td>
+<td>24.00–26.00 / 22.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc16ibm_3740_byte (C)</td>
+<td>table of 256</td>
+<td>16.00 / 14.00</td>
+<td>RAM lower</td>
+<td>24.00–26.00 / 22.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>32.00 / 26.00–28.00</td>
+<td>RAM lower</td>
+<td>40.00–44.00 / 36.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>11.00 / 9.00</td>
+<td>RAM lower</td>
+<td>17.00 / 13.00–15.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc8smbus_byte (C)</td>
+<td>table of 256</td>
+<td>11.00 / 9.00</td>
+<td>RAM lower</td>
+<td>17.00 / 13.00–15.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>acecrc crc8_byte (C++)</td>
+<td>table of 256</td>
+<td>11.00 / 9.00</td>
+<td>RAM lower</td>
+<td>17.00 / 13.00–15.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>27.00–31.00 / 23.00–24.00</td>
+<td>RAM lower</td>
+<td>35.00–39.00 / 31.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc8_ccitt (C)</td>
+<td>table of 16</td>
+<td>26.00–27.00 / 21.00–23.00</td>
+<td>RAM lower</td>
+<td>33.00–37.00 / 29.00</td>
+<td>RAM lower</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sam-d20-xplained-pro">SAM D20 Xplained Pro</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Class</th>
+<th>per byte, cache on: flash / RAM</th>
+<th></th>
+<th>per byte, cache off: flash / RAM</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>etl crc32_t256 (C++)</td>
+<td>table of 256</td>
+<td>15.32–15.59 / 13.00</td>
+<td>RAM lower</td>
+<td>20.00 / 19.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_byte (C)</td>
+<td>table of 256</td>
+<td>14.31–14.58 / 13.00</td>
+<td>RAM lower</td>
+<td>20.00 / 19.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crc (Rust) Table&lt;1&gt;</td>
+<td>table of 256</td>
+<td>12.66–12.87 / 10.75–11.00</td>
+<td>RAM lower</td>
+<td>15.50 / 14.50</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc32_t16 (C++)</td>
+<td>table of 16</td>
+<td>23.38 / 21.00</td>
+<td>RAM lower</td>
+<td>32.00 / 30.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc32_ieee (C)</td>
+<td>table of 16</td>
+<td>24.51–25.64 / 21.00</td>
+<td>RAM lower</td>
+<td>33.00 / 31.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc32iso_hdlc_word (C)</td>
+<td>slicing by 4</td>
+<td>11.91–12.12 / 10.00–10.25</td>
+<td>RAM lower</td>
+<td>14.75 / 13.75</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zlib crc32 (C)</td>
+<td>other: "braided" words</td>
+<td>17.56–17.70 / 15.75–15.89</td>
+<td>RAM lower</td>
+<td>19.77 / 18.77</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>16.49–16.50 / 14.00</td>
+<td>RAM lower</td>
+<td>22.00 / 21.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc16ibm_3740_byte (C)</td>
+<td>table of 256</td>
+<td>15.56 / 14.00</td>
+<td>RAM lower</td>
+<td>22.00 / 21.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc16_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>26.65–27.80 / 24.00</td>
+<td>RAM lower</td>
+<td>37.00 / 35.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t256 (C++)</td>
+<td>table of 256</td>
+<td>10.87–11.12 / 9.00</td>
+<td>RAM lower</td>
+<td>14.00 / 13.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>crcany crc8smbus_byte (C)</td>
+<td>table of 256</td>
+<td>10.86–11.14 / 9.00</td>
+<td>RAM lower</td>
+<td>14.00 / 13.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>acecrc crc8_byte (C++)</td>
+<td>table of 256</td>
+<td>10.89–11.13 / 9.00</td>
+<td>RAM lower</td>
+<td>14.00 / 13.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>etl crc8_ccitt_t16 (C++)</td>
+<td>table of 16</td>
+<td>24.94–25.10 / 21.00</td>
+<td>RAM lower</td>
+<td>32.00 / 30.00</td>
+<td>RAM lower</td>
+</tr>
+<tr>
+<td>zephyr crc8_ccitt (C)</td>
+<td>table of 16</td>
+<td>22.74–23.12 / 19.00</td>
+<td>RAM lower</td>
+<td>30.00 / 28.00</td>
+<td>RAM lower</td>
+</tr>
+</tbody>
+</table></div>
+<p>What the tables show, as facts of these runs:</p>
+<ul>
+<li><strong>With the cache off,</strong> the table in RAM is lower on 79 of the 90
+  board-and-configuration pairs. The other 11 are the same (overlapping
+  ranges): 8 on the H723, whose cache-off ranges are wide, 2 on the G0B1
+  and 1 on the G474.</li>
+<li><strong>With the cache on,</strong> it differs by board:</li>
+<li>NUCLEO-G0B1RE and SAM D20: lower in all 15.</li>
+<li>NUCLEO-G474RE: lower in 10, the same in 5 (the tables of 16).</li>
+<li>nRF5340: lower in 9, the same in 6.</li>
+<li>Pico 2: lower in 7, the same in 8.</li>
+<li>NUCLEO-H723ZG: the same in all 15.</li>
+<li><strong>No configuration is higher with its table in RAM,</strong> on any board, with
+  the cache on or off.</li>
+<li><strong>Bytes:</strong> a table copied to RAM still costs its bytes in flash (the
+  initial values the start-up code copies) and the same number of bytes
+  of RAM. The code is the library's own, unchanged.</li>
+</ul>
+<h2 id="zlibs-division-on-the-cortex-m0-boards">zlib's division on the Cortex-M0+ boards</h2>
+<p>zlib's <code>crc32_z</code> divides once per call, before its braided loop:
+<code>blks = len / (N * W)</code> (<code>crc32.c</code> line 653, zlib v1.4). On the Cortex-M0+
+(NUCLEO-G0B1RE, SAM D20), which has no divide instruction, gcc calls
+libgcc's <code>__aeabi_uidivmod</code> / <code>__udivsi3</code> for it. This holds in both zlib
+configurations, in flash and in RAM.</p>
+<p>So zlib's rows on those two boards include one library division per
+call. That is what a zlib user on these cores gets, not a fault of the
+method. The scan above found no other helper call in any timed function.</p>
+<h2 id="what-is-not-explained">What is not explained</h2>
+<ul>
+<li>Why a configuration needs more than the first wait of 5 s at its first
+  image (the retries above).</li>
+<li><strong>The NUCLEO-H723ZG with the cache off:</strong></li>
+<li>its per-byte ranges are wide for the tables in RAM as for those in
+    flash (e.g. ETL's table of 256 for CRC-8: 15.04–34.00 in flash, 5.00–25.00 in
+    RAM);</li>
+<li>with the cache on, the RAM and flash rows are the same.</li>
+<li>The board's data cache and its 7 flash wait states at 64 MHz (see the
+    method) fit both, but neither was measured.</li>
+<li><strong>The Pico 2's hardware rows</strong> with the cache off: the fixed cost of a
+  16-byte call (764–1081 cycles) against 1.18–1.38 per byte.</li>
+<li><strong>The G474's tables of 16:</strong> they are the same in RAM and flash with the
+  cache on, while its tables of 256 are lower in RAM.</li>
+</ul>
+<h2 id="decided-by-the-owner-2026-11-26">Decided by the owner (2026-11-26)</h2>
+<ol>
+<li><strong>The reproduce page</strong> says that on the nRF5340 DK our boot stub does
+   not open the debug port, so after any power-on the board stays locked
+   (nRF5340 PS v1.6, §8.2), and how we recovered it with probe-rs 0.32.0
+   (<a href="reproduce.html"><code>reproduce.md</code></a>, "Run it on your own
+   board").</li>
+<li><strong>For the next method version</strong>, on the list
+   <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-26-next-method-version.md"><code>lab/plans/2026-11-26-next-method-version.md</code></a>:</li>
+<li>the nRF5340 boot stub copies UICR into CTRL-AP at every boot, so a
+     power-on leaves the port open;</li>
+<li>the option registers of every board are read and recorded with each
+     series.</li>
+<li><strong>The board's CRC unit on the pages</strong> is a row of the same table as the
+   libraries, labelled, and scored like any row (DECISIONS.md, the
+   2026-11-25 entry's change of 2026-11-26).</li>
+</ol></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</body></html>

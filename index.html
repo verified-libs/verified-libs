@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation in software, for microcontrollers on six boards, every number with its record and source.">
+<meta name="description" content="An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation (libraries that compute a CRC in software and, on the boards that have one, the board&#x27;s CRC unit beside them), for microcontrollers on six boards, every number with its record and source.">
 <link rel="canonical" href="https://verified-libs.org/">
 <meta property="og:site_name" content="verified-libs">
 <meta property="og:type" content="website">
 <meta property="og:title" content="verified-libs: libraries tested on real hardware: embedded ring buffers and CRC">
-<meta property="og:description" content="An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation in software, for microcontrollers on six boards, every number with its record and source.">
+<meta property="og:description" content="An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation (libraries that compute a CRC in software and, on the boards that have one, the board&#x27;s CRC unit beside them), for microcontrollers on six boards, every number with its record and source.">
 <meta property="og:url" content="https://verified-libs.org/">
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "verified-libs", "url": "https://verified-libs.org/"}</script>
@@ -53,14 +53,15 @@ can be reproduced from the repository.</p>
 <ul>
 <li><strong>Embedded ring buffers</strong>: interrupt or DMA to main loop on Cortex-M, in
   C, C++ and Rust.</li>
-<li><strong>CRC calculation in software</strong>: CRC-32, CRC-16 and CRC-8 on Cortex-M, in
-  C, C++ and Rust.</li>
+<li><strong>CRC calculation</strong>: CRC-32, CRC-16 and CRC-8 on Cortex-M, by libraries
+  in C, C++ and Rust that compute it in software and, on the boards that
+  have one, by the board's CRC unit beside them.</li>
 </ul>
 <p><em>Run by AI, with a human who is accountable.</em></p>
 <h2 id="what-you-find-here">What you find here</h2>
 <ul>
 <li><strong><a href="kinds.html">Results</a></strong>: the results of both kinds, embedded ring
-  buffers and CRC calculation in software, each with the exact versions,
+  buffers and CRC calculation, each with the exact versions,
   compiler flags and boards.</li>
 <li><strong>Method</strong>: how each number is produced, and the rules that decide
   whether a run counts: <a href="method.html">ring buffers</a>, <a href="method-crc.html">CRC</a>.</li>

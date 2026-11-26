@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="The kinds of library tested so far, embedded ring buffers and CRC calculation in software: what is measured, how many libraries and boards, and where the results, method and records are.">
+<meta name="description" content="The kinds of library tested so far, embedded ring buffers and CRC calculation: what is measured, how many libraries and boards, and where the results, method and records are.">
 <link rel="canonical" href="https://verified-libs.org/kinds.html">
 <meta property="og:site_name" content="verified-libs">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Results - verified-libs">
-<meta property="og:description" content="The kinds of library tested so far, embedded ring buffers and CRC calculation in software: what is measured, how many libraries and boards, and where the results, method and records are.">
+<meta property="og:description" content="The kinds of library tested so far, embedded ring buffers and CRC calculation: what is measured, how many libraries and boards, and where the results, method and records are.">
 <meta property="og:url" content="https://verified-libs.org/kinds.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -60,13 +60,15 @@ The kinds are in the order they were added.</p>
 <li><strong>Records:</strong> <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/</code></a></li>
 <li><strong>How to repeat:</strong> <a href="reproduce.html">Reproduce</a></li>
 </ul>
-<h2 id="crc-calculation-in-software">CRC calculation in software</h2>
+<h2 id="crc-calculation">CRC calculation</h2>
 <ul>
 <li><strong>What is measured:</strong> cycles of one call that computes a CRC, for messages
   of 1 to 1024 bytes, with the cache off and on, and the bytes of flash and
-  RAM a configuration takes; every call's result is checked against a
-  reference.</li>
-<li><strong>Libraries:</strong> 8, in 20 configurations, for 3 CRCs.</li>
+  RAM it takes; by libraries that compute the CRC in software and, on the
+  boards that have one, by the board's CRC unit as a row beside them. Every
+  call's result is checked against a reference.</li>
+<li><strong>Libraries:</strong> 8, in 35 configurations, for 3 CRCs.</li>
+<li><strong>The board's CRC unit:</strong> on 4 boards, driven by our code (not a library), a row beside the libraries.</li>
 <li><strong>Boards:</strong> 6.</li>
 <li><strong>Results:</strong> <a href="results-crc.html">results page</a></li>
 <li><strong>Method:</strong> <a href="method-crc.html">method page</a></li>

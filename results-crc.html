@@ -1,16 +1,16 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Results for CRC libraries in software on six microcontroller boards: cycles for a short message and per byte, cache on and off, flash and RAM bytes, each with its record.">
+<meta name="description" content="Results for CRC calculation on six microcontroller boards, by libraries that compute a CRC in software and, on four boards, the board&#x27;s CRC unit beside them: cycles for a short message and per byte, cache on and off, flash and RAM bytes, each with its record.">
 <link rel="canonical" href="https://verified-libs.org/results-crc.html">
 <meta property="og:site_name" content="verified-libs">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Results: CRC in software - verified-libs">
-<meta property="og:description" content="Results for CRC libraries in software on six microcontroller boards: cycles for a short message and per byte, cache on and off, flash and RAM bytes, each with its record.">
+<meta property="og:title" content="Results: CRC calculation - verified-libs">
+<meta property="og:description" content="Results for CRC calculation on six microcontroller boards, by libraries that compute a CRC in software and, on four boards, the board&#x27;s CRC unit beside them: cycles for a short message and per byte, cache on and off, flash and RAM bytes, each with its record.">
 <meta property="og:url" content="https://verified-libs.org/results-crc.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<title>Results: CRC in software - verified-libs</title><style>
+<title>Results: CRC calculation - verified-libs</title><style>
 :root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
 @media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
@@ -43,25 +43,34 @@ tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:
 p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
 </style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html" class=on>Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
-<main><h1 id="results-crc-in-software">Results: CRC in software</h1>
+<main><h1 id="results-crc-calculation">Results: CRC calculation</h1>
 <p>The results of one of the two kinds of library so far; the other is embedded
 ring buffers (<a href="kinds.html">all kinds</a>, <a href="results.html">ring buffer results</a>).
 The same numbers by CRC, board, message and cache, with every length and both
 starts: <a href="compare-crc.html">Compare</a>.</p>
 <blockquote>
-<p><strong>Status: the kind's first board series.</strong> Every number comes from a
+<p><strong>Status: the kind's first and second board series.</strong> Every number comes from a
 record under <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/crc</code></a> that can be rebuilt
 and repeated from this repository (<a href="reproduce.html">how</a>). Numbers are
 facts about the pinned versions, the configuration and the board below,
 not general rankings.</p>
 </blockquote>
-<p>Twenty configurations of eight libraries, for three CRCs of the
+<p>Thirty-five configurations of eight libraries, for three CRCs of the
 <a href="https://reveng.sourceforge.io/crc-catalogue/all.htm">CRC RevEng catalogue</a>
-(CRC-32/ISO-HDLC, CRC-16/IBM-3740, CRC-8/SMBUS), on six boards. Every
-configuration was checked against a reference before it was timed, and
-every timed call's result was compared with the reference's on the board
-(<a href="method-crc.html">method</a>). The series: commit <code>6301058</code>, 2026-11-24 to
-2026-11-25, two passes (<a href="report-2026-11-25-crc-first-series.html">report</a>).
+(CRC-32/ISO-HDLC, CRC-16/IBM-3740, CRC-8/SMBUS), on six boards. Twenty are
+the libraries as they ship. Fifteen are those of them whose table lies in
+flash, with the table copied to RAM by the image at start ("table in RAM").
+The last row of a table, on the four boards that have one, is the board's
+CRC unit, driven by our code; it is not a library, and its name cell says
+so.</p>
+<p>Every configuration was checked against a reference before it was timed,
+and every timed call's result was compared with the reference's on the
+board (<a href="method-crc.html">method</a>). Two series, two passes each:
+- the first, commit <code>6301058</code>, 2026-11-24 to 2026-11-25
+  (<a href="report-2026-11-25-crc-first-series.html">report</a>);
+- the second (tables in RAM and the boards' CRC units), commits <code>04a2197</code>
+  and <code>40f1958</code>, 2026-11-25
+  (<a href="report-2026-11-25-crc-second-series.html">report</a>).
 Compiler: arm-none-eabi-gcc 14.2.1, <code>-O2 -DNDEBUG</code>, newlib-nano; the Rust
 crate with rustc 1.99.1 at the same optimisation level; pinned <a href="https://github.com/verified-libs/verified-libs/blob/main/toolchain/README.md">toolchain image</a>. The
 libraries are fetched at the commits in
@@ -77,7 +86,18 @@ ranking. Each configuration's name links to its record.</p>
   (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 2 of the kind's README</a>).</li>
 <li><strong>Flash bytes</strong>: the table in flash and the code at <code>-O2</code> for the
   board's core; <strong>RAM bytes</strong>: the table in RAM
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 4 of the kind's README</a>).</li>
+  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 4 of the kind's README</a>). A table
+  "RAM (copied at start by the image)" counts in both: its bytes stay in
+  flash as the values the start-up code copies
+  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 11</a>). libcrc and CRC++ build their
+  tables in RAM themselves, at run time.</li>
+<li><strong>The board's CRC unit</strong>, the last row where the board has one,
+  labelled "the board's CRC unit, driven by our code; not a library": the
+  STM32 CRC unit or the RP2350's DMA sniffer, driven by our code
+  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>adapter_hw.c</code></a>). Its class is "hardware
+  unit" and it has no table. Its bytes are those of our adapter code, read
+  from the board images. On the Pico 2 the unit is a DMA transfer that the
+  CPU waits for; for CRC-32 on the STM32 unit the final XOR is in our code.</li>
 <li><strong>16 B</strong>: cycles of one call on a message of 16 bytes at an 8-byte
   boundary, the mean of 256 calls.</li>
 <li><strong>per byte</strong>: (mean at 1024 bytes − mean at 256 bytes) / 768, at an
@@ -194,6 +214,69 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">1033</td>
 <td style="text-align: right;">61.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">174</td>
+<td style="text-align: right;">10.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4168</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">206</td>
+<td style="text-align: right;">10.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1250</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">7.2</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">278</td>
+<td style="text-align: right;">16.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">152</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">308</td>
+<td style="text-align: right;">17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4296</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">185</td>
+<td style="text-align: right;">5.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">5824</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">194</td>
+<td style="text-align: right;">8.0</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-32iso-hdlc-nrf5340-dk-cache-off">CRC-32/ISO-HDLC, nRF5340 DK, cache off</h3>
@@ -292,6 +375,69 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">2758–3734</td>
 <td style="text-align: right;">164.0–226.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">397–514</td>
+<td style="text-align: right;">22.0–30.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4168</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">471–583</td>
+<td style="text-align: right;">22.0–30.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1250</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">376–387</td>
+<td style="text-align: right;">15.2–16.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">615–707</td>
+<td style="text-align: right;">35.0–41.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">152</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">654–772</td>
+<td style="text-align: right;">35.0–42.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4296</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">396–434</td>
+<td style="text-align: right;">13.0–14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">5824</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">385–415</td>
+<td style="text-align: right;">15.7–16.5</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-16ibm-3740-nrf5340-dk-cache-on">CRC-16/IBM-3740, nRF5340 DK, cache on</h3>
@@ -362,6 +508,33 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">265</td>
 <td style="text-align: right;">15.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">11.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">594</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">218</td>
+<td style="text-align: right;">10.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">294</td>
+<td style="text-align: right;">17.0</td>
 </tr>
 </tbody>
 </table></div>
@@ -434,6 +607,33 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">598–714</td>
 <td style="text-align: right;">34.0–41.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">432–523</td>
+<td style="text-align: right;">24.0–30.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">594</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">481–630</td>
+<td style="text-align: right;">22.0–31.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">699–760</td>
+<td style="text-align: right;">41.0–44.0</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-nrf5340-dk-cache-on">CRC-8/SMBUS, nRF5340 DK, cache on</h3>
@@ -493,6 +693,51 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">92</td>
 <td style="text-align: right;">0</td>
+<td style="text-align: right;">293</td>
+<td style="text-align: right;">16.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">6.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1090</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">168</td>
+<td style="text-align: right;">7.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">129</td>
+<td style="text-align: right;">6.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">288</td>
+<td style="text-align: right;">17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">16</td>
 <td style="text-align: right;">293</td>
 <td style="text-align: right;">16.0</td>
 </tr>
@@ -557,6 +802,51 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">946–1182</td>
 <td style="text-align: right;">54.0–69.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">151–347</td>
+<td style="text-align: right;">6.0–19.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1090</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">430–463</td>
+<td style="text-align: right;">19.0–21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">185–380</td>
+<td style="text-align: right;">6.0–19.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">576–735</td>
+<td style="text-align: right;">33.0–43.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/nrf5340/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">610–734</td>
+<td style="text-align: right;">33.0–41.0</td>
 </tr>
 </tbody>
 </table></div>
@@ -658,6 +948,78 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">1012</td>
 <td style="text-align: right;">61.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">168</td>
+<td style="text-align: right;">10.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4168</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">10.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1250</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">156</td>
+<td style="text-align: right;">7.2</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">269</td>
+<td style="text-align: right;">16.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">152</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4296</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">145–146</td>
+<td style="text-align: right;">5.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">5824</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">162</td>
+<td style="text-align: right;">6.6</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">50–51</td>
+<td style="text-align: right;">1.2</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-32iso-hdlc-raspberry-pi-pico-2-h-cache-off">CRC-32/ISO-HDLC, Raspberry Pi Pico 2 H, cache off</h3>
@@ -756,6 +1118,78 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">31696–31697</td>
 <td style="text-align: right;">1910.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">4567</td>
+<td style="text-align: right;">259.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4168</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">5171–5173</td>
+<td style="text-align: right;">259.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1250</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">3324</td>
+<td style="text-align: right;">152.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">6754–6756</td>
+<td style="text-align: right;">394.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">152</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">7208–7209</td>
+<td style="text-align: right;">394.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4296</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">3729–3731</td>
+<td style="text-align: right;">132.2</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">5824</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">3436–3437</td>
+<td style="text-align: right;">163.3</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1081</td>
+<td style="text-align: right;">1.2</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-16ibm-3740-raspberry-pi-pico-2-h-cache-on">CRC-16/IBM-3740, Raspberry Pi Pico 2 H, cache on</h3>
@@ -826,6 +1260,42 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">257</td>
 <td style="text-align: right;">15.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">184</td>
+<td style="text-align: right;">11.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">594</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">198</td>
+<td style="text-align: right;">10.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: right;">17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">51–52</td>
+<td style="text-align: right;">1.2</td>
 </tr>
 </tbody>
 </table></div>
@@ -898,6 +1368,42 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">6378</td>
 <td style="text-align: right;">367.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">5000–5001</td>
+<td style="text-align: right;">286.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">594</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">5781–5782</td>
+<td style="text-align: right;">286.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">7186–7187</td>
+<td style="text-align: right;">421.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">764–905</td>
+<td style="text-align: right;">1.4</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-raspberry-pi-pico-2-h-cache-on">CRC-8/SMBUS, Raspberry Pi Pico 2 H, cache on</h3>
@@ -957,6 +1463,51 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">92</td>
 <td style="text-align: right;">0</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: right;">16.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">106</td>
+<td style="text-align: right;">6.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1090</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">148</td>
+<td style="text-align: right;">7.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">6.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">283</td>
+<td style="text-align: right;">17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">16</td>
 <td style="text-align: right;">280</td>
 <td style="text-align: right;">16.0</td>
 </tr>
@@ -1021,6 +1572,51 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">10927–10929</td>
 <td style="text-align: right;">636.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">3298–3299</td>
+<td style="text-align: right;">178.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1090</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">4458–4459</td>
+<td style="text-align: right;">205.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">3574–3575</td>
+<td style="text-align: right;">178.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">6322–6324</td>
+<td style="text-align: right;">367.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/rp2350/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">6194</td>
+<td style="text-align: right;">340.0</td>
 </tr>
 </tbody>
 </table></div>
@@ -1122,6 +1718,78 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">1025</td>
 <td style="text-align: right;">61.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">193</td>
+<td style="text-align: right;">11.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4168</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">216</td>
+<td style="text-align: right;">11.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1250</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">195</td>
+<td style="text-align: right;">9.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">293</td>
+<td style="text-align: right;">17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">306</td>
+<td style="text-align: right;">17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4296</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">171</td>
+<td style="text-align: right;">6.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">5818</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">173</td>
+<td style="text-align: right;">8.6</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">2.2</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-32iso-hdlc-nucleo-g474re-cache-off">CRC-32/ISO-HDLC, NUCLEO-G474RE, cache off</h3>
@@ -1220,6 +1888,78 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">2453–3002</td>
 <td style="text-align: right;">148.0–182.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">399–410</td>
+<td style="text-align: right;">23.0–24.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4168</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">443–463</td>
+<td style="text-align: right;">23.0–24.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1250</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">328–345</td>
+<td style="text-align: right;">15.2–16.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">593–666</td>
+<td style="text-align: right;">35.0–40.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">656–701</td>
+<td style="text-align: right;">37.0–40.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4296</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">344–366</td>
+<td style="text-align: right;">13.2–14.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">5818</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">348–364</td>
+<td style="text-align: right;">15.7–16.1</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">184–188</td>
+<td style="text-align: right;">4.2–4.5</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-16ibm-3740-nucleo-g474re-cache-on">CRC-16/IBM-3740, NUCLEO-G474RE, cache on</h3>
@@ -1290,6 +2030,42 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">294</td>
 <td style="text-align: right;">17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">209</td>
+<td style="text-align: right;">12.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">594</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">226</td>
+<td style="text-align: right;">11.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">325</td>
+<td style="text-align: right;">19.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">2.2</td>
 </tr>
 </tbody>
 </table></div>
@@ -1362,6 +2138,42 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">600–617</td>
 <td style="text-align: right;">35.0–36.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">431–474</td>
+<td style="text-align: right;">25.0–28.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">594</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">469–536</td>
+<td style="text-align: right;">23.0–28.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">684–701</td>
+<td style="text-align: right;">41.0–42.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">184–188</td>
+<td style="text-align: right;">4.2–4.5</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-nucleo-g474re-cache-on">CRC-8/SMBUS, NUCLEO-G474RE, cache on</h3>
@@ -1424,6 +2236,60 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">321</td>
 <td style="text-align: right;">18.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">146</td>
+<td style="text-align: right;">8.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1090</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">177</td>
+<td style="text-align: right;">8.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">302</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">159</td>
+<td style="text-align: right;">8.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">322</td>
+<td style="text-align: right;">19.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">321</td>
+<td style="text-align: right;">18.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_hw_crc8.json">the board's CRC unit, CRC-8 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">2.2</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-nucleo-g474re-cache-off">CRC-8/SMBUS, NUCLEO-G474RE, cache off</h3>
@@ -1485,6 +2351,60 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">619–679</td>
 <td style="text-align: right;">35.3–38.9</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">283–298</td>
+<td style="text-align: right;">16.0–17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1090</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">360–374</td>
+<td style="text-align: right;">17.0–18.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">302</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">309–318</td>
+<td style="text-align: right;">16.0–17.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">592–604</td>
+<td style="text-align: right;">35.0–36.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">522–598</td>
+<td style="text-align: right;">29.0–34.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g474/adapter_hw_crc8.json">the board's CRC unit, CRC-8 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">184–188</td>
+<td style="text-align: right;">4.2–4.5</td>
 </tr>
 </tbody>
 </table></div>
@@ -1586,6 +2506,78 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">702–718</td>
 <td style="text-align: right;">41.0–42.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">137–138</td>
+<td style="text-align: right;">8.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4168</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">165–166</td>
+<td style="text-align: right;">8.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1254</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">144–145</td>
+<td style="text-align: right;">6.8</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">233–234</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">152</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">251–252</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4296</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">96–97</td>
+<td style="text-align: right;">2.8</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">5820</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">141–143</td>
+<td style="text-align: right;">4.9</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">212</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">1.5</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-32iso-hdlc-nucleo-h723zg-cache-off">CRC-32/ISO-HDLC, NUCLEO-H723ZG, cache off</h3>
@@ -1685,6 +2677,78 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">808–3736</td>
 <td style="text-align: right;">41.0–225.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">167–441</td>
+<td style="text-align: right;">8.0–27.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4168</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">261–536</td>
+<td style="text-align: right;">8.0–27.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1254</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">262–288</td>
+<td style="text-align: right;">10.2–13.2</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">433–626</td>
+<td style="text-align: right;">25.0–39.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">152</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">511–703</td>
+<td style="text-align: right;">26.0–39.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4296</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">305–359</td>
+<td style="text-align: right;">7.2–10.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">5820</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">261–285</td>
+<td style="text-align: right;">10.0–12.1</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">212</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">130–218</td>
+<td style="text-align: right;">1.5–6.5</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-16ibm-3740-nucleo-h723zg-cache-on">CRC-16/IBM-3740, NUCLEO-H723ZG, cache on</h3>
@@ -1755,6 +2819,42 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">225–226</td>
 <td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">121–122</td>
+<td style="text-align: right;">7.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">594</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">153–154</td>
+<td style="text-align: right;">7.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">233</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">212</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">1.5</td>
 </tr>
 </tbody>
 </table></div>
@@ -1828,6 +2928,42 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">485–696</td>
 <td style="text-align: right;">26.0–40.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">150–447</td>
+<td style="text-align: right;">7.0–27.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">594</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">257–561</td>
+<td style="text-align: right;">7.0–27.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">482–653</td>
+<td style="text-align: right;">27.0–40.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">212</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">130–218</td>
+<td style="text-align: right;">1.5–6.5</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-nucleo-h723zg-cache-on">CRC-8/SMBUS, NUCLEO-H723ZG, cache on</h3>
@@ -1889,6 +3025,60 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">231–232</td>
 <td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">91–92</td>
+<td style="text-align: right;">5.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1090</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">123–124</td>
+<td style="text-align: right;">5.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">102–104</td>
+<td style="text-align: right;">5.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">234</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">231–232</td>
+<td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc8.json">the board's CRC unit, CRC-8 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">208</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">1.5</td>
 </tr>
 </tbody>
 </table></div>
@@ -1952,6 +3142,60 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">729–952</td>
 <td style="text-align: right;">40.0–54.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">296</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">112–425</td>
+<td style="text-align: right;">5.0–25.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1090</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">216–534</td>
+<td style="text-align: right;">5.0–26.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">150–473</td>
+<td style="text-align: right;">5.0–25.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">451–648</td>
+<td style="text-align: right;">26.0–39.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">502–682</td>
+<td style="text-align: right;">26.0–39.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc8.json">the board's CRC unit, CRC-8 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">208</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">130–218</td>
+<td style="text-align: right;">1.5–6.5</td>
 </tr>
 </tbody>
 </table></div>
@@ -2053,6 +3297,78 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">1476–1524</td>
 <td style="text-align: right;">87.0–90.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">233–236</td>
+<td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4170</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">288–292</td>
+<td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1216</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">240–243</td>
+<td style="text-align: right;">11.0–11.2</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">395–409</td>
+<td style="text-align: right;">23.0–24.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">142</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">430–488</td>
+<td style="text-align: right;">23.0–27.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4318</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">306–307</td>
+<td style="text-align: right;">10.0–10.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">6228</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">304–306</td>
+<td style="text-align: right;">13.6–14.1</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">2.0</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-32iso-hdlc-nucleo-g0b1re-cache-off">CRC-32/ISO-HDLC, NUCLEO-G0B1RE, cache off</h3>
@@ -2151,6 +3467,78 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">2319–2511</td>
 <td style="text-align: right;">139.0–151.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">335–361</td>
+<td style="text-align: right;">19.0–21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4170</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">396–424</td>
+<td style="text-align: right;">19.0–21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1216</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">309–313</td>
+<td style="text-align: right;">14.8</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">526–530</td>
+<td style="text-align: right;">31.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">142</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">564–592</td>
+<td style="text-align: right;">31.0–33.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4318</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">387–391</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">6228</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">18.8–19.1</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">156–158</td>
+<td style="text-align: right;">3.0–3.5</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-16ibm-3740-nucleo-g0b1re-cache-on">CRC-16/IBM-3740, NUCLEO-G0B1RE, cache on</h3>
@@ -2221,6 +3609,42 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">360–377</td>
 <td style="text-align: right;">20.0–21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">560</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">253</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">590</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">305–306</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">446–480</td>
+<td style="text-align: right;">26.0–28.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">129</td>
+<td style="text-align: right;">2.0</td>
 </tr>
 </tbody>
 </table></div>
@@ -2293,6 +3717,42 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">492–494</td>
 <td style="text-align: right;">28.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">560</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">381–383</td>
+<td style="text-align: right;">22.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">590</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">440</td>
+<td style="text-align: right;">22.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">610–614</td>
+<td style="text-align: right;">36.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">157–159</td>
+<td style="text-align: right;">3.0–3.5</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-nucleo-g0b1re-cache-on">CRC-8/SMBUS, NUCLEO-G0B1RE, cache on</h3>
@@ -2355,6 +3815,60 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">454–468</td>
 <td style="text-align: right;">26.0–27.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">288</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">166–168</td>
+<td style="text-align: right;">9.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1086</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">211–219</td>
+<td style="text-align: right;">9.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">298</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">182</td>
+<td style="text-align: right;">9.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">393–410</td>
+<td style="text-align: right;">23.0–24.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">372–404</td>
+<td style="text-align: right;">21.0–23.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_hw_crc8.json">the board's CRC unit, CRC-8 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">128–131</td>
+<td style="text-align: right;">2.0</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-nucleo-g0b1re-cache-off">CRC-8/SMBUS, NUCLEO-G0B1RE, cache off</h3>
@@ -2416,6 +3930,60 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">570–632</td>
 <td style="text-align: right;">33.0–37.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">288</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">234–262</td>
+<td style="text-align: right;">13.0–15.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1086</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">291–317</td>
+<td style="text-align: right;">13.0–15.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">298</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">250–280</td>
+<td style="text-align: right;">13.0–15.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">525–527</td>
+<td style="text-align: right;">31.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">504–506</td>
+<td style="text-align: right;">29.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32g0b1/adapter_hw_crc8.json">the board's CRC unit, CRC-8 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
+<td>hardware unit</td>
+<td>none</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">157–159</td>
+<td style="text-align: right;">3.0–3.5</td>
 </tr>
 </tbody>
 </table></div>
@@ -2517,6 +4085,69 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">1475–1476</td>
 <td style="text-align: right;">87.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">234–235</td>
+<td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4170</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1216</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">242–244</td>
+<td style="text-align: right;">10.8–11.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">368–369</td>
+<td style="text-align: right;">21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">142</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">396–397</td>
+<td style="text-align: right;">21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4318</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">307</td>
+<td style="text-align: right;">10.0–10.2</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">6228</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">340–342</td>
+<td style="text-align: right;">15.7–15.9</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-32iso-hdlc-sam-d20-xplained-pro-cache-off">CRC-32/ISO-HDLC, SAM D20 Xplained Pro, cache off</h3>
@@ -2615,6 +4246,69 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">2279</td>
 <td style="text-align: right;">137.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1072</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">329</td>
+<td style="text-align: right;">19.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4170</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">386</td>
+<td style="text-align: right;">19.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1216</td>
+<td style="text-align: right;">1028</td>
+<td style="text-align: right;">301</td>
+<td style="text-align: right;">14.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">509</td>
+<td style="text-align: right;">30.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">142</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">555</td>
+<td style="text-align: right;">31.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
+<td>slicing by 4</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">4318</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">372</td>
+<td style="text-align: right;">13.8</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
+<td>other: "braided" words</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">6228</td>
+<td style="text-align: right;">5120</td>
+<td style="text-align: right;">390</td>
+<td style="text-align: right;">18.8</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-16ibm-3740-sam-d20-xplained-pro-cache-on">CRC-16/IBM-3740, SAM D20 Xplained Pro, cache on</h3>
@@ -2685,6 +4379,33 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">330–331</td>
 <td style="text-align: right;">18.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">560</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">252</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">590</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">297–298</td>
+<td style="text-align: right;">14.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">418–420</td>
+<td style="text-align: right;">24.0</td>
 </tr>
 </tbody>
 </table></div>
@@ -2757,6 +4478,33 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">473</td>
 <td style="text-align: right;">27.0</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">560</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">361</td>
+<td style="text-align: right;">21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">590</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">414</td>
+<td style="text-align: right;">21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">591</td>
+<td style="text-align: right;">35.0</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-sam-d20-xplained-pro-cache-on">CRC-8/SMBUS, SAM D20 Xplained Pro, cache on</h3>
@@ -2819,6 +4567,51 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">402–407</td>
 <td style="text-align: right;">22.7–23.1</td>
 </tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">288</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">166–167</td>
+<td style="text-align: right;">9.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1086</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">209–211</td>
+<td style="text-align: right;">9.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">298</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">179–180</td>
+<td style="text-align: right;">9.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">366</td>
+<td style="text-align: right;">21.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">343</td>
+<td style="text-align: right;">19.0</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="crc-8smbus-sam-d20-xplained-pro-cache-off">CRC-8/SMBUS, SAM D20 Xplained Pro, cache off</h3>
@@ -2880,6 +4673,51 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">516</td>
 <td style="text-align: right;">30.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">288</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">229</td>
+<td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">1086</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
+<td>table of 256</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">298</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">244</td>
+<td style="text-align: right;">13.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">507</td>
+<td style="text-align: right;">30.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/samd20/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
+<td>table of 16</td>
+<td>RAM (copied at start by the image)</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">484</td>
+<td style="text-align: right;">28.0</td>
 </tr>
 </tbody>
 </table></div>

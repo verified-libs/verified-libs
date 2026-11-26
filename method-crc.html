@@ -49,17 +49,58 @@ the other kind's: <a href="method.html">embedded ring buffers</a>.</p>
 <p>The numbers are on the <a href="results-crc.html">results page</a>. The details and
 every run's output are in <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md"><code>kinds/crc/README.md</code></a>,
 the first series and the checks of its numbers in its
-<a href="report-2026-11-25-crc-first-series.html">report</a>; this page says
+<a href="report-2026-11-25-crc-first-series.html">report</a>, the second series
+(tables in RAM, the boards' CRC units) in
+<a href="report-2026-11-25-crc-second-series.html">its report</a>; this page says
 what they add up to.</p>
 <h2 id="what-is-measured">What is measured</h2>
-<p>Twenty configurations of eight libraries: one library, one CRC and one
+<p>Thirty-five configurations of eight libraries: one library, one CRC and one
 implementation of it each, for three CRCs of the
 <a href="https://reveng.sourceforge.io/crc-catalogue/all.htm">CRC RevEng catalogue</a>:
 CRC-32/ISO-HDLC, CRC-16/IBM-3740 and CRC-8/SMBUS. The configurations, the
 class of each (bitwise, a table of 16, a table of 256, slicing by 4, zlib's
 braided words, a table-free byte step) and where its table lies are listed
-in <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 2 of the kind's README</a>. The same six
-boards as for the ring buffers (<a href="method.html">method</a>, "Hardware").</p>
+in <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">steps 2 and 11 of the kind's README</a>. Twenty
+are the libraries as they ship. Fifteen are those of them whose table lies
+in flash, with the table moved to RAM (below). The same six boards as for
+the ring buffers (<a href="method.html">method</a>, "Hardware").</p>
+<p><strong>A table in RAM.</strong>
+- <em>How it is moved:</em> the library is built as for its configuration in
+  flash. Then our build renames the section of each table symbol from
+  <code>.rodata.*</code> to <code>.data.*</code> in a copy of the library's archive
+  (<code>kinds/crc/bench/onecrc.py</code>, <code>ram_archive</code>; the symbols are named in
+  <code>kinds/crc/ramtables.txt</code>). The image's start-up code copies <code>.data</code>
+  from flash to RAM before <code>main</code>, as for any initialised variable.
+- <em>The check:</em> the build checks that every table symbol lies once in RAM.
+- <em>What is unchanged:</em> the code is the library's own.
+- <em>Bytes:</em> the table counts twice. Its bytes stay in flash as the values
+  the start-up code copies, and the same number lie in RAM, so flash bytes
+  are the table and the code, as in flash, and RAM bytes are the table.
+  The table says "RAM (copied at start by the image)", told apart from
+  libcrc's and CRC++'s tables, which those libraries build in RAM
+  themselves at run time.</p>
+<p><strong>The board's CRC unit.</strong> On four boards the same CRCs are also computed
+by the board's own hardware, driven by our code
+(<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>kinds/crc/adapter_hw.c</code></a>); it is not a
+library. It is a row of the same tables, after the libraries, labelled
+"the board's CRC unit, driven by our code; not a library" in its name
+cell; on the comparison it is scored like any row, and a filter takes it
+out.
+- <em>The STM32 CRC unit</em> (NUCLEO-G474RE, NUCLEO-G0B1RE, NUCLEO-H723ZG), for
+  all three CRCs:
+  - our code enables its clock once and sets its polynomial, size, input
+    and output reflection and initial value;
+  - it writes the message as bytes up to a word boundary, then words with
+    their bytes swapped, then the last bytes, and reads the result;
+  - for CRC-32 the unit has no final XOR, so our code XORs the result with
+    0xFFFFFFFF.
+- <em>The RP2350's DMA sniffer</em> (Pico 2), for CRC-32 and CRC-16 (it has no
+  CRC-8 mode): one DMA transfer of the message to a dummy byte, with the
+  sniffer computing the CRC on the way and our code waiting for the end.
+- <em>Not measured:</em> the SAM D20's DSU (left out, see the plan), and the
+  nRF5340, which has no such unit.
+- <em>Bytes:</em> those of our code (its functions and its state) read from the
+  board images; there is no table.</p>
 <p><strong>One call, timed.</strong> Each call computes the CRC of a whole message (the
 one-shot call); the board's cycle counter is read around it by the same
 timing routine as the ring-buffer benchmark (<code>time_call</code>,
@@ -159,17 +200,14 @@ reference's; a record is made only if every call of every run agreed
 (<code>errors</code> and <code>baseline_errors</code> 0).</p>
 <h2 id="what-is-not-measured">What is not measured</h2>
 <ul>
-<li>The boards' CRC hardware (the CRC units of the STM32 parts, for
-  example): only software is measured.</li>
+<li>The SAM D20's DSU, which can compute a CRC-32 (left out of the second
+  series, see its plan), and CRC hardware other than the units above.</li>
 <li>Slicing by 8 or 16, and other configurations of the libraries than the
-  twenty.</li>
-<li>A table copied from flash to RAM by the application before use. libcrc
-  and CRC++ build their tables in RAM themselves; that is measured as they
-  ship it, with the building done before the timed calls. A series with
-  the tables in RAM is to follow this first publication
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>, 2026-11-25); the report's check 6
-  shows where it would matter most: with the cache off, and on the boards
-  with the slowest flash.</li>
+  thirty-five.</li>
+<li>A table that a library builds in RAM is measured as it ships, with the
+  building done before the timed calls (libcrc, CRC++). A table moved to
+  RAM is measured only as our build moves it, by the start-up code; not
+  by an application's own copy at another time.</li>
 <li>Code run from RAM: every configuration runs from flash.</li>
 </ul>
 <h2 id="what-the-placements-show">What the placements show</h2>
