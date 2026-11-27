@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="How the fixed-block memory pools are measured and checked: one image per configuration and placement, every call checked on the board, host tests with broken controls, a CBMC proof of the reference; one context, interrupt claims documented, not tested.">
+<meta name="description" content="How the fixed-block memory pools are measured and checked: one image per configuration and placement, every call checked on the board, host tests with broken controls, a CBMC proof of the reference; use from interrupts tested in a series of its own, with an interrupt at every cycle of a call.">
 <link rel="canonical" href="https://verified-libs.org/method-pools.html">
 <meta property="og:site_name" content="verified-libs">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Method: how fixed-block memory pools are measured and checked - verified-libs">
-<meta property="og:description" content="How the fixed-block memory pools are measured and checked: one image per configuration and placement, every call checked on the board, host tests with broken controls, a CBMC proof of the reference; one context, interrupt claims documented, not tested.">
+<meta property="og:description" content="How the fixed-block memory pools are measured and checked: one image per configuration and placement, every call checked on the board, host tests with broken controls, a CBMC proof of the reference; use from interrupts tested in a series of its own, with an interrupt at every cycle of a call.">
 <meta property="og:url" content="https://verified-libs.org/method-pools.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -69,18 +69,89 @@ from its code). One shape is measured: <strong>32 blocks of 32 bytes</strong>. A
 library whose pool is not of one block size, or that cannot be built
 without its kernel, is left out, with the reason in the kind's README
 ("Left out").</p>
-<h2 id="measured-in-one-context">Measured in one context</h2>
-<p><strong>This series measures one context only: no interrupt calls a pool while
-it is measured.</strong> Whether a pool is safe when an interrupt calls it is not
-tested. Several libraries document use from interrupts, or a lock; the
-comparison page shows what each documents, with its source, as documented,
-not tested, and no filter and no score uses it. A later series, with its
-own plan and the owner's decision, may test those claims (an interrupt
-stress test with a deliberately broken pool as the control, and a check of
-an interrupt at every instruction on a host model) and measure the time a
-pool keeps interrupts off (<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-26-pools-kind.md">plan</a>,
-section 4).</p>
-<p>What the series does show about locking: the <strong>lock as built</strong>, the
+<h2 id="use-from-interrupts">Use from interrupts</h2>
+<p><strong>The numbers of these pages are of one context:</strong> no interrupt calls a pool
+while it is timed. Whether a pool stays correct when an interrupt calls it
+is tested by a series of its own, the concurrency series
+(<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-27-pools-concurrency.md">plan</a>; records under
+<a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/pools-isr</code></a>). What it observed is in
+each board's fold-out "Use from interrupts" on the
+<a href="results-pools.html">results page</a> and in a column of the
+<a href="compare-pools.html">comparison page</a>; it is part of no score.</p>
+<ul>
+<li><strong>What it asks.</strong> An interrupt calls <code>alloc</code> or <code>free</code> on the same pool
+  while the main context is inside its own <code>alloc</code> or <code>free</code>. Is a block
+  then handed out twice, or lost? Is the pool's state corrupted, or an
+  answer given that no order of the calls gives? And, where a
+  configuration takes interrupts off, how long does an interrupt wait?</li>
+<li><strong>How, on the boards.</strong> SysTick is a one-shot interrupt, armed d cycles
+  before main's call, for d = 1, 2, 3 … until the interrupt has come after
+  the call 16 times in a row: so the interrupt comes at every cycle of the
+  call. This is done for:</li>
+<li>seven start states (0 to 32 blocks held);</li>
+<li>main's alloc or free;</li>
+<li>five patterns of the interrupt's calls;</li>
+<li>four arrangements of the free list;</li>
+<li>the cache off and on.</li>
+</ul>
+<p>Every trial is judged by the same code as the host check
+  (<code>kinds/pools-isr/verdict.h</code>). The record also says which instructions
+  of the configuration's code an interrupt came at.
+- <strong>On the host,</strong> the same trials with an interrupt at every instruction
+  (x86 single-step). CMSIS-RTX's LDREX/STREX variant, which the
+  Cortex-M4, M7 and M33 boards run, is checked there on a model of the
+  exclusive monitor.
+- <strong>Each library as it documents itself</strong> (<code>kinds/pools/claims.tsv</code>), in
+  three classes:
+  - <em>within its documentation:</em> passed, or a finding;
+  - <em>outside its documentation:</em> the library documents no use from
+    interrupts, or only with a lock it is not built with. It is run all
+    the same and only what was observed is reported; it is never called
+    failing;
+  - <em>ours:</em> our reference with interrupts off.
+- <strong>Controls.</strong> On every board, three builds of ours must be caught:
+  - our reference without a lock;
+  - two builds with interrupts on again too early, in <code>alloc</code> and in <code>free</code>.</p>
+<p>A board whose controls were not all caught has no records.
+- <strong>The interrupts-off time.</strong> It is read in the same sweep: when the
+  interrupt runs, it reads how many cycles ago SysTick ran out. The
+  largest such latency of a configuration, less the smallest of the
+  reference without a lock in the same image, is the longest an interrupt
+  waited because the configuration had interrupts off. It is for this
+  pool shape and these calls, cache off and on; it is not a bound for
+  every use.
+- <strong>What it cannot show:</strong>
+  - more than one core;
+  - a thread waiting for a block (the pools run without their kernels);
+  - two interrupts in one call, or nested interrupts;
+  - another compiler or optimisation level.
+  - on some cores, the one instruction right after a library turns
+    interrupts on again. Whether the sweep reaches it depends on the core
+    family, as the coverage of our controls showed:
+    - Cortex-M0+ (NUCLEO-G0B1RE, SAM D20 Xplained Pro) and Cortex-M7
+      (NUCLEO-H723ZG): yes, an interrupt landed on it;
+    - Cortex-M4 (NUCLEO-G474RE) and Cortex-M33 (nRF5340 DK): no, an
+      interrupt pending there was taken only after it.</p>
+<pre><code>The architecture allows both (Armv7-M B5.2.3, Armv8-M B3.18). The host
+check, which takes the interrupt at the unmask itself, covers that
+instruction. Every record lists, per function of the configuration, the
+instructions that no interrupt landed on (`coverage`, `per_function`,
+`unreached`), so for each row a reader can see what the sweep did not
+reach.
+</code></pre>
+<ul>
+<li>on the Raspberry Pi Pico 2 with the cache off, the later part of a long
+    call. The sweep moves the interrupt up to 4,096 cycles after it is armed,
+    and there about 1,200 of those come before the call. So a call longer
+    than about 2,900 cycles is interrupted only in its first part. Of the
+    first series' calls, Contiki-NG's longest (a mean of up to 7,436 cycles)
+    and perhaps C_Allocator's (up to 2,539) are that long. On every other
+    board the longest call with the cache off is 1,132 cycles. The record's
+    coverage per function (<code>unreached</code>) names the instructions no interrupt
+    landed on.</li>
+</ul>
+<p>It is not a proof: a trial covers the states it tried.</p>
+<p>What the timed series shows about locking: the <strong>lock as built</strong>, the
 library's own code around a call in the build measured (interrupts off,
 LDREX/STREX, an atomic bitmap, or none), and its cost in cycles, which is
 part of every number. Our own row "reference free list, interrupts off"

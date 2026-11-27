@@ -4,13 +4,16 @@
   "published": "false while there are no records under records/pools: the first board series is not published yet",
   "boards": "per board directory of records/pools (records_dir): id (the board's id on the site's other kinds), the record's board, board_decoded, core and clock_hz; note_cache_off: the sentence the CRC results page puts above the board's cache-off numbers (site/crc_tables.py, before_off), or null",
   "scenarios": "the scenarios of kinds/pools/README.md (\"The image\"), with what is timed, in one line each; 'init' is one call",
-  "configurations": "per adapter, in the order of kinds/pools/configs.txt: its name (the record's), language (column 2), and from the table \"The set\" of kinds/pools/README.md its library, pin, licence and the lock as built; role: 'library', or 'ours' for our reference free list with interrupts off (not a library, labelled in its name cell every time; scored like any row; a filter on the kind of row leaves it out); documented_interrupts: what the library documents about use from interrupts, with its source (kinds/pools/claims.tsv): shown as documented, NOT tested (the series is one context), and used in no filter and no score",
+  "configurations": "per adapter, in the order of kinds/pools/configs.txt: its name (the record's), language (column 2), and from the table \"The set\" of kinds/pools/README.md its library, pin, licence and the lock as built; role: 'library', or 'ours' for our reference free list with interrupts off (not a library, labelled in its name cell every time; scored like any row; a filter on the kind of row leaves it out); documented_interrupts: what the library documents about use from interrupts, with its source (kinds/pools/claims.tsv): shown as documented (the timing series is one context; whether it holds is tested by the concurrency series, each row's 'isr'), and used in no score",
   "baseline_documented": "the claims file's row of the baseline (adapter_ref), shown in the baseline's row",
   "rows": "per board and configuration: flash_bytes (the record's sizes.flash_bytes: code and constant data) and ram_bytes (the record's sizes.ram_overhead_bytes: RAM beyond the 1056 bytes of blocks and canaries; kinds/pools/README.md, \"Sizes\"), the record's path, and cycles",
   "cycles": "cycles[cache][key]: [min, max] over the eight placements, first pass, of the mean of the scenario's calls (the first call included), in cycles, the counter-read overhead subtracted; key 'init' (one call) or '<scenario>/<alloc|free>'; null where the scenario has no such call (empty/free)",
   "baseline": "per board: the reference free list (ours, not a library), timed in the same images (the records' baseline), cycles over all images of the board's library configurations",
   "ranges": "a difference between two rows is a difference only where their ranges do not overlap (DECISIONS 2026-11-25); the rows are in the order of kinds/pools/configs.txt, not ranked",
-  "not_here": "the second pass and the minimum, maximum and first call of each scenario: in the records"
+  "not_here": "the second pass and the minimum, maximum and first call of each scenario: in the records",
+  "isr": "per row: the concurrency series (records/pools-isr, lab/plans/2026-11-27-pools-concurrency.md): class ('within' its documentation, 'ours', 'outside' its documentation, 'control'); result: for 'within' and 'ours' passed or what was observed, for 'outside' only what was observed (never a verdict: the library was used in a way it does not document), for a control caught or not; trials; observed (kinds); irq_wait_cycles {off, on}, where the configuration takes interrupts off as built: the longest time an interrupt waited; coverage [instructions reached, instructions]; record. Used in no score; the comparison page offers a filter on it. null where the series has no record of the row",
+  "baseline_isr": "per board: the reference free list without a lock, which the concurrency series runs as a control (it must be caught), in the form of 'isr'",
+  "isr_controls": "per board: our two broken interrupts-off builds of the reference, the series' other controls"
  },
  "published": true,
  "source": {
@@ -377,6 +380,30 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 87,
+    "inside": 77,
+    "observed": [
+     "a crash"
+    ],
+    "observed_trials": 1,
+    "record": "records/pools-isr/nrf5340/adapter_etl.json",
+    "result": "outside its documentation; observed in 1 of 87 trials: a crash; the sweep stopped at trial 87 with the cache off, in the check after the trial; cache on not run",
+    "stopped": {
+     "trial": 87,
+     "cache": "off",
+     "where": "the check after the trial",
+     "desc": "a bus fault at 0x0",
+     "pc_symbol": "(anonymous namespace)::etl_alloc(unsigned int, unsigned int)"
+    },
+    "coverage": [
+     3,
+     69
+    ],
+    "text": "outside its documentation; observed in 1 of 87 trials: a crash; the sweep stopped at trial 87 with the cache off, in the check after the trial; cache on not run",
+    "passed": false
    }
   },
   {
@@ -488,6 +515,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 61104,
+    "inside": 49880,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 3696,
+    "record": "records/pools-isr/nrf5340/adapter_riot.json",
+    "result": "outside its documentation; observed in 3696 of 61104 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     15,
+     49
+    ],
+    "text": "outside its documentation; observed in 3696 of 61104 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -599,6 +646,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 74384,
+    "inside": 63160,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/nrf5340/adapter_threadx.json",
+    "result": "passed: nothing observed in 74384 trials",
+    "irq_wait_cycles": {
+     "off": 44,
+     "on": 21
+    },
+    "coverage": [
+     29,
+     275
+    ],
+    "text": "passed: nothing observed in 74384 trials; an interrupt waited at most 44 cycles with the cache off, 21 with it on",
+    "passed": true
    }
   },
   {
@@ -710,6 +776,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 67708,
+    "inside": 56484,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/nrf5340/adapter_cmsis_rtx.json",
+    "result": "passed: nothing observed in 67708 trials",
+    "coverage": [
+     50,
+     111
+    ],
+    "text": "passed: nothing observed in 67708 trials",
+    "passed": true
    }
   },
   {
@@ -821,6 +902,24 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 113886,
+    "inside": 102662,
+    "observed": [
+     "a block although none was free",
+     "a block twice"
+    ],
+    "observed_trials": 1008,
+    "record": "records/pools-isr/nrf5340/adapter_contiki.json",
+    "result": "outside its documentation; observed in 1008 of 113886 trials: a block although none was free; a block twice",
+    "coverage": [
+     47,
+     91
+    ],
+    "text": "outside its documentation; observed in 1008 of 113886 trials: a block although none was free; a block twice",
+    "passed": false
    }
   },
   {
@@ -932,6 +1031,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 90840,
+    "inside": 79616,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 2536,
+    "record": "records/pools-isr/nrf5340/adapter_c_allocator.json",
+    "result": "outside its documentation; observed in 2536 of 90840 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     73,
+     126
+    ],
+    "text": "outside its documentation; observed in 2536 of 90840 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -1043,6 +1162,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 77936,
+    "inside": 66712,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/nrf5340/adapter_lwip.json",
+    "result": "passed: nothing observed in 77936 trials",
+    "irq_wait_cycles": {
+     "off": 60,
+     "on": 28
+    },
+    "coverage": [
+     23,
+     88
+    ],
+    "text": "passed: nothing observed in 77936 trials; an interrupt waited at most 60 cycles with the cache off, 28 with it on",
+    "passed": true
    }
   },
   {
@@ -1154,6 +1292,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 44100,
+    "inside": 32876,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 1600,
+    "record": "records/pools-isr/nrf5340/adapter_memorypool.json",
+    "result": "outside its documentation; observed in 1600 of 44100 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     12,
+     40
+    ],
+    "text": "outside its documentation; observed in 1600 of 44100 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -1265,6 +1423,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 63105,
+    "inside": 51881,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/nrf5340/adapter_heapless.json",
+    "result": "passed: nothing observed in 63105 trials",
+    "coverage": [
+     54,
+     143
+    ],
+    "text": "passed: nothing observed in 63105 trials",
+    "passed": true
    }
   },
   {
@@ -1376,6 +1549,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 63736,
+    "inside": 52512,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/nrf5340/adapter_atomic_pool.json",
+    "result": "passed: nothing observed in 63736 trials",
+    "coverage": [
+     47,
+     164
+    ],
+    "text": "passed: nothing observed in 63736 trials",
+    "passed": true
    }
   },
   {
@@ -1487,6 +1675,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "ours",
+    "trials": 43736,
+    "inside": 32512,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/nrf5340/adapter_ref_primask.json",
+    "result": "passed: nothing observed in 43736 trials",
+    "irq_wait_cycles": {
+     "off": 28,
+     "on": 15
+    },
+    "coverage": [
+     4,
+     42
+    ],
+    "text": "passed: nothing observed in 43736 trials; an interrupt waited at most 28 cycles with the cache off, 15 with it on",
+    "passed": true
    }
   },
   {
@@ -1598,6 +1805,32 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 67181,
+    "inside": 61455,
+    "observed": [
+     "a block twice",
+     "a crash",
+     "blocks lost"
+    ],
+    "observed_trials": 7104,
+    "record": "records/pools-isr/rp2350/adapter_etl.json",
+    "result": "outside its documentation; observed in 7104 of 67181 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 67181 with the cache off, in the check after the trial; cache on not run",
+    "stopped": {
+     "trial": 67181,
+     "cache": "off",
+     "where": "the check after the trial",
+     "desc": "a usage fault",
+     "pc_symbol": "(anonymous namespace)::etl_alloc(unsigned int, unsigned int)"
+    },
+    "coverage": [
+     27,
+     69
+    ],
+    "text": "outside its documentation; observed in 7104 of 67181 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 67181 with the cache off, in the check after the trial; cache on not run",
+    "passed": false
    }
   },
   {
@@ -1709,6 +1942,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 506364,
+    "inside": 459028,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 30380,
+    "record": "records/pools-isr/rp2350/adapter_riot.json",
+    "result": "outside its documentation; observed in 30380 of 506364 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     15,
+     49
+    ],
+    "text": "outside its documentation; observed in 30380 of 506364 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -1820,6 +2073,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 542468,
+    "inside": 495132,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/rp2350/adapter_threadx.json",
+    "result": "passed: nothing observed in 542468 trials",
+    "irq_wait_cycles": {
+     "off": 380,
+     "on": 20
+    },
+    "coverage": [
+     31,
+     275
+    ],
+    "text": "passed: nothing observed in 542468 trials; an interrupt waited at most 380 cycles with the cache off, 20 with it on",
+    "passed": true
    }
   },
   {
@@ -1931,6 +2203,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 605152,
+    "inside": 557816,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/rp2350/adapter_cmsis_rtx.json",
+    "result": "passed: nothing observed in 605152 trials",
+    "coverage": [
+     52,
+     111
+    ],
+    "text": "passed: nothing observed in 605152 trials",
+    "passed": true
    }
   },
   {
@@ -2042,6 +2329,24 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 684569,
+    "inside": 638193,
+    "observed": [
+     "a block although none was free",
+     "a block twice"
+    ],
+    "observed_trials": 3616,
+    "record": "records/pools-isr/rp2350/adapter_contiki.json",
+    "result": "outside its documentation; observed in 3616 of 684569 trials: a block although none was free; a block twice",
+    "coverage": [
+     46,
+     91
+    ],
+    "text": "outside its documentation; observed in 3616 of 684569 trials: a block although none was free; a block twice",
+    "passed": false
    }
   },
   {
@@ -2153,6 +2458,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 702360,
+    "inside": 655024,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 12868,
+    "record": "records/pools-isr/rp2350/adapter_c_allocator.json",
+    "result": "outside its documentation; observed in 12868 of 702360 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     77,
+     126
+    ],
+    "text": "outside its documentation; observed in 12868 of 702360 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -2264,6 +2589,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 626024,
+    "inside": 578688,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/rp2350/adapter_lwip.json",
+    "result": "passed: nothing observed in 626024 trials",
+    "irq_wait_cycles": {
+     "off": 478,
+     "on": 21
+    },
+    "coverage": [
+     24,
+     88
+    ],
+    "text": "passed: nothing observed in 626024 trials; an interrupt waited at most 478 cycles with the cache off, 21 with it on",
+    "passed": true
    }
   },
   {
@@ -2375,6 +2719,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 412712,
+    "inside": 365376,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 14516,
+    "record": "records/pools-isr/rp2350/adapter_memorypool.json",
+    "result": "outside its documentation; observed in 14516 of 412712 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     13,
+     40
+    ],
+    "text": "outside its documentation; observed in 14516 of 412712 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -2486,6 +2850,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 489480,
+    "inside": 442144,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/rp2350/adapter_heapless.json",
+    "result": "passed: nothing observed in 489480 trials",
+    "coverage": [
+     56,
+     143
+    ],
+    "text": "passed: nothing observed in 489480 trials",
+    "passed": true
    }
   },
   {
@@ -2597,6 +2976,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 472892,
+    "inside": 425556,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/rp2350/adapter_atomic_pool.json",
+    "result": "passed: nothing observed in 472892 trials",
+    "coverage": [
+     50,
+     164
+    ],
+    "text": "passed: nothing observed in 472892 trials",
+    "passed": true
    }
   },
   {
@@ -2708,6 +3102,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "ours",
+    "trials": 420684,
+    "inside": 373348,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/rp2350/adapter_ref_primask.json",
+    "result": "passed: nothing observed in 420684 trials",
+    "irq_wait_cycles": {
+     "off": 395,
+     "on": 15
+    },
+    "coverage": [
+     6,
+     42
+    ],
+    "text": "passed: nothing observed in 420684 trials; an interrupt waited at most 395 cycles with the cache off, 15 with it on",
+    "passed": true
    }
   },
   {
@@ -2819,6 +3232,32 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 4963,
+    "inside": 3890,
+    "observed": [
+     "a block twice",
+     "a crash",
+     "blocks lost"
+    ],
+    "observed_trials": 704,
+    "record": "records/pools-isr/stm32g474/adapter_etl.json",
+    "result": "outside its documentation; observed in 704 of 4963 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4963 with the cache off, in the check after the trial; cache on not run",
+    "stopped": {
+     "trial": 4963,
+     "cache": "off",
+     "where": "the check after the trial",
+     "desc": "a bus fault at 0xc6c5c4c3",
+     "pc_symbol": "(anonymous namespace)::etl_alloc(unsigned int, unsigned int)"
+    },
+    "coverage": [
+     27,
+     68
+    ],
+    "text": "outside its documentation; observed in 704 of 4963 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4963 with the cache off, in the check after the trial; cache on not run",
+    "passed": false
    }
   },
   {
@@ -2930,6 +3369,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 60308,
+    "inside": 45668,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 3244,
+    "record": "records/pools-isr/stm32g474/adapter_riot.json",
+    "result": "outside its documentation; observed in 3244 of 60308 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     15,
+     49
+    ],
+    "text": "outside its documentation; observed in 3244 of 60308 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -3041,6 +3500,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 73272,
+    "inside": 58632,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g474/adapter_threadx.json",
+    "result": "passed: nothing observed in 73272 trials",
+    "irq_wait_cycles": {
+     "off": 30,
+     "on": 29
+    },
+    "coverage": [
+     30,
+     276
+    ],
+    "text": "passed: nothing observed in 73272 trials; an interrupt waited at most 30 cycles with the cache off, 29 with it on",
+    "passed": true
    }
   },
   {
@@ -3152,6 +3630,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 73088,
+    "inside": 58448,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g474/adapter_cmsis_rtx.json",
+    "result": "passed: nothing observed in 73088 trials",
+    "coverage": [
+     54,
+     110
+    ],
+    "text": "passed: nothing observed in 73088 trials",
+    "passed": true
    }
   },
   {
@@ -3263,6 +3756,24 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 123546,
+    "inside": 108906,
+    "observed": [
+     "a block although none was free",
+     "a block twice"
+    ],
+    "observed_trials": 1088,
+    "record": "records/pools-isr/stm32g474/adapter_contiki.json",
+    "result": "outside its documentation; observed in 1088 of 123546 trials: a block although none was free; a block twice",
+    "coverage": [
+     52,
+     91
+    ],
+    "text": "outside its documentation; observed in 1088 of 123546 trials: a block although none was free; a block twice",
+    "passed": false
    }
   },
   {
@@ -3374,6 +3885,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 83280,
+    "inside": 68640,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 1824,
+    "record": "records/pools-isr/stm32g474/adapter_c_allocator.json",
+    "result": "outside its documentation; observed in 1824 of 83280 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     75,
+     126
+    ],
+    "text": "outside its documentation; observed in 1824 of 83280 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -3485,6 +4016,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 74236,
+    "inside": 59596,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g474/adapter_lwip.json",
+    "result": "passed: nothing observed in 74236 trials",
+    "irq_wait_cycles": {
+     "off": 35,
+     "on": 18
+    },
+    "coverage": [
+     24,
+     88
+    ],
+    "text": "passed: nothing observed in 74236 trials; an interrupt waited at most 35 cycles with the cache off, 18 with it on",
+    "passed": true
    }
   },
   {
@@ -3596,6 +4146,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 47268,
+    "inside": 32628,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 984,
+    "record": "records/pools-isr/stm32g474/adapter_memorypool.json",
+    "result": "outside its documentation; observed in 984 of 47268 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     12,
+     38
+    ],
+    "text": "outside its documentation; observed in 984 of 47268 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -3707,6 +4277,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 67052,
+    "inside": 52412,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g474/adapter_heapless.json",
+    "result": "passed: nothing observed in 67052 trials",
+    "coverage": [
+     56,
+     143
+    ],
+    "text": "passed: nothing observed in 67052 trials",
+    "passed": true
    }
   },
   {
@@ -3818,6 +4403,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 68156,
+    "inside": 53516,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g474/adapter_atomic_pool.json",
+    "result": "passed: nothing observed in 68156 trials",
+    "coverage": [
+     56,
+     175
+    ],
+    "text": "passed: nothing observed in 68156 trials",
+    "passed": true
    }
   },
   {
@@ -3929,6 +4529,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "ours",
+    "trials": 48904,
+    "inside": 34264,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g474/adapter_ref_primask.json",
+    "result": "passed: nothing observed in 48904 trials",
+    "irq_wait_cycles": {
+     "off": 17,
+     "on": 12
+    },
+    "coverage": [
+     5,
+     40
+    ],
+    "text": "passed: nothing observed in 48904 trials; an interrupt waited at most 17 cycles with the cache off, 12 with it on",
+    "passed": true
    }
   },
   {
@@ -4040,6 +4659,32 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 8168,
+    "inside": 7095,
+    "observed": [
+     "a block twice",
+     "a crash",
+     "blocks lost"
+    ],
+    "observed_trials": 442,
+    "record": "records/pools-isr/stm32h723/adapter_etl.json",
+    "result": "outside its documentation; observed in 442 of 8168 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 8168 with the cache off, in the check after the trial; cache on not run",
+    "stopped": {
+     "trial": 8168,
+     "cache": "off",
+     "where": "the check after the trial",
+     "desc": "a usage fault",
+     "pc_symbol": "(anonymous namespace)::etl_alloc(unsigned int, unsigned int)"
+    },
+    "coverage": [
+     19,
+     69
+    ],
+    "text": "outside its documentation; observed in 442 of 8168 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 8168 with the cache off, in the check after the trial; cache on not run",
+    "passed": false
    }
   },
   {
@@ -4151,6 +4796,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 79461,
+    "inside": 64989,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 3519,
+    "record": "records/pools-isr/stm32h723/adapter_riot.json",
+    "result": "outside its documentation; observed in 3519 of 79461 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     13,
+     49
+    ],
+    "text": "outside its documentation; observed in 3519 of 79461 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -4262,6 +4927,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 86024,
+    "inside": 72024,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32h723/adapter_threadx.json",
+    "result": "passed: nothing observed in 86024 trials",
+    "irq_wait_cycles": {
+     "off": 66,
+     "on": 33
+    },
+    "coverage": [
+     32,
+     277
+    ],
+    "text": "passed: nothing observed in 86024 trials; an interrupt waited at most 66 cycles with the cache off, 33 with it on",
+    "passed": true
    }
   },
   {
@@ -4373,6 +5057,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 94062,
+    "inside": 79892,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32h723/adapter_cmsis_rtx.json",
+    "result": "passed: nothing observed in 94062 trials",
+    "coverage": [
+     47,
+     111
+    ],
+    "text": "passed: nothing observed in 94062 trials",
+    "passed": true
    }
   },
   {
@@ -4484,6 +5183,24 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 108150,
+    "inside": 94437,
+    "observed": [
+     "a block although none was free",
+     "a block twice"
+    ],
+    "observed_trials": 1072,
+    "record": "records/pools-isr/stm32h723/adapter_contiki.json",
+    "result": "outside its documentation; observed in 1072 of 108150 trials: a block although none was free; a block twice",
+    "coverage": [
+     43,
+     91
+    ],
+    "text": "outside its documentation; observed in 1072 of 108150 trials: a block although none was free; a block twice",
+    "passed": false
    }
   },
   {
@@ -4595,6 +5312,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 102868,
+    "inside": 88670,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 4312,
+    "record": "records/pools-isr/stm32h723/adapter_c_allocator.json",
+    "result": "outside its documentation; observed in 4312 of 102868 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     54,
+     126
+    ],
+    "text": "outside its documentation; observed in 4312 of 102868 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -4706,6 +5443,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 94516,
+    "inside": 80757,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32h723/adapter_lwip.json",
+    "result": "passed: nothing observed in 94516 trials",
+    "irq_wait_cycles": {
+     "off": 77,
+     "on": 37
+    },
+    "coverage": [
+     19,
+     88
+    ],
+    "text": "passed: nothing observed in 94516 trials; an interrupt waited at most 77 cycles with the cache off, 37 with it on",
+    "passed": true
    }
   },
   {
@@ -4817,6 +5573,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 62725,
+    "inside": 49016,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 392,
+    "record": "records/pools-isr/stm32h723/adapter_memorypool.json",
+    "result": "outside its documentation; observed in 392 of 62725 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     9,
+     40
+    ],
+    "text": "outside its documentation; observed in 392 of 62725 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -4928,6 +5704,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 77186,
+    "inside": 63522,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32h723/adapter_heapless.json",
+    "result": "passed: nothing observed in 77186 trials",
+    "coverage": [
+     44,
+     147
+    ],
+    "text": "passed: nothing observed in 77186 trials",
+    "passed": true
    }
   },
   {
@@ -5039,6 +5830,21 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 79104,
+    "inside": 65440,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32h723/adapter_atomic_pool.json",
+    "result": "passed: nothing observed in 79104 trials",
+    "coverage": [
+     45,
+     177
+    ],
+    "text": "passed: nothing observed in 79104 trials",
+    "passed": true
    }
   },
   {
@@ -5150,6 +5956,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "ours",
+    "trials": 67232,
+    "inside": 53568,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32h723/adapter_ref_primask.json",
+    "result": "passed: nothing observed in 67232 trials",
+    "irq_wait_cycles": {
+     "off": 67,
+     "on": 27
+    },
+    "coverage": [
+     6,
+     42
+    ],
+    "text": "passed: nothing observed in 67232 trials; an interrupt waited at most 67 cycles with the cache off, 27 with it on",
+    "passed": true
    }
   },
   {
@@ -5261,6 +6086,32 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 4838,
+    "inside": 3567,
+    "observed": [
+     "a block twice",
+     "a crash",
+     "blocks lost"
+    ],
+    "observed_trials": 689,
+    "record": "records/pools-isr/stm32g0b1/adapter_etl.json",
+    "result": "outside its documentation; observed in 689 of 4838 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4838 with the cache off, in the check after the trial; cache on not run",
+    "stopped": {
+     "trial": 4838,
+     "cache": "off",
+     "where": "the check after the trial",
+     "desc": "a HardFault",
+     "pc_symbol": "(anonymous namespace)::etl_alloc(unsigned int, unsigned int)"
+    },
+    "coverage": [
+     27,
+     76
+    ],
+    "text": "outside its documentation; observed in 689 of 4838 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4838 with the cache off, in the check after the trial; cache on not run",
+    "passed": false
    }
   },
   {
@@ -5372,6 +6223,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 70640,
+    "inside": 53316,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 6652,
+    "record": "records/pools-isr/stm32g0b1/adapter_riot.json",
+    "result": "outside its documentation; observed in 6652 of 70640 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     16,
+     59
+    ],
+    "text": "outside its documentation; observed in 6652 of 70640 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -5483,6 +6354,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 75808,
+    "inside": 58484,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g0b1/adapter_threadx.json",
+    "result": "passed: nothing observed in 75808 trials",
+    "irq_wait_cycles": {
+     "off": 31,
+     "on": 25
+    },
+    "coverage": [
+     34,
+     336
+    ],
+    "text": "passed: nothing observed in 75808 trials; an interrupt waited at most 31 cycles with the cache off, 25 with it on",
+    "passed": true
    }
   },
   {
@@ -5594,6 +6484,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 67892,
+    "inside": 50568,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g0b1/adapter_cmsis_rtx.json",
+    "result": "passed: nothing observed in 67892 trials",
+    "irq_wait_cycles": {
+     "off": 22,
+     "on": 16
+    },
+    "coverage": [
+     29,
+     115
+    ],
+    "text": "passed: nothing observed in 67892 trials; an interrupt waited at most 22 cycles with the cache off, 16 with it on",
+    "passed": true
    }
   },
   {
@@ -5705,6 +6614,24 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 105496,
+    "inside": 88172,
+    "observed": [
+     "a block although none was free",
+     "a block twice"
+    ],
+    "observed_trials": 672,
+    "record": "records/pools-isr/stm32g0b1/adapter_contiki.json",
+    "result": "outside its documentation; observed in 672 of 105496 trials: a block although none was free; a block twice",
+    "coverage": [
+     58,
+     97
+    ],
+    "text": "outside its documentation; observed in 672 of 105496 trials: a block although none was free; a block twice",
+    "passed": false
    }
   },
   {
@@ -5816,6 +6743,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 92392,
+    "inside": 75068,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 3416,
+    "record": "records/pools-isr/stm32g0b1/adapter_c_allocator.json",
+    "result": "outside its documentation; observed in 3416 of 92392 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     85,
+     140
+    ],
+    "text": "outside its documentation; observed in 3416 of 92392 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -5927,6 +6874,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 77200,
+    "inside": 59876,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g0b1/adapter_lwip.json",
+    "result": "passed: nothing observed in 77200 trials",
+    "irq_wait_cycles": {
+     "off": 30,
+     "on": 23
+    },
+    "coverage": [
+     31,
+     105
+    ],
+    "text": "passed: nothing observed in 77200 trials; an interrupt waited at most 30 cycles with the cache off, 23 with it on",
+    "passed": true
    }
   },
   {
@@ -6038,6 +7004,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 49664,
+    "inside": 32340,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 1688,
+    "record": "records/pools-isr/stm32g0b1/adapter_memorypool.json",
+    "result": "outside its documentation; observed in 1688 of 49664 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     19,
+     55
+    ],
+    "text": "outside its documentation; observed in 1688 of 49664 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -6149,6 +7135,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 79388,
+    "inside": 62064,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g0b1/adapter_atomic_pool.json",
+    "result": "passed: nothing observed in 79388 trials",
+    "irq_wait_cycles": {
+     "off": 26,
+     "on": 20
+    },
+    "coverage": [
+     55,
+     370
+    ],
+    "text": "passed: nothing observed in 79388 trials; an interrupt waited at most 26 cycles with the cache off, 20 with it on",
+    "passed": true
    }
   },
   {
@@ -6260,6 +7265,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "ours",
+    "trials": 52540,
+    "inside": 35216,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/stm32g0b1/adapter_ref_primask.json",
+    "result": "passed: nothing observed in 52540 trials",
+    "irq_wait_cycles": {
+     "off": 20,
+     "on": 16
+    },
+    "coverage": [
+     7,
+     48
+    ],
+    "text": "passed: nothing observed in 52540 trials; an interrupt waited at most 20 cycles with the cache off, 16 with it on",
+    "passed": true
    }
   },
   {
@@ -6371,6 +7395,32 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 4217,
+    "inside": 3111,
+    "observed": [
+     "a block twice",
+     "a crash",
+     "blocks lost"
+    ],
+    "observed_trials": 667,
+    "record": "records/pools-isr/samd20/adapter_etl.json",
+    "result": "outside its documentation; observed in 667 of 4217 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4217 with the cache off, in the check after the trial; cache on not run",
+    "stopped": {
+     "trial": 4217,
+     "cache": "off",
+     "where": "the check after the trial",
+     "desc": "a HardFault",
+     "pc_symbol": "(anonymous namespace)::etl_alloc(unsigned int, unsigned int)"
+    },
+    "coverage": [
+     27,
+     76
+    ],
+    "text": "outside its documentation; observed in 667 of 4217 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4217 with the cache off, in the check after the trial; cache on not run",
+    "passed": false
    }
   },
   {
@@ -6482,6 +7532,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 62648,
+    "inside": 46544,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 6488,
+    "record": "records/pools-isr/samd20/adapter_riot.json",
+    "result": "outside its documentation; observed in 6488 of 62648 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     16,
+     59
+    ],
+    "text": "outside its documentation; observed in 6488 of 62648 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -6593,6 +7663,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 69212,
+    "inside": 53108,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/samd20/adapter_threadx.json",
+    "result": "passed: nothing observed in 69212 trials",
+    "irq_wait_cycles": {
+     "off": 29,
+     "on": 25
+    },
+    "coverage": [
+     34,
+     336
+    ],
+    "text": "passed: nothing observed in 69212 trials; an interrupt waited at most 29 cycles with the cache off, 25 with it on",
+    "passed": true
    }
   },
   {
@@ -6704,6 +7793,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 61672,
+    "inside": 45568,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/samd20/adapter_cmsis_rtx.json",
+    "result": "passed: nothing observed in 61672 trials",
+    "irq_wait_cycles": {
+     "off": 22,
+     "on": 19
+    },
+    "coverage": [
+     29,
+     115
+    ],
+    "text": "passed: nothing observed in 61672 trials; an interrupt waited at most 22 cycles with the cache off, 19 with it on",
+    "passed": true
    }
   },
   {
@@ -6815,6 +7923,24 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 99060,
+    "inside": 82956,
+    "observed": [
+     "a block although none was free",
+     "a block twice"
+    ],
+    "observed_trials": 704,
+    "record": "records/pools-isr/samd20/adapter_contiki.json",
+    "result": "outside its documentation; observed in 704 of 99060 trials: a block although none was free; a block twice",
+    "coverage": [
+     58,
+     97
+    ],
+    "text": "outside its documentation; observed in 704 of 99060 trials: a block although none was free; a block twice",
+    "passed": false
    }
   },
   {
@@ -6926,6 +8052,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 84328,
+    "inside": 68224,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 3536,
+    "record": "records/pools-isr/samd20/adapter_c_allocator.json",
+    "result": "outside its documentation; observed in 3536 of 84328 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     85,
+     140
+    ],
+    "text": "outside its documentation; observed in 3536 of 84328 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -7037,6 +8183,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 70360,
+    "inside": 54256,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/samd20/adapter_lwip.json",
+    "result": "passed: nothing observed in 70360 trials",
+    "irq_wait_cycles": {
+     "off": 29,
+     "on": 25
+    },
+    "coverage": [
+     31,
+     105
+    ],
+    "text": "passed: nothing observed in 70360 trials; an interrupt waited at most 29 cycles with the cache off, 25 with it on",
+    "passed": true
    }
   },
   {
@@ -7148,6 +8313,26 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "outside",
+    "trials": 43128,
+    "inside": 27024,
+    "observed": [
+     "a block although none was free",
+     "a block twice",
+     "a block twice, afterwards",
+     "blocks lost"
+    ],
+    "observed_trials": 1560,
+    "record": "records/pools-isr/samd20/adapter_memorypool.json",
+    "result": "outside its documentation; observed in 1560 of 43128 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "coverage": [
+     19,
+     55
+    ],
+    "text": "outside its documentation; observed in 1560 of 43128 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
+    "passed": false
    }
   },
   {
@@ -7259,6 +8444,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "within",
+    "trials": 74139,
+    "inside": 58035,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/samd20/adapter_atomic_pool.json",
+    "result": "passed: nothing observed in 74139 trials",
+    "irq_wait_cycles": {
+     "off": 23,
+     "on": 21
+    },
+    "coverage": [
+     55,
+     370
+    ],
+    "text": "passed: nothing observed in 74139 trials; an interrupt waited at most 23 cycles with the cache off, 21 with it on",
+    "passed": true
    }
   },
   {
@@ -7370,6 +8574,25 @@
      ],
      "empty/free": null
     }
+   },
+   "isr": {
+    "class": "ours",
+    "trials": 45984,
+    "inside": 29880,
+    "observed": [],
+    "observed_trials": 0,
+    "record": "records/pools-isr/samd20/adapter_ref_primask.json",
+    "result": "passed: nothing observed in 45984 trials",
+    "irq_wait_cycles": {
+     "off": 18,
+     "on": 14
+    },
+    "coverage": [
+     7,
+     48
+    ],
+    "text": "passed: nothing observed in 45984 trials; an interrupt waited at most 18 cycles with the cache off, 14 with it on",
+    "passed": true
    }
   }
  ],
@@ -8020,5 +9243,450 @@
  "baseline_documented": {
   "text": "the baseline: no lock; measured in one context only",
   "source": "kinds/pools/adapter_ref.c"
- }
+ },
+ "isr_source": {
+  "records": "records/pools-isr",
+  "commits": [
+   "f344730728a6"
+  ],
+  "board_notes": {
+   "pico2": "On this board with the cache off, a call longer than about 2,900 cycles is interrupted only in its first part: the sweep moves the interrupt up to 4,096 cycles after it is armed, and about 1,200 of those come before the call. The record's coverage per function names the instructions no interrupt landed on."
+  }
+ },
+ "baseline_isr": [
+  {
+   "board": "nrf5340dk",
+   "class": "control",
+   "trials": 42048,
+   "inside": 30824,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 784,
+   "record": "records/pools-isr/nrf5340/adapter_ref.json",
+   "result": "caught in 784 of 42048 trials",
+   "coverage": [
+    12,
+    36
+   ],
+   "text": "caught in 784 of 42048 trials",
+   "passed": false
+  },
+  {
+   "board": "pico2",
+   "class": "control",
+   "trials": 412096,
+   "inside": 364760,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 12740,
+   "record": "records/pools-isr/rp2350/adapter_ref.json",
+   "result": "caught in 12740 of 412096 trials",
+   "coverage": [
+    13,
+    36
+   ],
+   "text": "caught in 12740 of 412096 trials",
+   "passed": false
+  },
+  {
+   "board": "nucleo-g474re",
+   "class": "control",
+   "trials": 46644,
+   "inside": 32004,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 900,
+   "record": "records/pools-isr/stm32g474/adapter_ref.json",
+   "result": "caught in 900 of 46644 trials",
+   "coverage": [
+    12,
+    34
+   ],
+   "text": "caught in 900 of 46644 trials",
+   "passed": false
+  },
+  {
+   "board": "nucleo-h723zg",
+   "class": "control",
+   "trials": 61140,
+   "inside": 47368,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 452,
+   "record": "records/pools-isr/stm32h723/adapter_ref.json",
+   "result": "caught in 452 of 61140 trials",
+   "coverage": [
+    11,
+    36
+   ],
+   "text": "caught in 452 of 61140 trials",
+   "passed": false
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "class": "control",
+   "trials": 48128,
+   "inside": 30804,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 1552,
+   "record": "records/pools-isr/stm32g0b1/adapter_ref.json",
+   "result": "caught in 1552 of 48128 trials",
+   "coverage": [
+    13,
+    42
+   ],
+   "text": "caught in 1552 of 48128 trials",
+   "passed": false
+  },
+  {
+   "board": "sam-d20-xpro",
+   "class": "control",
+   "trials": 41592,
+   "inside": 25488,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 1688,
+   "record": "records/pools-isr/samd20/adapter_ref.json",
+   "result": "caught in 1688 of 41592 trials",
+   "coverage": [
+    13,
+    42
+   ],
+   "text": "caught in 1688 of 41592 trials",
+   "passed": false
+  }
+ ],
+ "isr_controls": [
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_broken_isr_alloc",
+   "name": "broken: interrupts on too early in alloc (our control)",
+   "class": "control",
+   "trials": 43248,
+   "inside": 32024,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "blocks lost"
+   ],
+   "observed_trials": 1428,
+   "record": "records/pools-isr/nrf5340/adapter_broken_isr_alloc.json",
+   "result": "caught in 1428 of 43248 trials",
+   "irq_wait_cycles": {
+    "off": 26,
+    "on": 13
+   },
+   "coverage": [
+    7,
+    37
+   ],
+   "text": "caught in 1428 of 43248 trials; an interrupt waited at most 26 cycles with the cache off, 13 with it on",
+   "passed": false
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_broken_isr_free",
+   "name": "broken: interrupts on too early in free (our control)",
+   "class": "control",
+   "trials": 43960,
+   "inside": 32736,
+   "observed": [
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 1260,
+   "record": "records/pools-isr/nrf5340/adapter_broken_isr_free.json",
+   "result": "caught in 1260 of 43960 trials",
+   "irq_wait_cycles": {
+    "off": 28,
+    "on": 15
+   },
+   "coverage": [
+    6,
+    37
+   ],
+   "text": "caught in 1260 of 43960 trials; an interrupt waited at most 28 cycles with the cache off, 15 with it on",
+   "passed": false
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_broken_isr_alloc",
+   "name": "broken: interrupts on too early in alloc (our control)",
+   "class": "control",
+   "trials": 420440,
+   "inside": 373104,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "blocks lost"
+   ],
+   "observed_trials": 17272,
+   "record": "records/pools-isr/rp2350/adapter_broken_isr_alloc.json",
+   "result": "caught in 17272 of 420440 trials",
+   "irq_wait_cycles": {
+    "off": 313,
+    "on": 13
+   },
+   "coverage": [
+    8,
+    37
+   ],
+   "text": "caught in 17272 of 420440 trials; an interrupt waited at most 313 cycles with the cache off, 13 with it on",
+   "passed": false
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_broken_isr_free",
+   "name": "broken: interrupts on too early in free (our control)",
+   "class": "control",
+   "trials": 421020,
+   "inside": 373684,
+   "observed": [
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 16920,
+   "record": "records/pools-isr/rp2350/adapter_broken_isr_free.json",
+   "result": "caught in 16920 of 421020 trials",
+   "irq_wait_cycles": {
+    "off": 395,
+    "on": 15
+   },
+   "coverage": [
+    7,
+    37
+   ],
+   "text": "caught in 16920 of 421020 trials; an interrupt waited at most 395 cycles with the cache off, 15 with it on",
+   "passed": false
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_broken_isr_alloc",
+   "name": "broken: interrupts on too early in alloc (our control)",
+   "class": "control",
+   "trials": 49076,
+   "inside": 34436,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "blocks lost"
+   ],
+   "observed_trials": 1496,
+   "record": "records/pools-isr/stm32g474/adapter_broken_isr_alloc.json",
+   "result": "caught in 1496 of 49076 trials",
+   "irq_wait_cycles": {
+    "off": 16,
+    "on": 12
+   },
+   "coverage": [
+    7,
+    37
+   ],
+   "text": "caught in 1496 of 49076 trials; an interrupt waited at most 16 cycles with the cache off, 12 with it on",
+   "passed": false
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_broken_isr_free",
+   "name": "broken: interrupts on too early in free (our control)",
+   "class": "control",
+   "trials": 49524,
+   "inside": 34884,
+   "observed": [
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 1456,
+   "record": "records/pools-isr/stm32g474/adapter_broken_isr_free.json",
+   "result": "caught in 1456 of 49524 trials",
+   "irq_wait_cycles": {
+    "off": 18,
+    "on": 12
+   },
+   "coverage": [
+    7,
+    37
+   ],
+   "text": "caught in 1456 of 49524 trials; an interrupt waited at most 18 cycles with the cache off, 12 with it on",
+   "passed": false
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_broken_isr_alloc",
+   "name": "broken: interrupts on too early in alloc (our control)",
+   "class": "control",
+   "trials": 67068,
+   "inside": 53404,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "blocks lost"
+   ],
+   "observed_trials": 3128,
+   "record": "records/pools-isr/stm32h723/adapter_broken_isr_alloc.json",
+   "result": "caught in 3128 of 67068 trials",
+   "irq_wait_cycles": {
+    "off": 41,
+    "on": 24
+   },
+   "coverage": [
+    8,
+    37
+   ],
+   "text": "caught in 3128 of 67068 trials; an interrupt waited at most 41 cycles with the cache off, 24 with it on",
+   "passed": false
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_broken_isr_free",
+   "name": "broken: interrupts on too early in free (our control)",
+   "class": "control",
+   "trials": 67968,
+   "inside": 54304,
+   "observed": [
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 1800,
+   "record": "records/pools-isr/stm32h723/adapter_broken_isr_free.json",
+   "result": "caught in 1800 of 67968 trials",
+   "irq_wait_cycles": {
+    "off": 63,
+    "on": 27
+   },
+   "coverage": [
+    8,
+    37
+   ],
+   "text": "caught in 1800 of 67968 trials; an interrupt waited at most 63 cycles with the cache off, 27 with it on",
+   "passed": false
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_broken_isr_alloc",
+   "name": "broken: interrupts on too early in alloc (our control)",
+   "class": "control",
+   "trials": 52092,
+   "inside": 34768,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "blocks lost"
+   ],
+   "observed_trials": 2448,
+   "record": "records/pools-isr/stm32g0b1/adapter_broken_isr_alloc.json",
+   "result": "caught in 2448 of 52092 trials",
+   "irq_wait_cycles": {
+    "off": 14,
+    "on": 13
+   },
+   "coverage": [
+    11,
+    44
+   ],
+   "text": "caught in 2448 of 52092 trials; an interrupt waited at most 14 cycles with the cache off, 13 with it on",
+   "passed": false
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_broken_isr_free",
+   "name": "broken: interrupts on too early in free (our control)",
+   "class": "control",
+   "trials": 52540,
+   "inside": 35216,
+   "observed": [
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 1620,
+   "record": "records/pools-isr/stm32g0b1/adapter_broken_isr_free.json",
+   "result": "caught in 1620 of 52540 trials",
+   "irq_wait_cycles": {
+    "off": 20,
+    "on": 16
+   },
+   "coverage": [
+    8,
+    44
+   ],
+   "text": "caught in 1620 of 52540 trials; an interrupt waited at most 20 cycles with the cache off, 16 with it on",
+   "passed": false
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_broken_isr_alloc",
+   "name": "broken: interrupts on too early in alloc (our control)",
+   "class": "control",
+   "trials": 45984,
+   "inside": 29880,
+   "observed": [
+    "a block although none was free",
+    "a block twice",
+    "blocks lost"
+   ],
+   "observed_trials": 2176,
+   "record": "records/pools-isr/samd20/adapter_broken_isr_alloc.json",
+   "result": "caught in 2176 of 45984 trials",
+   "irq_wait_cycles": {
+    "off": 15,
+    "on": 13
+   },
+   "coverage": [
+    11,
+    44
+   ],
+   "text": "caught in 2176 of 45984 trials; an interrupt waited at most 15 cycles with the cache off, 13 with it on",
+   "passed": false
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_broken_isr_free",
+   "name": "broken: interrupts on too early in free (our control)",
+   "class": "control",
+   "trials": 45984,
+   "inside": 29880,
+   "observed": [
+    "a block twice, afterwards",
+    "blocks lost"
+   ],
+   "observed_trials": 1620,
+   "record": "records/pools-isr/samd20/adapter_broken_isr_free.json",
+   "result": "caught in 1620 of 45984 trials",
+   "irq_wait_cycles": {
+    "off": 18,
+    "on": 14
+   },
+   "coverage": [
+    8,
+    44
+   ],
+   "text": "caught in 1620 of 45984 trials; an interrupt waited at most 18 cycles with the cache off, 14 with it on",
+   "passed": false
+  }
+ ]
 }
