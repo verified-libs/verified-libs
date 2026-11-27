@@ -86,7 +86,7 @@ libraries with a licence.
 |---|---|---|---|---|---|
 | endurodave/C_Allocator | MIT | 2026-11-16 | v2.1.0 | Fixed-block allocator in C; a CI job named "RTOS Locks" (`README.md`); a lock guard (`src/LockGuard.h`) | Article on CodeProject; Arduino library manifest |
 | Igwe-Starking/eccles-rtmem | MIT | 2026-10-03 | v2.0.0 | Pool allocator in C99; Cortex-M PRIMASK backend; "RTOS-mutex backends aren't ISR-safe by default. Interrupt-masking backends (AVR, MSP430, Cortex-M…) are." (`README.md`) | – |
-| bertmelis/MemoryPool | MIT | 2024-05-15 | v0.1.0 | C++; a compile warning "The memory pool is not thread safe" where `std::mutex` is missing (`src/Fixed.h`) | Arduino/PlatformIO library |
+| bertmelis/MemoryPool | MIT | 2024-05-15 | v0.1.0; the kind measures main `5073178` (unreleased; after v0.1.0): its only release spaces `Fixed`'s blocks by a pointer's size and does not build for arm-none-eabi, both fixed at the head ([why](../kinds/pools/README.md), added 2026-11-26) | C++; a compile warning "The memory pool is not thread safe" where `std::mutex` is missing (`src/Fixed.h` at the head; v0.1.0 has no such check) | Arduino/PlatformIO library |
 
 ### Considered, not proposed
 

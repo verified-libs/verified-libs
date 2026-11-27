@@ -31,12 +31,22 @@ crc_images_digest; the ledger holds the checksum of the CRC test sources it
 was made from (sources_crc) beside that of the ring buffers' (sources). The
 libraries are copied from VL_CRC_LIBS_FROM (default ~/vl-next/kind-crc, if
 there) before they are fetched.
+The records of the pools kind (records/pools) are held the same way, with
+kinds/pools/bench/poolverify.sh, entries pools/<board>/<file> and the
+checksum of the pools test sources (sources_pools); libraries from
+VL_POOLS_LIBS_FROM (default ~/vl-next/kind-pools).
 
 --all   rebuild every record with an image checksum, also those the
         export takes without one, but for archived series, which
         the tree is not meant to build (a check of the whole tree; about
         20 seconds per record, half a minute per board for version 2)
 --out   write there instead of records/rebuilt.json
+
+VL_LIB_MIRROR=DIR: fetch the libraries from that local mirror only
+(lab/tools/lib-mirror.py; it must hold every pin, or nothing is rebuilt), not
+from the network. A rebuild whose library fetch failed is "not checked" with
+a note that begins "could not fetch the libraries", never "differs": a
+network fault is not a record that this tree builds another image of.
 
 With nothing to rebuild, no file is written. Commit the file with the
 records: the export reads it from HEAD.
@@ -56,7 +66,17 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 spec = importlib.util.spec_from_file_location("public_export", os.path.join(HERE, "public-export.py"))
 pe = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pe)
+spec = importlib.util.spec_from_file_location("lib_mirror", os.path.join(HERE, "lib-mirror.py"))
+lm = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(lm)
 
+# per kind of pe.KINDS: the check of a record (VL_TREE=1) and where its libraries are copied from
+KIND_VERIFY = {"crc": ("kinds/crc/bench/crcverify.sh", "VL_CRC_LIBS_FROM", "~/vl-next/kind-crc"),
+               "pools": ("kinds/pools/bench/poolverify.sh", "VL_POOLS_LIBS_FROM", "~/vl-next/kind-pools")}
+# a fetch of the libraries that failed, in the note of a record "not checked" (git's own words, and the verify scripts')
+FETCH_FAULT = re.compile(r"could not be fetched|could not fetch|fatal: early EOF|fetch-pack|could not read from remote|"
+                         r"Could not resolve host|unable to access|transport '\w+' not allowed|remote end hung up|"
+                         r"RPC failed|not our ref|couldn't find remote ref|Connection (?:timed out|reset|refused)", re.I)
 LINE = re.compile(r"^(\S+): (MATCH|DIFFERS)\s+(?:record [0-9a-f]{64}, rebuilt )?([0-9a-f]{64})\s+\((.*)\)(.*)$")
 
 
@@ -78,10 +98,15 @@ def main():
     try:
         arch = pe.archived()
 
-        def passes(c):
+        def archived_rec(c, name):
+            """the record (its path under records/) belongs to an archived series of commit c: an entry
+            of the commit that covers its path (an entry with "paths" covers only those, as in the export)"""
+            return any(pe.under(name, e) for e in arch.get(c[:12], []))
+
+        def passes(c, name):
             """the export takes a record of commit c without a rebuild: the tree's sources,
-            those but for recorded host fixes, or an archived series"""
-            return pe.same_sources(c) or pe.host_fixed(c) or c[:12] in arch
+            those but for recorded host fixes, or an archived series that covers it"""
+            return pe.same_sources(c) or pe.host_fixed(c) or archived_rec(c, name)
         todo = {}   # file name -> fw_sha256
         for f in git("ls-tree", "-r", "--name-only", "HEAD", "--", "records/bench", "records/stress").split("\n"):
             if not f.endswith(".json"):
@@ -93,7 +118,8 @@ def main():
             commits = set()
             for one, many in pe.RECORD_COMMIT.findall(text):
                 commits.update([one] if one else re.findall(r"[0-9a-f]{12,40}", many))
-            if not all(passes(c) for c in commits) or (every and not all(c[:12] in arch for c in commits)):
+            rel = f[len("records/"):]
+            if not all(passes(c, rel) for c in commits) or (every and not all(archived_rec(c, rel) for c in commits)):
                 name = os.path.basename(f)
                 if name in todo:
                     sys.exit(f"{name}: two records of that name")
@@ -106,65 +132,81 @@ def main():
                 continue
             text = git("show", f"HEAD:{f}")
             rec = json.loads(text)
-            if not passes(rec["bench_commit"]) or (every and rec["bench_commit"][:12] not in arch):
+            rel = f[len("records/"):]
+            if not passes(rec["bench_commit"], rel) or (every and not archived_rec(rec["bench_commit"], rel)):
                 name = f[len("records/"):]
                 todo2[name] = pe.v2_images_digest(rec)
                 os.makedirs(os.path.dirname(os.path.join(work, name)), exist_ok=True)
                 with open(os.path.join(work, name), "w") as fh:
                     fh.write(text)
-        todo3 = {}   # crc/<board>/<file> -> checksum over the record's images
-        for f in git("ls-tree", "-r", "--name-only", "HEAD", "--", pe.CRC_RECORDS.rstrip("/")).split("\n"):
-            if not f.endswith(".json"):
-                continue
-            text = git("show", f"HEAD:{f}")
-            rec = json.loads(text)
-            c = rec.get("bench_commit") or "unknown"
-            same = pe.source_ids(c, "crc")[0] is not None and pe.source_ids(c, "crc")[0] == pe.source_ids("HEAD", "crc")[0]
-            if every or (not same and not pe.crc_host_fixed(c) and pe.crc_host_stands(c)):
-                name = f[len("records/"):]
-                todo3[name] = pe.crc_images_digest(rec)
-                os.makedirs(os.path.dirname(os.path.join(work, name)), exist_ok=True)
-                with open(os.path.join(work, name), "w") as fh:
-                    fh.write(text)
+        todo3 = {}   # <kind>/<board>/<file> -> checksum over the record's images, for every kind of pe.KINDS
+        for kind, kv in pe.KINDS.items():
+            for f in git("ls-tree", "-r", "--name-only", "HEAD", "--", kv["records"].rstrip("/")).split("\n"):
+                if not f.endswith(".json"):
+                    continue
+                text = git("show", f"HEAD:{f}")
+                rec = json.loads(text)
+                c = rec.get("bench_commit") or "unknown"
+                if archived_rec(c, f[len("records/"):]):
+                    continue                         # an archived series: the tree is not meant to build it
+                same = pe.source_ids(c, kind)[0] is not None and pe.source_ids(c, kind)[0] == pe.source_ids("HEAD", kind)[0]
+                if every or (not same and not pe.crc_host_fixed(c, kind) and pe.crc_host_stands(c, kind)):
+                    name = f[len("records/"):]
+                    todo3[name] = pe.crc_images_digest(rec)
+                    os.makedirs(os.path.dirname(os.path.join(work, name)), exist_ok=True)
+                    with open(os.path.join(work, name), "w") as fh:
+                        fh.write(text)
         if not todo and not todo2 and not todo3:
             print("nothing to rebuild: every record with an image checksum is one the export takes as it is (the sources of HEAD, a recorded host fix, or an archived series)")
             if os.path.exists(out):
                 print(f"({out} exists; the export takes it only if it was made from these sources)")
             return 0
         env = dict(os.environ, VL_TREE="1", VL_REPO=ROOT, TMPDIR=work)
+        if os.environ.get("VL_LIB_MIRROR"):
+            mirror = os.path.abspath(os.path.expanduser(os.environ["VL_LIB_MIRROR"]))
+            bad = lm.check(mirror, lm.pins())
+            if bad:
+                print("\n".join(bad), file=sys.stderr)
+                sys.exit(f"could not fetch the libraries: the mirror {mirror} lacks {len(bad)} pins; nothing rebuilt")
+            env.update(lm.env(mirror, lm.pins()))
         libs = os.path.join(ROOT, "firmware/nrf5340-rb-bench/build/libs")
         if "VL_LIBS_FROM" not in env and os.path.isdir(libs):
             env["VL_LIBS_FROM"] = libs
         print(f"rebuilding {len(todo) + len(todo2) + len(todo3)} records from the sources of {head[:12]}", flush=True)
         records, last = {}, None
-        if todo3:
+        for kind, (script, libs_var, libs_default) in KIND_VERIFY.items():
+            mine = {n: d for n, d in todo3.items() if n.startswith(kind + "/")}
+            if not mine:
+                continue
             env3 = dict(env)
             env3.pop("VL_LIBS_FROM", None)
-            libs3 = os.environ.get("VL_CRC_LIBS_FROM", os.path.expanduser("~/vl-next/kind-crc"))
+            libs3 = os.environ.get(libs_var, os.path.expanduser(libs_default))
             if os.path.isdir(libs3):
                 env3["VL_LIBS_FROM"] = libs3
-            p = subprocess.Popen(["bash", os.path.join(ROOT, "kinds/crc/bench/crcverify.sh"),
-                                  *[os.path.join(work, n) for n in sorted(todo3)]], stdout=subprocess.PIPE, text=True, env=env3)
+            p = subprocess.Popen(["bash", os.path.join(ROOT, script), *[os.path.join(work, n) for n in sorted(mine)]],
+                                 stdout=subprocess.PIPE, text=True, env=env3)
+            last = None
             for line in p.stdout:
                 line = line.rstrip("\n")
                 print(line, flush=True)
                 m = re.match(r"^(\S+): (MATCH|DIFFERS)  (.*)$", line)
-                name = "crc/" + m.group(1) + ".json" if m else None
-                if name in todo3:
+                name = f"{kind}/" + m.group(1) + ".json" if m else None
+                if name in mine:
                     last = name
-                    records[last] = {"images_sha256": todo3[last], "result": "match" if m.group(2) == "MATCH" else "differs"}
+                    records[last] = {"images_sha256": mine[last], "result": "match" if m.group(2) == "MATCH" else "differs"}
                     if "ELF file differs" in m.group(3):
                         records[last]["note"] = m.group(3).rsplit("; ", 1)[-1]
-                elif line.startswith("  ") and last in todo3 and not line.startswith("  kept:"):
+                elif line.startswith("  ") and last in mine and not line.startswith("  kept:"):
                     records[last]["note"] = "; ".join(filter(None, [records[last].get("note"), line.strip()]))
                 else:
                     m = re.match(r"^(\S+): (.*)$", line)
-                    if m and "crc/" + m.group(1) + ".json" in todo3:
-                        last = "crc/" + m.group(1) + ".json"
-                        records[last] = {"images_sha256": todo3[last], "result": "not checked", "note": m.group(2)}
+                    if m and f"{kind}/" + m.group(1) + ".json" in mine:
+                        last = f"{kind}/" + m.group(1) + ".json"
+                        records[last] = {"images_sha256": mine[last], "result": "not checked", "note": m.group(2)}
             p.wait()
-            for n in todo3:
-                records.setdefault(n, {"images_sha256": todo3[n], "result": "not checked", "note": "no result from crcverify.sh"})
+            for n in mine:
+                records.setdefault(n, {"images_sha256": mine[n], "result": "not checked",
+                                       "note": f"no result from {os.path.basename(script)}"})
             last = None
         if todo2:
             p = subprocess.Popen(["bash", os.path.join(ROOT, "firmware/nrf5340-rb-bench/oneverify.sh"),
@@ -215,10 +257,15 @@ def main():
             p.wait()
         for n in todo:
             records.setdefault(n, {"fw_sha256": todo[n], "result": "not checked", "note": "no result from verify-build.sh"})
+        for r in records.values():
+            if r["result"] == "not checked" and FETCH_FAULT.search(r.get("note", "")) \
+                    and not r["note"].startswith("could not fetch the libraries"):
+                r["note"] = "could not fetch the libraries: " + r["note"]
         led = {"about": "Rebuilds of the records of other commits from this tree's test sources "
                         "(lab/tools/image-ledger.py, DECISIONS 2026-11-22). match: the tree builds, byte for byte, "
                         "the image the record was measured from.",
-               "commit": head, "sources": pe.source_ids("HEAD")[0], "sources_crc": pe.source_ids("HEAD", "crc")[0],
+               "commit": head, "sources": pe.source_ids("HEAD")[0],
+               **{f"sources_{k}": pe.source_ids("HEAD", k)[0] for k in pe.KINDS},
                "records": {n: records[n] for n in sorted(records)}}
         os.makedirs(os.path.dirname(out), exist_ok=True)
         with open(out, "w") as fh:

@@ -2,6 +2,99 @@
 
 Short log of what was decided and why. Newest first.
 
+## 2026-11-26: Method version 3 as counted, and pxq kept apart
+Decided by the owner ("vi gør som du har foreslået"), on the counted
+proposal of [`lab/plans/2026-11-26-method-version-3.md`](lab/plans/2026-11-26-method-version-3.md)
+and the reviewer's recommendations.
+- **Version 3 as proposed:** the order of jobs and the counts (about 30
+  flash writes); the draft applied on `kind-pools` (`ce79a27`: host fixes,
+  ledger, the nRF5340's and H723's present records archived as three
+  series "before method version 3").
+- **The three stress scripts stay untouched** in version 3: no rule
+  exception, not made host-fixable. Their "64 MHz (reset clock)" line for
+  the H723 is corrected when a new stress series is made.
+- **One watched power-on of the nRF5340 DK**, after the reruns' records
+  are made, to show that the new stub opens the port at boot. The recovery
+  is at hand, and the reviewer gives the OK at that moment. Until then the
+  board is never power-cycled.
+- **The Pico 2's pools write is alone and timed.** No timing beside a
+  neighbour's write now.
+- **pxq is kept apart.** Version 3 runs with the present pxq pin. The
+  owner's coming changes to pxq follow afterwards as a library update of
+  their own on all six boards, as lwrb v3.4.0 was: a tagged version, the
+  same checks, its own decision and publication.
+
+## 2026-11-26: Pools as the third kind, and method version 3
+Decided by the owner on the two plans at commit `2653e87`
+([`lab/plans/2026-11-26-pools-kind.md`](lab/plans/2026-11-26-pools-kind.md),
+[`lab/plans/2026-11-26-method-version-3.md`](lab/plans/2026-11-26-method-version-3.md)),
+every point as recommended.
+- **Pools (all 7):**
+  - "Narrower" means the bare-metal pools plus the two RTOS pools shown to
+    run alone (10 configurations, at most 12).
+  - The first series is one context only; the interrupt claims are shown
+    as documented, not tested, and the page says so.
+  - One pool shape, 32 blocks of 32 bytes.
+  - The baseline is our lock-free free list, with the same list under
+    PRIMASK as a labelled row of ours.
+  - Zephyr and lwIP are in only if each builds alone within an hour.
+  - The kind is measured only under method version 3.
+  - The prechecks report is reviewed and taken off "draft".
+- **Method version 3 (all 9):**
+  - The clock rule: the vendor's startup or template clock, no option
+    bytes, the manual's fewest wait states.
+  - The NUCLEO-H723ZG at 520 MHz, VOS0, 3 wait states.
+  - The nRF5340 DK stays at 64 MHz.
+  - The Pico 2's flash divider is confirmed on the host first, then
+    decided.
+  - The SAM D20's temperature grade is read before the series.
+  - The option registers go into a new record version.
+  - **The median beside the mean is left out of version 3, explicitly.**
+  - Records that are measured again are archived, as version 1 was.
+  - The pools kind is measured only under version 3.
+- Until each plan's "shown before any run" list is met and read, the
+  frozen files and the CRC test sources stay as they are.
+- **Later the same day, on the candidates (owner):**
+  - *MemoryPool is in the set, pinned at the head of its main branch,
+    `5073178` (2024-05-15), not at a release.*
+    - Its only release, v0.1.0 (`c98ff35`), spaces the blocks of `Fixed`
+      by the size of a pointer whatever the block size, so blocks overlap.
+      v0.1.0 also does not build for arm-none-eabi (`std::mutex`).
+    - The author fixed the spacing in PR #4 "Fix Fixed Mempool blocksize"
+      (merged 2024-05-14, `813b79a` on main), and the mutex at the head
+      under `_GLIBCXX_HAS_GTHREADS`. No release has been made since.
+    - The pages say plainly that the row is not a release, and why, with
+      the project's own sources and our host check of v0.1.0
+      (`kinds/pools`, `make memorypool-v010`).
+    - Nothing is sent to the author: he fixed it himself, and when he
+      releases is his matter.
+  - *Left out of the first series, with the reason in the kind's README:*
+    - eccles-rtmem: not a pool of one block size (a `malloc(size)` over
+      three block classes), and its storage is private to its file;
+    - Zephyr `k_mem_slab`: it cannot be built alone, since its headers
+      need Zephyr's generated configuration.
+
+## 2026-11-26: The nRF5340 boot stub opens the debug port at every boot, with the next kind
+Decided by the owner, on the lock found in the second CRC series
+([lab note](lab/drafts/2026-11-25-nrf5340-approtect-recovery.md);
+[`reproduce.md`](site/content/reproduce.md), "Run it on your own board").
+- **The change:** the nRF5340's boot stub (`firmware/common/benchboot.c`)
+  copies UICR.APPROTECT and UICR.SECUREAPPROTECT into CTRL-AP at every
+  boot, as Nordic's `SystemInit` does, so the debug port is open after a
+  power-on (nRF5340 Product Specification v1.6, §8.2).
+- **The rule stays as it is:** the nRF5340's series are run again for
+  every kind (CRC and ring buffers), so that its records are held against
+  images built with the new stub, byte for byte. No rule is made that lets
+  a changed stub pass.
+- **When:** not now. It is done when the next kind of library is tested on
+  the boards, and the nRF5340's CRC and ring-buffer series are run again
+  at that time.
+- **Until then:** the frozen files are unchanged, the nRF5340 DK stays
+  powered and is never power-cycled, and the paragraph on the reproduce
+  page stands.
+- **What the change must show before any run:** in
+  [`lab/plans/2026-11-26-next-method-version.md`](lab/plans/2026-11-26-next-method-version.md).
+
 ## 2026-11-26: CRC runs on several boards at once, on the proof
 Decided by the owner on the proof
 ([`reports/2026-11-26-parallel-runs-proof.md`](reports/2026-11-26-parallel-runs-proof.md)):
@@ -12,6 +105,12 @@ Decided by the owner on the proof
 - **Version 2's runner** (`firmware/nrf5340-rb-bench/run-one.py`) is tried
   once through the queue, with no flash write, before ring-buffer runs go
   on several boards at once.
+  - *Done on 2026-11-26* ([report, "Addition"](reports/2026-11-26-parallel-runs-proof.md)):
+    on the NUCLEO-G474RE, one write of ring-buffer bundle 0, then two
+    zero-write jobs, the second beside zero-write CRC jobs on two other
+    boards. Every mean was identical to the records and to each other.
+    Ring-buffer runs may now go through the queue beside others, with the
+    reviewer's OK per job.
 - **Enqueuing a job is where the OK for a board run is given.**
 - **Power switching** only on a hub with no job running, and never on the
   nRF5340 DK.

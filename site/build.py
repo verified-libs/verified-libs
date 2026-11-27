@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from embargo_strip import strip_embargo   # noqa: E402
 import kinds_page   # noqa: E402
 import crc_data   # noqa: E402
+import pools_data   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "site")
@@ -83,7 +84,12 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 .sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
 .tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
 """
 
 NAV = [("index", "Home"), ("kinds", "Results"), ("compare", "Compare"), ("method", "Method"),
@@ -91,6 +97,29 @@ NAV = [("index", "Home"), ("kinds", "Results"), ("compare", "Compare"), ("method
 
 
 SITE_URL = ""   # from site.conf (main): the address the pages are served at, for search engines
+GOATCOUNTER = ""   # from site.conf (main): the site code of the visit counter; empty: no counter, no script
+
+
+def counter_code(v):
+    """GOATCOUNTER_CODE as the build takes it: empty, or a site code of letters, digits and hyphens; anything
+    else stops the build, so that nothing but such a code from the setting reaches a page."""
+    if v and not re.fullmatch(r"[A-Za-z0-9-]{1,63}", v):
+        sys.exit("build refused: GOATCOUNTER_CODE (site.conf) is not a site code (letters, digits, hyphens)")
+    return v
+
+
+def counter():
+    """The visit counter (GoatCounter, cookieless) for a page, as (footer sentence, tag), or ("", "") when
+    GOATCOUNTER_CODE is empty: then a page holds no third-party script at all. Only the code, checked to be
+    letters, digits and hyphens, comes from the setting."""
+    if not GOATCOUNTER:
+        return "", ""
+    sentence = (' Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, '
+                'without cookies and without a personal profile; fetches of the data files and of the MCP server '
+                'are not counted.')
+    tag = (f'<script data-goatcounter="https://{GOATCOUNTER}.goatcounter.com/count" async '
+           'src="//gc.zgo.at/count.js"></script>\n')
+    return sentence, tag
 
 
 def describe(md_text):
@@ -111,6 +140,29 @@ def describe(md_text):
 FAVICON = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#1f5f8b"/>'
            '<path d="M8 17l5 5 11-12" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" '
            'stroke-linejoin="round"/></svg>\n')
+
+
+# The results pages' fold-outs (<details>): an address naming a fold-out, or anything inside one, opens it and
+# its parents, so a link to a board's table shows the table; and a small "open all / close all" control. Without
+# script the fold-outs work as they are and the reader clicks once.
+FOLD_SCRIPT = """<script>(function () {
+  function show() {
+    var id = decodeURIComponent(location.hash.slice(1)), e = id && document.getElementById(id), t = e;
+    for (; e; e = e.parentElement) if (e.tagName === "DETAILS") e.open = true;
+    if (t) t.scrollIntoView();
+  }
+  window.addEventListener("hashchange", show); show();
+  var all = document.querySelectorAll("main details"), h = document.querySelector("main h1");
+  if (all.length < 2 || !h) return;
+  var p = document.createElement("p"); p.className = "foldall";
+  [["open all", true], ["close all", false]].forEach(function (x, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { all.forEach(function (d) { d.open = x[1]; }); });
+    if (i) p.appendChild(document.createTextNode(" · ")); p.appendChild(b);
+  });
+  h.parentNode.insertBefore(p, h.nextSibling);
+})();</script>
+"""
 
 
 def page(slug, title, body, nav_on, desc="", listed=True):
@@ -137,30 +189,32 @@ def page(slug, title, body, nav_on, desc="", listed=True):
                     + json.dumps({"@context": "https://schema.org", "@type": "WebSite", "name": "verified-libs", "url": SITE_URL + "/"})
                     + '</script>\n')
     seo += '<link rel="icon" href="favicon.svg" type="image/svg+xml">\n'
+    count_text, count_tag = counter() if listed else ("", "")   # not on 404.html
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {seo}<title>{html.escape(full)}</title><style>{CSS}</style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a>{links}</nav></header>
-<main>{body}</main>
-<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
-</body></html>
+<main>{body}</main>{FOLD_SCRIPT if "<details" in body else ""}
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.{count_text}</footer>
+{count_tag}</body></html>
 """
 
 
 # The front page's heading is the project's name; its browser title says more.
 # The project is a registry of more than one kind of library; ring buffers
-# and CRC calculation are the kinds so far. Name the project first.
-INDEX_TITLE = "verified-libs: libraries tested on real hardware: embedded ring buffers and CRC"
+# CRC calculation and fixed-block memory pools are the kinds so far. Name the project first.
+INDEX_TITLE = "verified-libs: libraries tested on real hardware: embedded ring buffers, CRC and memory pools"
 INDEX_DESC = ("An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. "
-              "Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation (libraries that compute a CRC "
-              "in software and, on the boards that have one, the board's CRC unit beside them), for microcontrollers "
-              "on six boards, every number with its record and source.")
+              "Three kinds so far: embedded ring buffer (FIFO) libraries, CRC calculation (libraries that compute a CRC "
+              "in software and, on the boards that have one, the board's CRC unit beside them) and fixed-block memory "
+              "pools, for microcontrollers on six boards, every number with its record and source.")
 # What a search engine shows under the page's title. Pages not named here
 # (reports, findings) get their first paragraph (describe).
 DESCRIPTIONS = {
     "index.html": INDEX_DESC,
-    "kinds.html": "The kinds of library tested so far, embedded ring buffers and CRC calculation: "
+    "kinds.html": "The kinds of library tested so far, embedded ring buffers, CRC calculation and fixed-block "
+                  "memory pools: "
                   "what is measured, how many libraries and boards, and where the results, method and records are.",
     "method.html": "How the ring buffer libraries are tested: cycle-counted benchmarks on six microcontroller boards, "
                    "interrupt stress tests with a known-bad control, model checks and contract checks.",
@@ -171,13 +225,19 @@ DESCRIPTIONS = {
                         "and per byte, cache on and off, flash and RAM bytes, each with its record.",
     "method-crc.html": "How the CRC libraries are measured and checked: one image per configuration and placement, "
                        "every call compared with a reference, host tests and CBMC proofs.",
+    "results-pools.html": "Results for fixed-block memory pool libraries on six microcontroller boards: cycles per "
+                          "alloc and free in six scenarios, cache on and off, flash and RAM bytes, measured in one "
+                          "context, each with its record.",
+    "method-pools.html": "How the fixed-block memory pools are measured and checked: one image per configuration and "
+                         "placement, every call checked on the board, host tests with broken controls, a CBMC proof of "
+                         "the reference; one context, interrupt claims documented, not tested.",
     "reproduce.html": "How to rebuild the firmware bit for bit and repeat the measurements: every number comes from a "
                       "record that names the commit, the toolchain, the flags and the pinned library versions.",
     "repeats.html": "Repeats of the tests by people outside the project, and how to send in your own.",
 }
 
 SITE_PAGES = {"reports.html", "findings.html"}   # pages with no markdown source
-SITE_FILES = {"data/libs.json": "data/libs.json", "data/crc.json": "data/crc.json"}   # served as they are: output path -> file under site/
+SITE_FILES = {"data/libs.json": "data/libs.json", "data/crc.json": "data/crc.json", "data/pools.json": "data/pools.json"}   # served as they are: output path -> file under site/
 MISSING = []   # (page source, link target): links to files that are not in the tree
 
 
@@ -199,7 +259,8 @@ def render(md_text, src_rel, c, pagemap):
             MISSING.append((src_rel, target))
         return f"[{text}]({c['REPO_URL']}/{full}{'#' + frag if frag else ''})"
     md_text = re.sub(r"\[([^\]]*)\]\(([^)\s]+)\)", fix, md_text)
-    out = markdown.markdown(md_text, extensions=["tables", "fenced_code", "toc"])
+    # md_in_html: the Markdown inside <details markdown="1"> (the results pages' fold-outs) is rendered too
+    out = markdown.markdown(md_text, extensions=["tables", "fenced_code", "toc", "md_in_html"])
     return out.replace("<table>", '<div class="tw"><table>').replace("</table>", "</table></div>")
 
 
@@ -215,8 +276,9 @@ def main():
     out = args[0] if args else os.path.join(SITE, "_build")
     os.makedirs(out, exist_ok=True)
     c = conf()
-    global SITE_URL
+    global SITE_URL, GOATCOUNTER
     SITE_URL = c.get("SITE_URL", "").rstrip("/")
+    GOATCOUNTER = counter_code(c.get("GOATCOUNTER_CODE", ""))
     findings = [f for f in c.get("PUBLISH_FINDINGS", "").split(",") if f.strip()]
     reports = sorted(f for f in os.listdir(os.path.join(ROOT, "reports")) if f.endswith(".md"))
 
@@ -227,7 +289,10 @@ def main():
                "site/content/compare-crc.html": "compare-crc.html",
                "RESULTS.md": "results.html",
                # the CRC kind (DECISIONS 2026-11-24: static pages first)
-               "site/content/results-crc.md": "results-crc.html", "site/content/method-crc.md": "method-crc.html"}
+               "site/content/results-crc.md": "results-crc.html", "site/content/method-crc.md": "method-crc.html",
+               # the pools kind (lab/plans/2026-11-26-pools-kind.md, step 6)
+               "site/content/compare-pools.html": "compare-pools.html",
+               "site/content/results-pools.md": "results-pools.html", "site/content/method-pools.md": "method-pools.html"}
     for r in reports:
         pagemap[f"reports/{r}"] = "report-" + r[:-3] + ".html"
     for f in findings:
@@ -240,6 +305,13 @@ def main():
     # The CRC kind's data (site/data/crc.json) is written from records/crc by site/crc_data.py.
     if open(os.path.join(SITE, "data/crc.json")).read() != crc_data.text():
         sys.exit("build refused: site/data/crc.json is not up to date (python3 -I site/crc_data.py --write)")
+    # The pools kind's data (site/data/pools.json) is written from records/pools by site/pools_data.py, and the
+    # tables of its results page by site/pools_tables.py; a synthetic record under records/pools stops both.
+    if open(os.path.join(SITE, "data/pools.json")).read() != pools_data.text():
+        sys.exit("build refused: site/data/pools.json is not up to date (python3 -I site/pools_data.py --write)")
+    for pg in pools_data.t.PAGES.values():
+        if len(set(pools_data.t.page_text(os.path.join(ROOT, pg)))) != 1:
+            sys.exit(f"build refused: {pg} is not up to date (python3 -I site/pools_tables.py --write {pg})")
     pages = {}
     for src, dst in pagemap.items():
         if src.endswith(".html"):   # the comparison page is built below; in pagemap only as a link target
@@ -247,6 +319,7 @@ def main():
         text = strip_embargo(open(os.path.join(ROOT, src)).read())
         nav_on = {"index.html": "index", "method.html": "method", "results.html": "kinds", "kinds.html": "kinds",
                   "results-crc.html": "kinds", "method-crc.html": "method",
+                  "results-pools.html": "kinds", "method-pools.html": "method",
                   "reproduce.html": "reproduce", "repeats.html": "repeats"}.get(
             dst, "reports" if dst.startswith("report-") else "findings")
         title = INDEX_TITLE if dst == "index.html" else title_of(text, dst)
@@ -285,6 +358,17 @@ def main():
         "Compare CRC calculation by CRC, board and message: libraries that compute a CRC in software and, on the "
         "boards that have one, the board's CRC unit beside them; cycles per call and per byte as ranges over "
         "eight code placements, flash and RAM bytes, the reference as a row; no ranking.")
+
+    # The pools kind's comparison: static controls, the data of site/data/pools.json (site/pools_data.py) and
+    # site/compare-pools.js, all inline, as for the other kinds.
+    pdata = open(os.path.join(SITE, "data/pools.json")).read().replace("</", "<\\/")
+    pages["compare-pools.html"] = page("compare-pools", "Compare fixed-block memory pools", (
+        open(os.path.join(SITE, "content/compare-pools.html")).read()
+        + f'<script type="application/json" id="poolsdata">{pdata}</script>'
+        + f'<script>{open(os.path.join(SITE, "compare-pools.js")).read()}</script>'), "compare",
+        "Compare fixed-block memory pool libraries for microcontrollers by board, scenario and cache: cycles per alloc "
+        "and free as ranges over eight code placements, flash and RAM bytes, what each library documents about "
+        "interrupts (not tested); measured in one context; no ranking.")
 
     # What the server shows for an address that does not exist (GitHub Pages serves 404.html).
     pages["404.html"] = page("404", "Page not found", (

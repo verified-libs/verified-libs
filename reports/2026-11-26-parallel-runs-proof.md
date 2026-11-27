@@ -115,3 +115,45 @@ Three writes, each answering a question. The ledger
   WRITE" line the queue counts.
 - Runs longer than about 12 minutes at once. The longest job was the Pico
   2's.
+
+## Addition: version 2's runner through the queue (2026-11-26, 10:20 to 10:28 UTC)
+
+The trial the decision of 2026-11-26 asks for before ring-buffer runs go on
+several boards at once ([`DECISIONS.md`](../DECISIONS.md), "CRC runs on
+several boards at once"), with the reviewer's OK for each job.
+- **Setup.** All jobs on the NUCLEO-G474RE, from a clean worktree at
+  `a3174e7` (main), with `firmware/nrf5340-rb-bench/run-one.py` on bundle 0
+  (built there with `onebuild.sh table`). Two configurations, lwrb and
+  jnk0le, one pass, 16 runs each job.
+- **Why a write first.** No board held a ring-buffer bundle: since the CRC
+  series every board holds CRC bundles, and a board holds one bundle at a
+  time. So the trial began with one write.
+
+| Job | What ran | Flash writes | Time (UTC) | Means against the records (pass 1, same images) | Against each other |
+|---|---|---|---|---|---|
+| 1 | bundle 0 written (it replaces CRC bundle 54), then 16 runs | 1 (bundle 0, 127 units, 10:20:37) | 10:20:18–10:21:35 | 704 of 704 identical | – |
+| 2 | the same 16 runs, no write | 0 | 10:21:35–10:22:34 | 704 of 704 identical | job 1: 704 of 704 identical |
+| 3 | job 2 again, while the NUCLEO-G0B1RE and the SAM D20 ran zero-write CRC jobs through their own workers | 0 | 10:22:34–10:23:34 | 704 of 704 identical | jobs 1 and 2: 704 of 704 identical |
+
+- **Identical.** The largest difference in every comparison was 0.
+  "Within" (1 % or 0.05 cycles) is met trivially.
+- **The runner through the queue.** The queue counted the runner's FLASH
+  WRITE line (one line in `writes.tsv`), held job 1 to its budget of 1 and
+  jobs 2 and 3 to 0 (`--refuse "FLASH WRITE"`). Every job printed its
+  expected "done: 16 runs, 0 without a file, N flash writes".
+- **The CRC jobs beside job 3**, from the worktree at `40f1958`:
+  - *SAM D20*: the parallel proof's part-A command (bundle 115). 14 runs;
+    672 of 672 means identical to part A; 2 retries, as in part A.
+  - *NUCLEO-G0B1RE*: it holds bundle 55 since part C1, so the command was
+    C1's without `--flash`. 16 runs; 768 of 768 means identical to C1.
+- **Not run:** the nRF5340 DK, and no power switching.
+
+**What the boards hold now:** NUCLEO-G474RE ring-buffer bundle 0 (no longer
+CRC bundle 54); the others as after the proof (NUCLEO-G0B1RE 55,
+NUCLEO-H723ZG 28, Pico 2 6 and 7, SAM D20 115, nRF5340 DK 28). Flash
+writes in the queue's ledger: 4.
+
+**What this supports (a reading):** version 2's runner runs through the
+queue as the CRC runner does, with the same numbers alone and beside two
+other boards. The run files, logs and the comparison scripts are on the lab
+host (`~/vl-wt-crc-runs/v2-queue-trial/`, `~/vl-v2trial/`).

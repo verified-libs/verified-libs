@@ -29,6 +29,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 SCHEMA = "rb-bench/2"
+SCHEMA_V3 = "rb-bench/3"   # the same, with the board's option_registers (method version 3)
 PLACES = (0, 4, 8, 12, 16, 20, 24, 28)
 RUN_SCHEMA = "rb-bench-run/2"
 # the same in every run of a record
@@ -40,6 +41,43 @@ IMAGE = ("place", "slot", "image_base", "image_bytes", "fw_sha256", "image_sha25
 # of one run
 RUN = ("time", "host", "probe_rs", "pass", "attempt", "wait_s", "seconds", "run_number", "bundle", "bundle_sha256")
 
+
+
+# Method version 3 (DECISIONS 2026-11-26): the option registers of the board, read zero-write before a
+# series by lab/tools/read-options.py into the run directory (options.json, schema board-options/1). A
+# record of runs whose directories hold that file is of the new version and carries them as
+# "option_registers"; a record of runs without it is of the version before, unchanged.
+OPTIONS_SCHEMA = "board-options/1"
+
+
+def options_of(d, board):
+    """(the options.json of run directory d, or None; a problem, or None)."""
+    p = os.path.join(d, "options.json")
+    if not os.path.exists(p):
+        return None, None
+    o = json.load(open(p))
+    if (o.get("schema") != OPTIONS_SCHEMA or o.get("board") != board or not o.get("regions")
+            or any("error" in x or "words" not in x for x in o["regions"])):
+        return None, f"{p}: not every option register of {board} read (schema {OPTIONS_SCHEMA})"
+    return o, None
+
+
+def with_options(rec, runs, schema_new):
+    """rec with the new schema and its option_registers if every run has them; (rec, None) or (None, why)."""
+    opts = [r.get("_options") for r in runs]
+    if all(o is None for o in opts):
+        return rec, None
+    if any(o is None for o in opts):
+        return None, "runs with and without option registers"
+    seen, out = set(), []
+    for o in sorted(opts, key=lambda o: o["time"]):
+        key = json.dumps(o, sort_keys=True)
+        if key not in seen:
+            seen.add(key)
+            out.append(o)
+    rec = dict(rec, schema=schema_new)
+    rec["option_registers"] = out
+    return rec, None
 
 def main():
     args = sys.argv[1:]
@@ -56,6 +94,10 @@ def main():
             built = json.load(open(os.path.join(d, "build.json")))
         except OSError:
             sys.exit(f"{d}: no build.json (not an output directory of run-one.py)")
+        opts, why = options_of(d, built.get("board"))
+        if why:
+            problems.append(why)
+            continue
         for f in sorted(glob.glob(os.path.join(d, "adapter_*-p*-pass*.json"))):
             r = json.load(open(f))
             if r.get("schema") != RUN_SCHEMA or r.get("invalid"):
@@ -65,6 +107,7 @@ def main():
                 problems.append(f"{f}: not of the build in {d}/build.json")
                 continue
             r["_file"] = f
+            r["_options"] = opts
             groups.setdefault((r["board"], r["adapter"]), []).append(r)
             builds[(r["board"], r["adapter"])] = built
     written, left, base_note = 0, 0, {}
@@ -98,6 +141,11 @@ def main():
         rec["name"] = runs[0]["libs"][1]["name"]
         rec["toolchain"], rec["libs_pinned"] = built["toolchain"], built["libs_pinned"]
         rec["passes"] = len(passes)
+        rec, why = with_options(rec, runs, SCHEMA_V3)
+        if why:
+            left += 1
+            problems.append(f"{board} {adapter}: left out: {why}")
+            continue
         rec["images"] = images
         # the baseline over all runs of the board
         note = base_note.setdefault(board, {"runs": 0, "values": {}})

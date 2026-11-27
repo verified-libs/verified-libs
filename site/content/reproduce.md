@@ -39,6 +39,13 @@ that `firmware/nrf5340-rb-bench/nrf5-sdk.lock` names and give it as
 `NRF5_SDK=path/to/the/zip` in front of the command. The other five boards
 need nothing but the tree and the image.
 
+**An archived series** ([`records/archived.json`](../../records/README.md))
+is checked at its own public commit, not against the tree at hand: clone
+the public repository with its history, check out the entry's
+`public_commit`, and run the same command there on the series' records.
+The nRF5340 DK's and the NUCLEO-H723ZG's records from before method
+version 3 are such series; the results pages link them under each board.
+
 A tree without git history (the public repository, a release archive)
 carries its commit in the file `EXPORTED_FROM`. The records are committed
 after the commit they were made at, so they name an earlier one: the file
@@ -92,15 +99,25 @@ nRF5 SDK zip, which we may not redistribute:
 `--nrf5-sdk PATH` (`firmware/nrf5340-rb-bench/nrf5-sdk.lock` names the file
 and its checksum).
 
-**The nRF5340 DK is locked after a power-on.** The application core's
-debug port opens only when UICR.APPROTECT is Unprotected and firmware
-writes CTRL-AP.APPROTECT.DISABLE after each reset (nRF5340 Product
-Specification v1.6, §8.2 "Access port protection"). Our boot stub
-(`firmware/common/benchboot.c`) does not write it and starts no image after
-a power-on, so with our bundles on it the board's debug port is locked
-after any power-on, and a write or a run fails. We recovered it on
-2026-11-25 with one command of probe-rs 0.32.0, which erases the
-application core (CTRL-AP ERASEALL; the network core is not touched):
+**The nRF5340 DK and a power-on.** The application core's debug port
+opens only when UICR.APPROTECT is Unprotected and firmware writes
+CTRL-AP.APPROTECT.DISABLE after each reset (nRF5340 Product Specification
+v1.6, §8.2 "Access port protection").
+- *Since method version 3* our boot stub (`firmware/common/benchboot.c`)
+  copies UICR.APPROTECT and UICR.SECUREAPPROTECT into CTRL-AP at every
+  boot, so that a board with a bundle of this tree on it stays reachable
+  after a power-on. That was shown on our board on 2026-11-26: after a
+  power cycle with only our boot stub run, the debug port was open and a
+  run without a flash write measured as before
+  ([report](../../reports/2026-11-26-method-version-3-reruns.md#the-watched-power-on-of-the-nrf5340-dk-passed)).
+- *Bundles from before method version 3* (the archived series): their
+  stub does not write CTRL-AP and starts no image after a power-on, so
+  with one of them on the board the debug port is locked after any
+  power-on, and a write or a run fails.
+
+We recovered a locked board on 2026-11-25 with one command of probe-rs
+0.32.0, which erases the application core (CTRL-AP ERASEALL; the network
+core is not touched):
 
 ```sh
 probe-rs read --chip nRF5340_xxAA_APPONLY --allow-erase-all b32 0x00FF8000 1
@@ -218,16 +235,17 @@ commit. Time: in our check of the 120 records (2026-11-25, on 6 CPUs)
 repository, with nothing at hand, it took 28 s per board of 20 records
 (2026-11-25, all 120 records `MATCH`).
 
-**Which commit each record needs.** The records are of two series (the
-[records' README](../../records/README.md)):
-- The records of commit `40f1958` (the second series on the Pico 2,
-  nRF5340 DK and NUCLEO-H723ZG, and the NUCLEO-G0B1RE's CRC unit) have the
-  test sources of the published tree: the command above builds them from
-  the tree.
-- The records of `6301058` (the first series) and `04a2197` (the second
+**Which commit each record needs.** The records are of two series and of
+method version 3 (the [records' README](../../records/README.md)):
+- The records of commit `4032f80` (method version 3: the nRF5340 DK and
+  the NUCLEO-H723ZG) have the test sources of the published tree: the
+  command above builds them from the tree.
+- The records of `6301058` (the first series), `04a2197` (the second
   series on the NUCLEO-G474RE, SAM D20 and the NUCLEO-G0B1RE's tables in
-  RAM) are of earlier commits, and `records/rebuilt.json` lists them. Check
-  them with `VL_TREE=1` in front of the command:
+  RAM) and `40f1958` (the second series on the Pico 2 and the
+  NUCLEO-G0B1RE's CRC unit) are of earlier commits, and
+  `records/rebuilt.json` lists them. Check them with `VL_TREE=1` in front
+  of the command:
 
 ```sh
 VL_TREE=1 bash kinds/crc/bench/crcverify.sh records/crc/samd20/*.json
@@ -266,6 +284,68 @@ already on the board, 48 runs; result "same as ours"). In such a tree (no
 git history) it builds and runs in a copy of the sources under its result
 directory (`src/<commit>`), so that its records name a commit that can be
 rebuilt; your tree is not written to.
+
+## The pools records
+
+The records of the fixed-block memory pools (`records/pools/<board>/<adapter>.json`,
+one per board and configuration, eight images each;
+[`records/`](../../records/README.md)) are rebuilt with the kind's own
+tool. It needs the toolchain image `verified-libs/toolchain:2026-11-13` and
+fetches the libraries at their pins (`kinds/pools/libs.lock`).
+
+**Rebuild, without a board.**
+
+```sh
+bash kinds/pools/bench/poolverify.sh records/pools/stm32g474/*.json
+```
+
+For each record it builds every image of the board from the sources of the
+record's commit and compares, per image, the bytes in flash
+(`image_sha256`), the address, the fixed part, the boot stub, the
+toolchain, the layout of the image and the configuration's sizes: `MATCH`
+or `DIFFERS`. In a tree without git history it takes the sources from the
+tree if the record's commit is in `EXPORTED_FROM` or in
+`SAME_SOURCES_POOLS`.
+
+**Run it on your own board.**
+
+```sh
+kinds/pools/repeat.sh --check          # the tools, the image and the board
+kinds/pools/repeat.sh                  # quick: up to three configurations of one bundle, two passes
+kinds/pools/repeat.sh --level full     # every configuration of the board, two passes
+kinds/pools/repeat.sh --board pico2    # choose the board when more than one is connected
+kinds/pools/repeat.sh --bundle 101     # quick, with the configurations of that bundle, not of the first
+```
+
+It works as the CRC kind's script:
+- it builds the images of this tree;
+- it reads the board's option registers without writing anything, because
+  every pools record carries them (method version 3);
+- it writes a bundle to the board and runs its images in two passes, as our
+  series did;
+- it makes records of your runs and compares them with ours image by image
+  (`kinds/pools/bench/poolscompare.py`);
+- it packs everything into one archive (below, "Send us your result").
+
+On the Raspberry Pi Pico 2 the XIP cache replaces at random (RP2350
+datasheet 4.4.1.2), so with the cache on the number of calls that miss
+changes from run to run and our own two passes differ too; there the
+comparison judges a cache-on mean outside 1 % by its fastest call, and says
+how many means it judged so.
+
+Flash: the quick level writes one bundle, the full level every bundle of the
+board: nRF5340 DK 2, NUCLEO-G0B1RE 3, NUCLEO-G474RE 3, NUCLEO-H723ZG 2,
+SAM D20 Xplained Pro 5, Raspberry Pi Pico 2 1. A bundle that is already on the
+board is not written again. Time: a run took about 5.6 s on every board, and
+our series took 20 to 25 minutes per board on 2026-11-26
+([series report](../../reports/2026-11-26-pools-first-series.md)). The quick
+level runs 48 of those runs, after the build. In a tree exported from this
+repository (no git history), the script builds and runs in a copy of the sources
+under its result directory (`src/<commit>`), so that its records name a
+commit that can be rebuilt; your tree is not written to. It was run from such a
+tree on a Raspberry Pi Pico 2 on 2026-11-26 (quick level, one bundle that was
+already on the board, no flash write); its build step is tested
+(`lab/tools/test-pools-repeat-export.sh`).
 
 ## 3. Rebuild the toolchain image
 

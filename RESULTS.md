@@ -1,48 +1,32 @@
 # Results: embedded ring buffers
 
-The results of one of the two kinds of library so far; the other is CRC
-calculation ([all kinds](site/content/kinds.md), [CRC results](site/content/results-crc.md)).
+The results of one of the three kinds of library so far; the others are CRC
+calculation and fixed-block memory pools ([all kinds](site/content/kinds.md),
+[CRC results](site/content/results-crc.md),
+[memory pool results](site/content/results-pools.md)).
 
-> **Status: published results.** Every number comes from a record under
-> [records/](records/README.md) that can be rebuilt and repeated from this
-> repository ([how](site/content/reproduce.md)). Numbers are facts
-> about the pinned versions, configuration and board below, not general
-> rankings. ⚠ marks the project owner's own library; under principle 6 it
-> is tested with the same suite as every other library and more (every
-> documented mode and topology), and like every result its numbers can be
-> repeated outside the project. Defects are reported to
-> maintainers first (principle 5) and stay unpublished for 90 days from
-> sending.
+Speed, interrupt stress tests, model checks and contract checks of the ring
+buffer libraries on six boards; every number comes from a record. Every
+speed is one placement of the code: two numbers within each other's
+placement range are not told apart (the ranges are on the comparison page).
 
-Updated 2026-11-22. Six boards: nRF5340 DK (application core), Raspberry Pi
-Pico 2 (RP2350), NUCLEO-G474RE, NUCLEO-H723ZG, NUCLEO-G0B1RE and SAM D20
-Xplained Pro ([method](site/content/method.md)). Compiler:
-arm-none-eabi-gcc 14.2.1, `-O2 -DNDEBUG`, newlib-nano; the Rust libraries
-with rustc 1.99.1 at the same optimisation level; pinned
-[toolchain image](toolchain/README.md). All libraries are fetched at the
-commits in [`libs.lock`](firmware/nrf5340-rb-bench/libs.lock), never copied
-into this repo. Every number below comes from a result record in
-[`records/`](records/README.md); how to check one, with or without a board:
-[Reproduce our results](site/content/reproduce.md). The interactive
-[comparison](site/content/compare.html) shows the same records with filters,
-code size and placement ranges.
+**[Compare them on your board, with your own weights →](site/content/compare.html)**
 
-## How each column was measured
-| Column | Test | Details |
-|---|---|---|
-| Speed | cycle benchmark with the core's cycle counter, timing in assembly, 1024 calls per scenario, each configuration in a firmware image of its own, code in flash with the cache or flash accelerator on | [benchmark](firmware/nrf5340-rb-bench/README.md) |
-| ISR stress | timer interrupt ↔ main loop on one core (and core 0 ↔ core 1 on the Pico 2), both directions, single bytes, blocks and zero-copy, random seeds and interrupt rates, and the interrupt sweep (one interrupt at every delay in a call); cache on/off, flash/SRAM; gcc -O2 in the runs shown (earlier campaigns also rotated five compiler flag sets); a run counts only if a deliberately broken control buffer is caught | [stress test](firmware/nrf5340-rb-stress/README.md), night reports below |
-| GenMC | model check of all thread interleavings under the C11 memory model (RC11), single-byte push/pop between two threads; number of executions explored in brackets. "+ block" means the library's block and zero-copy APIs pass too. Every pass has negative controls (release and acquire made relaxed) that must fail, and do | [GenMC](verify/genmc/README.md) |
+Each part below opens with a click.
 
-## Speed on six boards
+<details id="speed-on-six-boards" markdown="1">
+<summary><strong>Speed on six boards</strong>: 39 configurations, one byte 16 to 373 cycles per push or pop, 64-byte blocks 2.5 to 227.6 cycles per byte (code in flash, cache on)</summary>
+
 Cells: mean cycles per call, 1-byte push / pop · 64-byte block, cycles per
 byte (mean of write and read); code in flash, cache or flash accelerator on,
-gcc -O2 (benchmark version 2, 2026-11-23, commit `d06180e914ab`). Each
+gcc -O2 (benchmark version 2, 2026-11-23; the commits, and each board's
+method version and clock, are listed under the table). Each
 configuration is measured in a firmware image of its own, so no number
 depends on which other libraries were built with it. Clocks: nRF5340 64 MHz,
-Pico 2 150 MHz, G474 170 MHz, H723 64 MHz, G0B1 64 MHz, SAM D20 48 MHz.
-Cycles, not time, so the clocks do not matter; wait states and the memory
-system do. The second column is the version tested: the release, where the
+Pico 2 150 MHz, G474 170 MHz, H723 520 MHz (method version 3), G0B1 64 MHz, SAM D20 48 MHz.
+Cycles, not time. With the cache on the clock hardly matters; from flash,
+wait states and the memory system do (on the H723 the flash bus runs at half
+the core clock: [method](site/content/method-crc.md#the-nucleo-h723zg-at-520-mhz)). The second column is the version tested: the release, where the
 library has releases, and the first eight digits of the commit it is pinned
 to in [`libs.lock`](firmware/nrf5340-rb-bench/libs.lock). Sorted by name;
 there is no ranking of ours. ⚠ marks the project owner's own library.
@@ -64,12 +48,12 @@ there is no ranking of ours. ⚠ marks the project owner's own library.
 | ETL etl::queue, single-context (C++) | 20.49.0 · `7d604f2e` | 25 / 29 · 33.6 | 26 / 28 · 33.3 | 32 / 34 · 38.9 | 22 / 21 · 19.3 | 46 / 47 · 61.4 | 47 / 48 · 54.5 |
 | ETL queue_spsc_atomic (C++) | 20.49.0 · `7d604f2e` | 24 / 31 · 22.6 | 25 / 26 · 22.3 | 30 / 27 · 23.9 | 33 / 32 · 26.1 | 54 / 51 · 40.0 | 57 / 53 · 37.6 |
 | ETL queue_spsc_isr (C++) | 20.49.0 · `7d604f2e` | 33 / 38 · 27.6 | 34 / 32 · 27.2 | 40 / 45 · 31.9 | 39 / 40 · 28.4 | 73 / 68 · 53.6 | 73 / 68 · 53.2 |
-| ETL queue_spsc_locked (C++) | 20.49.0 · `7d604f2e` | 80 / 80 · 51.7 | 63 / 61 · 50.9 | 79 / 80 · 61.5 | 75 / 72 · 61.9 | 115 / 110 · 92.5 | 108 / 104 · 89.1 |
+| ETL queue_spsc_locked (C++) | 20.49.0 · `7d604f2e` | 80 / 80 · 51.7 | 63 / 61 · 50.9 | 79 / 80 · 61.5 | 74 / 71 · 60.4 | 115 / 110 · 92.5 | 108 / 104 · 89.1 |
 | FreeRTOS stream buffer (C) | `89592801` | 307 / 257 · 5.4 | 209 / 172 · 4.0 | 325 / 273 · 6.5 | 224 / 172 · 4.6 | 373 / 325 · 13.2 | 359 / 322 · 13.0 |
 | heapless spsc::Queue (Rust) | 0.9.1 · `19188229` | 31 / 37 · 39.7 | 23 / 27 · 31.4 | 35 / 37 · 43.0 | 34 / 29 · 27.9 | 61 / 63 · 73.0 | 66 / 68 · 76.0 |
 | jnk0le Ringbuffer (C++) | `9efa07ff` | 17 / 19 · 9.5 | 17 / 17 · 9.4 | 23 / 26 · 9.5 | 30 / 30 · 6.5 | 36 / 42 · 11.8 | 36 / 42 · 11.8 |
-| kostyk348 lf_spsc (C) | `38649b8f` | 79 / 73 · 84.5 | 59 / 55 · 65.3 | 72 / 67 · 79.4 | 54 / 50 · 51.7 | 160 / 156 · 214.6 | 164 / 162 · 227.6 |
-| lwrb (C) | v3.4.0 · `b8534fd1` | 55 / 58 · 4.5 | 40 / 42 · 3.5 | 54 / 57 · 5.0 | 47 / 44 · 4.0 | 65 / 67 · 13.6 | 65 / 69 · 13.7 |
+| kostyk348 lf_spsc (C) | `38649b8f` | 79 / 73 · 84.5 | 59 / 55 · 65.3 | 72 / 67 · 79.4 | 55 / 50 · 51.7 | 160 / 156 · 214.6 | 164 / 162 · 227.6 |
+| lwrb (C) | v3.4.0 · `b8534fd1` | 55 / 58 · 4.5 | 40 / 42 · 3.5 | 54 / 57 · 5.0 | 47 / 43 · 4.0 | 65 / 67 · 13.6 | 65 / 69 · 13.7 |
 | Mbed CE CircularBuffer (C++) | `a4c70564` | 69 / 58 · 8.4 | 66 / 53 · 7.5 | 79 / 69 · 8.9 | 61 / 58 · 4.8 | 120 / 103 · 12.2 | 121 / 108 · 12.3 |
 | micoring default, single-context (C) | `a6f91ee2` | 96 / 98 · 77.0 | 60 / 60 · 50.7 | 78 / 75 · 66.5 | 43 / 48 · 36.8 | 103 / 99 · 91.8 | 102 / 99 · 91.1 |
 | micoring SPSC mode (C) | `a6f91ee2` | 118 / 123 · 118.4 | 74 / 77 · 75.7 | 98 / 97 · 96.9 | 78 / 71 · 60.0 | 127 / 132 · 128.7 | 128 / 132 · 131.4 |
@@ -92,10 +76,23 @@ there is no ranking of ours. ⚠ marks the project owner's own library.
 
 ¹ Not interrupt-safe by its own documentation or maintainers; measured for comparison only.
 
-Records: one per board and configuration in [`records/bench-v2/`](records/README.md), made at commit `d06180e914ab`.
+Records: one per board and configuration in [`records/bench-v2/`](records/README.md), made at commit `4032f809fd8d`, `d06180e914ab`.
+
+The method version and the clock of each board's records (DECISIONS.md, 2026-11-26):
+
+- nRF5340 DK: Method version 3, at 64 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series ["version 2, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"](https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/bench-v2/nrf5340) (public commit `be1da88`).
+- Raspberry Pi Pico 2 H: Method version 2, at 150 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
+- NUCLEO-G474RE: Method version 2, at 170 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
+- NUCLEO-H723ZG: Method version 3, at 520 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series ["version 2, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"](https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/bench-v2/stm32h723) (public commit `be1da88`).
+- NUCLEO-G0B1RE: Method version 2, at 64 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
+- SAM D20 Xplained Pro: Method version 2, at 48 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
 <!-- /table:speed -->
 
-Notes:
+</details>
+
+<details id="notes-on-the-speed-table" markdown="1">
+<summary><strong>Notes on the speed table</strong>: where the code lies, the call to a library, version 1, the clocks, Rust's <code>memcpy</code>, single-context variants</summary>
+
 - Where a library's code lies in flash can change a mean: every image is
   built at eight placements (moved by 0, 4 ... 28 bytes) and run twice. 743
   of the 1,007 numbers on the comparison page move by 0.05 % or less, the
@@ -121,9 +118,11 @@ Notes:
   [comparison page](site/content/compare.html): nearly nothing on the two
   Cortex-M0+ boards, a few numbers on the nRF5340, the Pico 2 and the G474,
   and most numbers on the H723, where placement decides most (single
-  numbers from -23 % to +27 %, the median unchanged).
-- The H723 runs at its reset clock (64 MHz) with reset-default flash wait
-  states; the Pico 2 fetches code through its XIP cache from QSPI flash.
+  numbers from -23 % to +27 %, the median unchanged; counted at 64 MHz,
+  before method version 3 moved the H723 to 520 MHz).
+- The H723 runs at 520 MHz with 3 flash wait states, as ST's template for
+  the board sets it (method version 3); the Pico 2 fetches code through its
+  XIP cache from QSPI flash.
 - The Cortex-M33 and M7 issue some instruction pairs together, so they can
   need fewer cycles than instructions (`firmware/counter-check`).
 - The Rust libraries are linked into the same C firmware and use the C
@@ -138,7 +137,46 @@ Notes:
 - Cache-off numbers for every library are in the records; code-in-SRAM
   numbers are in the archived version 1 records only.
 
-## Model checking (GenMC, C11 memory model)
+</details>
+
+<details id="how-each-column-was-measured" markdown="1">
+<summary><strong>How each column was measured, and where the numbers come from</strong>: status, versions, compiler, records</summary>
+
+> **Status: published results.** Every number comes from a record under
+> [records/](records/README.md) that can be rebuilt and repeated from this
+> repository ([how](site/content/reproduce.md)). Numbers are facts
+> about the pinned versions, configuration and board below, not general
+> rankings. ⚠ marks the project owner's own library; under principle 6 it
+> is tested with the same suite as every other library and more (every
+> documented mode and topology), and like every result its numbers can be
+> repeated outside the project. Defects are reported to
+> maintainers first (principle 5) and stay unpublished for 90 days from
+> sending.
+
+Updated 2026-11-22. Six boards: nRF5340 DK (application core), Raspberry Pi
+Pico 2 (RP2350), NUCLEO-G474RE, NUCLEO-H723ZG, NUCLEO-G0B1RE and SAM D20
+Xplained Pro ([method](site/content/method.md)). Compiler:
+arm-none-eabi-gcc 14.2.1, `-O2 -DNDEBUG`, newlib-nano; the Rust libraries
+with rustc 1.99.1 at the same optimisation level; pinned
+[toolchain image](toolchain/README.md). All libraries are fetched at the
+commits in [`libs.lock`](firmware/nrf5340-rb-bench/libs.lock), never copied
+into this repo. Every number below comes from a result record in
+[`records/`](records/README.md); how to check one, with or without a board:
+[Reproduce our results](site/content/reproduce.md). The interactive
+[comparison](site/content/compare.html) shows the same records with filters,
+code size and placement ranges.
+
+| Column | Test | Details |
+|---|---|---|
+| Speed | cycle benchmark with the core's cycle counter, timing in assembly, 1024 calls per scenario, each configuration in a firmware image of its own, code in flash with the cache or flash accelerator on | [benchmark](firmware/nrf5340-rb-bench/README.md) |
+| ISR stress | timer interrupt ↔ main loop on one core (and core 0 ↔ core 1 on the Pico 2), both directions, single bytes, blocks and zero-copy, random seeds and interrupt rates, and the interrupt sweep (one interrupt at every delay in a call); cache on/off, flash/SRAM; gcc -O2 in the runs shown (earlier campaigns also rotated five compiler flag sets); a run counts only if a deliberately broken control buffer is caught | [stress test](firmware/nrf5340-rb-stress/README.md), night reports below |
+| GenMC | model check of all thread interleavings under the C11 memory model (RC11), single-byte push/pop between two threads; number of executions explored in brackets. "+ block" means the library's block and zero-copy APIs pass too. Every pass has negative controls (release and acquire made relaxed) that must fail, and do | [GenMC](verify/genmc/README.md) |
+
+</details>
+
+<details id="model-checking-genmc-c11-memory-model" markdown="1">
+<summary><strong>Model checking</strong> (GenMC, C11 memory model): 10 libraries pass; pxq is checked by the one-core contract check instead</summary>
+
 2026-11-08, single-byte push/pop between two threads; "+ block": the block
 and zero-copy APIs pass too.
 
@@ -160,7 +198,11 @@ Libraries without atomics (they rely on a single-core contract, such as
 masking interrupts) cannot be judged by the plain C11 check; they are
 covered by the one-core contract check.
 
-## One-core contract check
+</details>
+
+<details id="one-core-contract-check" markdown="1">
+<summary><strong>One-core contract check</strong>: 38 configurations, 35 pass, 3 fail (the variants their own projects do not call interrupt-safe)</summary>
+
 2026-11-16 (commit `7ed89e4`): each library's own code, compiled for the
 host, with the interrupt's call made at every instruction of the main
 loop's call from every start state of a small buffer, and at every pair
@@ -177,7 +219,11 @@ topologies and with reserve/commit, and the Rust libraries. Per
 configuration: the contract-check column of the
 [comparison](site/content/compare.html).
 
-### Notes per library
+</details>
+
+<details id="notes-per-library" markdown="1">
+<summary><strong>Notes per library</strong> [N1] to [N7]</summary>
+
 - **[N1]** pxq uses `volatile` for its documented contract (ISR ↔ main loop on one
   core). Under the C11 model that is a data race by definition, so it is
   checked against its contract (the one-core contract check), not with the
@@ -221,7 +267,11 @@ configuration: the contract-check column of the
   can only use it in non-cacheable memory
   ([DMA report](reports/2026-11-17-dma-producer.md)).
 
-## ISR stress campaigns
+</details>
+
+<details id="isr-stress-campaigns" markdown="1">
+<summary><strong>ISR stress campaigns</strong>: no errors in any real library in any valid run, six campaigns from 2026-11-11 to 2026-11-22</summary>
+
 Every campaign so far: **no errors in any real library in any valid run**.
 The errors are where they are expected: the variants their own projects do
 not call interrupt-safe, and on the Pico 2 in two-core mode the single-core
@@ -342,7 +392,11 @@ slightly faster, and ATfE's size-built picolibc 3-5 times slower; up to 17
 library configurations' block numbers move by more than 5 %:
 [reports/2026-11-17-c-libraries.md](reports/2026-11-17-c-libraries.md).
 
-## What the numbers say
+</details>
+
+<details id="what-the-numbers-say" markdown="1">
+<summary><strong>What the numbers say</strong>: single bytes, blocks, zero-copy, correctness</summary>
+
 - **Single bytes:** on every board pxq, jnk0le, polycratia and rt-spsc are
   among the fastest (17–24 cycles on the nRF5340); the general stream APIs
   (FreeRTOS stream buffer, embassy-sync Pipe, bbqueue) are the
@@ -365,7 +419,11 @@ library configurations' block numbers move by more than 5 %:
   The diffstorm defects were found by GenMC and a targeted reproducer, not
   by SPSC stress testing, and reported to the maintainer on 2026-11-08.
 
-## Concurrency modes (what each library promises)
+</details>
+
+<details id="concurrency-modes-what-each-library-promises" markdown="1">
+<summary><strong>Concurrency modes</strong>: what each library promises for more than one producer or consumer, and the stress results</summary>
+
 All results above are for one producer and one consumer (SPSC). From the
 libraries' own documentation (2026-11-07):
 
@@ -419,14 +477,22 @@ Each library is tested only in the modes it documents. ETL
 the lock while the code it preempted holds it waits forever on one core.
 It is made for threads under an OS, not for interrupts.
 
-## Building bare-metal (first-try usability)
+</details>
+
+<details id="building-bare-metal-first-try-usability" markdown="1">
+<summary><strong>Building bare-metal</strong>: 8 of the first 19 configurations needed extra work</summary>
+
 8 of the first 19 configurations needed extra work to build for a
 bare-metal Cortex-M33: missing includes in headers, a CubeMX `main.h`, POSIX
 `nanosleep`, exceptions required, heap via `operator new`, ISR safety only
 via CMake or user macros. Details per library:
 [benchmark README](firmware/nrf5340-rb-bench/README.md#building-each-library-bare-metal-first-try-usability).
 
-## First results outside the tables
+</details>
+
+<details id="first-results-outside-the-tables" markdown="1">
+<summary><strong>First results outside the tables</strong>: two cores, DMA, C libraries, compilers, Nordic</summary>
+
 Run once or on some of the boards; each report says what it covers.
 
 - **Across the two cores of the nRF5340** (application ↔ network core):
@@ -441,7 +507,11 @@ Run once or on some of the boards; each report says what it covers.
 - **Nordic `nrf_ringbuf`** (nRF5 SDK 17.1.1; its licence allows Nordic
   chips only, so nRF5340 only): on the comparison page.
 
-## Not covered yet
+</details>
+
+<details id="not-covered-yet" markdown="1">
+<summary><strong>Not covered yet</strong></summary>
+
 - At the published commit: ISR stress runs of the zero-copy API on the
   nRF5340, the G0B1 and the SAM D20, and runs with the code in SRAM on the
   nRF5340 and the G0B1 (the five hours of the re-run did not reach them;
@@ -454,3 +524,5 @@ Run once or on some of the boards; each report says what it covers.
   in the order given there.
 - Repetitions outside the project, of every library (the owner's pxq, ⚠,
   included).
+
+</details>

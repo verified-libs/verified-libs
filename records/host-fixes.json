@@ -9,6 +9,42 @@
    "what": "The log line after a run printed the means of single/cache_on and stopped the runner when a configuration has no numbers on the core (DNedic lockfree mpmc::Queue on a Cortex-M0+). It now prints 'none'.",
    "numbers": "The line is printed after the run file is written and only writes to run.log; nothing that is read from the board, worked out or stored is changed.",
    "control": "2026-11-23 16:41 UTC, the first image of the bundle that was on each of the six boards, one pass, no flash write: the same image checksums, and all 56 statistics of the library and all 56 of the baseline the same as in both runs of the image's record, on every board. On the NUCLEO-G0B1RE the configuration without numbers ran through (all numbers none, no error)."
+  },
+  {
+   "file": "firmware/nrf5340-rb-bench/onerecords.py",
+   "from": "873fe49dfa98716a59dbf353ddaa11afbc36deca",
+   "to": "8c855d953d2513cfa159d2fff27bd73af6dcbf31",
+   "date": "2026-11-26",
+   "what": "Method version 3 (DECISIONS 2026-11-26): a record of runs whose directories hold options.json (lab/tools/read-options.py, board-options/1) is of schema rb-bench/3 and carries the board's option registers as option_registers; runs with and without the file are not mixed in one record.",
+   "numbers": "Nothing that is read from the board, worked out or stored per run changes. A record of runs without the board's option registers (options.json) is written byte for byte as before; with them, the record is of the new version and carries them as one field more.",
+   "control": "2026-11-26, on the host: the queue trial's runs of lwrb and jnk0le on the NUCLEO-G474RE made into records without and with a test options.json: rb-bench/2 and rb-bench/3, every other field equal; lab/tools/compare-records.py against records/bench-v2/stm32g474: 16 of 16 images the same, 384 of 384 means within."
+  },
+  {
+   "file": "firmware/nrf5340-rb-bench/oneverify.sh",
+   "from": "08d622cea1c8e1fcf14ed23b4fbdd3a0a9a247d1",
+   "to": "b0f4898960ba9ed850eaed79765fecce3e5395fa",
+   "date": "2026-11-26",
+   "what": "Method version 3: it takes records of schema rb-bench/3 as well as rb-bench/2.",
+   "numbers": "Nothing that is read from the board, worked out or stored per run changes. A record of runs without the board's option registers (options.json) is written byte for byte as before; with them, the record is of the new version and carries them as one field more.",
+   "control": "2026-11-26: the ledger of this tree (lab/tools/image-ledger.py) rebuilt every record of version 2 with it: those of the four boards whose images do not change MATCH."
+  },
+  {
+   "file": "kinds/crc/bench/crcrecords.py",
+   "from": "e24f79e6f79cc4d5758684f3603e04cf9e7635cd",
+   "to": "94ff401263c2fd5d06f05586890d16cc88d86264",
+   "date": "2026-11-26",
+   "what": "Method version 3: a record of runs whose directories hold options.json is of schema crc-bench/2 and carries the board's option registers as option_registers; runs with and without the file are not mixed; a file that is not whole is refused.",
+   "numbers": "Nothing that is read from the board, worked out or stored per run changes. A record of runs without the board's option registers (options.json) is written byte for byte as before; with them, the record is of the new version and carries them as one field more.",
+   "control": "2026-11-26, on the host: the nRF5340 DK's 15 records of the second CRC series remade from their run directories: byte for byte the records; with a test options.json: crc-bench/2, every other field equal; kinds/crc/bench/test_crcrecords.py 15 of 15."
+  },
+  {
+   "file": "kinds/crc/bench/crcverify.sh",
+   "from": "ade088516c74762b067d7048292a4a609770b339",
+   "to": "4057ef743ebb9e11fbd770ae0fb2d2a2bfc4b783",
+   "date": "2026-11-26",
+   "what": "Method version 3: it takes records of schema crc-bench/2 as well as crc-bench/1.",
+   "numbers": "Nothing that is read from the board, worked out or stored per run changes. A record of runs without the board's option registers (options.json) is written byte for byte as before; with them, the record is of the new version and carries them as one field more.",
+   "control": "2026-11-26: the ledger of this tree rebuilt every CRC record with it: those of the four boards whose images do not change MATCH."
   }
  ]
 }

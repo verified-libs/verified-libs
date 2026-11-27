@@ -40,7 +40,7 @@ board_dir() { case $1 in 1) echo nrf5340 ;; 2) echo stm32g0b1 ;; 3) echo stm32g4
 declare -A group
 for rec in "$@"; do
     base=$(basename "$(dirname "$rec")")/$(basename "$rec" .json)
-    [ "$(jq -r '.schema // empty' "$rec" 2>/dev/null)" = rb-bench/2 ] || { echo "$base: not a record of benchmark version 2"; note 2; continue; }
+    case "$(jq -r '.schema // empty' "$rec" 2>/dev/null)" in rb-bench/2|rb-bench/3) true ;; *) false ;; esac || { echo "$base: not a record of benchmark version 2"; note 2; continue; }
     commit=$(jq -r '.bench_commit // empty' "$rec"); img=$(jq -r '.toolchain_image // empty' "$rec")
     board=$(board_dir "$(jq -r '.board_id' "$rec")")
     case "$commit" in ""|unknown|*+dirty) echo "$base: commit '$commit' cannot be rebuilt (unknown, or uncommitted changes)"; note 2; continue ;; esac

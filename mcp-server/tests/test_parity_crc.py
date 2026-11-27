@@ -48,7 +48,10 @@ def fragments(C, seed=20261125, random_views=1500):
            "#board=nucleo-h723zg&kind=hardware&w=3,3,3&row=adapter_hw_crc32", "#board=nrf5340dk&kind=hardware",
            "#board=nucleo-h723zg&cache=off&w=10,0,0", "#board=pico2&crc=" + enc(C["crcs"][2]) + "&cache=off",
            "#board=nucleo-h723zg&w=10,10,10&row=adapter_etl_crc32_t256_ram",
-           "#board=pico2&cache=off&len=1024&row=adapter_crcany_crc32_word_ram"]
+           "#board=pico2&cache=off&len=1024&row=adapter_crcany_crc32_word_ram",
+           # the H723's unit note (by board and clock): shown with the unit's row, cache on and off, not without it
+           "#board=nucleo-h723zg", "#board=nucleo-h723zg&cache=off", "#board=nucleo-h723zg&kind=library",
+           "#board=nucleo-h723zg&kind=hardware&cache=off", "#board=nucleo-h723zg&class=" + enc("table of 256")]
     weights = ["10,0,0", "0,10,0", "0,0,10", "5,5,0", "3,3,3", "10,10,1", "1,0,10"]
     for crc in C["crcs"]:
         cfgs = cq.configs_of(C, crc)
@@ -185,6 +188,25 @@ class HardwareInTheTable(unittest.TestCase):
                 every, _ = cq.shown(C, st)
                 self.assertFalse(any(x["c"]["adapter"] in hw for x in every), (b, crc))
                 self.assertIn("libraries only", cq.page_view(C, st)["note"], (b, crc))
+
+
+class UnitNote(unittest.TestCase):
+    """The sentence about a board's CRC unit (note_hw_unit, by board and clock) is in the note exactly where the board
+    has one and the unit's row is shown, cache on or off."""
+    def test_unit_note(self):
+        C, _ = cq.load(DATA)
+        seen = 0
+        for frag in fragments(C, random_views=300):
+            st = cq.state_from_hash(C, frag)
+            bd = cq.board_of(C, st)
+            _, rs = cq.shown(C, st)
+            shown = any(cq.is_hardware(x["c"]) for x in rs)
+            note = cq.page_view(C, st)["note"]
+            if bd.get("note_hw_unit"):
+                self.assertEqual(bd["note_hw_unit"] in note, shown, frag)
+                seen += shown
+        if any(b.get("note_hw_unit") for b in C["boards"]):
+            self.assertGreater(seen, 10)
 
 
 class ScoreMarkControl(unittest.TestCase):

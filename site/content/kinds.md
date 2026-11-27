@@ -1,7 +1,7 @@
 # Results
 
-Two kinds of library are tested so far. Each has its own results, method
-and records; the numbers of one kind are not compared with the other's.
+Three kinds of library are tested so far. Each has its own results, method
+and records; the numbers of one kind are not compared with another's.
 The kinds are in the order they were added.
 
 ## Embedded ring buffers
@@ -32,6 +32,21 @@ The kinds are in the order they were added.
 - **Comparison page:** [Compare](compare-crc.html)
 - **Records:** [`records/crc`](../../records/README.md)
 - **How to repeat:** [Reproduce, "The CRC records"](reproduce.md#the-crc-records)
+
+## Fixed-block memory pools
+
+- **What is measured:** cycles of alloc and free of one block size (32
+  blocks of 32 bytes) in six scenarios and of creating the pool, with the
+  cache off and on, and the bytes of flash and RAM it takes; every call is
+  checked on the board. Measured in one context: what a library documents
+  about use from interrupts is shown, not tested.
+- **Libraries:** 10, in 10 configurations, and a row of ours (not a library).
+- **Boards:** 6.
+- **Results:** [results page](results-pools.md)
+- **Method:** [method page](method-pools.md)
+- **Comparison page:** [Compare](compare-pools.html)
+- **Records:** [`records/pools`](../../records/README.md)
+- **How to repeat:** [Reproduce, "The pools records"](reproduce.md#the-pools-records)
 
 The counts are written from the data by
 [`site/kinds_page.py`](../kinds_page.py); the site is not built if this

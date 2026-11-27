@@ -1,0 +1,4 @@
+# Configurations of the pools kind built on some boards only (bench/onepool.py, as kinds/crc/boards.txt):
+# heapless's pool needs LDREX/STREX (its src/pool.rs: "not thumbv6m-none-eabi"), so not on the two
+# Cortex-M0+ boards.
+adapter_heapless   nrf5340 stm32g474 stm32h723 rp2350

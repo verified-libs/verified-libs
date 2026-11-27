@@ -132,7 +132,7 @@ def load2(path):
     """{file name: record} of a version 2 record or a directory of them; None if it is neither."""
     files = sorted(glob.glob(os.path.join(path, "*.json"))) if os.path.isdir(path) else [path]
     recs = {os.path.basename(f): json.load(open(f)) for f in files}
-    return recs if recs and all(r.get("schema") == "rb-bench/2" for r in recs.values()) else None
+    return recs if recs and all(r.get("schema") in ("rb-bench/2", "rb-bench/3") for r in recs.values()) else None
 
 
 def main():

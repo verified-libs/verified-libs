@@ -1,0 +1,33 @@
+# The libraries of the pools kind, pinned by commit (format of
+# pilot/pools/libs.lock: name url commit [path ...]). fetch.sh fetches them
+# outside the repository (default ~/vl-next/kind-pools); nothing of them is
+# copied into it. The tag each commit belongs to, and the licence read from
+# the licence file, are in README.md.
+etl         https://github.com/ETLCPP/etl.git                       7d604f2e4f7fa79ff49bf675c089656943f9171b /include/ /LICENSE
+riot        https://github.com/RIOT-OS/RIOT.git                     9c9a6abec901838b1637ef9308427b50ef59ce5c /sys/memarray/ /sys/include/memarray.h /LICENSE
+threadx     https://github.com/eclipse-threadx/threadx.git          93387b0a60382a29579bbad5045c68328e3751df /common/inc/ /common/src/tx_block_allocate.c /common/src/tx_block_release.c /common/src/tx_block_pool_create.c /common/src/tx_block_pool_delete.c /ports/cortex_m4/gnu/inc/ /ports/cortex_m0/gnu/inc/ /ports/cortex_m7/gnu/inc/ /ports/cortex_m33/gnu/inc/ /LICENSE.txt
+cmsis-rtx   https://github.com/ARM-software/CMSIS-RTX.git           b566de42a5bf77d8b080f521cefc38ec7c45a3cc /Source/ /Include/ /Config/ /LICENSE* /README*
+cmsis6      https://github.com/ARM-software/CMSIS_6.git             af1b110e46a1720349f6f125e386e126767699bd /CMSIS/Core/Include/ /CMSIS/RTOS2/Include/ /LICENSE* /README*
+cortex-dfp  https://github.com/ARM-software/Cortex_DFP.git          cd38dbb875f7195e70460eee51faa7ab180c24a1 /Device/ARMCM4/Include/ /Device/ARMCM0plus/Include/ /Device/ARMCM33/Include/ /Device/ARMCM7/Include/ /LICENSE* /README*
+contiki-ng  https://github.com/contiki-ng/contiki-ng.git            4ccd1a3b9e767f168d12ec3df187fe6b7dc736b5 /os/lib/memb.c /os/lib/memb.h /LICENSE.md
+c-allocator https://github.com/endurodave/C_Allocator.git           497b46500e314467d2bc2a3f6623e68d71eab9db /*
+eccles      https://github.com/Igwe-Starking/eccles-rtmem.git       02146345a899e29fe53555098848a4584491818c /*
+memorypool  https://github.com/bertmelis/MemoryPool.git             c98ff35f19473b737c4b75817096481327023c02 /*
+atomic-pool https://github.com/embassy-rs/atomic-pool.git           ab88f3ccfebd382685bf97239df6828769c5b743 /*
+heapless    https://github.com/rust-embedded/heapless.git           19188229ac2b76fc91ad79f57dee01fa362a1e15 /*
+zephyr      https://github.com/zephyrproject-rtos/zephyr.git        41d10b59730406bbab4ca9f1fbbe9e96aafb4966 /kernel/mem_slab.c /include/ /LICENSE
+lwip        https://github.com/lwip-tcpip/lwip.git                  77dcd25a72509eb83f72b033d219b1d40cd8eb95 /src/ /COPYING /README
+memorypool-head https://github.com/bertmelis/MemoryPool.git             5073178622c3af7b682060a93c4b38ce386f2d59 /*
+# Rust dependencies, pinned as the ring buffers pin them (firmware/nrf5340-rb-bench/libs.lock) where they
+# are the same crates; cargo runs with --offline and finds each through [patch.crates-io] (rust/Cargo.toml).
+as-slice-01 https://github.com/japaric/as-slice.git               e21f5bd9e629f2bf5641b97f64e582ed745e3ab6 /*
+as-slice-02 https://github.com/japaric/as-slice.git               c3687342bc9f3c9c202676a5d2e17288ff979c90 /*
+rs-portable-atomic https://github.com/taiki-e/portable-atomic.git e4595528211f1d53b7f4d93e528ef84b491fc871 /*
+rs-stable-deref-trait https://github.com/storyyeller/stable_deref_trait.git 66f9d8a15b7209c45f58edee6c1b6bb497b7bd31 /*
+rs-hash32   https://github.com/japaric/hash32.git                 d44eb33a01be4582669d9a1fa3f7c58455a21de9 /*
+rs-byteorder https://github.com/BurntSushi/byteorder.git          ec068eefa042d494475db125c4b034bd8e9e34dd /*
+rs-generic-array-012 https://github.com/fizyk20/generic-array.git 42843cdb6c24ef3684494617e78745a62a64a29c /*
+rs-generic-array-013 https://github.com/fizyk20/generic-array.git 525f5e7dc3e3e9cab6ee92c2655611c5590675d3 /*
+rs-generic-array-014 https://github.com/fizyk20/generic-array.git a1b3c3cfdf64ad99fd2004c0d8ce81b0e56e5ebe /*
+rs-typenum  https://github.com/paholg/typenum.git                 b237efbb1da9646435274f63d7290cb7651b031f /*
+rs-version-check https://github.com/SergioBenitez/version_check.git d77ef9f27cc336719b2d839d09ee6635dd22f758 /*

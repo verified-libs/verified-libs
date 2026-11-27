@@ -323,6 +323,12 @@ position the repeat error is 0 on five boards and up to 1.26 % (cache on)
 on the Pico 2; what limits a comparison between two configurations is the
 spread over the placements (check 7), not the repetition.*
 
+*Correction, 2026-11-27:* the RP2350 datasheet does state the replacement
+policy: "Cache eviction policy is random" (RP-008373, 4.4.1.2 "Cache line
+states"). It explains the Pico 2's difference between the passes; see
+[What the CRC reports left unexplained](2026-11-27-crc-unexplained.md),
+item 2.
+
 *The first call in the page's figures* (`first`, every configuration and
 placement, first pass). A scenario's mean includes its first call. In the
 figures a page would show (16 bytes, and the cost per byte from 256 and

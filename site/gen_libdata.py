@@ -58,6 +58,8 @@ ROOT = os.path.dirname(HERE)
 STRESS = os.path.join(ROOT, "firmware/nrf5340-rb-stress")
 sys.path.insert(0, STRESS)
 from decode import MULTICORE_DOCUMENTED, MUTANTS, UNSAFE_BY_OWN_DOCS, ZERO_COPY   # noqa: E402
+sys.path.insert(0, HERE)
+import series_info   # noqa: E402
 from summarize import CONTROL, analyse                                            # noqa: E402
 from summarize_all import BOARD_ORDER, board_of                      # noqa: E402
 sys.path.insert(0, HERE)
@@ -192,7 +194,7 @@ def bench_v2(d):
         speeds, info = {}, None
         for f in sorted(glob.glob(os.path.join(d, fw, "*.json"))):
             rec = json.load(open(f))
-            if rec.get("schema") != "rb-bench/2":
+            if rec.get("schema") not in ("rb-bench/2", "rb-bench/3"):   # /3: with option registers (method version 3)
                 sys.exit(f"{f}: not a record of benchmark version 2")
             sp = speed_v2(rec)
             if sp:
@@ -203,7 +205,9 @@ def bench_v2(d):
                    # -O2 is the Makefile's default, which onebuild.sh builds with; the compilers are the image's
                    "opt": "-O2", "far_bytes": rec.get("far_bytes"),
                    "compiler": "arm-none-eabi-gcc " + rec["toolchain"]["arm_none_eabi_gcc"].split(") ")[1].split()[0],
-                   "rustc": rec["toolchain"]["rustc"].split(" (")[0]}
+                   "rustc": rec["toolchain"]["rustc"].split(" (")[0],
+                   # the method version of the records and the clock they ran at (site/series_info.py)
+                   "clock_mhz": round(rec["clock_hz"] / 1e6), "method_version": series_info.method_version(rec["schema"])}
             # One series per board; after a change of a library its records are measured again at a
             # later commit (lab/tools/bench2-changed.py), so the commits are listed, the oldest first.
             if info and any(info[k] != one[k] for k in one if k != "commit"):
@@ -216,6 +220,12 @@ def bench_v2(d):
                 if c not in seen:
                     seen.append(c)
             info["commit"] = ", ".join(seen)
+            # the series archived before method version 3 that this board's records replaced, and the sentence
+            # the comparison page and the results page put under the board's numbers
+            prefix = f"bench-v2/{fw}/"
+            info["archived"] = series_info.archived_for(prefix, seen)
+            info["method_text"] = series_info.method_text(info["method_version"], info["clock_mhz"] * 1e6, info["archived"],
+                                                          series_info.unchanged_under_3(prefix))
         if speeds:
             out[b] = (speeds, info)
     return out
@@ -294,7 +304,9 @@ def plain(md, base):
 def result_notes():
     """[N..] label -> the note of RESULTS.md ("Notes per library"), public text."""
     text = strip_embargo(_read(os.path.join(ROOT, "RESULTS.md")))
-    sec = re.search(r"^### Notes per library\n(.*?)^#{1,3} ", text, re.S | re.M)
+    # the section is a fold-out of its own (<details id="notes-per-library">), or, before, a heading
+    sec = (re.search(r'^<details id="notes-per-library"[^>]*>\n<summary>.*?</summary>\n(.*?)^</details>', text, re.S | re.M)
+           or re.search(r"^### Notes per library\n(.*?)^#{1,3} ", text, re.S | re.M))
     if not sec:
         sys.exit('RESULTS.md has no "Notes per library" section')
     notes = {}

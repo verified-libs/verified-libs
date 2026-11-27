@@ -264,7 +264,9 @@
       (mpMode() ? ". Speeds" + (w ? " and scores" : "") + " are those of each library's " + mpMode() + " mode, timed without contention " +
         "(one caller at a time), and compared among these libraries only; the ISR stress columns are still the SPSC test" : "");
     var b = D.boards.filter(function (x) { return x.id === st.board; })[0];
-    $("cmp-src").textContent = b.name + " (" + b.core + ", " + b.clock_mhz + " MHz). Speed: " +
+    // version 2's numbers: the clock of its records and their method version (site/series_info.py); version 1's: its record's clock
+    $("cmp-src").textContent = b.name + " (" + b.core + ", " + (two() ? b.bench2.clock_mhz : b.clock_mhz) + " MHz). " +
+      (two() && b.bench2.method_text ? b.bench2.method_text + " " : "") + "Speed: " +
       (two() ? "benchmark version 2, each configuration in an image of its own (" + b.bench2.records + ", commit " + b.bench2.commit +
         ", " + b.bench2.passes + " passes), " + b.bench2.compiler + " " + b.bench2.opt + " (Rust: " + b.bench2.rustc +
         ", same opt-level), code in flash" + (b.bench2.far_bytes ? ", library code that is not inlined at least " + b.bench2.far_bytes +

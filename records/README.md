@@ -45,6 +45,35 @@ here that names commit `a7a206190337`. To check one of them, clone the
 public repository with its history and run
 [`lab/tools/verify-build.sh`](../lab/tools/verify-build.sh) on it: the
 sources are taken from the public commit the series was published as.
+An entry with `paths` archives only its commit's records under those
+prefixes: the nRF5340 DK's and the NUCLEO-H723ZG's records of benchmark
+version 2 and of the two CRC series, as they were before method version 3
+(DECISIONS.md, 2026-11-26). The records of method version 3 replaced them
+in the same paths; the archived ones are in the public repository at the
+entry's `public_commit`.
+
+## Method version 3: `rb-bench/3` and `crc-bench/2`
+
+The records made under method version 3 (DECISIONS.md, 2026-11-26; the
+[method page](../site/content/method.md#method-version-3)) are of two new
+record versions, made by the same programs
+([`firmware/nrf5340-rb-bench/onerecords.py`](../firmware/nrf5340-rb-bench/onerecords.py)
+and [`kinds/crc/bench/crcrecords.py`](../kinds/crc/bench/crcrecords.py)):
+- `rb-bench/3` is `rb-bench/2` with one field more, `crc-bench/2` is
+  `crc-bench/1` with the same field; every other field is unchanged.
+- `option_registers`: the board's option registers, read through the debug
+  probe without writing anything before the series and each of its jobs
+  ([`lab/tools/read-options.py`](../lab/tools/read-options.py)). A list of
+  readings, each distinct reading once, in time order. A reading
+  (`board-options/1`) holds `board`, `chip`, `time`, `probe_rs` (the
+  probe-rs version) and `regions`: per register or register block its
+  `name`, `address`, `source` (the manual's section) and `words`.
+- A record whose runs have no option registers is of the old version,
+  written as before; a record whose runs have them is of the new one; a
+  record of runs with and without them is not made.
+
+The pages read both versions, and say per board which method version its
+records are of ([`site/series_info.py`](../site/series_info.py)).
 
 ## The CRC records (`crc/`)
 
@@ -54,7 +83,7 @@ made by [`kinds/crc/bench/crcrecords.py`](../kinds/crc/bench/crcrecords.py)
 from the run files of `kinds/crc/bench/run-crc.py`. Schema `crc-bench/1`.
 [`kinds/crc/bench/crcverify.sh`](../kinds/crc/bench/crcverify.sh) rebuilds
 a record's eight images and compares them. The 221 records here are of two
-series, six boards, two passes each:
+series, six boards, two passes each, and of method version 3 on two boards:
 - the first series, 120 records of the 20 configurations of step 2 (commit
   `6301058`, 2026-11-24 to 2026-11-25; the
   [report](../reports/2026-11-25-crc-first-series.md));
@@ -62,10 +91,16 @@ series, six boards, two passes each:
   tables in RAM, and the board's CRC unit on the four boards that have
   one). Its commits are `04a2197` (NUCLEO-G474RE, the NUCLEO-G0B1RE's
   tables in RAM, SAM D20) and `40f1958` (the rest). The account is in the
-  [report](../reports/2026-11-25-crc-second-series.md).
+  [report](../reports/2026-11-25-crc-second-series.md);
+- method version 3, 73 records of commit `4032f80` (2026-11-26): every
+  configuration of both series on the nRF5340 DK (35) and the
+  NUCLEO-H723ZG (38), measured again (record version `crc-bench/2`,
+  below). They replaced those boards' records of the two series, which
+  are archived series now (`archived.json`).
 
 Every record was rebuilt byte for byte from its commit. The records of
-`6301058` and `04a2197` also rebuild from this tree's sources, and
+`4032f80` have this tree's CRC test sources; those of `6301058`, `04a2197`
+and `40f1958` also rebuild from this tree's sources, and
 [`rebuilt.json`](rebuilt.json) says so (`lab/tools/image-ledger.py`). Fields:
 
 | Field | What it holds |

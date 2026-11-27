@@ -1,0 +1,77 @@
+<p class="kindsw">Kind: <a href="compare.html">Ring buffers</a> | <a href="compare-crc.html">CRC</a> | <strong>Memory pools</strong></p>
+<h1>Compare fixed-block memory pools</h1>
+<p><strong>Measured in one context.</strong> Whether a pool is safe when an interrupt calls it is not
+tested in this series. The last column gives what each library documents about use from interrupts,
+with its source: it is shown as documented, not tested, and no filter and no score uses it.</p>
+<p>Pick a board, a scenario and the cache, and set weights for what you care about. There is no
+ranking of ours: without weights the rows are in the order of the configuration list, and any order
+is the result of your weights, which are stored in the address so the view can be linked. Every
+number is the range over eight placements of the code (min–max), first pass, and so is the score.
+Choose a configuration's name to mark the rows whose range overlaps its range. One pool shape: 32
+blocks of 32 bytes. All numbers and how they were measured:
+<a href="results-pools.html">Memory pool results</a> and <a href="method-pools.html">Method</a>.</p>
+<noscript><p><strong>This page needs JavaScript.</strong> The same numbers are in the tables on the
+<a href="results-pools.html">memory pool results</a> page.</p></noscript>
+<form class="cmp" onsubmit="return false">
+<fieldset><legend>Board, scenario and cache</legend>
+<label>Numbers from <select id="pools-board"></select></label>
+<label>Scenario <select id="pools-scen"><option value="pair">pair: alloc then free, the pool almost empty</option>
+<option value="pair_full">pair_full: the same, 31 of 32 blocks held</option>
+<option value="fill_drain_lifo">fill_drain_lifo: 32 allocs, 32 frees in reverse order</option>
+<option value="fill_drain_fifo">fill_drain_fifo: 32 allocs, 32 frees in the same order</option>
+<option value="mixed">mixed: a fixed-seed sequence, 25–75 % full</option>
+<option value="empty">empty: alloc on an exhausted pool</option></select></label>
+<label>Cache <select id="pools-cache"><option value="on">on</option><option value="off">off</option></select></label>
+</fieldset>
+<fieldset><legend>Filters</legend>
+<label>Language <select id="pools-lang"><option value="">any</option><option value="C">C</option><option value="C++">C++</option><option value="Rust">Rust</option></select></label>
+<label>Kind of row <select id="pools-kind"><option value="">any</option><option value="library">library</option><option value="ours">ours (interrupts off; not a library)</option></select></label>
+</fieldset>
+<fieldset><legend>Weights (0 = ignore, 10 = most important)</legend>
+<div id="pools-weights"></div>
+<button type="button" id="pools-reset">Reset weights and choices</button>
+</fieldset>
+</form>
+<p id="cmp-note"></p>
+<p id="cmp-count" class="mute" aria-live="polite"></p>
+<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="tw"><table id="cmp-table" class="cmp"></table></div>
+<p class="mute">A range is min–max over eight placements of the code. Two rows differ only where their
+ranges do not overlap. With a configuration chosen, "overlaps" marks the rows whose range overlaps
+its range in that column, compared as the numbers are shown (whole cycles): this series does not
+tell those rows apart from the chosen one. With weights, a score marked "overlaps above" overlaps
+the score of the row above it: this series does not tell the two apart. The score's marks are
+judged on the score before rounding, so two rows can show the same score without a mark when they
+differ by less than the rounding.</p>
+<p id="cmp-src" class="mute"></p>
+<h2>How the score is computed</h2>
+<p>With a weight above 0, each row gets a score from 0 to 100, as on the other comparison pages: for
+each weighted value, the smallest value among the rows shown divided by the row's own, then the mean
+weighted by your weights, times 100, shown to one decimal. The values are the cycles of one alloc
+and of one free in the chosen scenario, and the bytes of flash and RAM together. The cycles are
+ranges, so the score is a range too: the smallest value is the smallest lower end among the rows
+shown; a row's lowest score uses its own upper ends, its highest score its lower ends. Bytes are
+exact. A value a row does not have (no free in the scenario <code>empty</code>) counts 0. The rows
+are ordered by the highest end of the score, ties in list order, and a score whose range overlaps
+the one above it is marked "overlaps above". Our row with interrupts off is scored like any row;
+choose "library" under "Kind of row" for the scores among the libraries only. The reference free
+list has no score, is never the smallest value a score is taken against, and stays apart as the
+last row. Sorting by name, flash or RAM bytes (the column headers) overrides the score order.</p>
+<p>What the score does not say: every call of every row was checked on the board (a block given
+exactly when one is free, in the pool, aligned, not given twice, its contents and the pool's
+canaries intact), so correctness is not a weight. Nor is what a library documents about
+interrupts, which this series does not test, nor language, licence, the lock or how the API looks.
+Those are for you to judge, with the filter and the records.</p>
+<h2>What the columns are</h2>
+<p><strong>Cycles</strong>: the mean of the scenario's calls (the first call included), in CPU cycles
+less the counter-read overhead; <strong>init</strong> is one call that creates the pool.
+<strong>Version</strong>: the pin measured; MemoryPool is measured at a commit after its only release,
+which is not a release itself (<a href="method-pools.html">why</a>). <strong>Lock as built</strong>:
+what the library takes around a call in the build measured. <strong>Flash bytes</strong>: the library's and the
+adapter's code and constant data at <code>-O2</code>, measured in the board's images;
+<strong>RAM bytes</strong>: what the pool needs beyond the 32 blocks of 32 bytes and their canaries. <strong>Documented use from interrupts</strong>: the library's own words, with
+their source; not tested here. The row "reference free list, interrupts off (ours)" is our free list
+with interrupts off around each call: the price of the simplest lock on the core, not a library. The
+last row, apart, is the reference free list without a lock, timed in the same images: the baseline,
+not a library. The second pass and the minimum, maximum and first call of each scenario are in the
+records, one per row.</p>

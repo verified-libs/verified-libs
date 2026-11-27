@@ -505,7 +505,8 @@ def source_text(D, st):
     bench, rust = b["bench"], b.get("rust_bench")
     if two(st):
         b2 = b["bench2"]
-        t = (b["name"] + " (" + b["core"] + ", " + js_str(b["clock_mhz"]) + " MHz). Speed: " +
+        t = (b["name"] + " (" + b["core"] + ", " + js_str(b2["clock_mhz"]) + " MHz). " +
+             (b2["method_text"] + " " if b2.get("method_text") else "") + "Speed: " +
              "benchmark version 2, each configuration in an image of its own (" + js_str(b2["records"]) + ", commit " +
              b2["commit"] + ", " + js_str(b2["passes"]) + " passes), " + b2["compiler"] + " " + b2["opt"] + " (Rust: " + b2["rustc"] +
              ", same opt-level), code in flash" + (", library code that is not inlined at least " + js_str(b2["far_bytes"]) +

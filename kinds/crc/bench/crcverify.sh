@@ -48,7 +48,7 @@ board_dir() { case $1 in 1) echo nrf5340 ;; 2) echo stm32g0b1 ;; 3) echo stm32g4
 declare -A group
 for rec in "$@"; do
     base=$(basename "$(dirname "$rec")")/$(basename "$rec" .json)
-    [ "$(jq -r '.schema // empty' "$rec" 2>/dev/null)" = crc-bench/1 ] || { echo "$base: not a record of the CRC kind (crc-bench/1)"; note 2; continue; }
+    case "$(jq -r '.schema // empty' "$rec" 2>/dev/null)" in crc-bench/1|crc-bench/2) true ;; *) false ;; esac || { echo "$base: not a record of the CRC kind (crc-bench/1 or /2)"; note 2; continue; }
     commit=$(jq -r '.bench_commit // empty' "$rec"); img=$(jq -r '.toolchain_image // empty' "$rec")
     board=$(board_dir "$(jq -r '.board_id' "$rec")")
     case "$commit" in ""|unknown|*+dirty) echo "$base: commit '$commit' cannot be rebuilt (unknown, or uncommitted changes)"; note 2; continue ;; esac

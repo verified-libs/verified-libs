@@ -396,9 +396,12 @@ def page_view(C, st):
                 else "in the order of the configuration list; this is not a ranking")
              + (". The chosen configuration is not shown: nothing is marked" if st["row"] and not ch else "") + ".")
     bd = board_of(C, st)
+    unit_shown = any(is_hardware(x["c"]) for x in rs)
     note = " ".join(t for t in (bd["note_cache_off"] if st["cache"] == "off" and bd.get("note_cache_off") else "",
+                                bd["note_hw_unit"] if unit_shown and bd.get("note_hw_unit") else "",
                                 "" if has_unit(every) else no_unit_text(bd, st)) if t)
-    src = (f"{bd['name']} ({bd['core']}, {math.floor(bd['clock_hz'] / 1e6 + 0.5)} MHz). Records: {C['source']['records']}, "
+    src = (f"{bd['name']} ({bd['core']}, {math.floor(bd['clock_hz'] / 1e6 + 0.5)} MHz). "
+           + (bd["method_text"] + " " if bd.get("method_text") else "") + f"Records: {C['source']['records']}, "
            f"series at commit {', '.join(C['source']['commits'])}, toolchain {', '.join(C['source']['toolchain_image'])}. "
            "Each number is the mean of the scenario's 256 calls, the first included, as min–max over the eight placements, "
            "first pass; per byte from the means at 256 and 1024 bytes, at the chosen start.")

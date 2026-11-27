@@ -12,6 +12,9 @@
  */
 #pragma once
 #include <stdint.h>
+#ifndef BOARD_TIMER_CLK_DIV
+#define BOARD_TIMER_CLK_DIV 1u   /* the timer runs at the core clock (every board but the H723 at 520 MHz) */
+#endif
 
 #define TIM3_CR1   (*(volatile uint32_t *)0x40000400u)
 #define TIM3_DIER  (*(volatile uint32_t *)0x4000040Cu)
@@ -31,7 +34,7 @@ static inline void board_timer_b_start(uint32_t prescaler, uint32_t first_period
     (void)TIM3_RCC_ENR;
     TIM3_CR1 = TIM_CR1_URS;
     TIM3_DIER = 0;
-    TIM3_PSC = (4u << prescaler) - 1u;
+    TIM3_PSC = (4u << prescaler) / BOARD_TIMER_CLK_DIV - 1u;   /* one tick = 4 << prescaler core cycles */
     TIM3_ARR = first_period - 1u;
     TIM3_CNT = 0;
     TIM3_EGR = TIM_EGR_UG;            /* load PSC; URS: no interrupt from this */

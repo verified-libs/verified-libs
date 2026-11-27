@@ -1,9 +1,10 @@
 #!/bin/bash
-# A test of public-export.py's rule for the test sources of two kinds (the
-# ring buffers, records under records/ but records/crc; the CRC kind,
-# records/crc): in a throwaway clone of this repository's HEAD, a made-up CRC
-# record (test values, no measurement) is committed, then one file is changed
-# per case and the export check must stop exactly the records it should.
+# A test of public-export.py's rule for the test sources of three kinds (the
+# ring buffers, records under records/ but records/crc and records/pools; the
+# CRC kind, records/crc; the pools kind, records/pools): in a throwaway clone
+# of this repository's HEAD, a made-up CRC record and a made-up pools record
+# (test values, no measurement) are committed, then one file is changed per
+# case and the export check must stop exactly the records it should.
 #   bash lab/tools/test-public-export.sh      exit 0: every case as expected
 #   bash lab/tools/test-public-export.sh --quick   without the CRC ledger cases
 # The CRC ledger cases (DECISIONS 2026-11-24, the same-image rule for the CRC
@@ -18,10 +19,21 @@
 # the ledger, which is held by the checksum of HEAD's test sources (the host
 # side included): after a recorded host fix exactly those records stop until
 # the ledger is made again, and the two host-fix cases test both steps. A
-# full run makes the ledger four times and takes about 32 minutes
-# (2026-11-26, 1925 s on this host with 221 CRC records), --quick a few seconds. The libraries are copied from
+# full run makes the ledger four times and took about 32 minutes
+# (2026-11-26, 1925 s on this host with 221 CRC records); since method
+# version 3 it also rebuilds the 176 version 2 records of the boards not
+# measured again, each time, and takes over an hour. --quick: a few seconds. The libraries are copied from
 # VL_CRC_LIBS_FROM_HOST (default ~/vl-next/kind-crc) and checked out at
 # their pins.
+# The rebuilds take their libraries from a local mirror only
+# (lab/tools/lib-mirror.py, VL_LIB_MIRROR, default ~/vl-scratch/lib-mirror):
+# it is filled before the first case (the network only for a pin it lacks;
+# if a pin cannot be fetched the test stops there, "could not fetch"), and
+# from then on git may use no other transport than file (GIT_ALLOW_PROTOCOL),
+# so a network fault cannot change a case's verdict. A last case shuts the
+# mirror off with no library at hand: every rebuild of the ledger fails at its
+# fetch, and the held records must stop as "could not fetch", never as
+# records HEAD builds another image of.
 # Nothing of this repository is changed; the clone is deleted at the end.
 set -uo pipefail
 export LC_ALL=C
@@ -36,13 +48,16 @@ src=$(git rev-parse HEAD)
 mkdir -p records/crc/stm32g474
 printf '{\n "schema": "crc-bench/1",\n "adapter": "adapter_test",\n "bench_commit": "%s",\n "images": []\n}\n' "$src" \
     > records/crc/stm32g474/adapter_test.json
-git add records/crc && git commit -q -m "test: a made-up CRC record"
+mkdir -p records/pools/stm32g474
+printf '{\n "schema": "pools-bench/1",\n "adapter": "adapter_test",\n "bench_commit": "%s",\n "images": []\n}\n' "$src" \
+    > records/pools/stm32g474/adapter_test.json
+git add records/crc records/pools && git commit -q -m "test: a made-up CRC record and a made-up pools record"
 base=$(git rev-parse HEAD)
 
 fails=0
-# case NAME FILE EXPECT_CRC_STOPPED EXPECT_RB_STOPPED
+# case NAME FILE EXPECT_CRC_STOPPED EXPECT_RB_STOPPED EXPECT_POOLS_STOPPED
 case_() {
-    local name=$1 file=$2 crc=$3 rb=$4 out rc got_crc=no got_rb=no
+    local name=$1 file=$2 crc=$3 rb=$4 pools=$5 out rc got_crc=no got_rb=no got_pools=no
     git reset -q --hard "$base"
     if [ -n "$file" ]; then
         printf '\n/* test change */\n' >> "$file"
@@ -51,22 +66,78 @@ case_() {
     out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
     grep -q "under records/crc/ name commit" <<<"$out" && got_crc=yes
     grep -q "whose test sources (firmware" <<<"$out" && got_rb=yes
+    grep -q "under records/pools/ name commit" <<<"$out" && got_pools=yes
     local want_rc=0
-    { [ "$crc" = yes ] || [ "$rb" = yes ]; } && want_rc=1
-    if [ "$got_crc" = "$crc" ] && [ "$got_rb" = "$rb" ] && [ "$rc" = "$want_rc" ]; then
-        echo "ok   $name: CRC records stopped: $got_crc, ring-buffer records stopped: $got_rb"
+    { [ "$crc" = yes ] || [ "$rb" = yes ] || [ "$pools" = yes ]; } && want_rc=1
+    if [ "$got_crc" = "$crc" ] && [ "$got_rb" = "$rb" ] && [ "$got_pools" = "$pools" ] && [ "$rc" = "$want_rc" ]; then
+        echo "ok   $name: CRC records stopped: $got_crc, ring-buffer records stopped: $got_rb, pools records stopped: $got_pools"
     else
-        echo "FAIL $name: CRC records stopped: $got_crc (want $crc), ring-buffer records stopped: $got_rb (want $rb), rc $rc"
+        echo "FAIL $name: CRC records stopped: $got_crc (want $crc), ring-buffer records stopped: $got_rb (want $rb), pools records stopped: $got_pools (want $pools), rc $rc"
         sed 's/^/     /' <<<"$out"
         fails=$((fails + 1))
     fi
 }
-case_ "nothing changed"                                ""                                          no  no
-case_ "a file of the CRC kind (kinds/crc/ref_crc.c)"   kinds/crc/ref_crc.c                         yes no
-case_ "a proof of the CRC kind (kinds/crc/proof/)"     "$(git ls-files kinds/crc/proof | grep -m1 '\.c$')" no no
-case_ "a ring-buffer file (firmware/, not common)"     firmware/nrf5340-rb-bench/main.c            no  yes
-case_ "the board support (firmware/common)"            firmware/common/benchboot.c                 yes yes
-case_ "a version 2 program the CRC kind imports"       firmware/nrf5340-rb-bench/onebundle.py      yes yes
+case_ "nothing changed"                                ""                                          no  no  no
+case_ "a file of the CRC kind (kinds/crc/ref_crc.c)"   kinds/crc/ref_crc.c                         yes no  no
+case_ "a proof of the CRC kind (kinds/crc/proof/)"     "$(git ls-files kinds/crc/proof | grep -m1 '\.c$')" no no no
+case_ "a ring-buffer file (firmware/, not common)"     firmware/nrf5340-rb-bench/main.c            no  yes no
+case_ "the board support (firmware/common)"            firmware/common/benchboot.c                 yes yes yes
+case_ "a version 2 program the kinds import"           firmware/nrf5340-rb-bench/onebundle.py      yes yes yes
+case_ "pools: the reference (kinds/pools/adapter_ref.c)" kinds/pools/adapter_ref.c                 no  no  yes
+case_ "pools: the bench program (bench/main.c)"        kinds/pools/bench/main.c                    no  no  yes
+case_ "pools: the runner (bench/run-pools.py)"         kinds/pools/bench/run-pools.py              no  no  yes
+case_ "pools: the slots (slots.txt)"                   kinds/pools/slots.txt                       no  no  yes
+case_ "pools: the host test (test_pool.c)"             kinds/pools/test_pool.c                     no  no  no
+case_ "pools: a proof (kinds/pools/proof/)"            "$(git ls-files kinds/pools/proof | grep -m1 '\.c$')" no no no
+case_ "pools: a host-only shim (shims/host/)"          kinds/pools/shims/host/ARMCM_host.h         no  no  no
+case_ "pools: the host Makefile"                       kinds/pools/Makefile                        no  no  no
+case_ "pools: the record path's test"                  kinds/pools/bench/test_poolrecords.py       no  no  no
+case_ "pools: the claims file (claims.tsv)"            kinds/pools/claims.tsv                      no  no  no
+case_ "pools: the repeat script (repeat.sh)"           kinds/pools/repeat.sh                       no  no  no
+case_ "pools: the comparison (bench/poolscompare.py)"  kinds/pools/bench/poolscompare.py           no  no  no
+case_ "pools: control, an adapter (adapter_lwip.c)"    kinds/pools/adapter_lwip.c                  no  no  yes
+
+# an archived series whose records have left the tree (method version 3: replaced at their paths by the
+# records measured again) is kept in the public history its entry names: nothing stops; a series only partly
+# gone still stops the export (the records are not the ones archived)
+acase() {   # NAME WANT_STOPPED PATH...
+    local name=$1 want=$2 out rc got=no; shift 2
+    git reset -q --hard "$base"; git rm -q -r "$@"; git commit -q -m "test: $name"
+    out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
+    grep -q "the records are not the ones archived" <<<"$out" && got=yes
+    local want_rc=0
+    [ "$want" = yes ] && want_rc=1
+    if [ "$got" = "$want" ] && [ "$rc" = "$want_rc" ]; then
+        echo "ok   $name: stopped: $got"
+    else
+        echo "FAIL $name: stopped: $got (want $want), rc $rc"; sed 's/^/     /' <<<"$out"; fails=$((fails + 1))
+    fi
+}
+# (version 1's series: its 215 records are still in the tree, under records/bench, stress and campaign; the
+# series "before method version 3" left it when the records measured again replaced them)
+one_archived=$(git ls-files records/bench | grep -m1 '\.json$')
+acase "archive: version 1's records all left the tree" no records/bench records/stress records/campaign
+acase "archive: only version 1's stress records left (a series partly gone)" yes records/stress
+acase "archive: one record of version 1 left the tree" yes "$one_archived"
+
+# session names (site/session-names.txt): one put into a public file stops the export, which names the file
+# and the line; the same in a path left out (lab/drafts) does not
+scase() {   # NAME FILE WANT_STOPPED
+    local name=$1 file=$2 want=$3 out rc got=no want_rc=0
+    git reset -q --hard "$base"
+    printf '\nwritten by %s\n' "$(grep -v '^#' site/session-names.txt | sed -n 1p)" >> "$file"
+    git commit -q -am "test: $name"
+    out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
+    grep -q "SESSION NAME: $file:$(wc -l < "$file"):" <<<"$out" && got=yes
+    [ "$want" = yes ] && want_rc=1
+    if [ "$got" = "$want" ] && [ "$rc" = "$want_rc" ] && grep -q "$([ "$want" = yes ] && echo 1 || echo 0) with session names" <<<"$out"; then
+        echo "ok   $name: stopped: $got"
+    else
+        echo "FAIL $name: stopped: $got (want $want), rc $rc"; sed 's/^/     /' <<<"$out"; fails=$((fails + 1))
+    fi
+}
+scase "session name: in a public file (README.md)" README.md yes
+scase "session name: in a path left out (lab/drafts)" "$(git ls-files lab/drafts | grep -m1 '\.md$')" no
 
 # the export writes the CRC records' commits to SAME_SOURCES_CRC: exactly the
 # commits (12 digits, sorted) the records under records/crc of the clone name,
@@ -83,11 +154,25 @@ if python3 lab/tools/public-export.py "$T/out" >/dev/null && [ "$(cat "$T/out/SA
 else
     echo "FAIL SAME_SOURCES_CRC is '$(echo $(cat "$T/out/SAME_SOURCES_CRC" 2>/dev/null))', want '$(echo $want_same)'"; fails=$((fails + 1))
 fi
+want_pools=$(find records/pools -name '*.json' -exec jq -r '.bench_commit[0:12]' {} + | sort -u)
+if [ -f "$T/out/SAME_SOURCES_POOLS" ] && [ "$(cat "$T/out/SAME_SOURCES_POOLS")" = "$want_pools" ]; then
+    echo "ok   the export lists the pools records' commits in SAME_SOURCES_POOLS ($(echo $want_pools))"
+else
+    echo "FAIL SAME_SOURCES_POOLS is '$(echo $(cat "$T/out/SAME_SOURCES_POOLS" 2>/dev/null))', want '$(echo $want_pools)'"; fails=$((fails + 1))
+fi
 # The same-image rule for CRC records (DECISIONS 2026-11-24): two made-up
 # records of a real build of this commit, on a base of their own.
 if [ "${1:-}" != --quick ]; then
     B=stm32g0b1
     run2() { nice -n 10 taskset -c 0,1 "$@"; }
+    MIRROR=${VL_LIB_MIRROR:-$HOME/vl-scratch/lib-mirror}
+    python3 -I lab/tools/lib-mirror.py fill "$MIRROR" > "$T/mirror.log" 2>&1 ||
+        { echo "FAIL could not fetch the libraries into the mirror $MIRROR (no case run):"; grep -v ': in the mirror$' "$T/mirror.log" | sed 's/^/     /'; exit 1; }
+    # the mirror as the rebuilds use it, bounded (lab/tools/test-lib-mirror.sh): every pin from it, no fetch nested
+    # in another (2026-11-27: lazy fetches nested some 520 deep from the mirror and the host ran out of memory)
+    TMPDIR=$T bash lab/tools/test-lib-mirror.sh "$MIRROR" > "$T/mirror-test.log" 2>&1 ||
+        { echo "FAIL the library mirror is not safe to use (lab/tools/test-lib-mirror.sh; no case run):"; sed 's/^/     /' "$T/mirror-test.log"; exit 1; }
+    eval "$(python3 -I lab/tools/lib-mirror.py env "$MIRROR")"
     git reset -q --hard "$src"
     export VL_CRC_LIBS_FROM=$T/libs
     cp -a "${VL_CRC_LIBS_FROM_HOST:-$HOME/vl-next/kind-crc}" "$T/libs" 2>/dev/null || mkdir -p "$T/libs"
@@ -121,8 +206,10 @@ if [ "${1:-}" != --quick ]; then
         # groups come from the clone's ledger: its crc/ entries whose record is still there, by their commit.
         lcase() {
             local name=$1 out rc groups bad=0 c n total=0
+            # not the ledger's entries of records an archived series covers: the export holds those by the archive
             groups=$(jq -r '.records | keys[] | select(startswith("crc/"))' records/rebuilt.json |
-                while read -r e; do [ -f "records/$e" ] && jq -r '.bench_commit[0:12]' "records/$e"; done |
+                while read -r e; do [ -f "records/$e" ] && echo "$e"; done | not_archived |
+                while read -r e; do jq -r '.bench_commit[0:12]' "records/$e"; done |
                 grep -v "^${src:0:12}$" | sort | uniq -c)
             out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
             [ "$rc" = 1 ] || bad=1
@@ -142,11 +229,25 @@ if [ "${1:-}" != --quick ]; then
             fi
         }
         ledger_() {   # records/rebuilt.json made from the tree, committed
-            run2 python3 lab/tools/image-ledger.py > "$T/ledger.log" 2>&1 ||
-                echo "     image-ledger.py: $(tail -n 3 "$T/ledger.log" | tr '\n' ' ')"
+            run2 python3 lab/tools/image-ledger.py > "$T/ledger.log" 2>&1 || {
+                # the lines that say why, not the log's last lines (a later MATCH)
+                why=$(grep -E ': (DIFFERS|build failed|could not|not a record|commit .* cannot|toolchain image .* not present)|^could not fetch|lacks' "$T/ledger.log" | head -n 5)
+                echo "     image-ledger.py: ${why:-$(tail -n 3 "$T/ledger.log")}" | cut -c1-400; }
             git add records/rebuilt.json && git commit -q -m "test: ledger"
         }
         change() { printf '\n/* test change */\n' >> "$1"; git commit -q -am "test: $1"; }
+        # not_archived: of the record paths (under records/) on stdin, those no archive entry of the record's
+        # commit covers (public-export.py archived() and under(), as the export and image-ledger.py hold them)
+        not_archived() {
+            python3 -I -c '
+import importlib.util, json, sys
+s = importlib.util.spec_from_file_location("pe", "lab/tools/public-export.py"); pe = importlib.util.module_from_spec(s)
+s.loader.exec_module(pe); arch = pe.archived()
+for n in sys.stdin.read().split():
+    c = json.load(open("records/" + n)).get("bench_commit", "")[:12]
+    if not any(pe.under(n, e) for e in arch.get(c, [])):
+        print(n)'
+        }
 
         ccase "CRC: two records of this commit" no no
         git reset -q --hard "$base2"; change kinds/crc/adapter_etl.cpp
@@ -154,7 +255,7 @@ if [ "${1:-}" != --quick ]; then
         ledger_
         # every CRC record of the clone is now of another commit than HEAD: the two
         # made-up ones (they replace two real ones of the board) and the real ones
-        n_crc=$(find records/crc -name '*.json' | wc -l)
+        n_crc=$( (cd records && find crc -name '*.json') | not_archived | wc -l)
         ccase "CRC: the same change, the ledger says every image is the same" no no \
             "0 CRC records ($n_crc more of other commits whose images this tree builds)"
         change kinds/crc/ref_crc.h
@@ -186,6 +287,42 @@ if [ "${1:-}" != --quick ]; then
         lcase "CRC: crcverify.sh changed, with a recorded fix, ledger of before"
         ledger_
         ccase "CRC: crcverify.sh changed, with a recorded fix, ledger made again" no no
+        # pools (the ledger's pools/ entries, image-ledger.py): a file that only builds images (configs.txt)
+        # changed; without a ledger the pools records stop, with one made again from this tree they stand (the
+        # made-up pools record, which has no images, is taken out first)
+        pcase() {   # NAME WANT_STOPPED TEXT
+            local name=$1 want=$2 text=$3 out rc got=no want_rc=0
+            out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
+            grep -q "under records/pools/ name commit" <<<"$out" && got=yes
+            [ "$want" = yes ] && want_rc=1
+            if [ "$got" = "$want" ] && [ "$rc" = "$want_rc" ] && grep -q "$text" <<<"$out"; then
+                echo "ok   $name: pools records stopped: $got"
+            else
+                echo "FAIL $name: pools records stopped: $got (want $want), rc $rc"; sed 's/^/     /' <<<"$out"; fails=$((fails + 1))
+            fi
+        }
+        git reset -q --hard "$base2"
+        git rm -q records/pools/stm32g474/adapter_test.json; git commit -q -m "test: without the made-up pools record"
+        n_pools=$(git ls-files records/pools | grep -c '\.json$')
+        printf '\n# test change\n' >> kinds/pools/configs.txt; git commit -q -am "test: kinds/pools/configs.txt"
+        pcase "pools: configs.txt changed, no ledger" yes "no rebuild from the sources of HEAD"
+        ledger_
+        pcase "pools: configs.txt changed, the ledger made again" no "0 pools records ($n_pools more of other commits"
+        # a fetch that fails: no mirror, no library at hand, no transport but file: every rebuild fails at its
+        # fetch; the held records stop, each with "could not fetch", none as "HEAD builds another image"
+        ( export GIT_CONFIG_COUNT=0 VL_CRC_LIBS_FROM=$T/none VL_POOLS_LIBS_FROM=$T/none; unset VL_LIB_MIRROR VL_LIBS_FROM
+          run2 python3 lab/tools/image-ledger.py > "$T/ledger-nofetch.log" 2>&1 )
+        git add records/rebuilt.json && git commit -q -m "test: a ledger whose fetches failed"
+        out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
+        why=$(grep -E '^ +[0-9]+: ' <<<"$out")
+        n_led=$(jq '.records | length' records/rebuilt.json)
+        n_nf=$(jq '[.records[] | select(.result == "not checked" and (.note | startswith("could not fetch the libraries")))] | length' records/rebuilt.json)
+        if [ "$rc" = 1 ] && [ -n "$why" ] && ! grep -qv "could not fetch the libraries" <<<"$why" && [ "$n_nf" = "$n_led" ] && [ "$n_led" -gt 0 ]; then
+            echo "ok   a fetch that fails: all $n_led ledger entries \"could not fetch\", the export stops them as such, none \"builds another image\""
+        else
+            echo "FAIL a fetch that fails: $n_nf of $n_led ledger entries \"could not fetch\", rc $rc; the reasons:"
+            sed 's/^/     /' <<<"$why" | cut -c1-300; tail -n 5 "$T/ledger-nofetch.log" | sed 's/^/     /'; fails=$((fails + 1))
+        fi
     fi
 fi
 [ "$fails" = 0 ] && echo "every case as expected" || echo "$fails cases not as expected"

@@ -50,6 +50,8 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import series_info   # noqa: E402  (the method version of a board's records, and the series archived before)
 # Footnotes, from the code they name (checked 2026-11-24 at 6301058).
 NOTES = {
     "adapter_crcany_crc32_byte": "crcany's generated crc32iso_hdlc.c defines `table_byte` as `table_word[0]` "
@@ -64,13 +66,59 @@ NOTES = {
 }
 # The order of the boards on the page, as on the ring buffers' results page (RESULTS.md).
 PAGE_ORDER = ["nRF5340 DK", "Raspberry Pi Pico 2 H", "NUCLEO-G474RE", "NUCLEO-H723ZG", "NUCLEO-G0B1RE", "SAM D20 Xplained Pro"]
-# A sentence directly above a board's cache-off tables (decided 2026-11-25, DECISIONS.md).
+# A sentence directly above a board's cache-off tables (decided 2026-11-25, DECISIONS.md), by the board
+# and the clock its records were measured at (clock_hz), so that the page says what the records it shows
+# carry: version 2's NUCLEO-H723ZG ran at the reset clock, method version 3's at 520 MHz.
 BEFORE_OFF = {
-    "NUCLEO-H723ZG": "The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the "
+    ("NUCLEO-H723ZG", 64000000): "The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the "
         "board's 64 MHz build leaves `FLASH_ACR` as after reset (`firmware/common/stm32h723/board.h`). RM0468 "
         "(Table 16) allows 0 or 1 wait states at 64 MHz. The numbers with the cache off carry the 7 wait states; "
         "fewer were not measured.",
+    ("NUCLEO-H723ZG", 520000000): "The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as "
+        "ST's template for the board sets it (`firmware/common/stm32h723/board.h`, method version 3). RM0468 "
+        "(Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 "
+        "wait states.",
 }
+
+
+def method_of(records_dir, recs, link=False):
+    """{method_version, archived, method_text} of one board's CRC records (site/series_info.py); link: the text in
+    markdown, each archived series linked at its public commit."""
+    vs = {series_info.method_version(r["schema"]) for r in recs}
+    clocks = {r["clock_hz"] for r in recs}
+    if len(vs) != 1 or len(clocks) != 1:
+        sys.exit(f"records/crc/{records_dir}: records of more than one method version or clock ({sorted(vs)}, {sorted(clocks)})")
+    prefix = f"crc/{records_dir}/"
+    arch = series_info.archived_for(prefix, sorted({r["bench_commit"] for r in recs}))
+    v, clock = vs.pop(), clocks.pop()
+    return {"method_version": v, "archived": arch,
+            "method_text": series_info.method_text(v, clock, arch, series_info.unchanged_under_3(prefix), link)}
+
+
+# A sentence under a board's tables about its CRC unit, by the board and the clock its records were measured
+# at, as BEFORE_OFF (decided 2026-11-26): the H723's unit at 520 MHz, against the archived series at 64 MHz.
+# (text on the results page with its link, text on the comparison page and in the MCP notes)
+HW_UNIT = {
+    ("NUCLEO-H723ZG", 520000000): (
+        "The board's CRC unit is reached over a bus that runs at half the core clock since method version 3, so its "
+        "cycles per byte are 3.0 where the archived series at 64 MHz had 1.5; in time it is faster: 1024 bytes take "
+        "3109 cycles at 520 MHz (6.0 µs) against 1567 at 64 MHz (24.5 µs)",
+        " ([method](method-crc.md#the-nucleo-h723zg-at-520-mhz)).",
+        " (method page, \"The NUCLEO-H723ZG at 520 MHz\")."),
+}
+
+
+def hw_unit_note(board, clock_hz, md=False):
+    """The sentence about the board's CRC unit for records measured at clock_hz, or None."""
+    t = HW_UNIT.get((board, clock_hz))
+    return None if t is None else t[0] + (t[1] if md else t[2])
+
+
+def before_off(board, clock_hz):
+    """The sentence above a board's cache-off tables for records measured at clock_hz, or None."""
+    return BEFORE_OFF.get((board, clock_hz))
+
+
 CORE = {"Cortex-M0+": "M0+", "Cortex-M4": "M4", "Cortex-M4F": "M4", "Cortex-M7": "M7", "Cortex-M33": "M33"}
 
 
@@ -167,7 +215,7 @@ def main():
         recs = {}
         for f in glob.glob(os.path.join(ROOT, "records/crc", "*", "*.json")):
             r = json.load(open(f))
-            if r.get("schema") == "crc-bench/1":
+            if r.get("schema") in ("crc-bench/1", "crc-bench/2"):
                 recs[(r["board"], r["crc"], r["adapter"])] = r
         edges(recs, ads, place, cache)
         return 0
@@ -184,7 +232,7 @@ def main():
     recs = {}
     for f in glob.glob(os.path.join(opt["--records"], "*", "*.json")):
         r = json.load(open(f))
-        if r.get("schema") == "crc-bench/1":
+        if r.get("schema") in ("crc-bench/1", "crc-bench/2"):
             recs[(r["board"], r["crc"], r["adapter"])] = r
     for board in sorted({k[0] for k in recs}):
         if opt["--board"] and opt["--board"] not in (board, os.path.basename(board)):
@@ -208,8 +256,8 @@ def table(board, crc, rows, core, cls, sizes, place, cache, variant, out=None, l
         emit(f"### {crc}, {board}, cache {cache}\n")
     else:
         emit(f"### {crc} on the {board} ({rows[0]['core']}, {rows[0]['clock_hz'] // 1000000} MHz), cache {cache}\n")
-    if cache == "off" and board in BEFORE_OFF:
-        emit(BEFORE_OFF[board] + "\n")
+    if cache == "off" and before_off(board, rows[0]["clock_hz"]):
+        emit(before_off(board, rows[0]["clock_hz"]) + "\n")
     if variant == "2":
         emit(f"Cycles, cache {cache}, placement {place} of 8 (range over the eight placements in brackets), first pass.\n")
     else:
@@ -255,15 +303,48 @@ def rows_of(rows, cls, sizes, core, place, cache, variant, emit, link):
              f"{c16} | {cb} |")
 
 
+def slug(text):
+    """The anchor python-markdown's toc gives a heading of this text (ASCII), so that the fold-outs keep the
+    anchors the board and table headings had."""
+    t = re.sub(r"[^\w\s-]", "", text).strip().lower()
+    return re.sub(r"[-\s]+", "-", t)
+
+
+def numbers(r, cache):
+    """(16-byte figures, per-byte figures) of a record over its eight placements, first pass, as on the page."""
+    b16, cpb = [], []
+    for x in per_place(r).values():
+        res = x["results"]
+        m16, m256, m1024 = (res.get(f"len{n}/offset0/cache_{cache}") for n in (16, 256, 1024))
+        if m16:
+            b16.append(m16["mean"])
+        if m256 and m1024:
+            cpb.append((m1024["mean"] - m256["mean"]) / 768)
+    return b16, cpb
+
+
+def span_text(vals, fmt):
+    lo, hi = fmt(min(vals)), fmt(max(vals))
+    return lo if lo == hi else f"{lo}–{hi}"
+
+
+def fold(fid, summary, lines):
+    """A fold-out (<details>, closed), its Markdown inside rendered (md_in_html; GitHub: the blank line after it)."""
+    return [f'<details id="{fid}" markdown="1">', f"<summary>{summary}</summary>\n"] + lines + ["</details>\n"]
+
+
 def page_block(rdir, rel):
-    """The tables of the results page (site/content/results-crc.md): variant 1, per board a
-    section, per CRC the cache-on and the cache-off table, the footnotes once at the end.
-    rel: the records directory as the page links it."""
+    """The tables of the results page (site/content/results-crc.md): variant 1, per board a fold-out whose
+    summary says the board, its clock and method version, how many configurations and the span of the 16-byte
+    figure with the cache on; inside it the board's lines and one fold-out per CRC and cache setting with the
+    table (crc_tables.table, unchanged), the cache on first; the footnotes once at the end, in a fold-out of
+    their own. The fold-outs carry the anchors the headings had (slug). rel: the records directory as the
+    page links it."""
     ads, cls, sizes = kind_tables()
     recs, where = {}, {}
     for f in sorted(glob.glob(os.path.join(rdir, "*", "*.json"))):
         r = json.load(open(f))
-        if r.get("schema") == "crc-bench/1":
+        if r.get("schema") in ("crc-bench/1", "crc-bench/2"):
             recs[(r["board"], r["crc"], r["adapter"])] = r
             where[id(r)] = f"{rel}/{os.path.basename(os.path.dirname(f))}/{os.path.basename(f)}"
     crcs = []
@@ -273,20 +354,49 @@ def page_block(rdir, rel):
                 crcs.append(k[1])
     boards = sorted({k[0] for k in recs}, key=lambda b: (PAGE_ORDER.index(b) if b in PAGE_ORDER else 99, b))
     out = []
+    f0, f1 = (lambda v: f"{v:.0f}"), (lambda v: f"{v:.1f}")
     for board in boards:
         first = next(r for k, r in recs.items() if k[0] == board)
-        out.append(f"## {board}\n")
-        out.append(f"{first['board_decoded']}, {first['clock_hz'] / 1e6:.0f} MHz.\n")
+        mine = [r for k, r in recs.items() if k[0] == board]
+        d = sorted({os.path.basename(os.path.dirname(f)) for f in glob.glob(os.path.join(rdir, "*", "*.json"))
+                    if json.load(open(f)).get("board") == board})[0]
+        version = method_of(d, mine)["method_version"]
+        libs = {r["adapter"] for r in mine if not is_hw(cls, r["adapter"])}
+        unit = any(is_hw(cls, r["adapter"]) for r in mine)
+        on16 = [v for r in mine for v in numbers(r, "on")[0]]
+        inner = [f"{first['board_decoded']}, {first['clock_hz'] / 1e6:.0f} MHz.\n", board_method_md(rdir, board, recs) + "\n"]
         for crc in crcs:
             rows = [recs[(board, crc, ad)] for ad in ads if (board, crc, ad) in recs]
             if not rows:
                 continue
             core = CORE.get(rows[0]["core"].split("(")[-1].rstrip(")"), rows[0]["core"])
             for cache in ("on", "off"):
-                table(board, crc, rows, core, cls, sizes, 0, cache, "1", out, lambda r: where[id(r)], False, True)
-    for i, (k, text) in enumerate(NOTES.items()):
-        out.append(f"[{i + 1}] {text}\n")
+                t = []
+                table(board, crc, rows, core, cls, sizes, 0, cache, "1", t, lambda r: where[id(r)], False, True)
+                head = t.pop(0)   # "### <crc>, <board>, cache <on|off>": its text goes to the summary, its anchor to the fold-out
+                title = head.lstrip("#").strip()
+                b16 = [v for r in rows for v in numbers(r, cache)[0]]
+                pb = [v for r in rows for v in numbers(r, cache)[1]]
+                summ = (f"{crc}, cache {cache}: {len(rows)} rows, 16 bytes {span_text(b16, f0)} cycles, "
+                        f"{span_text(pb, f1)} cycles per byte")
+                inner += fold(slug(title), summ, t)
+        hw = hw_unit_note(board, first["clock_hz"], md=True)
+        if hw and unit:
+            inner.append(hw + "\n")
+        summ = (f"<strong>{board}</strong>, {first['clock_hz'] / 1e6:.0f} MHz, method version {version}: "
+                f"{len(libs)} configurations" + (" and the board's CRC unit" if unit else "")
+                + f", a call on 16 bytes {span_text(on16, f0)} cycles with the cache on")
+        out += fold(slug(board), summ, inner)
+    notes = [f"[{i + 1}] {text}\n" for i, (k, text) in enumerate(NOTES.items())]
+    out += fold("notes-to-the-tables", f"Notes [1] to [{len(NOTES)}] to the tables", notes)
     return "\n".join(out).rstrip() + "\n"
+
+
+def board_method_md(rdir, board, recs):
+    """The method sentence of a board on the results page, each archived series linked at its public commit."""
+    d = sorted({os.path.basename(os.path.dirname(f)) for f in glob.glob(os.path.join(rdir, "*", "*.json"))
+                if json.load(open(f)).get("board") == board})[0]
+    return method_of(d, [r for k, r in recs.items() if k[0] == board], link=True)["method_text"]
 
 
 def write_page(path, check):

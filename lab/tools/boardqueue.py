@@ -12,7 +12,7 @@ Usage:
                 [--cwd SUBDIR] [--expect REGEX]... [--refuse REGEX]... [--note TEXT] -- COMMAND...
   boardqueue.py worker BOARD [--follow]
   boardqueue.py status
-  boardqueue.py power BOARD on|off|cycle [--wait SECONDS]
+  boardqueue.py power BOARD on|off|cycle [--wait SECONDS] [--override-no-power REASON]
 
 BOARD is a board's name in lab/boards.conf (e.g. nucleo-g474re).
 
@@ -39,7 +39,11 @@ status: per board the worker, the job running, the jobs waiting, done and
 power: switches a board's port through lab/tools/boardpower.sh, only while
   no job runs on that board's hub (the hub's lock, exclusive). Never the
   nRF5340 DK: after a power-on our boot stub leaves its debug port locked
-  (lab/drafts/2026-11-25-nrf5340-approtect-recovery.md).
+  (lab/drafts/2026-11-25-nrf5340-approtect-recovery.md). The rule stays;
+  --override-no-power REASON lifts it for that one call, for a power-on the
+  reviewer has given the OK for, and writes a line to power-overrides.tsv in
+  the queue directory (UTC, board, action, reason, exit code), before and
+  after the switch.
 
 Flash writes are counted in one place, the ledger writes.tsv in the queue
 directory: one line per write (UTC, board, what was written, units, job),
@@ -383,10 +387,16 @@ def cmd_status(argv):
 # --- power ---------------------------------------------------------------------------
 
 def cmd_power(argv):
-    wait = 0.0
+    wait, override = 0.0, None
     if "--wait" in argv:
         i = argv.index("--wait")
         wait = float(argv[i + 1])
+        argv = argv[:i] + argv[i + 2:]
+    if "--override-no-power" in argv:
+        i = argv.index("--override-no-power")
+        if i + 1 >= len(argv) or not argv[i + 1].strip():
+            die("power: --override-no-power needs a reason")
+        override = argv[i + 1].strip().replace("\t", " ").replace("\n", " ")
         argv = argv[:i] + argv[i + 2:]
     if len(argv) != 2 or argv[1] not in ("on", "off", "cycle"):
         die("power BOARD on|off|cycle [--wait SECONDS]")
@@ -394,13 +404,21 @@ def cmd_power(argv):
     hubs = boards()
     if board not in hubs:
         die(f"power: {board} is not in {CONF}")
-    if board in NO_POWER:
+    if board in NO_POWER and override is None:
         die(f"power: never {board}: {NO_POWER[board]}")
     h = lock(os.path.join(LOCKS, f"hub-{hubs[board]}.lock"), exclusive=True, wait=wait)
     if h is None:
         die(f"power: a job runs on hub {hubs[board]}; not switched")
+
+    def trace(what):
+        if board in NO_POWER:
+            with open(os.path.join(QROOT, "power-overrides.tsv"), "a") as fh:
+                fh.write(f"{now()}\t{board}\t{action}\t{what}\t{override}\n")
     try:
-        return subprocess.run(["bash", BOARDPOWER, action, board]).returncode
+        trace("start")
+        rc = subprocess.run(["bash", BOARDPOWER, action, board]).returncode
+        trace(f"exit {rc}")
+        return rc
     finally:
         h.close()
 

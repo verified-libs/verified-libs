@@ -1,0 +1,17 @@
+# The configurations of the pools kind's first series (lab/plans/2026-11-26-pools-kind.md, DECISIONS
+# 2026-11-26), one image per configuration and placement (bench/onepool.py, slots.txt). Fields: adapter,
+# kind (c, cpp or rust: what is compiled for it), the name a record carries. The reference free list of
+# our own (adapter_ref.c) is the baseline in every image (bench/main.c).
+#
+# adapter                kind  name
+adapter_etl              cpp   ETL etl::pool (C++)
+adapter_riot             c     RIOT memarray (C)
+adapter_threadx          c     ThreadX block pool (C)
+adapter_cmsis_rtx        c     CMSIS-RTX osRtxMemoryPool (C)
+adapter_contiki          c     Contiki-NG memb (C)
+adapter_c_allocator      c     C_Allocator fb_allocator (C)
+adapter_lwip             c     lwIP memp (C)
+adapter_memorypool       cpp   MemoryPool Fixed (C++)
+adapter_heapless         rust  heapless pool, BoxPool (Rust)
+adapter_atomic_pool      rust  atomic-pool (Rust)
+adapter_ref_primask      c     reference free list, interrupts off (ours)

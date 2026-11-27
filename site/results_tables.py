@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.join(ROOT, "firmware/nrf5340-rb-stress"))
 from decode import UNSAFE_BY_OWN_DOCS   # noqa: E402
 sys.path.insert(0, HERE)
 import gen_libdata   # noqa: E402
+import series_info   # noqa: E402
 
 SHORT = {"nrf5340dk": "nRF5340", "pico2": "Pico 2", "nucleo-g474re": "G474", "nucleo-h723zg": "H723",
          "nucleo-g0b1re": "G0B1", "sam-d20-xpro": "SAM D20"}
@@ -66,23 +67,47 @@ def versions():
     return out
 
 
+SPAN = {}   # filled by table(): every 1-byte push and pop, and every block number, of the table
+
+
+def summary():
+    """The fold-out's summary line of the speed table: what is inside and the span of its numbers (no order)."""
+    n = len(TABLE_ROWS)
+    return (f"<strong>Speed on six boards</strong>: {n} configurations, one byte {min(SPAN['push']):.0f} to "
+            f"{max(SPAN['push']):.0f} cycles per push or pop, 64-byte blocks {min(SPAN['block']):.1f} to "
+            f"{max(SPAN['block']):.1f} cycles per byte (code in flash, cache on)")
+
+
+TABLE_ROWS = []
+
+
 def table():
+    SPAN.clear()
+    TABLE_ROWS.clear()
     data = json.load(open(os.path.join(HERE, "data/libs.json")))
     ver = versions()
     own = {l["record_name"] for l in data["libs"] if l.get("own")}
-    rows, commits = {}, set()
+    rows, commits, method = {}, set(), {}
     for bid in ORDER:
         d = os.path.join(ROOT, "records/bench-v2", gen_libdata.FW[bid])
         for name in sorted(os.listdir(d)):
             r = json.load(open(os.path.join(d, name)))
+            m = method.setdefault(bid, {"v": set(), "clock": set(), "commits": set(), "name": r["board"]})
+            m["v"].add(series_info.method_version(r["schema"])); m["clock"].add(r["clock_hz"]); m["commits"].add(r["bench_commit"])
             if MODES.search(r["adapter"]) or SKIP.search(r["name"]):
                 continue
             commits.add(r["bench_commit"])
-            rows.setdefault(r["name"], {})[bid] = cell(gen_libdata.speed_v2(r))
+            sp = gen_libdata.speed_v2(r)
+            rows.setdefault(r["name"], {})[bid] = cell(sp)
+            if sp and sp.get("push") is not None:
+                SPAN.setdefault("push", []).extend([sp["push"], sp["pop"]])
+                if sp.get("block") is not None:
+                    SPAN.setdefault("block", []).append(sp["block"])
     core = {"nrf5340dk": "M33", "pico2": "M33", "nucleo-g474re": "M4", "nucleo-h723zg": "M7",
             "nucleo-g0b1re": "M0+", "sam-d20-xpro": "M0+"}
     head = "| Library | Version · commit | " + " | ".join(f"{SHORT[b]} {core[b]}" for b in ORDER) + " |"
     out = [head, "|---|---|" + "---|" * len(ORDER)]
+    TABLE_ROWS.extend(rows)
     for n in sorted(rows, key=str.lower):
         label = n + (" ⚠" if n in own else "")
         if n in UNSAFE_BY_OWN_DOCS:
@@ -95,6 +120,17 @@ def table():
     out.append("")
     out.append("Records: one per board and configuration in [`records/bench-v2/`](records/README.md), made at commit "
                + ", ".join(f"`{c}`" for c in sorted(commits)) + ".")
+    out.append("")
+    out.append("The method version and the clock of each board's records (DECISIONS.md, 2026-11-26):")
+    out.append("")
+    for bid in ORDER:
+        m = method[bid]
+        if len(m["v"]) != 1 or len(m["clock"]) != 1:
+            sys.exit(f"records/bench-v2/{gen_libdata.FW[bid]}: records of more than one method version or clock")
+        prefix = f"bench-v2/{gen_libdata.FW[bid]}/"
+        out.append(f"- {m['name']}: " + series_info.method_text(
+            min(m["v"]), min(m["clock"]), series_info.archived_for(prefix, sorted(m["commits"])),
+            series_info.unchanged_under_3(prefix), link=True))
     return "\n".join(out)
 
 
@@ -105,6 +141,11 @@ def main():
     if not m:
         sys.exit("RESULTS.md has no <!-- table:speed --> ... <!-- /table:speed --> block")
     new = s[:m.start(2)] + table() + s[m.end(2):]
+    # the summary line of the speed table's fold-out (the line after its <details>), from the same records
+    new, k = re.subn(r'(<details id="speed-on-six-boards" markdown="1">\n)<summary>.*?</summary>',
+                     lambda x: x.group(1) + "<summary>" + summary() + "</summary>", new)
+    if k != 1:
+        sys.exit('RESULTS.md has no <details id="speed-on-six-boards" markdown="1"> with a <summary> line after it')
     if "--check" in sys.argv[1:]:
         sys.exit(0 if new == s else 1)
     open(p, "w").write(new)

@@ -63,7 +63,7 @@ def load(rdir):
     for b in BOARDS:
         for f in sorted(glob.glob(os.path.join(rdir, b, "*.json"))):
             r = json.load(open(f))
-            if r.get("schema") == "crc-bench/1":
+            if r.get("schema") in ("crc-bench/1", "crc-bench/2"):
                 out.setdefault(b, {})[r["adapter"]] = r
     return out
 

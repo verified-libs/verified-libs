@@ -1,0 +1,60 @@
+# The Rust pools of the pools kind: heapless's pool (rust-embedded/heapless,
+# the commit the ring buffers pin, version 0.9.1) and atomic-pool
+# (embassy-rs/atomic-pool 2.0.1), from the checkouts fetch.sh makes from
+# ../libs.lock, mounted at /libs in the toolchain image; cargo runs with
+# --offline and never reads crates.io. Built as a static library with a C
+# interface (../adapter_rust.c), as firmware/rust-adapters does for the ring
+# buffers.
+[package]
+name = "vl-pools-rust"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+path = "src/lib.rs"
+
+[features]
+# heapless's pool needs LDREX/STREX on Arm (its src/pool.rs: "not thumbv6m-none-eabi"):
+# the Cortex-M0+ build (cross.sh) leaves this feature out.
+default = ["heapless-pool"]
+heapless-pool = ["dep:heapless"]
+
+[dependencies]
+heapless = { path = "/libs/heapless", default-features = false, optional = true }
+atomic-pool = { path = "/libs/atomic-pool" }
+
+# Cortex-M0+ has no compare-and-swap: atomic-pool's README says to give
+# portable-atomic its critical-section or unsafe-assume-single-core feature
+# there; the boards are single-core, so unsafe-assume-single-core (portable-atomic
+# then turns interrupts off around each atomic operation).
+[target.thumbv6m-none-eabi.dependencies]
+portable-atomic = { path = "/libs/rs-portable-atomic", features = ["unsafe-assume-single-core"] }
+
+# heapless's pool on x86_64 is a Treiber stack with a 128-bit tagged CAS
+# (src/pool/treiber/cas.rs), which needs portable-atomic's AtomicU128 there; on
+# the boards with LDREX/STREX it is the LL/SC stack (treiber/llsc.rs) and needs
+# nothing more. So the host runs heapless's CAS path, the boards its LL/SC path.
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+heapless = { path = "/libs/heapless", default-features = false, features = ["portable-atomic"], optional = true }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+debug = true
+lto = false
+
+[patch.crates-io]
+heapless = { path = "/libs/heapless" }
+hash32 = { path = "/libs/rs-hash32" }
+byteorder = { path = "/libs/rs-byteorder" }
+stable_deref_trait = { path = "/libs/rs-stable-deref-trait" }
+portable-atomic = { path = "/libs/rs-portable-atomic" }
+as-slice-01 = { package = "as-slice", path = "/libs/as-slice-01" }
+as-slice-02 = { package = "as-slice", path = "/libs/as-slice-02" }
+generic-array-012 = { package = "generic-array", path = "/libs/rs-generic-array-012" }
+generic-array-013 = { package = "generic-array", path = "/libs/rs-generic-array-013" }
+generic-array-014 = { package = "generic-array", path = "/libs/rs-generic-array-014" }
+typenum = { path = "/libs/rs-typenum" }
+version_check = { path = "/libs/rs-version-check" }

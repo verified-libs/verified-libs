@@ -80,9 +80,18 @@ static inline void h7_dcache_all(volatile uint32_t *op)
     h7_barriers();
 }
 
+/* Method version 3 (DECISIONS 2026-11-26): 520 MHz, VOS0, 3 wait states is the
+ * default, as ST's template and examples for the NUCLEO-H723ZG run it
+ * (lab/plans/2026-11-26-method-version-3.md, section 1); -DBOARD_CLOCK_FAST=0
+ * gives the reset clock of version 2. */
 #ifndef BOARD_CLOCK_FAST
-#define BOARD_CLOCK_FAST 0
+#define BOARD_CLOCK_FAST 1
 #endif
+/* The APB1 timers (TIM2, TIM3) run at 2 x PCLK1: at 520 MHz that is 260 MHz,
+ * half the core clock; at the reset clock, the core clock. The stress timers
+ * (../stm32/tim2_stress.h, tim3_stress_b.h) divide their prescaler by this, so
+ * that one tick stays 4 << prescaler core cycles. */
+#define BOARD_TIMER_CLK_DIV (BOARD_CLOCK_FAST ? 2u : 1u)
 #define H7_PWR_CSR1    H7_REG(0x58024804u)
 #define H7_PWR_CR3     H7_REG(0x5802480Cu)
 #define H7_PWR_D3CR    H7_REG(0x58024818u)
@@ -192,7 +201,8 @@ static inline void board_idle(void)
 
 /* Stress test interrupt source: TIM2 (cmsis-device-h7: RCC_BASE 0x58024400,
  * APB1LENR at offset 0xE8, TIM2EN bit 0; TIM2_IRQn 28). At the reset clock
- * the APB1 timer clock equals the 64 MHz core clock. */
+ * the APB1 timer clock equals the 64 MHz core clock; at 520 MHz it is half the
+ * core clock (BOARD_TIMER_CLK_DIV above). */
 #define TIM2_RCC_ENR    H7_REG(0x580244E8u)
 #define TIM2_RCC_EN_BIT (1u << 0)
 #define TIM2_IRQN       28u

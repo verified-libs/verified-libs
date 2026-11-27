@@ -5,23 +5,27 @@ hardware, stress-tested with a negative control that must be caught, and
 model-checked where the library promises lock-free concurrency. Everything
 can be reproduced from the repository.
 
-Two kinds of library so far:
+Three kinds of library so far:
 
 - **Embedded ring buffers**: interrupt or DMA to main loop on Cortex-M, in
   C, C++ and Rust.
 - **CRC calculation**: CRC-32, CRC-16 and CRC-8 on Cortex-M, by libraries
   in C, C++ and Rust that compute it in software and, on the boards that
   have one, by the board's CRC unit beside them.
+- **Fixed-block memory pools**: alloc and free of one block size on
+  Cortex-M, in C, C++ and Rust, measured in one context (what a library
+  documents about interrupts is shown, not tested).
 
 *Run by AI, with a human who is accountable.*
 
 ## What you find here
 
-- **[Results](kinds.html)**: the results of both kinds, embedded ring
-  buffers and CRC calculation, each with the exact versions,
-  compiler flags and boards.
+- **[Results](kinds.html)**: the results of each kind, embedded ring
+  buffers, CRC calculation and fixed-block memory pools, each with the
+  exact versions, compiler flags and boards.
 - **Method**: how each number is produced, and the rules that decide
-  whether a run counts: [ring buffers](method.html), [CRC](method-crc.html).
+  whether a run counts: [ring buffers](method.html), [CRC](method-crc.html),
+  [memory pools](method-pools.html).
 - **[Findings](findings.html)**: defects found in libraries, published
   after the maintainer has been told.
 - **[Reports](reports.html)**: the campaign and measurement reports, in
@@ -35,7 +39,9 @@ The comparisons can be read without a browser:
   an AI agent (Model Context Protocol). It gives the same rows in the same
   order as the comparison pages for [ring buffers](compare.html) (with the
   notes and published findings, and which library the project owner wrote)
-  and for [CRC](compare-crc.html) (`list_crc_configurations`, `compare_crc`).
+  for [CRC](compare-crc.html) (`list_crc_configurations`, `compare_crc`)
+  and for [memory pools](compare-pools.html) (`list_pool_configurations`,
+  `compare_pools`).
   It runs on your own machine from a copy of the repository; there is no
   hosted server.
 - **[data/libs.json](data/libs.json)**: the data behind the ring buffers'
@@ -46,6 +52,10 @@ The comparisons can be read without a browser:
 - **[data/crc.json](data/crc.json)**: the data behind the CRC comparison
   page, written from the CRC records by [`site/crc_data.py`](../crc_data.py),
   which says where each field comes from (the file's `about`).
+- **[data/pools.json](data/pools.json)**: the data behind the memory pools'
+  comparison page, written from the pools records by
+  [`site/pools_data.py`](../pools_data.py), which says where each field
+  comes from (the file's `about`).
 
 ## Principles, in short
 

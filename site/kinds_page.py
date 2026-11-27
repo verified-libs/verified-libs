@@ -13,7 +13,14 @@ One block per kind, the same fields in the same order, no ranking. The counts:
     adapters (third column of kinds/crc/configs.txt), CRCs = the distinct
     "crc", boards = the distinct "board"; the board's CRC unit (the class of
     step 11 of kinds/crc/README.md, site/crc_tables.py) is not a library and
-    is counted apart, by the boards that have one.
+    is counted apart, by the boards that have one;
+  - fixed-block memory pools: the records under records/pools (schema
+    pools-bench/1, read by site/pools_tables.py): configurations = the
+    distinct adapters of the libraries, libraries = the distinct libraries
+    of those (the table "The set" of kinds/pools/README.md), boards = the
+    distinct "board"; our row with interrupts off is not a library and is
+    not counted. With no records the block says the first series is not
+    published yet.
 
 Usage: python3 -I site/kinds_page.py [--write | --check]
   (no argument: print the page; --write: write site/content/kinds.md;
@@ -45,7 +52,7 @@ def crc_counts():
     ads, crcs, boards, hw_boards = set(), set(), set(), set()
     for f in glob.glob(os.path.join(ROOT, "records/crc/*/*.json")):
         r = json.load(open(f))
-        if r.get("schema") == "crc-bench/1":
+        if r.get("schema") in ("crc-bench/1", "crc-bench/2"):
             if crc_tables.is_hw(cls, r["adapter"]):
                 hw_boards.add(r["board"])
                 continue
@@ -54,12 +61,46 @@ def crc_counts():
             "crcs": len(crcs), "boards": len(boards), "hw_boards": len(hw_boards)}
 
 
+def pools_counts():
+    import sys
+    sys.path.insert(0, os.path.join(ROOT, "site"))
+    import pools_tables
+    recs, _ = pools_tables.load()
+    _, cfg, sets = pools_tables.kind_meta()
+    libs = [r for _, r in recs if pools_tables.role(r["adapter"]) == "library"]
+    return {"records": len(recs), "configurations": len({r["adapter"] for r in libs}),
+            "libraries": len({(sets.get(r["name"]) or {}).get("library") or r["adapter"] for r in libs}),
+            "boards": len({r["board"] for _, r in recs})}
+
+
+def pools_block(p):
+    if not p["records"]:
+        counts = ("- **Status:** the first board series is not published yet; the pages below fill from its\n"
+                  "  records when it is.\n")
+    else:
+        counts = (f"- **Libraries:** {p['libraries']}, in {p['configurations']} configurations, and a row of ours "
+                  f"(not a library).\n- **Boards:** {p['boards']}.\n")
+    return f"""## Fixed-block memory pools
+
+- **What is measured:** cycles of alloc and free of one block size (32
+  blocks of 32 bytes) in six scenarios and of creating the pool, with the
+  cache off and on, and the bytes of flash and RAM it takes; every call is
+  checked on the board. Measured in one context: what a library documents
+  about use from interrupts is shown, not tested.
+{counts}- **Results:** [results page](results-pools.md)
+- **Method:** [method page](method-pools.md)
+- **Comparison page:** [Compare](compare-pools.html)
+- **Records:** [`records/pools`](../../records/README.md)
+- **How to repeat:** [Reproduce, "The pools records"](reproduce.md#the-pools-records)
+"""
+
+
 def markdown():
-    rb, crc = ring_counts(), crc_counts()
+    rb, crc, pools = ring_counts(), crc_counts(), pools_counts()
     return f"""# Results
 
-Two kinds of library are tested so far. Each has its own results, method
-and records; the numbers of one kind are not compared with the other's.
+Three kinds of library are tested so far. Each has its own results, method
+and records; the numbers of one kind are not compared with another's.
 The kinds are in the order they were added.
 
 ## Embedded ring buffers
@@ -91,6 +132,7 @@ The kinds are in the order they were added.
 - **Records:** [`records/crc`](../../records/README.md)
 - **How to repeat:** [Reproduce, "The CRC records"](reproduce.md#the-crc-records)
 
+{pools_block(pools)}
 The counts are written from the data by
 [`site/kinds_page.py`](../kinds_page.py); the site is not built if this
 page and the data disagree.

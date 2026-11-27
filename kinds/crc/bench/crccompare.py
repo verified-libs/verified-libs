@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-SCHEMA = "crc-bench/1"
+SCHEMA = ("crc-bench/1", "crc-bench/2")   # /2: with option registers (method version 3)
 BUILD = ("board", "core", "crc", "toolchain_image", "toolchain", "libs_pinned", "runs", "lens", "offsets", "far_bytes",
          "layout", "result_version", "fixed_sha256", "boot_image_sha256")
 
@@ -35,7 +35,7 @@ def load(path):
         recs = {os.path.basename(f): json.load(open(f)) for f in files}
     except (OSError, ValueError):
         return None
-    return recs if recs and all(r.get("schema") == SCHEMA for r in recs.values()) else None
+    return recs if recs and all(r.get("schema") in SCHEMA for r in recs.values()) else None
 
 
 def compare(ours, yours, tol):

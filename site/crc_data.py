@@ -21,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import crc_tables   # noqa: E402
+import series_info   # noqa: E402
 
 OUT = os.path.join(ROOT, "site/data/crc.json")
 LENS = (1, 4, 16, 64, 256, 1024)
@@ -30,9 +31,15 @@ SITE_ID = {"nrf5340": "nrf5340dk", "rp2350": "pico2", "stm32g474": "nucleo-g474r
            "stm32g0b1": "nucleo-g0b1re", "samd20": "sam-d20-xpro"}   # configs.txt's language column, as the ring buffers' data names it
 ABOUT = {
     "boards": "per board directory of records/crc (records_dir): id (the board's id in libs.json and in "
-              "kinds/crc/repeat.sh), the record's board, board_decoded, core and clock_hz; "
+              "kinds/crc/repeat.sh), the record's board, board_decoded, core and clock_hz; method_version (3 for "
+              "the records of crc-bench/2, with the board's option registers; 2 for crc-bench/1), archived (the "
+              "series of records/archived.json that held this board's records before method version 3, where the "
+              "present records replaced them; with its public commit), method_text (the sentence the pages put "
+              "under the board's numbers; site/series_info.py); "
               "note_cache_off: the sentence the results page puts above the board's cache-off tables "
-              "(site/crc_tables.py, BEFORE_OFF), or null",
+              "(site/crc_tables.py, before_off: by the board and the clock its records ran at), or null; "
+              "note_hw_unit: the sentence about the board's CRC unit that the pages show where its row is shown "
+              "(site/crc_tables.py, hw_unit_note: by the board and the clock), or null",
     "crcs": "the CRCs in the order of kinds/crc/configs.txt",
     "configurations": "per adapter, in the order of kinds/crc/configs.txt with the board's CRC units last: its language "
                       "(column 2: C, C++ or Rust) and library (column 3), "
@@ -86,15 +93,17 @@ def build():
     recs = {}
     for f in sorted(glob.glob(os.path.join(ROOT, "records/crc/*/*.json"))):
         r = json.load(open(f))
-        if r.get("schema") == "crc-bench/1":
+        if r.get("schema") in ("crc-bench/1", "crc-bench/2"):
             recs[(os.path.basename(os.path.dirname(f)), r["adapter"])] = (r, os.path.relpath(f, ROOT))
     bdirs = sorted({b for b, _ in recs}, key=lambda d: next(
         (crc_tables.PAGE_ORDER.index(r["board"]) for (b, _), (r, _) in recs.items() if b == d), 99))
     boards = []
     for d in bdirs:
         r = next(r for (b, _), (r, _) in recs.items() if b == d)
-        boards.append({"id": SITE_ID.get(d, d), "records_dir": d, "name": r["board"], "board_decoded": r["board_decoded"], "core": r["core"],
-                       "clock_hz": r["clock_hz"], "note_cache_off": crc_tables.BEFORE_OFF.get(r["board"])})
+        boards.append(dict({"id": SITE_ID.get(d, d), "records_dir": d, "name": r["board"], "board_decoded": r["board_decoded"], "core": r["core"],
+                            "clock_hz": r["clock_hz"], "note_cache_off": crc_tables.before_off(r["board"], r["clock_hz"]),
+                            "note_hw_unit": crc_tables.hw_unit_note(r["board"], r["clock_hz"])},
+                           **crc_tables.method_of(d, [x for (b, _), (x, _) in recs.items() if b == d])))
     configs, crcs = [], []
     for ad in ads:
         any_rec = next((r for (b, a), (r, _) in recs.items() if a == ad), None)

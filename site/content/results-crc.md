@@ -1,9 +1,22 @@
 # Results: CRC calculation
 
-The results of one of the two kinds of library so far; the other is embedded
-ring buffers ([all kinds](kinds.md), [ring buffer results](../../RESULTS.md)).
-The same numbers by CRC, board, message and cache, with every length and both
-starts: [Compare](compare-crc.html).
+The results of one of the three kinds of library so far; the others are
+embedded ring buffers and fixed-block memory pools ([all kinds](kinds.md),
+[ring buffer results](../../RESULTS.md), [memory pool results](results-pools.md)).
+
+Cycles and bytes of CRC calculation on six boards: libraries that compute
+a CRC in software and, on four boards, the board's CRC unit beside them,
+for three CRCs; every number comes from a record. Every number is the range
+over eight placements of the code: two rows whose ranges overlap are not
+told apart. The same numbers by CRC, board and message, with every length
+and both starts:
+
+**[Compare them with your own weights →](compare-crc.html)**
+
+Each part below opens with a click.
+
+<details id="what-was-measured" markdown="1">
+<summary><strong>What was measured</strong>: the configurations, the checks, the series and their commits, the compiler</summary>
 
 > **Status: the kind's first and second board series.** Every number comes from a
 > record under [`records/crc`](../../records/README.md) that can be rebuilt
@@ -22,19 +35,32 @@ so.
 
 Every configuration was checked against a reference before it was timed,
 and every timed call's result was compared with the reference's on the
-board ([method](method-crc.md)). Two series, two passes each:
+board ([method](method-crc.md)). Two series, two passes each, and the
+two boards that method version 3 changed measured again:
 - the first, commit `6301058`, 2026-11-24 to 2026-11-25
   ([report](../../reports/2026-11-25-crc-first-series.md));
 - the second (tables in RAM and the boards' CRC units), commits `04a2197`
   and `40f1958`, 2026-11-25
-  ([report](../../reports/2026-11-25-crc-second-series.md)).
+  ([report](../../reports/2026-11-25-crc-second-series.md));
+- method version 3: every configuration of the nRF5340 DK and the
+  NUCLEO-H723ZG, both series' configurations, commit `4032f80`,
+  2026-11-26 ([method](method-crc.md#method-version-3)). Their records of
+  the two series before it are archived series, linked under each board
+  below.
+
+What the series reports left unexplained, studied later in the same data:
+[report of 2026-11-27](../../reports/2026-11-27-crc-unexplained.md).
+
 Compiler: arm-none-eabi-gcc 14.2.1, `-O2 -DNDEBUG`, newlib-nano; the Rust
 crate with rustc 1.99.1 at the same optimisation level; pinned [toolchain image](../../toolchain/README.md). The
 libraries are fetched at the commits in
 [`kinds/crc/libs.lock`](../../kinds/crc/libs.lock), never copied into this
 repository.
 
-## How to read the tables
+</details>
+
+<details id="how-to-read-the-tables" markdown="1">
+<summary><strong>How to read the tables</strong>: the columns, the board's CRC unit, the ranges, what is only in the records</summary>
 
 One table per board, CRC and cache setting: the cache on first, then off.
 One row per configuration, in the order of
@@ -74,13 +100,19 @@ image) are in the records. The 1-byte figures are not shown: at an 8-byte
 boundary with the cache on, that scenario is the first one after the cache
 is switched on ([method](method-crc.md), "A mean includes the first call").
 
+</details>
+
 <!-- table:crc -->
 
-## nRF5340 DK
+<details id="nrf5340-dk" markdown="1">
+<summary><strong>nRF5340 DK</strong>, 64 MHz, method version 3: 35 configurations, a call on 16 bytes 112–1033 cycles with the cache on</summary>
 
 nRF5340 DK, application core (Cortex-M33), 64 MHz.
 
-### CRC-32/ISO-HDLC, nRF5340 DK, cache on
+Method version 3, at 64 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series ["CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"](https://github.com/verified-libs/verified-libs/tree/fc7e8ad78c8949684c2e5920d72f957edd431ca8/records/crc/nrf5340) (public commit `fc7e8ad`); the archived series ["CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"](https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/crc/nrf5340) (public commit `be1da88`).
+
+<details id="crc-32iso-hdlc-nrf5340-dk-cache-on" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache on: 16 rows, 16 bytes 174–1033 cycles, 5.5–61.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -103,7 +135,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [crcany crc32iso_hdlc_word (C), table in RAM](../../records/crc/nrf5340/adapter_crcany_crc32_word_ram.json) | slicing by 4 | RAM (copied at start by the image) | 4296 | 4096 | 185 | 5.5 |
 | [zlib crc32 (C), table in RAM](../../records/crc/nrf5340/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5824 | 5120 | 194 | 8.0 |
 
-### CRC-32/ISO-HDLC, nRF5340 DK, cache off
+</details>
+
+<details id="crc-32iso-hdlc-nrf5340-dk-cache-off" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache off: 16 rows, 16 bytes 376–3734 cycles, 13.0–226.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -126,7 +161,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [crcany crc32iso_hdlc_word (C), table in RAM](../../records/crc/nrf5340/adapter_crcany_crc32_word_ram.json) | slicing by 4 | RAM (copied at start by the image) | 4296 | 4096 | 396–434 | 13.0–14.0 |
 | [zlib crc32 (C), table in RAM](../../records/crc/nrf5340/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5824 | 5120 | 385–415 | 15.7–16.5 |
 
-### CRC-16/IBM-3740, nRF5340 DK, cache on
+</details>
+
+<details id="crc-16ibm-3740-nrf5340-dk-cache-on" markdown="1">
+<summary>CRC-16/IBM-3740, cache on: 9 rows, 16 bytes 190–294 cycles, 10.0–17.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -142,7 +180,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [crcany crc16ibm_3740_byte (C), table in RAM](../../records/crc/nrf5340/adapter_crcany_crc16_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 594 | 512 | 218 | 10.0 |
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/nrf5340/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 108 | 32 | 294 | 17.0 |
 
-### CRC-16/IBM-3740, nRF5340 DK, cache off
+</details>
+
+<details id="crc-16ibm-3740-nrf5340-dk-cache-off" markdown="1">
+<summary>CRC-16/IBM-3740, cache off: 9 rows, 16 bytes 432–1202 cycles, 22.0–72.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -158,7 +199,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [crcany crc16ibm_3740_byte (C), table in RAM](../../records/crc/nrf5340/adapter_crcany_crc16_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 594 | 512 | 481–630 | 22.0–31.0 |
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/nrf5340/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 108 | 32 | 699–760 | 41.0–44.0 |
 
-### CRC-8/SMBUS, nRF5340 DK, cache on
+</details>
+
+<details id="crc-8smbus-nrf5340-dk-cache-on" markdown="1">
+<summary>CRC-8/SMBUS, cache on: 10 rows, 16 bytes 112–293 cycles, 6.0–17.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -175,7 +219,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/nrf5340/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 84 | 16 | 288 | 17.0 |
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/nrf5340/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 92 | 16 | 293 | 16.0 |
 
-### CRC-8/SMBUS, nRF5340 DK, cache off
+</details>
+
+<details id="crc-8smbus-nrf5340-dk-cache-off" markdown="1">
+<summary>CRC-8/SMBUS, cache off: 10 rows, 16 bytes 151–1182 cycles, 6.0–69.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -192,11 +239,19 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/nrf5340/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 84 | 16 | 576–735 | 33.0–43.0 |
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/nrf5340/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 92 | 16 | 610–734 | 33.0–41.0 |
 
-## Raspberry Pi Pico 2 H
+</details>
+
+</details>
+
+<details id="raspberry-pi-pico-2-h" markdown="1">
+<summary><strong>Raspberry Pi Pico 2 H</strong>, 150 MHz, method version 2: 35 configurations and the board's CRC unit, a call on 16 bytes 50–1012 cycles with the cache on</summary>
 
 Raspberry Pi Pico 2 H (RP2350A, core 0, Cortex-M33), 150 MHz.
 
-### CRC-32/ISO-HDLC, Raspberry Pi Pico 2 H, cache on
+Method version 2, at 150 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
+
+<details id="crc-32iso-hdlc-raspberry-pi-pico-2-h-cache-on" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache on: 17 rows, 16 bytes 50–1012 cycles, 1.2–61.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -220,7 +275,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [zlib crc32 (C), table in RAM](../../records/crc/rp2350/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5824 | 5120 | 162 | 6.6 |
 | [the board's CRC unit, CRC-32 (our code)](../../records/crc/rp2350/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 80 | 1 | 50–51 | 1.2 |
 
-### CRC-32/ISO-HDLC, Raspberry Pi Pico 2 H, cache off
+</details>
+
+<details id="crc-32iso-hdlc-raspberry-pi-pico-2-h-cache-off" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache off: 17 rows, 16 bytes 1081–31697 cycles, 1.2–1910.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -244,7 +302,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [zlib crc32 (C), table in RAM](../../records/crc/rp2350/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5824 | 5120 | 3436–3437 | 163.3 |
 | [the board's CRC unit, CRC-32 (our code)](../../records/crc/rp2350/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 80 | 1 | 1081 | 1.2 |
 
-### CRC-16/IBM-3740, Raspberry Pi Pico 2 H, cache on
+</details>
+
+<details id="crc-16ibm-3740-raspberry-pi-pico-2-h-cache-on" markdown="1">
+<summary>CRC-16/IBM-3740, cache on: 10 rows, 16 bytes 51–285 cycles, 1.2–17.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -261,7 +322,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/rp2350/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 108 | 32 | 285 | 17.0 |
 | [the board's CRC unit, CRC-16 (our code)](../../records/crc/rp2350/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 80 | 1 | 51–52 | 1.2 |
 
-### CRC-16/IBM-3740, Raspberry Pi Pico 2 H, cache off
+</details>
+
+<details id="crc-16ibm-3740-raspberry-pi-pico-2-h-cache-off" markdown="1">
+<summary>CRC-16/IBM-3740, cache off: 10 rows, 16 bytes 764–12131 cycles, 1.4–730.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -278,7 +342,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/rp2350/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 108 | 32 | 7186–7187 | 421.0 |
 | [the board's CRC unit, CRC-16 (our code)](../../records/crc/rp2350/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 80 | 1 | 764–905 | 1.4 |
 
-### CRC-8/SMBUS, Raspberry Pi Pico 2 H, cache on
+</details>
+
+<details id="crc-8smbus-raspberry-pi-pico-2-h-cache-on" markdown="1">
+<summary>CRC-8/SMBUS, cache on: 10 rows, 16 bytes 106–283 cycles, 6.0–17.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -295,7 +362,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/rp2350/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 84 | 16 | 283 | 17.0 |
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/rp2350/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 92 | 16 | 280 | 16.0 |
 
-### CRC-8/SMBUS, Raspberry Pi Pico 2 H, cache off
+</details>
+
+<details id="crc-8smbus-raspberry-pi-pico-2-h-cache-off" markdown="1">
+<summary>CRC-8/SMBUS, cache off: 10 rows, 16 bytes 3298–11060 cycles, 178.0–663.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -312,11 +382,19 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/rp2350/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 84 | 16 | 6322–6324 | 367.0 |
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/rp2350/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 92 | 16 | 6194 | 340.0 |
 
-## NUCLEO-G474RE
+</details>
+
+</details>
+
+<details id="nucleo-g474re" markdown="1">
+<summary><strong>NUCLEO-G474RE</strong>, 170 MHz, method version 2: 35 configurations and the board's CRC unit, a call on 16 bytes 96–1025 cycles with the cache on</summary>
 
 NUCLEO-G474RE (STM32G474RET6, Cortex-M4F), 170 MHz.
 
-### CRC-32/ISO-HDLC, NUCLEO-G474RE, cache on
+Method version 2, at 170 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
+
+<details id="crc-32iso-hdlc-nucleo-g474re-cache-on" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache on: 17 rows, 16 bytes 96–1025 cycles, 2.2–61.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -340,7 +418,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [zlib crc32 (C), table in RAM](../../records/crc/stm32g474/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5818 | 5120 | 173 | 8.6 |
 | [the board's CRC unit, CRC-32 (our code)](../../records/crc/stm32g474/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 196 | 4 | 96 | 2.2 |
 
-### CRC-32/ISO-HDLC, NUCLEO-G474RE, cache off
+</details>
+
+<details id="crc-32iso-hdlc-nucleo-g474re-cache-off" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache off: 17 rows, 16 bytes 184–3002 cycles, 4.2–182.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -364,7 +445,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [zlib crc32 (C), table in RAM](../../records/crc/stm32g474/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5818 | 5120 | 348–364 | 15.7–16.1 |
 | [the board's CRC unit, CRC-32 (our code)](../../records/crc/stm32g474/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 196 | 4 | 184–188 | 4.2–4.5 |
 
-### CRC-16/IBM-3740, NUCLEO-G474RE, cache on
+</details>
+
+<details id="crc-16ibm-3740-nucleo-g474re-cache-on" markdown="1">
+<summary>CRC-16/IBM-3740, cache on: 10 rows, 16 bytes 96–325 cycles, 2.2–19.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -381,7 +465,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/stm32g474/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 108 | 32 | 325 | 19.0 |
 | [the board's CRC unit, CRC-16 (our code)](../../records/crc/stm32g474/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 192 | 4 | 96 | 2.2 |
 
-### CRC-16/IBM-3740, NUCLEO-G474RE, cache off
+</details>
+
+<details id="crc-16ibm-3740-nucleo-g474re-cache-off" markdown="1">
+<summary>CRC-16/IBM-3740, cache off: 10 rows, 16 bytes 184–820 cycles, 4.2–49.5 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -398,7 +485,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/stm32g474/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 108 | 32 | 684–701 | 41.0–42.0 |
 | [the board's CRC unit, CRC-16 (our code)](../../records/crc/stm32g474/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 192 | 4 | 184–188 | 4.2–4.5 |
 
-### CRC-8/SMBUS, NUCLEO-G474RE, cache on
+</details>
+
+<details id="crc-8smbus-nucleo-g474re-cache-on" markdown="1">
+<summary>CRC-8/SMBUS, cache on: 11 rows, 16 bytes 96–322 cycles, 2.2–19.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -416,7 +506,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/stm32g474/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 90 | 16 | 321 | 18.0 |
 | [the board's CRC unit, CRC-8 (our code)](../../records/crc/stm32g474/adapter_hw_crc8.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 188 | 4 | 96 | 2.2 |
 
-### CRC-8/SMBUS, NUCLEO-G474RE, cache off
+</details>
+
+<details id="crc-8smbus-nucleo-g474re-cache-off" markdown="1">
+<summary>CRC-8/SMBUS, cache off: 11 rows, 16 bytes 184–689 cycles, 4.2–41.3 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -434,11 +527,19 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/stm32g474/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 90 | 16 | 522–598 | 29.0–34.0 |
 | [the board's CRC unit, CRC-8 (our code)](../../records/crc/stm32g474/adapter_hw_crc8.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 188 | 4 | 184–188 | 4.2–4.5 |
 
-## NUCLEO-H723ZG
+</details>
 
-NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7), 64 MHz.
+</details>
 
-### CRC-32/ISO-HDLC, NUCLEO-H723ZG, cache on
+<details id="nucleo-h723zg" markdown="1">
+<summary><strong>NUCLEO-H723ZG</strong>, 520 MHz, method version 3: 35 configurations and the board's CRC unit, a call on 16 bytes 85–718 cycles with the cache on</summary>
+
+NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7), 520 MHz.
+
+Method version 3, at 520 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series ["CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"](https://github.com/verified-libs/verified-libs/tree/fc7e8ad78c8949684c2e5920d72f957edd431ca8/records/crc/stm32h723) (public commit `fc7e8ad`); the archived series ["CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"](https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/crc/stm32h723) (public commit `be1da88`).
+
+<details id="crc-32iso-hdlc-nucleo-h723zg-cache-on" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache on: 17 rows, 16 bytes 85–718 cycles, 2.8–42.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -450,7 +551,7 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [crc (Rust) Table<1>](../../records/crc/stm32h723/adapter_rust_crc32_table1.json) | table of 256 | flash, computed at compile time | 1254 | 0 | 144–145 | 6.8 |
 | [etl crc32_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc32_t16.json) | table of 16 | flash | 132 | 0 | 233–234 | 14.0 |
 | [zephyr crc32_ieee (C)](../../records/crc/stm32h723/adapter_zephyr_crc32_ieee.json) | table of 16 | flash | 152 | 0 | 251–252 | 14.0 |
-| [crcany crc32iso_hdlc_word (C)](../../records/crc/stm32h723/adapter_crcany_crc32_word.json) | slicing by 4 | flash (4 KB) | 4296 | 0 | 96–98 | 2.8 |
+| [crcany crc32iso_hdlc_word (C)](../../records/crc/stm32h723/adapter_crcany_crc32_word.json) | slicing by 4 | flash (4 KB) | 4296 | 0 | 97–99 | 2.8 |
 | [zlib crc32 (C)](../../records/crc/stm32h723/adapter_zlib_crc32.json) | other: "braided" words | flash | 5820 | 0 | 141–143 | 4.9 |
 | [crcany crc32iso_hdlc_bit (C)](../../records/crc/stm32h723/adapter_crcany_crc32_bit.json) | bitwise | none | 96 | 0 | 702–718 | 41.0–42.0 |
 | [etl crc32_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc32_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 1072 | 1024 | 137–138 | 8.0 |
@@ -460,113 +561,138 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [zephyr crc32_ieee (C), table in RAM](../../records/crc/stm32h723/adapter_zephyr_crc32_ieee_ram.json) | table of 16 | RAM (copied at start by the image) | 152 | 64 | 251–252 | 14.0 |
 | [crcany crc32iso_hdlc_word (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc32_word_ram.json) | slicing by 4 | RAM (copied at start by the image) | 4296 | 4096 | 96–97 | 2.8 |
 | [zlib crc32 (C), table in RAM](../../records/crc/stm32h723/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5820 | 5120 | 141–143 | 4.9 |
-| [the board's CRC unit, CRC-32 (our code)](../../records/crc/stm32h723/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 212 | 4 | 55 | 1.5 |
+| [the board's CRC unit, CRC-32 (our code)](../../records/crc/stm32h723/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 212 | 4 | 85 | 3.0 |
 
-### CRC-32/ISO-HDLC, NUCLEO-H723ZG, cache off
+</details>
 
-The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the board's 64 MHz build leaves `FLASH_ACR` as after reset (`firmware/common/stm32h723/board.h`). RM0468 (Table 16) allows 0 or 1 wait states at 64 MHz. The numbers with the cache off carry the 7 wait states; fewer were not measured.
+<details id="crc-32iso-hdlc-nucleo-h723zg-cache-off" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache off: 17 rows, 16 bytes 167–4316 cycles, 3.0–258.0 cycles per byte</summary>
+
+The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as ST's template for the board sets it (`firmware/common/stm32h723/board.h`, method version 3). RM0468 (Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 wait states.
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
 | Configuration | Class | Table | Flash bytes | RAM bytes | 16 B | per byte |
 |---|---|---|---:|---:|---:|---:|
-| [etl crc32_t256 (C++)](../../records/crc/stm32h723/adapter_etl_crc32_t256.json) | table of 256 | flash | 1072 | 0 | 336–569 | 18.8–34.0 |
-| [crcany crc32iso_hdlc_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc32_byte.json)[1] | table of 256 | flash | 4168 | 0 | 431–673 | 18.8–34.0 |
-| [libcrc crc_32 (C)](../../records/crc/stm32h723/adapter_libcrc_crc32.json)[2] | table of 256 | RAM, built at the first call | 144 | 1025 | 208–501 | 8.0–26.0 |
-| [crc (Rust) Table<1>](../../records/crc/stm32h723/adapter_rust_crc32_table1.json) | table of 256 | flash, computed at compile time | 1254 | 0 | 424–484 | 19.2–23.7 |
-| [etl crc32_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc32_t16.json) | table of 16 | flash | 132 | 0 | 685–893 | 40.0–54.0 |
-| [zephyr crc32_ieee (C)](../../records/crc/stm32h723/adapter_zephyr_crc32_ieee.json) | table of 16 | flash | 152 | 0 | 758–965 | 40.0–54.0 |
-| [crcany crc32iso_hdlc_word (C)](../../records/crc/stm32h723/adapter_crcany_crc32_word.json) | slicing by 4 | flash (4 KB) | 4296 | 0 | 474–522 | 18.4–19.8 |
-| [zlib crc32 (C)](../../records/crc/stm32h723/adapter_zlib_crc32.json) | other: "braided" words | flash | 5820 | 0 | 439–479 | 20.3–22.3 |
-| [crcany crc32iso_hdlc_bit (C)](../../records/crc/stm32h723/adapter_crcany_crc32_bit.json) | bitwise | none | 96 | 0 | 808–3736 | 41.0–225.0 |
-| [etl crc32_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc32_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 1072 | 1024 | 167–441 | 8.0–27.0 |
-| [crcany crc32iso_hdlc_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc32_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 4168 | 4096 | 261–536 | 8.0–27.0 |
-| [crc (Rust) Table<1>, table in RAM](../../records/crc/stm32h723/adapter_rust_crc32_table1_ram.json) | table of 256 | RAM (copied at start by the image) | 1254 | 1028 | 262–288 | 10.2–13.2 |
-| [etl crc32_t16 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc32_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 132 | 64 | 433–626 | 25.0–39.0 |
-| [zephyr crc32_ieee (C), table in RAM](../../records/crc/stm32h723/adapter_zephyr_crc32_ieee_ram.json) | table of 16 | RAM (copied at start by the image) | 152 | 64 | 511–703 | 26.0–39.0 |
-| [crcany crc32iso_hdlc_word (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc32_word_ram.json) | slicing by 4 | RAM (copied at start by the image) | 4296 | 4096 | 305–359 | 7.2–10.5 |
-| [zlib crc32 (C), table in RAM](../../records/crc/stm32h723/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5820 | 5120 | 261–285 | 10.0–12.1 |
-| [the board's CRC unit, CRC-32 (our code)](../../records/crc/stm32h723/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 212 | 4 | 130–218 | 1.5–6.5 |
+| [etl crc32_t256 (C++)](../../records/crc/stm32h723/adapter_etl_crc32_t256.json) | table of 256 | flash | 1072 | 0 | 371–720 | 19.8–42.0 |
+| [crcany crc32iso_hdlc_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc32_byte.json)[1] | table of 256 | flash | 4168 | 0 | 488–804 | 19.8–42.0 |
+| [libcrc crc_32 (C)](../../records/crc/stm32h723/adapter_libcrc_crc32.json)[2] | table of 256 | RAM, built at the first call | 144 | 1025 | 226–590 | 8.0–32.0 |
+| [crc (Rust) Table<1>](../../records/crc/stm32h723/adapter_rust_crc32_table1.json) | table of 256 | flash, computed at compile time | 1254 | 0 | 501–558 | 22.5–27.0 |
+| [etl crc32_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc32_t16.json) | table of 16 | flash | 132 | 0 | 832–1106 | 48.0–66.0 |
+| [zephyr crc32_ieee (C)](../../records/crc/stm32h723/adapter_zephyr_crc32_ieee.json) | table of 16 | flash | 152 | 0 | 902–1172 | 48.0–66.0 |
+| [crcany crc32iso_hdlc_word (C)](../../records/crc/stm32h723/adapter_crcany_crc32_word.json) | slicing by 4 | flash (4 KB) | 4296 | 0 | 564–618 | 20.7–23.0 |
+| [zlib crc32 (C)](../../records/crc/stm32h723/adapter_zlib_crc32.json) | other: "braided" words | flash | 5820 | 0 | 510–539 | 23.8–26.1 |
+| [crcany crc32iso_hdlc_bit (C)](../../records/crc/stm32h723/adapter_crcany_crc32_bit.json) | bitwise | none | 96 | 0 | 814–4316 | 41.0–258.0 |
+| [etl crc32_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc32_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 1072 | 1024 | 184–562 | 8.0–34.0 |
+| [crcany crc32iso_hdlc_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc32_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 4168 | 4096 | 300–684 | 8.0–34.0 |
+| [crc (Rust) Table<1>, table in RAM](../../records/crc/stm32h723/adapter_rust_crc32_table1_ram.json) | table of 256 | RAM (copied at start by the image) | 1254 | 1028 | 320–360 | 12.5–16.5 |
+| [etl crc32_t16 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc32_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 132 | 64 | 536–786 | 30.0–48.0 |
+| [zephyr crc32_ieee (C), table in RAM](../../records/crc/stm32h723/adapter_zephyr_crc32_ieee_ram.json) | table of 16 | RAM (copied at start by the image) | 152 | 64 | 626–852 | 32.0–48.0 |
+| [crcany crc32iso_hdlc_word (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc32_word_ram.json) | slicing by 4 | RAM (copied at start by the image) | 4296 | 4096 | 385–438 | 9.0–13.5 |
+| [zlib crc32 (C), table in RAM](../../records/crc/stm32h723/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 5820 | 5120 | 330–364 | 12.7–14.7 |
+| [the board's CRC unit, CRC-32 (our code)](../../records/crc/stm32h723/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 212 | 4 | 167–251 | 3.0–8.0 |
 
-### CRC-16/IBM-3740, NUCLEO-H723ZG, cache on
+</details>
+
+<details id="crc-16ibm-3740-nucleo-h723zg-cache-on" markdown="1">
+<summary>CRC-16/IBM-3740, cache on: 10 rows, 16 bytes 85–233 cycles, 3.0–14.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
 | Configuration | Class | Table | Flash bytes | RAM bytes | 16 B | per byte |
 |---|---|---|---:|---:|---:|---:|
 | [etl crc16_ccitt_t256 (C++)](../../records/crc/stm32h723/adapter_etl_crc16_t256.json) | table of 256 | flash | 568 | 0 | 121–122 | 7.0 |
-| [crcany crc16ibm_3740_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc16_byte.json) | table of 256 | flash | 594 | 0 | 153–154 | 7.0 |
+| [crcany crc16ibm_3740_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc16_byte.json) | table of 256 | flash | 594 | 0 | 153–155 | 7.0 |
 | [libcrc crc_ccitt_ffff (C)](../../records/crc/stm32h723/adapter_libcrc_ccitt_ffff.json)[3] | table of 256 | RAM, built at the first call | 180 | 513 | 141–142 | 7.0 |
 | [crcpp CRC_16_CCITTFALSE Table (C++)](../../records/crc/stm32h723/adapter_crcpp_ccittfalse_table.json) | table of 256 | RAM, built by the table's constructor | 344 | 524 | 183 | 10.0 |
 | [etl crc16_ccitt_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc16_t16.json) | table of 16 | flash | 112 | 0 | 233 | 14.0 |
-| [zephyr crc16_itu_t (C)](../../records/crc/stm32h723/adapter_zephyr_crc16_itu_t.json) | other: shifts and XORs | none | 72 | 0 | 225–226 | 13.0 |
+| [zephyr crc16_itu_t (C)](../../records/crc/stm32h723/adapter_zephyr_crc16_itu_t.json) | other: shifts and XORs | none | 72 | 0 | 225–227 | 13.0 |
 | [etl crc16_ccitt_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc16_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 568 | 512 | 121–122 | 7.0 |
-| [crcany crc16ibm_3740_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc16_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 594 | 512 | 153–154 | 7.0 |
+| [crcany crc16ibm_3740_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc16_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 594 | 512 | 153–155 | 7.0 |
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 112 | 32 | 233 | 14.0 |
-| [the board's CRC unit, CRC-16 (our code)](../../records/crc/stm32h723/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 212 | 4 | 55 | 1.5 |
+| [the board's CRC unit, CRC-16 (our code)](../../records/crc/stm32h723/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 212 | 4 | 85 | 3.0 |
 
-### CRC-16/IBM-3740, NUCLEO-H723ZG, cache off
+</details>
 
-The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the board's 64 MHz build leaves `FLASH_ACR` as after reset (`firmware/common/stm32h723/board.h`). RM0468 (Table 16) allows 0 or 1 wait states at 64 MHz. The numbers with the cache off carry the 7 wait states; fewer were not measured.
+<details id="crc-16ibm-3740-nucleo-h723zg-cache-off" markdown="1">
+<summary>CRC-16/IBM-3740, cache off: 10 rows, 16 bytes 167–1150 cycles, 3.0–68.0 cycles per byte</summary>
+
+The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as ST's template for the board sets it (`firmware/common/stm32h723/board.h`, method version 3). RM0468 (Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 wait states.
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
 | Configuration | Class | Table | Flash bytes | RAM bytes | 16 B | per byte |
 |---|---|---|---:|---:|---:|---:|
-| [etl crc16_ccitt_t256 (C++)](../../records/crc/stm32h723/adapter_etl_crc16_t256.json) | table of 256 | flash | 568 | 0 | 317–574 | 17.5–34.0 |
-| [crcany crc16ibm_3740_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc16_byte.json) | table of 256 | flash | 594 | 0 | 423–689 | 17.6–34.0 |
-| [libcrc crc_ccitt_ffff (C)](../../records/crc/stm32h723/adapter_libcrc_ccitt_ffff.json)[3] | table of 256 | RAM, built at the first call | 180 | 513 | 210–513 | 7.0–27.0 |
-| [crcpp CRC_16_CCITTFALSE Table (C++)](../../records/crc/stm32h723/adapter_crcpp_ccittfalse_table.json) | table of 256 | RAM, built by the table's constructor | 344 | 524 | 469–519 | 25.0–28.0 |
-| [etl crc16_ccitt_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc16_t16.json) | table of 16 | flash | 112 | 0 | 683–902 | 40.0–54.0 |
-| [zephyr crc16_itu_t (C)](../../records/crc/stm32h723/adapter_zephyr_crc16_itu_t.json) | other: shifts and XORs | none | 72 | 0 | 485–696 | 26.0–40.0 |
-| [etl crc16_ccitt_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc16_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 568 | 512 | 150–447 | 7.0–27.0 |
-| [crcany crc16ibm_3740_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc16_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 594 | 512 | 257–561 | 7.0–27.0 |
-| [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 112 | 32 | 482–653 | 27.0–40.0 |
-| [the board's CRC unit, CRC-16 (our code)](../../records/crc/stm32h723/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 212 | 4 | 130–218 | 1.5–6.5 |
+| [etl crc16_ccitt_t256 (C++)](../../records/crc/stm32h723/adapter_etl_crc16_t256.json) | table of 256 | flash | 568 | 0 | 369–720 | 19.6–44.0 |
+| [crcany crc16ibm_3740_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc16_byte.json) | table of 256 | flash | 594 | 0 | 495–850 | 19.6–42.0 |
+| [libcrc crc_ccitt_ffff (C)](../../records/crc/stm32h723/adapter_libcrc_ccitt_ffff.json)[3] | table of 256 | RAM, built at the first call | 180 | 513 | 226–632 | 7.0–34.0 |
+| [crcpp CRC_16_CCITTFALSE Table (C++)](../../records/crc/stm32h723/adapter_crcpp_ccittfalse_table.json) | table of 256 | RAM, built by the table's constructor | 344 | 524 | 576–666 | 30.0–36.0 |
+| [etl crc16_ccitt_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc16_t16.json) | table of 16 | flash | 112 | 0 | 830–1150 | 48.0–68.0 |
+| [zephyr crc16_itu_t (C)](../../records/crc/stm32h723/adapter_zephyr_crc16_itu_t.json) | other: shifts and XORs | none | 72 | 0 | 606–876 | 32.0–50.0 |
+| [etl crc16_ccitt_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc16_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 568 | 512 | 168–578 | 7.0–34.0 |
+| [crcany crc16ibm_3740_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc16_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 594 | 512 | 290–704 | 7.0–34.0 |
+| [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 112 | 32 | 608–824 | 34.0–50.0 |
+| [the board's CRC unit, CRC-16 (our code)](../../records/crc/stm32h723/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 212 | 4 | 167–251 | 3.0–8.0 |
 
-### CRC-8/SMBUS, NUCLEO-H723ZG, cache on
+</details>
+
+<details id="crc-8smbus-nucleo-h723zg-cache-on" markdown="1">
+<summary>CRC-8/SMBUS, cache on: 11 rows, 16 bytes 85–234 cycles, 3.0–14.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
 | Configuration | Class | Table | Flash bytes | RAM bytes | 16 B | per byte |
 |---|---|---|---:|---:|---:|---:|
 | [etl crc8_ccitt_t256 (C++)](../../records/crc/stm32h723/adapter_etl_crc8_t256.json) | table of 256 | flash | 296 | 0 | 91–92 | 5.0 |
-| [crcany crc8smbus_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc8_byte.json) | table of 256 | flash | 1090 | 0 | 123–124 | 5.0 |
+| [crcany crc8smbus_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc8_byte.json) | table of 256 | flash | 1090 | 0 | 123–125 | 5.0 |
 | [acecrc crc8_byte (C++)](../../records/crc/stm32h723/adapter_acecrc_crc8_byte.json) | table of 256 | flash | 304 | 0 | 102–104 | 5.0 |
 | [etl crc8_ccitt_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc8_t16.json) | table of 16 | flash | 92 | 0 | 234 | 14.0 |
-| [zephyr crc8_ccitt (C)](../../records/crc/stm32h723/adapter_zephyr_crc8_ccitt.json) | table of 16 | flash | 100 | 0 | 231–232 | 13.0 |
+| [zephyr crc8_ccitt (C)](../../records/crc/stm32h723/adapter_zephyr_crc8_ccitt.json) | table of 16 | flash | 100 | 0 | 231–233 | 13.0 |
 | [etl crc8_ccitt_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc8_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 296 | 256 | 91–92 | 5.0 |
-| [crcany crc8smbus_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc8_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 1090 | 1024 | 123–124 | 5.0 |
+| [crcany crc8smbus_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc8_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 1090 | 1024 | 123–125 | 5.0 |
 | [acecrc crc8_byte (C++), table in RAM](../../records/crc/stm32h723/adapter_acecrc_crc8_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 304 | 256 | 102–104 | 5.0 |
 | [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 92 | 16 | 234 | 14.0 |
-| [zephyr crc8_ccitt (C), table in RAM](../../records/crc/stm32h723/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 100 | 16 | 231–232 | 13.0 |
-| [the board's CRC unit, CRC-8 (our code)](../../records/crc/stm32h723/adapter_hw_crc8.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 208 | 4 | 55 | 1.5 |
+| [zephyr crc8_ccitt (C), table in RAM](../../records/crc/stm32h723/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 100 | 16 | 231–233 | 13.0 |
+| [the board's CRC unit, CRC-8 (our code)](../../records/crc/stm32h723/adapter_hw_crc8.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 208 | 4 | 85 | 3.0 |
 
-### CRC-8/SMBUS, NUCLEO-H723ZG, cache off
+</details>
 
-The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the board's 64 MHz build leaves `FLASH_ACR` as after reset (`firmware/common/stm32h723/board.h`). RM0468 (Table 16) allows 0 or 1 wait states at 64 MHz. The numbers with the cache off carry the 7 wait states; fewer were not measured.
+<details id="crc-8smbus-nucleo-h723zg-cache-off" markdown="1">
+<summary>CRC-8/SMBUS, cache off: 11 rows, 16 bytes 128–1168 cycles, 3.0–66.0 cycles per byte</summary>
+
+The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as ST's template for the board sets it (`firmware/common/stm32h723/board.h`, method version 3). RM0468 (Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 wait states.
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
 | Configuration | Class | Table | Flash bytes | RAM bytes | 16 B | per byte |
 |---|---|---|---:|---:|---:|---:|
-| [etl crc8_ccitt_t256 (C++)](../../records/crc/stm32h723/adapter_etl_crc8_t256.json) | table of 256 | flash | 296 | 0 | 272–569 | 15.0–34.0 |
-| [crcany crc8smbus_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc8_byte.json) | table of 256 | flash | 1090 | 0 | 380–678 | 15.1–34.0 |
-| [acecrc crc8_byte (C++)](../../records/crc/stm32h723/adapter_acecrc_crc8_byte.json) | table of 256 | flash | 304 | 0 | 311–617 | 15.0–34.0 |
-| [etl crc8_ccitt_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc8_t16.json) | table of 16 | flash | 92 | 0 | 683–893 | 40.0–54.0 |
-| [zephyr crc8_ccitt (C)](../../records/crc/stm32h723/adapter_zephyr_crc8_ccitt.json) | table of 16 | flash | 100 | 0 | 729–952 | 40.0–54.0 |
-| [etl crc8_ccitt_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc8_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 296 | 256 | 112–425 | 5.0–25.0 |
-| [crcany crc8smbus_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc8_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 1090 | 1024 | 216–534 | 5.0–26.0 |
-| [acecrc crc8_byte (C++), table in RAM](../../records/crc/stm32h723/adapter_acecrc_crc8_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 304 | 256 | 150–473 | 5.0–25.0 |
-| [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 92 | 16 | 451–648 | 26.0–39.0 |
-| [zephyr crc8_ccitt (C), table in RAM](../../records/crc/stm32h723/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 100 | 16 | 502–682 | 26.0–39.0 |
-| [the board's CRC unit, CRC-8 (our code)](../../records/crc/stm32h723/adapter_hw_crc8.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 208 | 4 | 130–218 | 1.5–6.5 |
+| [etl crc8_ccitt_t256 (C++)](../../records/crc/stm32h723/adapter_etl_crc8_t256.json) | table of 256 | flash | 296 | 0 | 321–690 | 17.2–42.0 |
+| [crcany crc8smbus_byte (C)](../../records/crc/stm32h723/adapter_crcany_crc8_byte.json) | table of 256 | flash | 1090 | 0 | 438–820 | 17.2–42.0 |
+| [acecrc crc8_byte (C++)](../../records/crc/stm32h723/adapter_acecrc_crc8_byte.json) | table of 256 | flash | 304 | 0 | 370–738 | 17.2–42.0 |
+| [etl crc8_ccitt_t16 (C++)](../../records/crc/stm32h723/adapter_etl_crc8_t16.json) | table of 16 | flash | 92 | 0 | 832–1106 | 48.0–66.0 |
+| [zephyr crc8_ccitt (C)](../../records/crc/stm32h723/adapter_zephyr_crc8_ccitt.json) | table of 16 | flash | 100 | 0 | 880–1168 | 48.0–66.0 |
+| [etl crc8_ccitt_t256 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc8_t256_ram.json) | table of 256 | RAM (copied at start by the image) | 296 | 256 | 128–502 | 5.0–30.0 |
+| [crcany crc8smbus_byte (C), table in RAM](../../records/crc/stm32h723/adapter_crcany_crc8_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 1090 | 1024 | 244–664 | 5.0–32.0 |
+| [acecrc crc8_byte (C++), table in RAM](../../records/crc/stm32h723/adapter_acecrc_crc8_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 304 | 256 | 176–550 | 5.0–30.0 |
+| [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/stm32h723/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 92 | 16 | 568–788 | 32.0–48.0 |
+| [zephyr crc8_ccitt (C), table in RAM](../../records/crc/stm32h723/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 100 | 16 | 624–852 | 32.0–48.0 |
+| [the board's CRC unit, CRC-8 (our code)](../../records/crc/stm32h723/adapter_hw_crc8.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 208 | 4 | 167–251 | 3.0–8.0 |
 
-## NUCLEO-G0B1RE
+</details>
+
+The board's CRC unit is reached over a bus that runs at half the core clock since method version 3, so its cycles per byte are 3.0 where the archived series at 64 MHz had 1.5; in time it is faster: 1024 bytes take 3109 cycles at 520 MHz (6.0 µs) against 1567 at 64 MHz (24.5 µs) ([method](method-crc.md#the-nucleo-h723zg-at-520-mhz)).
+
+</details>
+
+<details id="nucleo-g0b1re" markdown="1">
+<summary><strong>NUCLEO-G0B1RE</strong>, 64 MHz, method version 2: 35 configurations and the board's CRC unit, a call on 16 bytes 128–1524 cycles with the cache on</summary>
 
 NUCLEO-G0B1RE (STM32G0B1RET6, Cortex-M0+), 64 MHz.
 
-### CRC-32/ISO-HDLC, NUCLEO-G0B1RE, cache on
+Method version 2, at 64 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
+
+<details id="crc-32iso-hdlc-nucleo-g0b1re-cache-on" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache on: 17 rows, 16 bytes 128–1524 cycles, 2.0–90.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -590,7 +716,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [zlib crc32 (C), table in RAM](../../records/crc/stm32g0b1/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 6228 | 5120 | 304–306 | 13.6–14.1 |
 | [the board's CRC unit, CRC-32 (our code)](../../records/crc/stm32g0b1/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 196 | 4 | 128 | 2.0 |
 
-### CRC-32/ISO-HDLC, NUCLEO-G0B1RE, cache off
+</details>
+
+<details id="crc-32iso-hdlc-nucleo-g0b1re-cache-off" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache off: 17 rows, 16 bytes 156–2511 cycles, 3.0–151.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -614,7 +743,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [zlib crc32 (C), table in RAM](../../records/crc/stm32g0b1/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 6228 | 5120 | 401 | 18.8–19.1 |
 | [the board's CRC unit, CRC-32 (our code)](../../records/crc/stm32g0b1/adapter_hw_crc32.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 196 | 4 | 156–158 | 3.0–3.5 |
 
-### CRC-16/IBM-3740, NUCLEO-G0B1RE, cache on
+</details>
+
+<details id="crc-16ibm-3740-nucleo-g0b1re-cache-on" markdown="1">
+<summary>CRC-16/IBM-3740, cache on: 10 rows, 16 bytes 129–544 cycles, 2.0–32.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -631,7 +763,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/stm32g0b1/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 100 | 32 | 446–480 | 26.0–28.0 |
 | [the board's CRC unit, CRC-16 (our code)](../../records/crc/stm32g0b1/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 200 | 4 | 129 | 2.0 |
 
-### CRC-16/IBM-3740, NUCLEO-G0B1RE, cache off
+</details>
+
+<details id="crc-16ibm-3740-nucleo-g0b1re-cache-off" markdown="1">
+<summary>CRC-16/IBM-3740, cache off: 10 rows, 16 bytes 157–738 cycles, 3.0–44.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -648,7 +783,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/stm32g0b1/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 100 | 32 | 610–614 | 36.0 |
 | [the board's CRC unit, CRC-16 (our code)](../../records/crc/stm32g0b1/adapter_hw_crc16.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 200 | 4 | 157–159 | 3.0–3.5 |
 
-### CRC-8/SMBUS, NUCLEO-G0B1RE, cache on
+</details>
+
+<details id="crc-8smbus-nucleo-g0b1re-cache-on" markdown="1">
+<summary>CRC-8/SMBUS, cache on: 11 rows, 16 bytes 128–522 cycles, 2.0–31.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -666,7 +804,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/stm32g0b1/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 78 | 16 | 372–404 | 21.0–23.0 |
 | [the board's CRC unit, CRC-8 (our code)](../../records/crc/stm32g0b1/adapter_hw_crc8.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 192 | 4 | 128–131 | 2.0 |
 
-### CRC-8/SMBUS, NUCLEO-G0B1RE, cache off
+</details>
+
+<details id="crc-8smbus-nucleo-g0b1re-cache-off" markdown="1">
+<summary>CRC-8/SMBUS, cache off: 11 rows, 16 bytes 157–655 cycles, 3.0–39.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -684,11 +825,19 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/stm32g0b1/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 78 | 16 | 504–506 | 29.0 |
 | [the board's CRC unit, CRC-8 (our code)](../../records/crc/stm32g0b1/adapter_hw_crc8.json) (the board's CRC unit, driven by our code; not a library) | hardware unit | none | 192 | 4 | 157–159 | 3.0–3.5 |
 
-## SAM D20 Xplained Pro
+</details>
+
+</details>
+
+<details id="sam-d20-xplained-pro" markdown="1">
+<summary><strong>SAM D20 Xplained Pro</strong>, 48 MHz, method version 2: 35 configurations, a call on 16 bytes 166–1476 cycles with the cache on</summary>
 
 SAM D20 Xplained Pro (ATSAMD20J18A, Cortex-M0+), 48 MHz.
 
-### CRC-32/ISO-HDLC, SAM D20 Xplained Pro, cache on
+Method version 2, at 48 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
+
+<details id="crc-32iso-hdlc-sam-d20-xplained-pro-cache-on" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache on: 16 rows, 16 bytes 234–1476 cycles, 10.0–87.0 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -711,7 +860,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [crcany crc32iso_hdlc_word (C), table in RAM](../../records/crc/samd20/adapter_crcany_crc32_word_ram.json) | slicing by 4 | RAM (copied at start by the image) | 4318 | 4096 | 307 | 10.0–10.2 |
 | [zlib crc32 (C), table in RAM](../../records/crc/samd20/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 6228 | 5120 | 340–342 | 15.7–15.9 |
 
-### CRC-32/ISO-HDLC, SAM D20 Xplained Pro, cache off
+</details>
+
+<details id="crc-32iso-hdlc-sam-d20-xplained-pro-cache-off" markdown="1">
+<summary>CRC-32/ISO-HDLC, cache off: 16 rows, 16 bytes 301–2279 cycles, 13.8–137.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -734,7 +886,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [crcany crc32iso_hdlc_word (C), table in RAM](../../records/crc/samd20/adapter_crcany_crc32_word_ram.json) | slicing by 4 | RAM (copied at start by the image) | 4318 | 4096 | 372 | 13.8 |
 | [zlib crc32 (C), table in RAM](../../records/crc/samd20/adapter_zlib_crc32_ram.json) | other: "braided" words | RAM (copied at start by the image) | 6228 | 5120 | 390 | 18.8 |
 
-### CRC-16/IBM-3740, SAM D20 Xplained Pro, cache on
+</details>
+
+<details id="crc-16ibm-3740-sam-d20-xplained-pro-cache-on" markdown="1">
+<summary>CRC-16/IBM-3740, cache on: 9 rows, 16 bytes 252–482 cycles, 14.0–27.8 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -750,7 +905,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [crcany crc16ibm_3740_byte (C), table in RAM](../../records/crc/samd20/adapter_crcany_crc16_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 590 | 512 | 297–298 | 14.0 |
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/samd20/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 100 | 32 | 418–420 | 24.0 |
 
-### CRC-16/IBM-3740, SAM D20 Xplained Pro, cache off
+</details>
+
+<details id="crc-16ibm-3740-sam-d20-xplained-pro-cache-off" markdown="1">
+<summary>CRC-16/IBM-3740, cache off: 9 rows, 16 bytes 361–623 cycles, 20.0–37.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -766,7 +924,10 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [crcany crc16ibm_3740_byte (C), table in RAM](../../records/crc/samd20/adapter_crcany_crc16_byte_ram.json) | table of 256 | RAM (copied at start by the image) | 590 | 512 | 414 | 21.0 |
 | [etl crc16_ccitt_t16 (C++), table in RAM](../../records/crc/samd20/adapter_etl_crc16_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 100 | 32 | 591 | 35.0 |
 
-### CRC-8/SMBUS, SAM D20 Xplained Pro, cache on
+</details>
+
+<details id="crc-8smbus-sam-d20-xplained-pro-cache-on" markdown="1">
+<summary>CRC-8/SMBUS, cache on: 10 rows, 16 bytes 166–431 cycles, 9.0–25.1 cycles per byte</summary>
 
 Cycles, cache on: the range over the eight placements (min–max), first pass.
 
@@ -783,7 +944,10 @@ Cycles, cache on: the range over the eight placements (min–max), first pass.
 | [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/samd20/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 72 | 16 | 366 | 21.0 |
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/samd20/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 78 | 16 | 343 | 19.0 |
 
-### CRC-8/SMBUS, SAM D20 Xplained Pro, cache off
+</details>
+
+<details id="crc-8smbus-sam-d20-xplained-pro-cache-off" markdown="1">
+<summary>CRC-8/SMBUS, cache off: 10 rows, 16 bytes 229–539 cycles, 13.0–32.0 cycles per byte</summary>
 
 Cycles, cache off: the range over the eight placements (min–max), first pass.
 
@@ -800,17 +964,27 @@ Cycles, cache off: the range over the eight placements (min–max), first pass.
 | [etl crc8_ccitt_t16 (C++), table in RAM](../../records/crc/samd20/adapter_etl_crc8_t16_ram.json) | table of 16 | RAM (copied at start by the image) | 72 | 16 | 507 | 30.0 |
 | [zephyr crc8_ccitt (C), table in RAM](../../records/crc/samd20/adapter_zephyr_crc8_ccitt_ram.json) | table of 16 | RAM (copied at start by the image) | 78 | 16 | 484 | 28.0 |
 
+</details>
+
+</details>
+
+<details id="notes-to-the-tables" markdown="1">
+<summary>Notes [1] to [3] to the tables</summary>
+
 [1] crcany's generated crc32iso_hdlc.c defines `table_byte` as `table_word[0]` (`#define table_byte table_word[0]`, build/gen/src/crc32iso_hdlc.c line 29): the byte code reads the first row of the word table, so the whole word table (4 x 256 x 4 = 4096 bytes, one symbol `table_word` in the image) is linked in. The flash bytes count it.
 
 [2] libcrc builds its table in RAM at its first call. The adapter's init() makes that call (kinds/crc/adapter_libcrc.c, lc32_init) and bench/main.c calls init() before the timed calls (line 156), so the 256 calls of a scenario find the table built; the building is not measured.
 
 [3] As libcrc crc_32: the table is built by init() (lc16_init) before the timed calls; the building is not measured.
 
+</details>
+
 <!-- /table:crc -->
 
-## What the tables show
+<details id="what-the-tables-show" markdown="1">
+<summary><strong>What the tables show</strong>: the same class from two libraries, the table in flash or in RAM, the placements with the cache off</summary>
 
-Each sentence names the rows it rests on; the rows are those of the tables above.
+Each sentence names the rows it rests on; the rows are those of the tables above (open a board).
 
 - **The same class from two libraries.** With the cache on, ETL
   `crc32_t256` and crcany `crc32iso_hdlc_byte`, both a CRC-32 table of 256
@@ -829,6 +1003,9 @@ Each sentence names the rows it rests on; the rows are those of the tables above
 - **The placements, with the cache off.** On the SAM D20 Xplained Pro
   every row of the cache-off tables is one number: the eight placements
   agree. On the NUCLEO-H723ZG, crcany `crc32iso_hdlc_bit` (CRC-32,
-  bitwise) costs 41.0–225.0 cycles per byte with the cache off and
-  41.0–42.0 with it on: at its best placements the same with the cache off
-  as on (the report, check 7).
+  bitwise) costs 41.0–258.0 cycles per byte with the cache off and
+  41.0–42.0 with it on, at 520 MHz (method version 3): at its best
+  placements the same with the cache off as on. The first series, at
+  64 MHz, gave 41.0–225.0 with the cache off (the report, check 7).
+
+</details>

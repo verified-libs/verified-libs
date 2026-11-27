@@ -1,0 +1,97 @@
+# The slots of the pools kind's benchmark images (bench/poolslots.py writes this
+# file, bench/onepool.py builds from it), by the rules of version 2
+# (firmware/nrf5340-rb-bench/oneslots.py). One image per line; segments of
+# 256 KB, the same table for every board; the kind's segments are 200 to 299.
+# A line is added, or the lines of the one configuration that changed are
+# replaced: no other line is touched, because an image's bytes depend on
+# its line.
+#
+# adapter                 placement segment offset  bytes
+adapter_etl               0         200     0x01000 12288
+adapter_etl               4         200     0x04000 12288
+adapter_etl               8         200     0x07000 12288
+adapter_etl               12        200     0x0a000 12288
+adapter_etl               16        200     0x0d000 12288
+adapter_etl               20        200     0x10000 12288
+adapter_etl               24        200     0x13000 12288
+adapter_etl               28        200     0x16000 12288
+adapter_riot              0         200     0x19000 12288
+adapter_riot              4         200     0x1c000 12288
+adapter_riot              8         200     0x1f000 12288
+adapter_riot              12        200     0x22000 12288
+adapter_riot              16        200     0x25000 12288
+adapter_riot              20        200     0x28000 12288
+adapter_riot              24        200     0x2b000 12288
+adapter_riot              28        200     0x2e000 12288
+adapter_threadx           0         200     0x31000 12288
+adapter_threadx           4         200     0x34000 12288
+adapter_threadx           8         200     0x37000 12288
+adapter_threadx           12        200     0x3a000 12288
+adapter_threadx           16        200     0x3d000 12288
+adapter_threadx           20        201     0x01000 12288
+adapter_threadx           24        201     0x04000 12288
+adapter_threadx           28        201     0x07000 12288
+adapter_cmsis_rtx         0         201     0x0a000 12288
+adapter_cmsis_rtx         4         201     0x0d000 12288
+adapter_cmsis_rtx         8         201     0x10000 12288
+adapter_cmsis_rtx         12        201     0x13000 12288
+adapter_cmsis_rtx         16        201     0x16000 12288
+adapter_cmsis_rtx         20        201     0x19000 12288
+adapter_cmsis_rtx         24        201     0x1c000 12288
+adapter_cmsis_rtx         28        201     0x1f000 12288
+adapter_contiki           0         201     0x22000 12288
+adapter_contiki           4         201     0x25000 12288
+adapter_contiki           8         201     0x28000 12288
+adapter_contiki           12        201     0x2b000 12288
+adapter_contiki           16        201     0x2e000 12288
+adapter_contiki           20        201     0x31000 12288
+adapter_contiki           24        201     0x34000 12288
+adapter_contiki           28        201     0x37000 12288
+adapter_c_allocator       0         201     0x3a000 12288
+adapter_c_allocator       4         201     0x3d000 12288
+adapter_c_allocator       8         202     0x01000 12288
+adapter_c_allocator       12        202     0x04000 12288
+adapter_c_allocator       16        202     0x07000 12288
+adapter_c_allocator       20        202     0x0a000 12288
+adapter_c_allocator       24        202     0x0d000 12288
+adapter_c_allocator       28        202     0x10000 12288
+adapter_lwip              0         202     0x13000 12288
+adapter_lwip              4         202     0x16000 12288
+adapter_lwip              8         202     0x19000 12288
+adapter_lwip              12        202     0x1c000 12288
+adapter_lwip              16        202     0x1f000 12288
+adapter_lwip              20        202     0x22000 12288
+adapter_lwip              24        202     0x25000 12288
+adapter_lwip              28        202     0x28000 12288
+adapter_memorypool        0         202     0x2b000 12288
+adapter_memorypool        4         202     0x2e000 12288
+adapter_memorypool        8         202     0x31000 12288
+adapter_memorypool        12        202     0x34000 12288
+adapter_memorypool        16        202     0x37000 12288
+adapter_memorypool        20        202     0x3a000 12288
+adapter_memorypool        24        202     0x3d000 12288
+adapter_memorypool        28        203     0x01000 12288
+adapter_heapless          0         203     0x04000 12288
+adapter_heapless          4         203     0x07000 12288
+adapter_heapless          8         203     0x0a000 12288
+adapter_heapless          12        203     0x0d000 12288
+adapter_heapless          16        203     0x10000 12288
+adapter_heapless          20        203     0x13000 12288
+adapter_heapless          24        203     0x16000 12288
+adapter_heapless          28        203     0x19000 12288
+adapter_atomic_pool       0         203     0x1c000 12288
+adapter_atomic_pool       4         203     0x1f000 12288
+adapter_atomic_pool       8         203     0x22000 12288
+adapter_atomic_pool       12        203     0x25000 12288
+adapter_atomic_pool       16        203     0x28000 12288
+adapter_atomic_pool       20        203     0x2b000 12288
+adapter_atomic_pool       24        203     0x2e000 12288
+adapter_atomic_pool       28        203     0x31000 12288
+adapter_ref_primask       0         203     0x34000 12288
+adapter_ref_primask       4         203     0x37000 12288
+adapter_ref_primask       8         203     0x3a000 12288
+adapter_ref_primask       12        203     0x3d000 12288
+adapter_ref_primask       16        204     0x01000 12288
+adapter_ref_primask       20        204     0x04000 12288
+adapter_ref_primask       24        204     0x07000 12288
+adapter_ref_primask       28        204     0x0a000 12288

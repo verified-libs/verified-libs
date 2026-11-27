@@ -26,15 +26,25 @@
 #define STEPS     20000u
 
 extern const pool_adapter adapter_ref, adapter_broken_double, adapter_broken_lost;
+#ifdef POOL_TEST_CMSIS_RTX
+/* The pool pre-checks (../pools-prechecks): the reference, the two broken
+ * pools and CMSIS-RTX's pool, without the pilot's three libraries. */
+extern const pool_adapter adapter_cmsis_rtx;
+#else
 extern const pool_adapter adapter_etl_pool, adapter_riot_memarray, adapter_threadx_block;
+#endif
 
 static struct { const pool_adapter *ad; int expect_pass; } CASES[] = {
     { &adapter_ref, 1 },
     { &adapter_broken_double, 0 },
     { &adapter_broken_lost, 0 },
+#ifdef POOL_TEST_CMSIS_RTX
+    { &adapter_cmsis_rtx, 1 },
+#else
     { &adapter_etl_pool, 1 },
     { &adapter_riot_memarray, 1 },
     { &adapter_threadx_block, 1 },
+#endif
 };
 
 /* "Interrupts off" for the ThreadX port header: a flag, nothing more on

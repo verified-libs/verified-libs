@@ -1,5 +1,5 @@
 {
- "about": "Archived series: published records that are checked against their own commit, not against the tree at hand (DECISIONS.md, 2026-11-23). To check one, take the public repository at public_commit and run lab/tools/verify-build.sh there.",
+ "about": "Archived series: published records that are checked against their own commit, not against the tree at hand (DECISIONS.md, 2026-11-23). To check one, take the public repository at public_commit and run lab/tools/verify-build.sh there. An entry with \"paths\" archives only its commit's records under those prefixes of records/; the commit's other records are held against the tree as before (method version 3, DECISIONS 2026-11-26).",
  "series": [
   {
    "name": "version 1",
@@ -8,6 +8,42 @@
    "public_commit": "eae0e156aaef0baad179e4c4146dc88576b5e223",
    "records": 215,
    "records_sha256": "5e168c8bc8a4bdbc25a90bd75d311f13c6faec8229aa010a7f3953cca8b3a54b"
+  },
+  {
+   "name": "version 2, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+   "commit": "d06180e914ab",
+   "paths": [
+    "bench-v2/nrf5340/",
+    "bench-v2/stm32h723/"
+   ],
+   "exported_from": "a3174e77c77f42fccc0e3a7f08fb95f8ca77dace",
+   "public_commit": "be1da88cda418e07e5b503c2cc8c93b2cd019f5e",
+   "records": 89,
+   "records_sha256": "644bb1f297897a8892594b838d14e5cc48885420766dc348486c010b9588e4e1"
+  },
+  {
+   "name": "CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+   "commit": "63010588cf9c",
+   "paths": [
+    "crc/nrf5340/",
+    "crc/stm32h723/"
+   ],
+   "exported_from": "f3ee191e05e286e9230f578ff12851d411860318",
+   "public_commit": "fc7e8ad78c8949684c2e5920d72f957edd431ca8",
+   "records": 40,
+   "records_sha256": "36ccb7252f817f47bb9ca3d1f94429d4c437eb0be299fd77c53deabb31b0a6ed"
+  },
+  {
+   "name": "CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+   "commit": "40f19587e4ed",
+   "paths": [
+    "crc/nrf5340/",
+    "crc/stm32h723/"
+   ],
+   "exported_from": "a3174e77c77f42fccc0e3a7f08fb95f8ca77dace",
+   "public_commit": "be1da88cda418e07e5b503c2cc8c93b2cd019f5e",
+   "records": 33,
+   "records_sha256": "a5b6ef78a262113b4bcca99e7bbc00fec60d8d9261a156c00ab7ff9a37ab28b3"
   }
  ]
 }

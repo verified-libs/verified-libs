@@ -3,7 +3,7 @@
 // it asks for; after each load the table is read back as text.
 //
 //   gjs page_harness.js COMPARE_JS DATA_JSON FRAGMENTS_FILE
-//   (compare.js with libs.json, or compare-crc.js with crc.json)
+//   (compare.js with libs.json, compare-crc.js with crc.json, or compare-pools.js with pools.json)
 //
 // FRAGMENTS_FILE: one address fragment per line. Output: one JSON line per
 // fragment: {hash, written, header, rows, seps, count, src, note}, and first one
@@ -37,8 +37,8 @@ function flat(n) {
 }
 
 function run(src, data, fragment) {
-  // the ring buffers' page reads #libdata, the CRC page (compare-crc.js) #crcdata
-  const byId = { libdata: { textContent: data }, crcdata: { textContent: data } };
+  // the ring buffers' page reads #libdata, the CRC page (compare-crc.js) #crcdata, the pools page #poolsdata
+  const byId = { libdata: { textContent: data }, crcdata: { textContent: data }, poolsdata: { textContent: data } };
   const document = {
     getElementById: function (id) { return byId[id] || (byId[id] = new Node("#" + id)); },
     createElement: function (tag) { return new Node(tag); },
@@ -50,7 +50,9 @@ function run(src, data, fragment) {
   const window = { addEventListener: function () {} };
   new Function("document", "location", "history", "window", src)(document, location, history, window);
 
-  const table = byId["cmp-table"], thead = table.children[0], tbody = table.children[1];
+  // an empty table (the pools page before its first series is published): no header, no rows
+  const table = byId["cmp-table"], thead = table.children[0] || new Node("thead"), tbody = table.children[1] || new Node("tbody");
+  if (!thead.children.length) thead.children.push(new Node("tr"));
   const rows = [], seps = [];
   tbody.children.forEach(function (tr) {
     if (tr.className === "sep") seps.push([rows.length, tr.children[0].textContent]);

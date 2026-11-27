@@ -1,4 +1,4 @@
-<p class="kindsw">Kind: <strong>Ring buffers</strong> | <a href="compare-crc.html">CRC</a></p>
+<p class="kindsw">Kind: <strong>Ring buffers</strong> | <a href="compare-crc.html">CRC</a> | <a href="compare-pools.html">Memory pools</a></p>
 <h1>Compare embedded ring buffers by what matters to you</h1>
 <p>Pick a board, filter on hard requirements, and set weights for the speeds you care about.
 There is no ranking of ours: without weights the table is alphabetical, and any ranking is the
@@ -114,7 +114,9 @@ score uses the value at 0.</p>
 <h2>What changed from version 1, per board</h2>
 <p>The libraries, their versions and the compiler versions are those of version 1; what changed
 is what else is in the image and where the library's code lies. Counted when version 2 replaced
-version 1 (2026-11-23), over every mean on the page (push, pop and 64-byte block of every configuration and producer/consumer mode):</p>
+version 1 (2026-11-23), over every mean on the page (push, pop and 64-byte block of every configuration and producer/consumer mode),
+with the NUCLEO-H723ZG at 64 MHz as both versions then ran it. Its numbers on this page now are of method version 3, at 520 MHz
+(<a href="method.html#method-version-3">method</a>); the nRF5340 DK's method version 3 numbers equal its earlier ones.</p>
 <table>
 <thead><tr><th>Board</th><th>Means</th><th>Same to 0.1 cycle</th><th>Within each other's range</th><th>Largest moves outside the ranges</th></tr></thead>
 <tbody>
@@ -130,7 +132,7 @@ alignment and, with a cache, what shared its cache lines came from them. TinyUSB
 nRF5340 and pxq's &#9888; block number on the Pico 2 were the two numbers that had already moved
 when another library's code changed
 (<a href="https://github.com/verified-libs/verified-libs/blob/main/reports/2026-11-22-lwrb-v3.4.0-rerun.md">2026-11-22 report</a>). The NUCLEO-H723ZG
-(Cortex-M7 with caches, at its reset clock with reset-default flash wait states) is the board
+(Cortex-M7 with caches; at 64 MHz in this count) is the board
 where placement decides most: there the numbers of version 1 and version 2 are two placements of
 the same code (and, for a library that is called, the distance above), and neither is the
 library's speed to the cycle. Without a cache and with code

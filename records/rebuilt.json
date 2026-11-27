@@ -1,95 +1,728 @@
 {
  "about": "Rebuilds of the records of other commits from this tree's test sources (lab/tools/image-ledger.py, DECISIONS 2026-11-22). match: the tree builds, byte for byte, the image the record was measured from.",
- "commit": "77e8043e4871b78b12c2494578fa8bea6afb5bf5",
- "sources": "079389d05f1a310ab0fdc54f7550f555ff54192ceaf8d68fcca414e9102e4ecc",
- "sources_crc": "d1b28fdecc1a6f7fba254b19e704aa9025cff60a049acfb901022e12bea7ea88",
+ "commit": "125d0ba324602558cc2959eead4a4463237f749f",
+ "sources": "3c9689654e611f4bdf94a9eff12fe37a8fae2ce1ea2374f3576033bf2a292a7b",
+ "sources_crc": "4bf602b52538d2519cb4d33fb65d4df4448da2640e2ef86b6c404d0c020c4573",
+ "sources_pools": "07a4b7a610c0857b006545fda8e4b90dbc8e720f029850a49b295dd45ec5116c",
  "records": {
-  "crc/nrf5340/adapter_acecrc_crc8_byte.json": {
-   "images_sha256": "6d78536a6e64f575e1935323ea1b3cba1c0556d35daa9d7d2c4bebf74fdb209e",
+  "bench-v2/rp2350/adapter_anders.json": {
+   "images_sha256": "81a966886eaadfb375288b6089028d513f4832de36791aeb79aa72762dbe54f7",
    "result": "match"
   },
-  "crc/nrf5340/adapter_crcany_crc16_byte.json": {
-   "images_sha256": "e21a107eb334b1b375236f874c180d214ad6443226bac00ee4ad2cd8610759ba",
+  "bench-v2/rp2350/adapter_arduino_plain.json": {
+   "images_sha256": "0a199f26c797c0209edf05f7dc59dfd551d9c0cf4182da8af3dc305f65270756",
    "result": "match"
   },
-  "crc/nrf5340/adapter_crcany_crc32_bit.json": {
-   "images_sha256": "cc8f38cc9cd1c673c683a42a9b5fcda7b32d35fbfc42ec2233653fc5c158a473",
+  "bench-v2/rp2350/adapter_arduino_safe.json": {
+   "images_sha256": "22f674163b0d9cab7bec05f7ef798a19964dfd430443d699190622b565fa981f",
    "result": "match"
   },
-  "crc/nrf5340/adapter_crcany_crc32_byte.json": {
-   "images_sha256": "c018887e49e02b6cb74ea53ffede2d8c4d32194c099aa3790113629235ed947f",
+  "bench-v2/rp2350/adapter_bbqueue.json": {
+   "images_sha256": "ea2786346d505d3005874a4e04768d19ada0c4b3f862447c63537cb1bdc22af5",
    "result": "match"
   },
-  "crc/nrf5340/adapter_crcany_crc32_word.json": {
-   "images_sha256": "9ee1121be1ce9f208b28ba8514d9e8d1d2db050e93e3a119019f0c307e4016a3",
+  "bench-v2/rp2350/adapter_contiki.json": {
+   "images_sha256": "414b69946c9f999b30e72f8f05832e23cdd856c368f21e22d3583c426452bcd6",
    "result": "match"
   },
-  "crc/nrf5340/adapter_crcany_crc8_byte.json": {
-   "images_sha256": "8c9c7ae9c8515e3c5fd8d104db7c0d196aaabdefe218109fd956ee78ae6fb6bb",
+  "bench-v2/rp2350/adapter_diffstorm.json": {
+   "images_sha256": "acd1577e2f12af02e446e146a5b8924ddd5ce019b7d3a29a20f8159b066f5034",
    "result": "match"
   },
-  "crc/nrf5340/adapter_crcpp_ccittfalse_table.json": {
-   "images_sha256": "91cb3de467d690b24a9ba22a6c5d152fa577ab14433e75e8d6517b1e091348b1",
+  "bench-v2/rp2350/adapter_ea_cbuf.json": {
+   "images_sha256": "b93c431f89e22e7b927fc71ed6e93a90c0ab2ccd72bc2c44ff882eb56f2c28e1",
    "result": "match"
   },
-  "crc/nrf5340/adapter_etl_crc16_t16.json": {
-   "images_sha256": "6af3c5d2441c93263a9410c52105fb66ac11539e678097f045de71556ac7b3b2",
+  "bench-v2/rp2350/adapter_ea_cbuf_plain.json": {
+   "images_sha256": "21c0977b1f1589f61b7266358d99a632b885642b8df9bd95b568968b9429035d",
    "result": "match"
   },
-  "crc/nrf5340/adapter_etl_crc16_t256.json": {
-   "images_sha256": "a07ed2cf29e094ec78a0a4c5d8204c1e3e4ad65876214f66ae2cba378549116b",
+  "bench-v2/rp2350/adapter_ece.json": {
+   "images_sha256": "8842c0d3b4c9215bba4f0b47638b7fda2ff671f52f28ec876f69978bf806f6bc",
    "result": "match"
   },
-  "crc/nrf5340/adapter_etl_crc32_t16.json": {
-   "images_sha256": "0510ca11528483f3dc2b67b6d4315877b44d76fd4a6cbb80eeec486d0f4258b4",
+  "bench-v2/rp2350/adapter_embassy_pipe.json": {
+   "images_sha256": "2a6074e37b2ef64d8433e58ce84b7954ab16fb2131df6f0e024de486b7fac4b6",
    "result": "match"
   },
-  "crc/nrf5340/adapter_etl_crc32_t256.json": {
-   "images_sha256": "7fd729d9c80f6a1bb8cfc4c98d523c2c4bbc67ca2371f6b86252110308b2a1d2",
+  "bench-v2/rp2350/adapter_etl_atomic.json": {
+   "images_sha256": "01cb5e977d07e6a40e62e6c2bb417c6bb6162408710d3a31b9b07beffd1c7abe",
    "result": "match"
   },
-  "crc/nrf5340/adapter_etl_crc8_t16.json": {
-   "images_sha256": "2fecff172be6780b904b4a968ad5458060e6b6f2dc93cc3aafd88f0dd41f39af",
+  "bench-v2/rp2350/adapter_etl_isr.json": {
+   "images_sha256": "e5d5b5c85225dabe91565a6bfa3eac4fd0d3a0fd8a6322b33cfeaff8e74e384b",
    "result": "match"
   },
-  "crc/nrf5340/adapter_etl_crc8_t256.json": {
-   "images_sha256": "26d750a6f9d1f15e2200058b4ebc78bba1e8ce43a658bd8b697c7dbed66e7002",
+  "bench-v2/rp2350/adapter_etl_locked.json": {
+   "images_sha256": "4f987f9f873a69620a51838126d42deadbe10b835e87e1c955c0f70c98377997",
    "result": "match"
   },
-  "crc/nrf5340/adapter_libcrc_ccitt_ffff.json": {
-   "images_sha256": "c72cf06459821200047e10517bce9120edf4a978ed474b0cdcf01e9d7b49e2eb",
+  "bench-v2/rp2350/adapter_etl_queue.json": {
+   "images_sha256": "e1533e78a6a83e9a936b4540f3d6bf67ab722a726b7a2833538c500f8839d484",
    "result": "match"
   },
-  "crc/nrf5340/adapter_libcrc_crc32.json": {
-   "images_sha256": "98af65e7c645a9aa49274a607965cc6cba0a00abba2c308d3e981926bd1f06e4",
+  "bench-v2/rp2350/adapter_freertos_sb.json": {
+   "images_sha256": "041c4c2bca4c2a1e9174041b01bfe2be8dde64424a78d66c72eb1f668406a80a",
    "result": "match"
   },
-  "crc/nrf5340/adapter_rust_crc32_table1.json": {
-   "images_sha256": "9c415ceb05aad15905f8d9d048be7c6223deb19cdd537a0953d0772a8adf9e03",
+  "bench-v2/rp2350/adapter_heapless.json": {
+   "images_sha256": "639ca0ae90c73a7c59f923833927e955ee6e2a6b982d45c55a038e4a888eeaa4",
    "result": "match"
   },
-  "crc/nrf5340/adapter_zephyr_crc16_itu_t.json": {
-   "images_sha256": "0a285d1a8a937f8fe8e911e421afde8f483662aa6df3f594481461f73943100d",
+  "bench-v2/rp2350/adapter_heapless_mpmc.json": {
+   "images_sha256": "e640d567bdf87608903cb468d3ddb06885cd101da5fbb820c7c5407a2f7b50ad",
    "result": "match"
   },
-  "crc/nrf5340/adapter_zephyr_crc32_ieee.json": {
-   "images_sha256": "6ebbfe6482f21f5332518baf8fb0e429f59083d4e66ff4a71624e9b01e5ef6d1",
+  "bench-v2/rp2350/adapter_jnk0le.json": {
+   "images_sha256": "2e4636b637993fede67c4cb005dd5acd1032d33bb7d9bf085623d16a1d02eee4",
    "result": "match"
   },
-  "crc/nrf5340/adapter_zephyr_crc8_ccitt.json": {
-   "images_sha256": "ced304efd74e9e5e452aa68a32400f4e4a6e744ee2e812cb79fb960e57b8371a",
+  "bench-v2/rp2350/adapter_kostyk.json": {
+   "images_sha256": "720aa8401f7057040f24b141a7608a348e8ef580268805e897db80c4fb2c7d02",
    "result": "match"
   },
-  "crc/nrf5340/adapter_zlib_crc32.json": {
-   "images_sha256": "f3d767b132e4903af898a8782d6c812c878dad700fa91659e97a3cfaa756ac85",
+  "bench-v2/rp2350/adapter_lockfree.json": {
+   "images_sha256": "4eb7205875ac21adce23c51093ae90c195996f595e5906d2e202a0390257497f",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_lockfree_mpmc.json": {
+   "images_sha256": "09fe1f8b9b589a4b46a4e432218c690209717e0909877db7c2431d94aebe041a",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_lwrb.json": {
+   "images_sha256": "e142bb67665f5f49cadf952e5e8802fb05a0ea16a061bec232b3c10c36e2d426",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_mbed_cb.json": {
+   "images_sha256": "f76efd343f88f71699dd89fe0be266129b90dec3c4d4d3dd6b518568acc66aec",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_micoring.json": {
+   "images_sha256": "6634774c55bfdc4fcce515f843eb89c73cbee26a033b400cde59f57896029643",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_micoring_sc.json": {
+   "images_sha256": "f6b77bc096b659cb92b0ca62ea1ede7036fd91401b7c789afd7d573da0b42345",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_moodycamel.json": {
+   "images_sha256": "490d4eb732818f6dc4410738ae7b062ee92d3ae25bf46ee28e708a11b5f37ad1",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_nuttx_circbuf.json": {
+   "images_sha256": "98f8c26bb1b913a53eec1344827f2325c8cbf06f77fb35da6aa5c95fb137048e",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_polycratia.json": {
+   "images_sha256": "0d4bdff6fcbef210eac8bc5287087a0b1d19a31724e5bebe88da91989133bf37",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_pxq.json": {
+   "images_sha256": "5bf9061e6f98b2b917261b77b07da91dbe407fd0464d2c3792dcbeab08ab08e4",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_pxq_mpmc.json": {
+   "images_sha256": "1fa3d489394b8499e50be7471bc0539763030eff2ebe953bca9ad6a7bd445a70",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_pxq_mpsc.json": {
+   "images_sha256": "ddf419be708414d4fcba7d10bc5d06f948e4ddf9a7b6e9adf1b47ee4c9036d3d",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_pxq_none.json": {
+   "images_sha256": "6611eb1376c8d8d4dbfadac6191da19e40f602b2ff4a037ccd18c5d60ffdecef",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_pxq_spmc.json": {
+   "images_sha256": "df218a950e9edb3a5e80fc5ee92f6130108fe78760b615c818713e93e483583c",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_qp_lfrb.json": {
+   "images_sha256": "0301d259a6dc3ccbc8437a3343fc3b7cfbcef0cabbb570cb84626e4b96aadca8",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_rigtorp.json": {
+   "images_sha256": "8ef13c572e8e3cf0caf587003fc9e247fd923013c64b2fb40219a77a9357e34f",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_riot_tsrb.json": {
+   "images_sha256": "18e62a0ba57c247865136b5162436d1fc79c522aabe60012cdfcdcc2bdec7995",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_rtspsc.json": {
+   "images_sha256": "6dfcbf08b97fa9744a770ff0a62f0b8064bccad893d2f69315cac987aa6bf1fb",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_rtthread_locked.json": {
+   "images_sha256": "39fe6eb8786dc4cf2ca1c3f70d7062d7562c6f38c4d32055cf8735391b761351",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_rtthread_plain.json": {
+   "images_sha256": "24691e4c7e8340f005467a814736e39b02fff18ac82cfc87a0c564058e343e39",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_tinyusb.json": {
+   "images_sha256": "1f535e5af2c16903cb04fed5c1224b2a964caeae00202cb276bb735c5fcd88b5",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_wizard97_plain.json": {
+   "images_sha256": "b477df0120f78edf59e58a9a8f0f776f64778666a3ee4dd603a5d4f32b3332ea",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_wizard97_primask.json": {
+   "images_sha256": "298b255b142ac828cdf623fa3d2031db20cee12da1294afaa05b7a20eeb81145",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_zephyr.json": {
+   "images_sha256": "4a19f5d923a6784439815ec7b1bacf568071a35bc15ffd0e1658abbc56db727c",
+   "result": "match"
+  },
+  "bench-v2/rp2350/adapter_zephyr_smp.json": {
+   "images_sha256": "a2349764ec5c62025fc7d94f0093df1f201fafe644522d5a864bf3d312738ef2",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_anders.json": {
+   "images_sha256": "697a9023e2a0fc1b3df55ea84cc0886e3e514870230f040486faad5ef79b6812",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_arduino_plain.json": {
+   "images_sha256": "72d5cb97c6ee521cf1509e709019784cd384c4294a0184797d0e114329af3d29",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_arduino_safe.json": {
+   "images_sha256": "4e1dc192b9518f2cc0ec1895a6fb6cda831691747dcc2f81a26327bd26cd3a09",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_bbqueue.json": {
+   "images_sha256": "2545f0b8f1f3124eb790ddf2ac956c53f2d09b2844c9d02961c9d760442f6a19",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_contiki.json": {
+   "images_sha256": "a99796306e93a1a8848538557f92e6974f5609e885ae6819d7f51d505a244781",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_diffstorm.json": {
+   "images_sha256": "249b02c6df03812c779115c8b9ce0ec8ef0a3583e942ad2d0f7952cb31e960d0",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_ea_cbuf.json": {
+   "images_sha256": "34176c3b94fc2dbd784bd896b357ad8a9cfeb6b0f8f5a554e2cf868b1c2cac36",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_ea_cbuf_plain.json": {
+   "images_sha256": "7232bc9f14242baf0052d4a94549eda72c295fbea0dda47aae285a8a54a46580",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_ece.json": {
+   "images_sha256": "f66f07ce7180a75632296c2c5fbf1782cae090fa9674e5c4face749b3428f53e",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_embassy_pipe.json": {
+   "images_sha256": "5204e5b5f39eea8f095f27d9cbaa2e466221603173c342c0bf43dd6f876978c7",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_etl_atomic.json": {
+   "images_sha256": "ba924621df624937bd0e6b1578ca8e8eab889f5ebbe24ffd764cd47eb7c3a136",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_etl_isr.json": {
+   "images_sha256": "3294af8625251e453d12d7416d0b79a1bef6c4f955e6820abeb78b655460f45d",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_etl_locked.json": {
+   "images_sha256": "0401b576670ce11ca3398bec364f6ea500a2a9738c8704643d3f961089419bb0",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_etl_queue.json": {
+   "images_sha256": "718027e6400cb9b18cbb69894d19c7d49cf3ecd25c53b702f15ee76a23dfdd5d",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_freertos_sb.json": {
+   "images_sha256": "59d9f08a872542d7f20b14c416f84d470f41128218d326e7d65b9e422356d4b5",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_heapless.json": {
+   "images_sha256": "5f372e27cca9925471fe7a09d483ee46b218e6278df08ad35b90ed3bf92ffc1c",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_heapless_mpmc.json": {
+   "images_sha256": "58f899015e292d367f6214e3cef21f4bb00bd4dbb5bb403c7efb9622825143b2",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_jnk0le.json": {
+   "images_sha256": "27f904fc201ae9fd8152d730461d4d7cc839dd765315e615e8e6a51f13fe6bf3",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_kostyk.json": {
+   "images_sha256": "070d941e5a201f45fa3543c570e78f706dcd4fb8534c98071653932b9179967c",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_lockfree.json": {
+   "images_sha256": "cf743062b15bd6a0323d58385d3015c6fb77777978e36b374640882ab502d91a",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_lockfree_mpmc.json": {
+   "images_sha256": "0b5eff8dc24b0d37dea9a58d5025852a3bdc95e836d1ce7d6e69edfce1ca23f3",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_lwrb.json": {
+   "images_sha256": "4e2c0aa8ec3d579246377b4819c3444b3dc90cb50ce926db8b9b15d519fba4b9",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_mbed_cb.json": {
+   "images_sha256": "3d1a836b062264f183d66fd10cb73155b39a67dcabc5b341ef0a5d47de47c1e0",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_micoring.json": {
+   "images_sha256": "1d04c48a4989a0d69ada5059a8ca006199d191ea588e5b63626d136e83cb3ff2",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_micoring_sc.json": {
+   "images_sha256": "2d0887411a3a5eb3dadc32460174beb9322ab184cf6a8e195431963ef18a3a92",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_moodycamel.json": {
+   "images_sha256": "bb37c89fbd5fd3e28e6852af6471f22b88cd0402954e8ed8f2bc122c91504b08",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_nuttx_circbuf.json": {
+   "images_sha256": "800067f99b2c1f356b7b7475ab1423e7cae7fa29569829360f400e5b664b9c59",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_polycratia.json": {
+   "images_sha256": "cd6aa94f2effadb8a7ba2cc057dc74294b6629f0442618bab2c0de1870ca3dd2",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_pxq.json": {
+   "images_sha256": "70d8bb947c700c793834df07c94ccc87dc6a4a17cebbb028f4d4d8c470662bd7",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_pxq_mpmc.json": {
+   "images_sha256": "f010d4585a79840681e5fa07eda489fd349019963ae70ade53c574ca176a70d1",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_pxq_mpsc.json": {
+   "images_sha256": "3897093761cd329f6ebf257a314a6c4e84631da501cd7314a170cf72b51ae069",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_pxq_none.json": {
+   "images_sha256": "d774f18470e9e8c03ffcaa546564bb4751979767f6bf3657abb8b00430c88e5e",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_pxq_spmc.json": {
+   "images_sha256": "910f8dcf6ee56d2eb26854c0da5724b1777731a9292c26fd451292cc1111c04e",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_qp_lfrb.json": {
+   "images_sha256": "a347e73c9cc518c3aff48d968dabb0aef4b3d517440306d23211a92dd4dcf5c5",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_rigtorp.json": {
+   "images_sha256": "b21238a539e0829d89eaffc89b0e954e728aa3610d6af429c6b662de42ad35d1",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_riot_tsrb.json": {
+   "images_sha256": "a3c99a60000a102fd2502470d689217142fc82f2f8070b8be82fa6376d7b6fe6",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_rtspsc.json": {
+   "images_sha256": "cff4477173d5d0157948677a323de7dd6a2c487d4be76310ce67f2b60de18b4a",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_rtthread_locked.json": {
+   "images_sha256": "322d24ebf8f7cab5a69edb7582e4f1126bd9196964d901fa7322dfccd6c82611",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_rtthread_plain.json": {
+   "images_sha256": "001bfc1c8e1755da1c2586c0dfebd33046eaf0ed82344cfe588158b2aeb9edd2",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_tinyusb.json": {
+   "images_sha256": "c3a14843a9014bdace08f1f97a9a09326466cbee919d59ff30503affe8e811b2",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_wizard97_plain.json": {
+   "images_sha256": "36e8a8ffad1708726b6901c0510942d8974acd18fe598a1b8887f1039ec8346d",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_wizard97_primask.json": {
+   "images_sha256": "ed9c7cb7f442e66065ec6188fa4c9900edaabec679ea37a1a2078c771db9b6e8",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_zephyr.json": {
+   "images_sha256": "858ceb9a36cbae4762222dff32ad1a4e92d25d9186c7a362c50a780a75102c44",
+   "result": "match"
+  },
+  "bench-v2/samd20/adapter_zephyr_smp.json": {
+   "images_sha256": "26bee4850956aa391ac27504d63fb485c39fe1e23665e17c5c93b0414224a022",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_anders.json": {
+   "images_sha256": "c6f5b93ceb4f052895592b6435e748741bdfdeeb1c3cb2e83e9ea0cbfd19c05e",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_arduino_plain.json": {
+   "images_sha256": "e42943c833a7452299eeab6e637d9dd4d3eb482cf0918d5f4104850ee915dcf8",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_arduino_safe.json": {
+   "images_sha256": "cc902a584d721a53d828d4c2cc3c5c26e807765768c08ff42713d86106a86148",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_bbqueue.json": {
+   "images_sha256": "e6aecb626ecc00b6307da6570404ac47e076e0b436435234f962694315f04f29",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_contiki.json": {
+   "images_sha256": "66994313c509e6df05065e3edb26bc3b95cb5ef874a5383c0d638f75d5279a7e",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_diffstorm.json": {
+   "images_sha256": "62437d7e65d6a85c8c46b727261bf963e2db1b2abeab9989e57c330cf69009da",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_ea_cbuf.json": {
+   "images_sha256": "1d09eec19132e1bab904b60da64f112150f1488b5d6707addbaf2ed8a723fb8d",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_ea_cbuf_plain.json": {
+   "images_sha256": "07ca90286fb4bb9c9ed02a0c52906158a8ffc92fc6fcd36970a9e70e1b820494",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_ece.json": {
+   "images_sha256": "4b9f8af2b594dedfc9eb0802059ad1214dffee1c5f89e270bb21ac8fe0b7659d",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_embassy_pipe.json": {
+   "images_sha256": "0b1b0b8e6ba573943b01c2f153acf0d4eaab1d6f19a61f40a5bf23d875dd6a0d",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_etl_atomic.json": {
+   "images_sha256": "3289545143dd1ced3f006d688c7c29e897b1b2143dc0f019cb40e1faaabf20d5",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_etl_isr.json": {
+   "images_sha256": "50d82355c535f034e1748f29a6d9373cdc8ae6973593756ca7777dd45b9174ff",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_etl_locked.json": {
+   "images_sha256": "28bc6e4dc2bf3cc762fa86a275dc479f8c5320a8e0f393783dbd959caf8eadef",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_etl_queue.json": {
+   "images_sha256": "9ff3b8ea4d90b38cb7e80ff7e9f5df69d31d2bbe63cf0599891ffe555cc7ea23",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_freertos_sb.json": {
+   "images_sha256": "ad5ab3aa06f016f3f574e40d08d617d9ee1b5b661ac5fc902ebc619018531f1a",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_heapless.json": {
+   "images_sha256": "74a5fc9486be18bff3343dab11774e255e010ab2a8f2517ab345aecf77763700",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_heapless_mpmc.json": {
+   "images_sha256": "bd7abb5ffdcfa60126b8044055f9c75c8d7ba1ddc10ebbc9be08ae6946cad0e1",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_jnk0le.json": {
+   "images_sha256": "6ec72902872f188986054d15a96b14b2b6dac2900012e63f2b8f59d4d606ac75",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_kostyk.json": {
+   "images_sha256": "f95ddab956739403619d9989f63b3d154a74853949e8626955e607b27771f769",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_lockfree.json": {
+   "images_sha256": "bdc5b53cf060fd22f2bfa51a06bf66a02aeb12a7b791025fc3949d5b1a8f9000",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_lockfree_mpmc.json": {
+   "images_sha256": "d169a85edbc3a29d10543c168e605468f5cace10f9fd4361efbc0306c3274bf3",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_lwrb.json": {
+   "images_sha256": "edb076970038a3f2d3f541222ae02ce70f5617c90f284b6ab27f997641b42a9c",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_mbed_cb.json": {
+   "images_sha256": "8e8f9810915c6fc1f050c7d81a09d5b755d13f4ac79ec92fd1c6e39bce51fe55",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_micoring.json": {
+   "images_sha256": "ac24a4f36a2e36de8e1bf2937fa4916c13adb045680537e7d6cdf80368f60ad0",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_micoring_sc.json": {
+   "images_sha256": "eb501554234af57256ec23cdc04dabddd06a52c446e4a80cfd74be488cd00846",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_moodycamel.json": {
+   "images_sha256": "39890f66fdbaccea03694c126a2ef5a976c7a4b7cc465f47549ac83c6f5851a7",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_nuttx_circbuf.json": {
+   "images_sha256": "46cb590b0601d18e2bb421ebb7d57f143b9a695730467118c0167a81d1a11e37",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_polycratia.json": {
+   "images_sha256": "b421cb3e7e247a6ee4f6fcbd7f14dda8fd9fbbbf1dcf77a190fe61a02a358942",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_pxq.json": {
+   "images_sha256": "da889333e7bb050a0c746c07da8c101e03e0c34bf47b299f64c0e2ea50bd3374",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_pxq_mpmc.json": {
+   "images_sha256": "94c00c3ead54f7c293b579580bfec798b68384fb7b7263ead87544967db40711",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_pxq_mpsc.json": {
+   "images_sha256": "6824a6d9fa3dd6ac0c38fb20eaa26f6bffd1ce2f0b0d21403952db3fe130e3a1",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_pxq_none.json": {
+   "images_sha256": "7caa08582a1c0170d809459cded23ffbfd1d5b207d83c21a8b12664e340cf912",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_pxq_spmc.json": {
+   "images_sha256": "83a87503bd1a6864389d229e1a0976dc1d71e46707a1779bc46cdb854db76f67",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_qp_lfrb.json": {
+   "images_sha256": "0860f1311e17f26dde45e52b03702ceb363a92032c616e01bbc16f55e5c14db1",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_rigtorp.json": {
+   "images_sha256": "a914877c18a8c125ba2c8f3daa2ef82364fa4cbabdaa860551177c4199472d05",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_riot_tsrb.json": {
+   "images_sha256": "cc4a2979a7da0f518c8d48fe094ac611b845334888a57c5c43bad0ca6b4320a4",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_rtspsc.json": {
+   "images_sha256": "6d2ef20d9704e416dac00a09f64591e032d38d5ef8e766e15add636f0ee4e9cb",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_rtthread_locked.json": {
+   "images_sha256": "f1b1ec036ab6ac95939edcdac3010c016d684944e7123bbd04a2a936d3a4163e",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_rtthread_plain.json": {
+   "images_sha256": "7fa1282184ab7c64faa7b4f4b75e1a4ef83c825f058418eca31cbfee8d887648",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_tinyusb.json": {
+   "images_sha256": "52a7d717e97490f1648d61111232e70c7d0fbecee90ba942ca2e8be4cd05d4d8",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_wizard97_plain.json": {
+   "images_sha256": "aab6c47a189cde6e622d15cca855765f3c00b491d2f3e5ca0c6a2f6e8aaf999d",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_wizard97_primask.json": {
+   "images_sha256": "3b550fa88c86a947438de7fd1ccd17fdba2cdba0c5f4220f6b0801d6c774fff5",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_zephyr.json": {
+   "images_sha256": "d2bb0636c4ba920a3671e24cc781d2c9712d2d37dcccb3895dda948691d03bb8",
+   "result": "match"
+  },
+  "bench-v2/stm32g0b1/adapter_zephyr_smp.json": {
+   "images_sha256": "bfd481758051e8c2573dc24bf3ae1fd6190189e3fa6456c8858273621426b7b8",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_anders.json": {
+   "images_sha256": "a6f974f551c2919679b335f3289190afe671bd148363293d46d6848620dc82ae",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_arduino_plain.json": {
+   "images_sha256": "5aa742959a13c3dc054cd3c33bdd3418a848aff084ee29566795b8ce915012b1",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_arduino_safe.json": {
+   "images_sha256": "ae6c401a5d8569ccb0692c3ffffbbceb2bf9303436f8b7e2a9b6eaf99046311e",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_bbqueue.json": {
+   "images_sha256": "ea09570dc7d5a6f62272aff862951099642667edd358a1afd513cf4507ce4dd8",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_contiki.json": {
+   "images_sha256": "cb43c9da03e7e86ae9c1f583fecf9cd4741efc67e32321c30b827f7137a61b11",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_diffstorm.json": {
+   "images_sha256": "f799d67f2c5d3cf93dafb42e175f8428b7111eae4fb31957e7de2a4e0ea49778",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_ea_cbuf.json": {
+   "images_sha256": "c0beba2ce6a64e694c9b662161cc7799720097f5d8ea364ed66ac5270724d536",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_ea_cbuf_plain.json": {
+   "images_sha256": "5363a7ad38b1c54b4d5a461528d17e23cb0602aa2538c58b1834459fe072b4a9",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_ece.json": {
+   "images_sha256": "d1252fd1fb04691ba84d727fff09ee21441f25fd1d054df645d316f84ca224ef",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_embassy_pipe.json": {
+   "images_sha256": "6b463e58930ccd05ca56c026bc68877e4b0928d1762aa1c82f77d86443f2f474",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_etl_atomic.json": {
+   "images_sha256": "b3030aa1f3cf26c41ac78c96034207dcf1de80e204d1ba199419b3626ef0819d",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_etl_isr.json": {
+   "images_sha256": "b44f27a6670ce29ad388eafec7472c6d4563d166bc0819006fe951929c8864a9",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_etl_locked.json": {
+   "images_sha256": "37a2919e18a0c1167d5cc128207cc0fdf185fd63b99cee1333848dd12b6925cd",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_etl_queue.json": {
+   "images_sha256": "7620c3ec861ea4130d3d2d1806168f707a6ecaa884fa087b22107017c93eb247",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_freertos_sb.json": {
+   "images_sha256": "340c628deb72fb4753d2778b18038d800088c339054162f5bf4fc5a12f626306",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_heapless.json": {
+   "images_sha256": "c4906a8a705ec071d53700627f5877beed7465e7c88284d8d45ece1a44b89512",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_heapless_mpmc.json": {
+   "images_sha256": "4893167ac4bb7c907aafcd5f00ddcaf5ae76d25b2c1c73d61ac1c44546806510",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_jnk0le.json": {
+   "images_sha256": "07ebe9a595d454f0c2e16b91675f1f0e5705885f15d76b4ef78a02e0c762ee11",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_kostyk.json": {
+   "images_sha256": "2e643617f4fccce50354479824058a96eec94ac027e33e911d274c287832e114",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_lockfree.json": {
+   "images_sha256": "3e3edcc331a46bffbedc0b1c11493af8e06f0c4a93c40ed05ec7ed10db532618",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_lockfree_mpmc.json": {
+   "images_sha256": "35a5ec006d3bdbca2322d2f313a00708394a9d52ab3260fbf07e8c24ca2f31ff",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_lwrb.json": {
+   "images_sha256": "400768c6fd85a636bc58ea52e721d0ccd6d1958dc858c7d72e4351f8a4d5b018",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_mbed_cb.json": {
+   "images_sha256": "77fae36e0022c1ffe4a7e07e5128b6bfb34edc293c011c4691053939b6258a83",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_micoring.json": {
+   "images_sha256": "fb74684f105fc2dd259e95797b2f59bd216fe7c098314032b6af0ffed6a01b44",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_micoring_sc.json": {
+   "images_sha256": "ae2ad97e0cd7f36d5f6a6993c87d0f47d4700d63e12b5b740877d6a2cd9fe88c",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_moodycamel.json": {
+   "images_sha256": "7c5339eb9451a45608969f614e544740ca500e353b9cabadc03b9f2c9099a5dc",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_nuttx_circbuf.json": {
+   "images_sha256": "1efa5677b7663cd9f445486ba13fc5db809b461d72136237a083d07703b6a384",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_polycratia.json": {
+   "images_sha256": "a3762a5d8c2c9061708a5054f6f2f3e772b14d4c7cb60089b9b6c9956d49283f",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_pxq.json": {
+   "images_sha256": "42def968e757855b3401bdf82a4dc2d63dcd6c208b9f5b5e0eaa9a5abd14f6b8",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_pxq_mpmc.json": {
+   "images_sha256": "1d8fe6e8c5080c385ca97c7929919202c4bfc533f502d23262e82c8f7366ffdb",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_pxq_mpsc.json": {
+   "images_sha256": "7cfd4d311c02df3ab841bdf87ece1100e9a6acc288d88d805e01f5d54f0e314a",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_pxq_none.json": {
+   "images_sha256": "31c35fd455e1688fa979c00a7a6ef04f39da5b78202b7fb0ad03f7e20a2e4f78",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_pxq_spmc.json": {
+   "images_sha256": "1349508c24157b0a32f38d19d7bb1f394131aa6a01decf8873bdca1223e92cd2",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_qp_lfrb.json": {
+   "images_sha256": "c0433e17f7250d6839e7e9e9cc286979983fe57785b35b66c5c7605bb433f181",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_rigtorp.json": {
+   "images_sha256": "80866b0995fdec8b0a077db5b6b8e35d0b735826c7f80f9cb91d6acfca3fb26c",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_riot_tsrb.json": {
+   "images_sha256": "ee834f2efa4ab49d338171856c8fefc5b80e36367e626f9770daf4b4f863c125",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_rtspsc.json": {
+   "images_sha256": "0c3bcf1f4c0afc5facdd282fc2559590b824016aeef0a219de644e96dc139a16",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_rtthread_locked.json": {
+   "images_sha256": "871a7aba3e43af5bd69db85377a575106b8362d0325e6801ef70fed18c5e291b",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_rtthread_plain.json": {
+   "images_sha256": "5b6699a1a874e0106fe58eaf4ac32d1e1eb1cdd7f67f82d51d068bf816d4e95b",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_tinyusb.json": {
+   "images_sha256": "10d1afd40e4bfa8ea0431c93c5eefdddf515740ec7ba869d5906820510e58ac4",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_wizard97_plain.json": {
+   "images_sha256": "11fcf2cb9a90685b32c8e890b2f29d6b3deb1da543a5f742163f5e219d1898af",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_wizard97_primask.json": {
+   "images_sha256": "f2ef01b5f4329573a567f59bdc3f8ed7ad26bef6a5d1f69e2d0d1d461303e853",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_zephyr.json": {
+   "images_sha256": "13c5718d5d66dac0004741677a212c1b817bd7796d8015c7a7c4337fc60e3e0e",
+   "result": "match"
+  },
+  "bench-v2/stm32g474/adapter_zephyr_smp.json": {
+   "images_sha256": "6883073f2ef7345bc6cf4e067da464d9dada0711419b69be0b8fce8fe5b1b0a9",
    "result": "match"
   },
   "crc/rp2350/adapter_acecrc_crc8_byte.json": {
    "images_sha256": "f483c3693d67b50729ad596f866edef197222946dd81fb54790f1ad97fb3c55a",
    "result": "match"
   },
+  "crc/rp2350/adapter_acecrc_crc8_byte_ram.json": {
+   "images_sha256": "4e2ddbc79c4fd4355f734d66a46a26c29e98269f10f98ed85a62214b817ca595",
+   "result": "match"
+  },
   "crc/rp2350/adapter_crcany_crc16_byte.json": {
    "images_sha256": "8c1939cf10439602a6caa24c424ad90a18421c760d2228543bc566a19893b17f",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_crcany_crc16_byte_ram.json": {
+   "images_sha256": "41ce1f219c7fcb1dbdcff58fe52666aca9e0bd70c936155c8aa1c850072067d1",
    "result": "match"
   },
   "crc/rp2350/adapter_crcany_crc32_bit.json": {
@@ -100,12 +733,24 @@
    "images_sha256": "0ed50fff93fcc76bee1d18d11591a6babc93db4c602e2599f1dff2a523d810e5",
    "result": "match"
   },
+  "crc/rp2350/adapter_crcany_crc32_byte_ram.json": {
+   "images_sha256": "9b720bd5ac0831963a1e52dcaa304c2d2507cdc9c367fa78477d6850e47f4a16",
+   "result": "match"
+  },
   "crc/rp2350/adapter_crcany_crc32_word.json": {
    "images_sha256": "0340a12c9c23f51daee47110c294cb191b0fc3ae1fff5cd1d1cde0d64311910f",
    "result": "match"
   },
+  "crc/rp2350/adapter_crcany_crc32_word_ram.json": {
+   "images_sha256": "1547de5cb7e429c04a3a56419b6efbdc31b1177951a89e992ff783ecd16f660a",
+   "result": "match"
+  },
   "crc/rp2350/adapter_crcany_crc8_byte.json": {
    "images_sha256": "a718c33676a81b4de391ef222597a81a2d9d93869aa5cec5385432274a8a3381",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_crcany_crc8_byte_ram.json": {
+   "images_sha256": "2af90de48763afe95ecef0da26f2c2f9a45fc14da13c34daf1ad708857ac0177",
    "result": "match"
   },
   "crc/rp2350/adapter_crcpp_ccittfalse_table.json": {
@@ -116,24 +761,56 @@
    "images_sha256": "c13a890735d648c535ee331315c65d053c312cb16da02a2f24ffdaca54c38ec5",
    "result": "match"
   },
+  "crc/rp2350/adapter_etl_crc16_t16_ram.json": {
+   "images_sha256": "63a37122362c855680a5d9c5a77516ffaa204fb75886d336dcdd633c87f76ed5",
+   "result": "match"
+  },
   "crc/rp2350/adapter_etl_crc16_t256.json": {
    "images_sha256": "a7fb41360d635d526a130ea4e4c4834249202d41e0bc7ac95adce17d0d2b3aa2",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc16_t256_ram.json": {
+   "images_sha256": "73392d6c2d00276a32b5a7a4a0bc3c385f30f799d59702e7734dcd8068f7f4e3",
    "result": "match"
   },
   "crc/rp2350/adapter_etl_crc32_t16.json": {
    "images_sha256": "c6d24c12773330cb86606be948145542e017a3dac3bd9dd9ed1038eccc582ad4",
    "result": "match"
   },
+  "crc/rp2350/adapter_etl_crc32_t16_ram.json": {
+   "images_sha256": "0088d3e03395004c346376e1609ec5260601f8999e51bbbd0a54341394ed79ee",
+   "result": "match"
+  },
   "crc/rp2350/adapter_etl_crc32_t256.json": {
    "images_sha256": "558628f6d1eb70f5ac228d46af50d31ac61a94e4f3a879c1cf3529d333e60719",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc32_t256_ram.json": {
+   "images_sha256": "80bb4ea3fec79325056a412b07d10553aef5156ad0ab3a04bfe5739daf28ad4e",
    "result": "match"
   },
   "crc/rp2350/adapter_etl_crc8_t16.json": {
    "images_sha256": "535dd51ef07178cbca1e075668e8eb29d267e8c6f1819ed47bb6c5d9fe6b85d2",
    "result": "match"
   },
+  "crc/rp2350/adapter_etl_crc8_t16_ram.json": {
+   "images_sha256": "af96ff2c8c2c5972c8f6bb9cb19d445548b0926aaa97ac09140c559c7912e64b",
+   "result": "match"
+  },
   "crc/rp2350/adapter_etl_crc8_t256.json": {
    "images_sha256": "7a2454644cb33df38bed239ede9811764795e4fa36165a7da0528411f349ec60",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_etl_crc8_t256_ram.json": {
+   "images_sha256": "a51bc3d803b79334a2c5e82a7520775bcc860d4be00abad1231274cc1cffd158",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_hw_crc16.json": {
+   "images_sha256": "71d3baf043fc30f9e481a11dd42a84df82fa2f934a9a2958410ca0e21da8cfb7",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_hw_crc32.json": {
+   "images_sha256": "4d186a7b72051f69ef820f5638f1a7a25dace03966a3bbc817027b83987c1e19",
    "result": "match"
   },
   "crc/rp2350/adapter_libcrc_ccitt_ffff.json": {
@@ -148,6 +825,10 @@
    "images_sha256": "ef320fa92d32f370b38b22a899ba6e13e4f1f915892ec3ea8dc5a4cb65381799",
    "result": "match"
   },
+  "crc/rp2350/adapter_rust_crc32_table1_ram.json": {
+   "images_sha256": "cbff9a0b1c088225f2dfa00e9a377b665f2e66be1c8d2dca5d4d5556c793c3ae",
+   "result": "match"
+  },
   "crc/rp2350/adapter_zephyr_crc16_itu_t.json": {
    "images_sha256": "741ce618d738555c90b6608e78d29a1cd4a735144f6b67aeaec6abb2b4eda979",
    "result": "match"
@@ -156,12 +837,24 @@
    "images_sha256": "e52a8f2034db1096a90106ce4166051da9b328707c5885986891ab8c6a66cea5",
    "result": "match"
   },
+  "crc/rp2350/adapter_zephyr_crc32_ieee_ram.json": {
+   "images_sha256": "c90835bc68fa4f5c36ec1892c0a03ce1858064204d4f7d9516f9590547bce9b2",
+   "result": "match"
+  },
   "crc/rp2350/adapter_zephyr_crc8_ccitt.json": {
    "images_sha256": "22f69f21e2a5ba256ae43e9289c3b83d0c98f0b5f77e2f76e8478f42ffa1233c",
    "result": "match"
   },
+  "crc/rp2350/adapter_zephyr_crc8_ccitt_ram.json": {
+   "images_sha256": "aa32b0ed71b9b8232912ee1a4dd5c7435362fafb5df5e6f8735f4bf607e9aa66",
+   "result": "match"
+  },
   "crc/rp2350/adapter_zlib_crc32.json": {
    "images_sha256": "fb3699df42cfaf83399f29a08ef526d87082849d8f82eb1fa929830ac34d5ef6",
+   "result": "match"
+  },
+  "crc/rp2350/adapter_zlib_crc32_ram.json": {
+   "images_sha256": "7fd168da2e65ecd7c7ece22d47d8f3cf550a15b727f8727f1314b005654b8188",
    "result": "match"
   },
   "crc/samd20/adapter_acecrc_crc8_byte.json": {
@@ -400,6 +1093,18 @@
    "images_sha256": "d430af3958805a54ad30c9338942d6044185d14bf968fe1ea8f2b37424d9db4f",
    "result": "match"
   },
+  "crc/stm32g0b1/adapter_hw_crc16.json": {
+   "images_sha256": "59921e855b01e499375f36491e4eb198aee6de0de85c9b6ff5a3d386eb3e3e56",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_hw_crc32.json": {
+   "images_sha256": "4c2795dd77a925456bfb982a3bbbc564eb8ca312ab01ddfa94aca4a109194b6d",
+   "result": "match"
+  },
+  "crc/stm32g0b1/adapter_hw_crc8.json": {
+   "images_sha256": "79abd7064372dc985d4dd94d2f1a728b75d74b7d72757f7e25638bebec5e08bf",
+   "result": "match"
+  },
   "crc/stm32g0b1/adapter_libcrc_ccitt_ffff.json": {
    "images_sha256": "b9ca76b46668501d1b9f9369001f376955f38f13c0e5b0e4c8809f30351f54b4",
    "result": "match"
@@ -597,86 +1302,6 @@
   },
   "crc/stm32g474/adapter_zlib_crc32_ram.json": {
    "images_sha256": "d1bdd42979254c1d007a55ce25ca6a9e6c83e1019527f8639ffaca6fcb2c6d14",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_acecrc_crc8_byte.json": {
-   "images_sha256": "f9067c8cb92a13be9f22c8c37c5e5ddc18f594f1ab6b16476b65b993f0c84938",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_crcany_crc16_byte.json": {
-   "images_sha256": "fc69e8f90bc03b2cf4beeb3bdaefcfe2d0cc4777b8547a0eb50625aa3cbd2aaa",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_crcany_crc32_bit.json": {
-   "images_sha256": "f44e63a933db1b236756552bbb6f8a4946f5916a56b22a89c7d5eaaa9050a399",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_crcany_crc32_byte.json": {
-   "images_sha256": "c44d3d378285c239eec71e056427e540c8a483ddff5993a73798ec71d6afd42b",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_crcany_crc32_word.json": {
-   "images_sha256": "f9d06e4c9040130d1c6da2b931adf05b9dcc71aeb6326d329f9edd5f50fa45b4",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_crcany_crc8_byte.json": {
-   "images_sha256": "0354964d11129902323b865b96a353409723465191265865f5b9f9dd24ad17e1",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_crcpp_ccittfalse_table.json": {
-   "images_sha256": "c8e21b6bf7a40b993ccda6e1d0dcb88a834cb8acea5fc05b117ecdf088992e6c",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_etl_crc16_t16.json": {
-   "images_sha256": "ee9a1b5fe2913384894d6e3ea60e89a2b98d3ff2c281e0ad2819b48cf7fe8047",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_etl_crc16_t256.json": {
-   "images_sha256": "78c60d16c3601215af83e52ba62d16fc5a8c871aabea6c6f49228d3a3af21bed",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_etl_crc32_t16.json": {
-   "images_sha256": "e9c25eeadf3b1b210ef94d9fcbc2eb19e17380247692021e9c987fdaa20e1f39",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_etl_crc32_t256.json": {
-   "images_sha256": "3606d1deda897f02ef39433fa9e20d48ab91cd96bce16994dc77981481812af6",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_etl_crc8_t16.json": {
-   "images_sha256": "da11d97390b1625f9b0a45e407c926b93440d567e24f65ff461ae2225a60e111",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_etl_crc8_t256.json": {
-   "images_sha256": "7abeaad17404bbd9d3463e3c2d568c5a8d54ae1dd95519df2a55357a9140f7da",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_libcrc_ccitt_ffff.json": {
-   "images_sha256": "b46525685c5d043c0fe4f23344870850ca68978ed4a771e4f3c3fc153465bb95",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_libcrc_crc32.json": {
-   "images_sha256": "cb2fd7f1998f346990c4b60ebca325a0a801253f1199c476a5164ad5fe30aada",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_rust_crc32_table1.json": {
-   "images_sha256": "7a181e45114ec47626c31b240cf80c9b96c894023ae14395697bc7fb5b3780a0",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_zephyr_crc16_itu_t.json": {
-   "images_sha256": "fb81177bee33011e51408df402083b3b6137911627a377d634d9250f17156c05",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_zephyr_crc32_ieee.json": {
-   "images_sha256": "d91d996f7057dcbf194eaea4734bd8cba6222914be3ac2cb2a226b3ef60d5fd7",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_zephyr_crc8_ccitt.json": {
-   "images_sha256": "793280737ba2d977979c5fab83cf5b4ca9ac2c84b34cd41f8b2350ab95a9ea18",
-   "result": "match"
-  },
-  "crc/stm32h723/adapter_zlib_crc32.json": {
-   "images_sha256": "f2d41e27b9ff787721c17c3dcf509f8953be7ac8db3642ce497fafc9455181de",
    "result": "match"
   }
  }

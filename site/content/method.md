@@ -1,7 +1,8 @@
 # Method: how the embedded ring buffers are measured and tested
 
-The method of one of the two kinds of library so far ([all kinds](kinds.md));
-the other kind's: [CRC calculation](method-crc.md).
+The method of one of the three kinds of library so far ([all kinds](kinds.md));
+the other kinds': [CRC calculation](method-crc.md) and
+[fixed-block memory pools](method-pools.md).
 
 ## Hardware
 
@@ -9,8 +10,8 @@ the other kind's: [CRC calculation](method-crc.md).
 |---|---|---|---|
 | nRF5340 DK (application core) | Cortex-M33 | 64 MHz | DWT CYCCNT |
 | NUCLEO-G0B1RE | Cortex-M0+ | 64 MHz | SysTick |
-| NUCLEO-G474RE | Cortex-M4F | 170 MHz | DWT CYCCNT |
-| NUCLEO-H723ZG | Cortex-M7 | 64 MHz (reset clock) | DWT CYCCNT |
+| NUCLEO-G474RE | Cortex-M4F | 170 MHz (boost mode, 4 flash wait states) | DWT CYCCNT |
+| NUCLEO-H723ZG | Cortex-M7 | 520 MHz (VOS0, 3 flash wait states; method version 3) | DWT CYCCNT |
 | SAM D20 Xplained Pro | Cortex-M0+ | 48 MHz | SysTick |
 | Raspberry Pi Pico 2 H (RP2350) | 2 x Cortex-M33 | 150 MHz | DWT CYCCNT |
 
@@ -19,6 +20,78 @@ probes, and every board can be power-cycled by switching its USB port, so
 long campaigns run unattended. A `counter-check` firmware confirms on each
 board that the cycle counter counts core cycles through the same timing
 routine the benchmark uses.
+
+## Method version 3
+
+Since 2026-11-26 ([`DECISIONS.md`](../../DECISIONS.md); the plan with its
+sources: [`lab/plans/2026-11-26-method-version-3.md`](../../lab/plans/2026-11-26-method-version-3.md)).
+It applies to both kinds' benchmarks and to every series after it. Each
+board's records say which version they are of, on the results and
+comparison pages.
+
+**The clock rule.** Each board runs at the clock its vendor's start-up
+code or board template uses, never at one that needs an option byte, with
+the fewest flash wait states the reference manual allows at that clock.
+Where the vendor's code and the manual differ, the manual's minimum is
+taken and the difference is said.
+- *NUCLEO-H723ZG*, the only board whose clock changes: from 64 MHz with
+  the 7 wait states it has after power-on to **520 MHz** (voltage scale 0,
+  AXI bus at 260 MHz, 3 wait states), as ST's template for the board sets
+  it (`STM32CubeH7` `Projects/NUCLEO-H723ZG/Templates`; RM0468 Table 16:
+  3 wait states for an AXI clock of 210–275 MHz at VOS0). 550 MHz needs an
+  option byte (CPU_FREQ_BOOST) and is not used.
+- *NUCLEO-G474RE*: ST's template for the board runs 170 MHz in boost mode
+  with 8 wait states (`FLASH_LATENCY_8`, `STM32CubeG4`
+  `Projects/NUCLEO-G474RE/Templates/Src/main.c`); RM0440 (Table 9) requires
+  4 at 170 MHz in boost mode. We measure at 4, as before. It is the only
+  board where the template and the manual differ.
+- *The others are unchanged:* NUCLEO-G0B1RE 64 MHz with 2 wait states (ST's
+  template and RM0444 Table 13 agree); nRF5340 DK 64 MHz, the reset value
+  of its clock divider, which Nordic's start-up code keeps;
+  Raspberry Pi Pico 2 150 MHz, with the flash clock divider of 3 that the
+  boot ROM leaves and an SDK image also runs at; SAM D20 Xplained Pro
+  48 MHz with 1 wait state, allowed for its part (ATSAMD20J18A-AUT, 85 °C
+  grade, by Microchip's bill of materials for the board).
+
+**The option registers are recorded.** Before each series, and each job of
+it, the board's option registers are read through the debug probe without
+writing anything: FLASH_OPTR on the two STM32G boards, FLASH_OPTSR_CUR and
+FLASH_OPTSR2_CUR on the H723, UICR.APPROTECT and SECUREAPPROTECT on the
+nRF5340, the OTP rows of its critical flags, boot configuration and boot
+keys on the Pico 2, and the NVM
+user row on the SAM D20 (`lab/tools/read-options.py`). The records of
+method version 3 carry them (`option_registers`; record versions
+`rb-bench/3` and `crc-bench/2`, [records](../../records/README.md)).
+
+**The nRF5340's boot stub opens the debug port at every boot.** Our boot
+stub copies UICR.APPROTECT and SECUREAPPROTECT into the debug access port
+at start, so that the board stays reachable after a power-on
+(`firmware/common/benchboot.c`). It changes only the stub's bytes: the
+measured part of every image is unchanged.
+
+**What was measured again.** A record is shown only if the tree builds its
+images byte for byte (the same-image rule, DECISIONS 2026-11-22). So:
+- the NUCLEO-H723ZG (new clock) and the nRF5340 DK (new boot stub) were
+  measured again, ring buffers and CRC; their records before method
+  version 3 are kept as archived series, checked against their own
+  commit and linked from the results pages;
+- on the other four boards method version 3 builds the same images byte
+  for byte, so their records stand.
+
+**What is not in method version 3:**
+- *The median of a scenario's calls beside the mean* was left out
+  explicitly (DECISIONS 2026-11-26): it would need every benchmark measured
+  again.
+- *The ISR stress test* is unchanged. Its records are of version 1 of the
+  benchmark firmware and were made at the clocks of their time: on the
+  NUCLEO-H723ZG at 64 MHz, the reset clock. A new stress series would run
+  under method version 3.
+
+**Cycles at another clock are not times.** At 520 MHz the H723's numbers
+with the cache off are higher in cycles than at 64 MHz, while the time is
+far shorter: the flash's wait states count bus cycles, and the bus runs at
+half the core clock. The arithmetic is on the
+[CRC method page](method-crc.md#the-nucleo-h723zg-at-520-mhz).
 
 ## Toolchain
 

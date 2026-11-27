@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
-"""MCP server for the verified-libs comparisons: embedded ring buffers and
-CRC calculation.
+"""MCP server for the verified-libs comparisons: embedded ring buffers, CRC
+calculation and fixed-block memory pools.
 
 Gives an AI agent the comparisons a person gets on
-https://verified-libs.org/compare.html (ring buffers) and
-https://verified-libs.org/compare-crc.html (CRC): the same data
-(site/data/libs.json and site/data/crc.json of this checkout), the same
-filters and the same order, computed by vlquery.py and crcquery.py, ports of
-the pages' own scripts that are tested against them.
+https://verified-libs.org/compare.html (ring buffers),
+https://verified-libs.org/compare-crc.html (CRC) and
+https://verified-libs.org/compare-pools.html (memory pools): the same data
+(site/data/libs.json, site/data/crc.json and site/data/pools.json of this
+checkout), the same filters and the same order, computed by vlquery.py,
+crcquery.py and poolsquery.py, ports of the pages' own scripts that are
+tested against them. The pools tools are in poolstools.py.
 
 Transport: stdio (one JSON-RPC 2.0 message per line), as the Model Context
-Protocol defines it. Read-only: the server reads the two JSON files at start,
+Protocol defines it. Read-only: the server reads the three JSON files at start,
 and opens no network connection and no other file.
 
     python3 mcp-server/server.py                    serve on stdin/stdout
     python3 mcp-server/server.py --data FILE        another libs.json
     python3 mcp-server/server.py --crc-data FILE    another crc.json
+    python3 mcp-server/server.py --pools-data FILE  another pools.json
     python3 mcp-server/server.py --call TOOL [JSON] one tool call, result on stdout (no MCP client needed)
     python3 mcp-server/server.py --tools            the tool list as JSON
 
@@ -27,10 +30,11 @@ import sys
 import traceback
 
 import crcquery as cq
+import poolstools as pt
 import vlquery as q
 
 SERVER_NAME = "verified-libs"
-SERVER_VERSION = "0.4.0"
+SERVER_VERSION = "0.5.0"
 # Protocol revisions this server answers in. It uses only what all of them
 # have (tools over stdio), plus the optional fields each one added.
 PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"]
@@ -42,13 +46,13 @@ OWNER_NOTE = ("pxq RingBuffer_PackedState is written by Erik N (pxq.dk), who run
               "Say so whenever you mention or recommend it. How the project handles that: " + COI_URL)
 
 INSTRUCTIONS = (
-    "Measured results from verified-libs.org for two kinds of library on six Cortex-M boards. Embedded ring "
+    "Measured results from verified-libs.org for three kinds of library on six Cortex-M boards. Embedded ring "
     "buffer libraries (C, C++, Rust): speed in CPU cycles, code size, interrupt stress tests, model checking; "
     "use list_ring_buffers, compare_ring_buffers and get_ring_buffer when a user is choosing a ring buffer / "
     "FIFO / circular queue for a microcontroller. CRC calculation (CRC-32, CRC-16, CRC-8) by libraries that compute "
     "it in software and, on the boards that have one, the board's CRC unit beside them: cycles per "
     "call and per byte, flash and RAM bytes; use list_crc_configurations and compare_crc when a user is choosing "
-    "a CRC implementation. The two kinds are not compared with each other.\n"
+    "a CRC implementation. The kinds are not compared with each other.\n"
     "How to use the ring buffer tools honestly:\n"
     "1. Turn the user's hard requirements into filters (board or core, producers and consumers, one or two "
     "cores, language, licence, block or zero-copy API). Set weights only from what the user says matters. "
@@ -64,7 +68,10 @@ INSTRUCTIONS = (
     "get_ring_buffer before you recommend that library.\n"
     "How to use the CRC tools honestly: every number is a range over eight placements of the code; two rows "
     "differ only where their ranges do not overlap ('overlaps' names, per number, the rows that are not told "
-    "apart). The rows are in the order of the configuration list: there is no ranking, do not present one.")
+    "apart). The rows are in the order of the configuration list: there is no ranking, do not present one.\n"
+    "Fixed-block memory pools (alloc and free of one block size): list_pool_configurations and compare_pools, with the "
+    "same rules as the CRC tools. They are measured in one context: what a library documents about use from interrupts "
+    "is given as documented, not tested; never present it as a result.")
 
 REQUIRE = {   # tool word -> the page's filter
     "zero_stress_errors": ("clean", "0 errors in the ISR stress test on every board tested"),
@@ -123,7 +130,7 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
     crc_boards = [b["id"] for b in C["boards"]]
     crc_board_text = "; ".join(f"{b['id']} = {b['name']}, {b['core']}" for b in C["boards"])
     boards = [b["id"] for b in D["boards"]]
-    board_text = "; ".join(f"{b['id']} = {b['name']}, {b['core']}, {b['clock_mhz']} MHz" for b in D["boards"])
+    board_text = "; ".join(f"{b['id']} = {b['name']}, {b['core']}, {_board(b)['clock_mhz']} MHz" for b in D["boards"])
     tools = [
         {
             "name": "about",
@@ -270,7 +277,7 @@ def tool_list(D, version=PROTOCOL_VERSIONS[0]):
                 },
             },
         },
-    ]
+    ] + pt.tool_defs()
     for t in tools:
         if version < "2025-06-18":
             del t["title"]
@@ -388,8 +395,16 @@ def _row(D, st, r):
     return o
 
 
-def _board(b):
-    return {"id": b["id"], "name": b["name"], "core": b["core"], "clock_mhz": b["clock_mhz"]}
+def _board(b, series="2"):
+    """A board as the answers name it. The speeds of benchmark version 2 (the site's) carry the clock of their records
+    and their method version (site/series_info.py, through libs.json); version 1's the clock of its record."""
+    b2 = b.get("bench2") if series == "2" else None
+    o = {"id": b["id"], "name": b["name"], "core": b["core"], "clock_mhz": b2["clock_mhz"] if b2 and "clock_mhz" in b2 else b["clock_mhz"]}
+    if b2 and "method_version" in b2:
+        o["method"] = {"version": b2["method_version"], "text": b2["method_text"],
+                       "archived_series": [{"name": a["name"], "public_commit": a["public_commit"], "url": a["url"]}
+                                           for a in b2["archived"]]}
+    return o
 
 
 def _check_args(args, allowed):
@@ -452,7 +467,7 @@ def tool_compare(D, prov, args):
     st = state_from_args(D, args)
     rs = q.compare(D, st)
     mode, w = q.mp_mode(st), q.weighted(st)
-    out = {"board": _board(q.board_of(D, st))}
+    out = {"board": _board(q.board_of(D, st), st.get("series", "2"))}
     if "board" not in args:
         out["board_note"] = ("No board was given, so these are the numbers of the first board. Speeds and even the "
                              "order differ between cores: pass the board closest to the user's. Boards: " +
@@ -634,10 +649,12 @@ def tool_about(D, prov, args):
     return {
         "project": "verified-libs (" + SITE + "): an open registry of specialist libraries, measured on real hardware, "
                    "stress-tested with a negative control that must be caught, and model-checked where the library promises "
-                   "lock-free concurrency. Everything can be reproduced from the repository. Two kinds of library so "
-                   "far: embedded ring buffers (interrupt or DMA to main loop on Cortex-M; the tools *_ring_buffer*) "
-                   "and CRC calculation (the tools list_crc_configurations and compare_crc). The rest of "
-                   "this answer is about the ring buffers; for CRC see " + SITE + "/method-crc.html.",
+                   "lock-free concurrency. Everything can be reproduced from the repository. Three kinds of library so "
+                   "far: embedded ring buffers (interrupt or DMA to main loop on Cortex-M; the tools *_ring_buffer*), "
+                   "CRC calculation (the tools list_crc_configurations and compare_crc) and fixed-block memory pools "
+                   "(the tools list_pool_configurations and compare_pools; measured in one context, use from interrupts "
+                   "not tested). The rest of this answer is about the ring buffers; for CRC see " + SITE +
+                   "/method-crc.html, for the memory pools " + SITE + "/method-pools.html.",
         "compared": f"{len(D['libs'])} configurations of ring buffer libraries in {', '.join(langs)}, on {len(D['boards'])} boards. "
                     "A configuration is a library set up one way; some libraries have two or more.",
         "tests": {
@@ -800,7 +817,11 @@ def tool_compare_crc(D, prov, args):
                      "as_on_the_page": _shown(st, base),
                      "overlaps": {"cycles": ov["cycles"], "cycles_per_byte": ov["per_byte"]}})
     out = {"crc": st["crc"],
-           "board": {"id": bd["id"], "name": bd["name"], "core": bd["core"], "clock_mhz": round(bd["clock_hz"] / 1e6)},
+           "board": dict({"id": bd["id"], "name": bd["name"], "core": bd["core"], "clock_mhz": round(bd["clock_hz"] / 1e6)},
+                         **({"method": {"version": bd["method_version"], "text": bd["method_text"],
+                                        "archived_series": [{"name": a["name"], "public_commit": a["public_commit"],
+                                                             "url": a["url"]} for a in bd["archived"]]}}
+                            if "method_version" in bd else {})),
            "message": {"length_bytes": int(st["len"]), "offset": int(st["off"]),
                        "start": "at an 8-byte boundary" if st["off"] == "0" else "one byte after an 8-byte boundary",
                        "cache": st["cache"]}}
@@ -831,9 +852,24 @@ def tool_compare_crc(D, prov, args):
     return out
 
 
+def tool_list_pools(D, prov, args):
+    try:
+        return pt.tool_list_pools(args, _check_args)
+    except pt.ToolError as e:
+        raise ToolError(str(e))
+
+
+def tool_compare_pools(D, prov, args):
+    try:
+        return pt.tool_compare_pools(args, _check_args, _choice, _flag)
+    except pt.ToolError as e:
+        raise ToolError(str(e))
+
+
 TOOLS = {"about": tool_about, "list_ring_buffers": tool_list_libs,
          "compare_ring_buffers": tool_compare, "get_ring_buffer": tool_get, "list_findings": tool_findings,
-         "list_crc_configurations": tool_list_crc, "compare_crc": tool_compare_crc}
+         "list_crc_configurations": tool_list_crc, "compare_crc": tool_compare_crc,
+         "list_pool_configurations": tool_list_pools, "compare_pools": tool_compare_pools}
 
 
 def call_tool(D, prov, name, args):
@@ -952,7 +988,7 @@ def serve(session, fin, fout):
 
 
 def main(argv):
-    data_path, crc_path, call, show_tools = None, None, None, False
+    data_path, crc_path, pools_path, call, show_tools = None, None, None, None, False
     args = list(argv)
     while args:
         a = args.pop(0)
@@ -960,6 +996,8 @@ def main(argv):
             data_path = args.pop(0)
         elif a == "--crc-data" and args:
             crc_path = args.pop(0)
+        elif a == "--pools-data" and args:
+            pools_path = args.pop(0)
         elif a == "--call" and args:
             call = (args.pop(0), args.pop(0) if args and not args[0].startswith("--") else "{}")
         elif a == "--tools":
@@ -970,6 +1008,7 @@ def main(argv):
     try:
         D, prov = q.load(data_path)
         C, cprov = crc_data(crc_path)
+        P, pprov = pt.pools_data(pools_path)
     except (OSError, ValueError) as e:
         print(f"verified-libs MCP server: cannot read the data: {e}", file=sys.stderr)
         return 1
@@ -989,7 +1028,8 @@ def main(argv):
         return 0
     print(f"verified-libs MCP server {SERVER_VERSION}: ring buffers {len(D['libs'])} configurations, {len(D['boards'])} boards, "
           f"data sha256 {prov['sha256'][:12]}; CRC {len(C['configurations'])} configurations, {len(C['boards'])} boards, "
-          f"data sha256 {cprov['sha256'][:12]}; waiting for an MCP client on stdin", file=sys.stderr)
+          f"data sha256 {cprov['sha256'][:12]}; pools {len(P['configurations'])} configurations, {len(P['boards'])} boards, "
+          f"data sha256 {pprov['sha256'][:12]}; waiting for an MCP client on stdin", file=sys.stderr)
     try:
         serve(Session(D, prov), sys.stdin.buffer, sys.stdout.buffer)
     except (BrokenPipeError, KeyboardInterrupt):

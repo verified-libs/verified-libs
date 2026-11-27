@@ -206,7 +206,7 @@ verify_one() {
 # board by board, by the tool beside their build: oneverify.sh
 two=()
 for rec in "$@"; do
-    if [ "$(jq -r '.schema // empty' "$rec" 2>/dev/null)" = rb-bench/2 ]; then two+=("$rec"); continue; fi
+    if case "$(jq -r '.schema // empty' "$rec" 2>/dev/null)" in rb-bench/2|rb-bench/3) true ;; *) false ;; esac; then two+=("$rec"); continue; fi
     verify_one "$rec"; note $?
 done
 if [ ${#two[@]} -gt 0 ]; then

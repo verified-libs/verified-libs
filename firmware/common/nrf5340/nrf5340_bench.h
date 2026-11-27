@@ -52,7 +52,9 @@ static inline void nrf5340_bench_init(void)
     NRF_CTRLAP_SECUREAPPROTECT_DISABLE = NRF_UICR_SECUREAPPROTECT;
 
     /* HCLK = 128 MHz / 2 = 64 MHz; with -DBOARD_CLOCK_FAST=1 the full
-     * 128 MHz (divider 1, as Zephyr runs the application core by default).
+     * 128 MHz (divider 1). 64 MHz is the vendor's default: the startup
+     * Zephyr builds (nrfx system_nrf5340_application.c) and Zephyr's nRF53
+     * SoC code leave the reset value Div2 (method version 3, section 1).
      * Opt-in, so the default firmware is unchanged; board_clock_hz() reads
      * the divider back, so every record names the clock it ran at. The
      * peripherals (timers, UARTE) run from their own 16 MHz clock and are

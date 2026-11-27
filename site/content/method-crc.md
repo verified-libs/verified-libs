@@ -1,7 +1,8 @@
 # Method: how CRC libraries are measured and checked
 
-The method of one of the two kinds of library so far ([all kinds](kinds.md));
-the other kind's: [embedded ring buffers](method.md).
+The method of one of the three kinds of library so far ([all kinds](kinds.md));
+the other kinds': [embedded ring buffers](method.md) and
+[fixed-block memory pools](method-pools.md).
 
 The numbers are on the [results page](results-crc.md). The details and
 every run's output are in [`kinds/crc/README.md`](../../kinds/crc/README.md),
@@ -98,10 +99,10 @@ tables are in flash on every board, so what the switch covers differs
 
 | Board | Cache on | Flash wait states |
 |---|---|---|
-| NUCLEO-G474RE, 170 MHz | ART: instruction cache, a data cache of 256 bytes on DCode, prefetch (RM0440) | 4 |
+| NUCLEO-G474RE, 170 MHz | ART: instruction cache, a data cache of 256 bytes on DCode, prefetch (RM0440) | 4, as RM0440 requires at 170 MHz in boost mode (Table 9); ST's template for the board sets 8 |
 | NUCLEO-G0B1RE, 64 MHz | an instruction cache of two 8-byte lines and prefetch; "No data cache is available on Cortex-M0+" (RM0444) | 2 |
 | nRF5340 DK, 64 MHz | the application core's cache, 16-byte lines, instruction and data accesses to flash (nRF5340 Product Specification v1.6) | no setting |
-| NUCLEO-H723ZG, 64 MHz | the Cortex-M7 L1 instruction and data caches, 32-byte lines | 7, the power-on default (RM0468 allows 0 or 1 at 64 MHz) |
+| NUCLEO-H723ZG, 520 MHz | the Cortex-M7 L1 instruction and data caches, 32-byte lines | 3, as RM0468 requires for an AXI clock of 260 MHz (Table 16) |
 | SAM D20 Xplained Pro, 48 MHz | the NVM controller's direct-mapped cache; the data sheet does not say whether data reads are cached | 1 |
 | Raspberry Pi Pico 2, 150 MHz | the 16 kB XIP cache, 8-byte lines, in front of the external QSPI flash; with it off every read goes to the flash | a miss is a QSPI transfer |
 
@@ -152,13 +153,22 @@ reference's; a record is made only if every call of every run agreed
 
 ## What the placements show
 
+The figures in this section are those of the first series
+([report](../../reports/2026-11-25-crc-first-series.md)); for the
+NUCLEO-H723ZG and the nRF5340 DK that is before method version 3, in the
+archived series linked from the [results page](results-crc.md).
+
 **The measurement repeats exactly.** On five of the six boards every
 number of the series is the same in both passes, to the cycle, and the
 baseline measures the same in every image of a board of one CRC. On the Pico 2, 90
 of 7680 means differ between the passes, all with the cache on, by at
 most 1.26 %; the shortest call is the same in both passes, so the
 difference lies in a few slower calls (the [series report](../../reports/2026-11-25-crc-first-series.md),
-"The numbers, checked", check 1).
+"The numbers, checked", check 1). That fits the Pico 2's XIP cache, which
+replaces a line at random ("Cache eviction policy is random", RP2350
+datasheet 4.4.1.2) and is cleared by the boot ROM at every start, so two
+runs of one image can miss in different calls
+([what was explained later](../../reports/2026-11-27-crc-unexplained.md), item 2).
 
 **A mean includes the first call.** Each scenario's mean is over its 256
 calls, the first included. The scenarios run in a fixed order: the cache
@@ -187,12 +197,21 @@ and RM0444 3.2); on the nRF5340 DK every 16 bytes, its cache line (128
 bits, nRF5340 Product Specification v1.6, 5.4.1); on the NUCLEO-H723ZG a
 configuration is slow exactly where its loop crosses a 32-byte boundary,
 the width of the flash word that its read buffer holds (256 bits, RM0468
-4.3.8), in the three configurations looked at. The NUCLEO-H723ZG runs at
-the 7 wait states it has after power-on, which RM0468 does not require at
-64 MHz (Table 16: 0 or 1); its numbers with the cache off carry them.
+4.3.8), in the three configurations looked at (measured at 64 MHz, before
+method version 3). The NUCLEO-H723ZG runs at 520 MHz with 3 wait states,
+as ST's template for the board sets it (method version 3); its numbers
+with the cache off carry them ([below](#the-nucleo-h723zg-at-520-mhz)).
 "Fits" is all that is claimed: the period matches the figure in the
 manual; the mechanism was not measured. What is not explained is listed
-in the report.
+in the series reports. Two items have been studied since in the data at
+hand ([report of 2026-11-27](../../reports/2026-11-27-crc-unexplained.md)):
+- on the Pico 2 with the cache off, a configuration's numbers are decided
+  by where its loop starts modulo 8 (15 of 20 configurations exactly),
+  which is the period of 8 bytes; which of the two positions is the slow
+  one is still not explained (item 3);
+- the NUCLEO-H723ZG's retries in the first two series came from the
+  images' own running time, the untimed reference included, against the
+  runner's first wait (item 1).
 
 **What this means for the tables.** A difference between two
 configurations is a difference only where their ranges over the eight
@@ -200,12 +219,73 @@ placements do not overlap. Every table therefore shows the range over the
 placements, and with the cache off a single placement says little on the
 NUCLEO-H723ZG, the nRF5340 DK and the two STM32 boards with 8-byte reads.
 
-## For the next version of the method
+## Method version 3
 
-Two changes are noted for when both kinds are measured again, not before
-([`DECISIONS.md`](../../DECISIONS.md), 2026-11-25):
+Since 2026-11-26 the boards run at the clock of their vendor's start-up
+code or template with the fewest flash wait states the manual allows, the
+option registers are recorded with every series, and the nRF5340's boot
+stub opens its debug port at every boot ([ring buffers' method page,
+"Method version 3"](method.md#method-version-3), with the sources). For
+the CRC kind that means:
+- the NUCLEO-H723ZG runs at 520 MHz with 3 wait states instead of 64 MHz
+  with 7, and its configurations were measured again (below);
+- the nRF5340 DK's configurations were measured again, as its boot stub
+  changed; the measured code is the same;
+- the records of the other four boards stand: method version 3 builds
+  their images byte for byte the same;
+- the two boards' records before method version 3 are archived series,
+  linked from the [results page](results-crc.md) under each board;
+- the median of a scenario's 256 calls beside the mean was left out of
+  method version 3 explicitly ([`DECISIONS.md`](../../DECISIONS.md),
+  2026-11-26): it would need every benchmark measured again.
 
-- the NUCLEO-H723ZG with the flash wait states a user would set at its
-  clock, not the 7 it has after power-on;
-- the median of a scenario's 256 calls beside the mean, so that a few slow
-  calls can be told from a shifted level.
+### The NUCLEO-H723ZG at 520 MHz
+
+**Cycles with the cache off rise, the time falls.** The flash's wait
+states count cycles of the AXI bus clock (RM0468 4.3.8, "Adjusting read
+timing constraints"; Table 16), and since method version 3 the AXI bus
+runs at half the core clock, 260 MHz (`firmware/common/stm32h723/board.h`:
+the core divider /1, the bus divider /2).
+- *A read from the flash array costs the same in core cycles:* before,
+  (7 + 1) flash clocks at 64 MHz = 8 core cycles; now (3 + 1) flash clocks
+  at 260 MHz = 4 × 2 = 8 core cycles.
+- *Everything else an access pays on the bus side* (the bus matrix, the
+  flash interface's read queue, the response) is counted in bus cycles,
+  which cost one core cycle before and two now. So the cycles with the
+  cache off rise by that overhead per flash access, times the number of
+  accesses.
+- *What the numbers show* (ETL `crc32_t256`,
+  [its record](../../records/crc/stm32h723/adapter_etl_crc32_t256.json) of
+  method version 3 against the archived one, first pass, cache off): per byte 32 → 38
+  cycles at placement 0 and 34 → 42 at placement 4. The step between the
+  two placements doubles, from 2 to 4 cycles per byte: one extra bus
+  access per byte, caused by where the code lies, costs twice as many core
+  cycles. The reference: 59 → 64 cycles per byte. With the cache on
+  nothing changes (8 = 8 and 41 = 41 cycles per byte): the loop then makes
+  no bus access.
+- *Time:* 1024 bytes with the cache off, placement 0, took 32 796 cycles at 64 MHz
+  (512 µs) and take 38 968 cycles at 520 MHz (74.9 µs): 19 % more cycles,
+  6.8 times less time. Cycles at another clock are not times.
+
+**The board's CRC unit on the H723 is slower in cycles with the cache on
+too.** Its rows are the only ones whose numbers with the cache on changed:
+per byte from 1.5 to 3.0 cycles, a call on 16 bytes from 55 to 85 cycles,
+for all three CRCs ([the H723's records](../../records/crc/stm32h723/adapter_hw_crc32.json)
+against the archived ones). The unit is a peripheral that our code writes
+and reads over an AHB bus, and since method version 3 the AHB clock is half
+the core clock (`firmware/common/stm32h723/board.h`: HPRE /2), so each of
+those accesses costs twice as many core cycles; that fits the doubling
+exactly, and was not measured further. In time it is faster: 1024 bytes
+took 1567 cycles at 64 MHz (24.5 µs) and take 3109 cycles at 520 MHz
+(6.0 µs).
+
+**What is not explained.** The number of bus accesses behind each rise
+was not counted: how the Cortex-M7 fetches with its instruction cache off,
+and how the flash interface queues and overlaps reads. So the overhead of
+about 2 bus cycles per access is inferred from one pair of placements, not
+measured; the rise per call of 1 byte (+23 cycles for the reference, +28
+for the configuration) cannot be split between
+instruction fetches and table loads; and why the configuration's rise
+exceeds the reference's is not known. A test that counts accesses
+(the same loop from ITCM, or the table in DTCM, at both clocks) was not
+run.

@@ -4,13 +4,15 @@ An AI agent asked to "pick a ring buffer for this Cortex-M0+ project" usually
 answers from memory: the library it has seen most often. This server gives it
 measurements instead: the comparisons a person gets on
 <https://verified-libs.org/compare.html> (embedded ring buffers) and
-<https://verified-libs.org/compare-crc.html> (CRC calculation),
+<https://verified-libs.org/compare-crc.html> (CRC calculation) and
+<https://verified-libs.org/compare-pools.html> (fixed-block memory pools),
 as tools an agent can call.
 
 It is a small [Model Context Protocol](https://modelcontextprotocol.io)
-server over stdio, version 0.4.0. It reads two files of this checkout,
-[`site/data/libs.json`](../site/data/libs.json) and
-[`site/data/crc.json`](../site/data/crc.json) (the files the website's
+server over stdio, version 0.5.0. It reads three files of this checkout,
+[`site/data/libs.json`](../site/data/libs.json),
+[`site/data/crc.json`](../site/data/crc.json) and
+[`site/data/pools.json`](../site/data/pools.json) (the files the website's
 comparisons are built from), and nothing else: no network, no other files,
 no writing. Python 3.9 or newer (tested with 3.14), standard library only;
 nothing to install.
@@ -50,7 +52,8 @@ python3 mcp-server/server.py --call compare_crc '{"crc": "CRC-16/IBM-3740", "boa
 
 The data is the one in your checkout: `git pull` to get new results. Every
 answer carries the SHA-256 of the data file it was computed from.
-`--data FILE` and `--crc-data FILE` take another file of the same kind.
+`--data FILE`, `--crc-data FILE` and `--pools-data FILE` take another file
+of the same kind.
 
 ## Tools
 
@@ -63,6 +66,8 @@ answer carries the SHA-256 of the data file it was computed from.
 | `list_findings` | The published findings: what was wrong, the versions affected, where it was fixed, and the version the comparison shows. |
 | `list_crc_configurations` | The CRC configurations (one library, one CRC, one way of computing it) with library, language, CRC, class and where the table lies, and the boards' CRC units with the boards that have one. No numbers. |
 | `compare_crc` | The CRC comparison table for one CRC, board, message length, start and cache: per configuration the cycles for one call and per byte as `{min, max}` over eight placements of the code, the same as the page shows them, flash and RAM bytes, the link to its record, and per number `overlaps`: the rows whose range overlaps this one's, which this series does not tell apart. The reference (baseline) is the last row. In the order of the configuration list, or sorted by name, flash or RAM bytes; cycles are not sorted. Optional weights (cycles, cycles per byte, bytes) give each row a score range as on the page, order the rows by its highest end and mark a score that overlaps the one above (`score_not_told_apart_from_the_row_above`). Length 1 is in the data, not on the page, and the answer says why. The board's CRC unit, driven by our code (not a library), is a row of the same table after the libraries, with `hardware_not_a_library`, and with weights it is scored like any row; `kind: "library"` leaves it out. Only on the boards that have one. |
+| `list_pool_configurations` | The fixed-block memory pool configurations (one pool of 32 blocks of 32 bytes, alloc and free) with library, version, language, licence, the lock as built and `documented_use_from_interrupts`: the library's own words with their source, `tested: false` (the series is one context). Our reference free list with interrupts off is listed apart, as ours. No numbers. Until the first series is published: `published: false` and nothing else. |
+| `compare_pools` | The pools comparison table for one board, scenario (`pair`, `pair_full`, `fill_drain_lifo`, `fill_drain_fifo`, `mixed`, `empty`) and cache: per configuration the cycles of init, alloc and free as `{min, max}` over eight placements of the code, the same as the page shows them, flash and RAM bytes, the lock as built, `documented_use_from_interrupts` (not tested, in no filter and no score), the link to its record, and per number `overlaps`. Our row with interrupts off has `ours_not_a_library`, is scored like any row, and `kind: "library"` leaves it out; the reference free list (baseline) is the last row. Optional weights (alloc, free, bytes) give a score range as on the page. Until the first series is published: `published: false` and no rows. |
 
 All seven are read-only and take a fraction of a second. A full comparison
 (all configurations) is about 30 000 characters; filters make it shorter.
@@ -84,7 +89,16 @@ The same for CRC: [`crcquery.py`](crcquery.py) is a port of
 2909 views (every CRC, board, length, start and cache; every sort; every
 configuration chosen, with its overlap marks; filters; seven sets of weights
 on every board and CRC, with the score marks; 1500 views drawn with a fixed
-seed).
+seed). And for the pools: [`poolsquery.py`](poolsquery.py) is a port of
+[`site/compare-pools.js`](../site/compare-pools.js), and
+[`tests/test_parity_pools.py`](tests/test_parity_pools.py) compares them on
+the committed data (before the first series: no rows, and the line that says
+so) and on synthetic data made by the test (`site/pools_synthetic.py`;
+made-up numbers, never in the tree): 2024 views (every board, scenario and
+cache; every sort; every configuration chosen, with its overlap marks;
+filters; seven sets of weights on every board, with the score marks; 1500
+views drawn with a fixed seed). The pools tools are in
+[`poolstools.py`](poolstools.py).
 
 What follows from that:
 
@@ -133,7 +147,9 @@ python3 -m unittest discover -s mcp-server/tests
 ```
 
 `test_server.py` starts the server and talks to it as a client would.
-`test_parity.py` and `test_parity_crc.py` need `gjs` to run the website's
-scripts and are skipped without it. When `site/compare.js` or
-`site/compare-crc.js` changes, its port changes with it, and the parity test
-says where they differ.
+`test_parity.py`, `test_parity_crc.py` and `test_parity_pools.py` need `gjs`
+to run the website's scripts and are skipped without it. When
+`site/compare.js`, `site/compare-crc.js` or `site/compare-pools.js` changes,
+its port changes with it, and the parity test says where they differ.
+`test_server_pools.py` checks the pools tools, and that the other tools'
+definitions are unchanged by them.

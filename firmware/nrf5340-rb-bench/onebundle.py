@@ -273,7 +273,8 @@ def stub(board, sel, out):
         "-ffunction-sections", "-Wl,--gc-sections", f"-DBENCHBOOT_SEL_ADDR={sel:#x}u",
         f"-DBENCHBOOT_FIRST={fbase + BOOT_LEN:#x}u", f"-DBENCHBOOT_END={fbase + flen:#x}u", f"-DBENCHBOOT_UNIT={UNIT}u",
         f"-DBENCHBOOT_RAM={rbase:#x}u", f"-DBENCHBOOT_RAM_END={rbase + rlen:#x}u"]
-       + (["-DBENCHBOOT_RP2350"] if board.name == "rp2350" else []) +
+       + (["-DBENCHBOOT_RP2350"] if board.name == "rp2350" else [])
+       + (["-DBENCHBOOT_NRF5340"] if board.name == "nrf5340" else []) +
        ["-T", stub_ld, os.path.join(HERE, "../common/benchboot.c"), "-o", boot])
     for ln in sh(["arm-none-eabi-size", "-A", boot]).splitlines():
         f = ln.split()

@@ -259,10 +259,13 @@
       (st.row && !chosen ? ". The chosen configuration is not shown: nothing is marked" : "") + ".";
     var bd = D.boards.filter(function (x) { return x.id === st.board; })[0];
     var hasUnit = v.all.some(function (x) { return x.c.role === "hardware"; });
+    var unitShown = rs.some(function (x) { return x.c.role === "hardware"; });
     $("cmp-note").textContent = [st.cache === "off" && bd.note_cache_off ? bd.note_cache_off : "",
+      unitShown && bd.note_hw_unit ? bd.note_hw_unit : "",
       hasUnit ? "" : "No CRC unit of the " + bd.name + " was measured for " + st.crc + ": the table holds libraries only."]
       .filter(function (x) { return x; }).join(" ");
-    $("cmp-src").textContent = bd.name + " (" + bd.core + ", " + Math.round(bd.clock_hz / 1e6) + " MHz). Records: " +
+    $("cmp-src").textContent = bd.name + " (" + bd.core + ", " + Math.round(bd.clock_hz / 1e6) + " MHz). " +
+      (bd.method_text ? bd.method_text + " " : "") + "Records: " +
       D.source.records + ", series at commit " + D.source.commits.join(", ") + ", toolchain " + D.source.toolchain_image.join(", ") +
       ". Each number is the mean of the scenario's 256 calls, the first included, as min–max over the eight placements, first pass; " +
       "per byte from the means at 256 and 1024 bytes, at the chosen start.";
