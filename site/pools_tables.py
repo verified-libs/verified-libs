@@ -184,6 +184,14 @@ def board_sections(recs):
 ONE_CONTEXT_HTML = ('<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in '
                     'this series; the last column is what each library documents.</div>')
 CLAIM_HEAD = "Documented use from interrupts (not tested)"
+# With records of the concurrency series (site/pools_isr.py) the box says where the test is, and the claims
+# column is what each library documents beside what was observed.
+ISR_CONTEXT_HTML = ('<div class="onectx"><strong>Use from interrupts was tested</strong> in a series of its own, the '
+                    'concurrency series: an interrupt at every cycle of a call, on every board, with controls that must '
+                    'be caught (<a href="method-pools.html#use-from-interrupts">method</a>). What it observed is in each '
+                    'board\'s fold-out "Use from interrupts"; a library used in a way it does not document is never '
+                    'called failing. The numbers in the tables are of one context.</div>')
+CLAIM_HEAD_ISR = "Documented use from interrupts"
 SUMMARY = "pair"   # the one pattern of the results page: the plan's "common driver pattern"
 CLAIMS = os.path.join(ROOT, "kinds/pools/claims.tsv")
 
@@ -232,7 +240,41 @@ def span_of(rgs, key, cache="on"):
     return range_text([min(vals), max(vals)]) if vals else "–"
 
 
-def page_block(recs, syn, rel, claims_path=None):
+def isr_fold(board, bdir, data, isr, isr_rel, cl):
+    """The nested fold-out of a board with what the concurrency series observed (site/pools_isr.py)."""
+    import pools_isr
+    lines = ["**Use from interrupts.** What the concurrency series observed with an interrupt at every cycle of "
+             "the main context's alloc or free, cache off and on, in the classes of its method: within the "
+             "library's documentation (passed, or a finding), ours, outside the library's documentation (only what "
+             "was observed), and our controls, which must be caught. The longest wait of an interrupt is shown "
+             "where the configuration takes interrupts off as built. Not part of any score.\n"
+             + ("" if any(b == bdir for b, _ in isr) else "\n*The series has not run on this board yet.*\n")
+             + (f"\n{pools_isr.BOARD_NOTE[bdir]}\n" if bdir in pools_isr.BOARD_NOTE and any(b == bdir for b, _ in isr) else ""),
+             f"| Configuration | {CLAIM_HEAD_ISR} | Observed in the concurrency series | Trials | "
+             "Instructions reached by an interrupt |",
+             "|---|---|---|---:|---:|"]
+
+    def row(name, adapter):
+        k = (bdir, adapter)
+        if k not in isr:
+            return f"| {name} | {claim_cell(cl.get(adapter))} | – | – | – |"
+        f, r = isr[k]
+        sm = pools_isr.summary(bdir, f, r)
+        cov = sm["coverage"]
+        # linked to its record; synthetic records (a preview) lie outside the tree: no link
+        link = f"[{pools_isr.cell(sm)}]({isr_rel}/{bdir}/{os.path.basename(f)})" if isr_rel else pools_isr.cell(sm)
+        return (f"| {name} | {claim_cell(cl.get(adapter)) if adapter not in pools_isr.CONTROLS[1:] else '–'} | {link} | "
+                f"{sm['trials']} | {'–' if not cov else f'{cov[0]} of {cov[1]}'} |")
+    for name, r, _s, _rg in data:
+        lines.append(row(name, r["adapter"]))
+    lines.append(row(BASE_LABEL + "; the control without a lock", "adapter_ref"))
+    for a in pools_isr.CONTROLS[1:]:
+        lines.append(row(pools_isr.CONTROL_TEXT[a], a))
+    lines.append("")
+    return fold(slug(board) + "-use-from-interrupts", "Use from interrupts on this board (the concurrency series)", lines)
+
+
+def page_block(recs, syn, rel, claims_path=None, isr=None, isr_syn=False, isr_rel=None):
     """The block of the results page: per board one fold-out, closed, whose summary says the board, its clock and
     method version, how many configurations and the span of the pair alloc with the cache on; inside it the table
     of the pattern SUMMARY, and a nested fold-out "Every pattern on this board" with the table of bytes and init and
@@ -250,6 +292,11 @@ def page_block(recs, syn, rel, claims_path=None):
     if syn:
         out.append("**SYNTHETIC: every number below is made up (site/pools_synthetic.py); none is a measurement. "
                    "Not for publication.**\n")
+    if isr_syn:
+        out.append("**SYNTHETIC: every result of the concurrency series below is made up (site/pools_isr_synthetic.py); "
+                   "none is a measurement. Not for publication.**\n")
+    context = ISR_CONTEXT_HTML if isr else ONE_CONTEXT_HTML
+    claim_head = CLAIM_HEAD_ISR if isr else CLAIM_HEAD
     commits = sorted({r["bench_commit"] for _, r in recs})
     boards = {r["board"] for _, r in recs}
     ads = {r["adapter"] for _, r in recs}
@@ -257,7 +304,7 @@ def page_block(recs, syn, rel, claims_path=None):
     out.append(f"{len(libs)} libraries and {len(ads) - len(libs)} configuration of ours on {len(boards)} boards, "
                f"{len(recs)} records; series at commit{'s' if len(commits) > 1 else ''} "
                + ", ".join(f"`{c}`" for c in commits) + ".\n")
-    out.append(ONE_CONTEXT_HTML + "\n")
+    out.append(context + "\n")
     used = []
     for board, first, rows, base in board_sections(recs):
         bdir = os.path.basename(os.path.dirname(rows[0][0]))
@@ -279,12 +326,12 @@ def page_block(recs, syn, rel, claims_path=None):
         note = crc_tables.before_off(board, first["clock_hz"])
         nlib = sum(1 for _, r, _, _ in data if role(r["adapter"]) == "library")
         inner = [f"{first['board_decoded']}, {first['clock_hz'] / 1e6:.0f} MHz. "
-                 + series_info.method_text(version, first["clock_hz"], []) + "\n", ONE_CONTEXT_HTML + "\n"]
+                 + series_info.method_text(version, first["clock_hz"], []) + "\n", context + "\n"]
         inner.append(f"Pattern `{SUMMARY}`: {dict(SCENARIOS)[SUMMARY]}. Cycles per call, and of the one call of init: "
                      "the range over the eight placements, first pass. Flash: code and constants; RAM: beyond the "
                      "blocks and their canaries.\n")
         inner.append(f"| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | "
-                     f"alloc, cache on | free, cache on | alloc, cache off | free, cache off | {CLAIM_HEAD} |")
+                     f"alloc, cache on | free, cache on | alloc, cache off | free, cache off | {claim_head} |")
         inner.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|")
         for name, r, s, rg in data:
             fl, ram = sizes_of(r)
@@ -301,7 +348,7 @@ def page_block(recs, syn, rel, claims_path=None):
         every = ["**Bytes and init.** Flash: the library's and the adapter's code and constants at `-O2`, measured in "
                  f"the board's images; RAM: beyond the 32 blocks of 32 bytes and the canaries. Init: cycles of {INIT_TEXT}, "
                  "the range over the eight placements, first pass.\n",
-                 f"| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | {CLAIM_HEAD} |",
+                 f"| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | {claim_head} |",
                  "|---|---|---|---|---:|---:|---:|---:|---|"]
         for name, r, s, rg in data:
             fl, ram = sizes_of(r)
@@ -318,6 +365,8 @@ def page_block(recs, syn, rel, claims_path=None):
             for name, r, s, rg in data + [(BASE_LABEL, None, None, base)]:
                 every.append(f"| {name} | " + " | ".join(range_text(rg[c][f'{sc}/{o}']) for c in ("on", "off") for o in OPS) + " |")
             every.append("")
+        if isr:
+            inner += isr_fold(board, bdir, data, isr, isr_rel, cl)
         inner += fold(slug(board) + "-every-pattern", "Every pattern on this board: bytes and init, and "
                       + ", ".join(f"<code>{k}</code>" for k, _ in SCENARIOS), every)
         if note:
@@ -332,25 +381,29 @@ def page_block(recs, syn, rel, claims_path=None):
     return "\n".join(out).rstrip() + "\n"
 
 
-def block(rdir=None, page_dir=None, claims_path=None):
+def block(rdir=None, page_dir=None, claims_path=None, isr_dir=None):
+    import pools_isr
     recs, syn = load(rdir)
     rel = os.path.relpath(rdir or RECORDS, page_dir or os.path.join(ROOT, "site/content"))
-    return page_block(recs, syn, rel, claims_path)
+    isr, isr_syn = pools_isr.load(isr_dir)
+    isr_rel = os.path.relpath(isr_dir or pools_isr.RECORDS, page_dir or os.path.join(ROOT, "site/content")) \
+        if not isr_syn else None
+    return page_block(recs, syn, rel, claims_path, isr, isr_syn, isr_rel)
 
 
 PAGES = {"results": "site/content/results-pools.md"}
 
 
-def page_text(path, rdir=None):
+def page_text(path, rdir=None, isr_dir=None):
     """(the page as it is, the page with the block written from the records between its markers)"""
     s = open(path).read()
     a, b = "<!-- table:pools -->\n", "<!-- /table:pools -->"
     i, j = s.index(a) + len(a), s.index(b)
-    return s, s[:i] + "\n" + block(rdir, os.path.dirname(os.path.abspath(path))) + "\n" + s[j:]
+    return s, s[:i] + "\n" + block(rdir, os.path.dirname(os.path.abspath(path)), isr_dir=isr_dir) + "\n" + s[j:]
 
 
-def write_page(path, check, rdir=None):
-    s, new = page_text(path, rdir)
+def write_page(path, check, rdir=None, isr_dir=None):
+    s, new = page_text(path, rdir, isr_dir)
     if check:
         if new != s:
             print(f"{path}: not up to date (python3 -I site/pools_tables.py --write {path})")
@@ -363,12 +416,15 @@ def write_page(path, check, rdir=None):
 
 def main():
     a = sys.argv[1:]
-    rdir = None
+    rdir = isr_dir = None
     if "--records" in a:
         i = a.index("--records")
         rdir, a = a[i + 1], a[:i] + a[i + 2:]
+    if "--isr" in a:   # the concurrency series' records from another directory (synthetic ones: a preview)
+        i = a.index("--isr")
+        isr_dir, a = a[i + 1], a[:i] + a[i + 2:]
     if a[:1] in (["--write"], ["--check"]) and len(a) == 2:
-        return write_page(a[1], a[0] == "--check", rdir)
+        return write_page(a[1], a[0] == "--check", rdir, isr_dir)
     if a:
         sys.exit(__doc__)
     print(block(rdir), end="")

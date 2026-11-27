@@ -1,0 +1,281 @@
+{
+ "schema": "pools-isr/1",
+ "kind": "pools-isr",
+ "board": "stm32h723",
+ "board_id": 4,
+ "board_decoded": "NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7)",
+ "adapter": "adapter_lwip",
+ "class": "within",
+ "bench_commit": "f344730728a6",
+ "toolchain_image": "verified-libs/toolchain:2026-11-13",
+ "toolchain": {
+  "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+  "ubuntu_snapshot": "20261105T000000Z",
+  "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+  "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+  "cbmc": "6.6.0 (cbmc-6.6.0)",
+  "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+  "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+  "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+  "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+ },
+ "libs_pinned": [
+  "etl 7d604f2e4f7fa79ff49bf675c089656943f9171b",
+  "riot 9c9a6abec901838b1637ef9308427b50ef59ce5c",
+  "threadx 93387b0a60382a29579bbad5045c68328e3751df",
+  "cmsis-rtx b566de42a5bf77d8b080f521cefc38ec7c45a3cc",
+  "cmsis6 af1b110e46a1720349f6f125e386e126767699bd",
+  "cortex-dfp cd38dbb875f7195e70460eee51faa7ab180c24a1",
+  "contiki-ng 4ccd1a3b9e767f168d12ec3df187fe6b7dc736b5",
+  "c-allocator 497b46500e314467d2bc2a3f6623e68d71eab9db",
+  "eccles 02146345a899e29fe53555098848a4584491818c",
+  "memorypool c98ff35f19473b737c4b75817096481327023c02",
+  "atomic-pool ab88f3ccfebd382685bf97239df6828769c5b743",
+  "heapless 19188229ac2b76fc91ad79f57dee01fa362a1e15",
+  "zephyr 41d10b59730406bbab4ca9f1fbbe9e96aafb4966",
+  "lwip 77dcd25a72509eb83f72b033d219b1d40cd8eb95",
+  "memorypool-head 5073178622c3af7b682060a93c4b38ce386f2d59",
+  "as-slice-01 e21f5bd9e629f2bf5641b97f64e582ed745e3ab6",
+  "as-slice-02 c3687342bc9f3c9c202676a5d2e17288ff979c90",
+  "rs-portable-atomic e4595528211f1d53b7f4d93e528ef84b491fc871",
+  "rs-stable-deref-trait 66f9d8a15b7209c45f58edee6c1b6bb497b7bd31",
+  "rs-hash32 d44eb33a01be4582669d9a1fa3f7c58455a21de9",
+  "rs-byteorder ec068eefa042d494475db125c4b034bd8e9e34dd",
+  "rs-generic-array-012 42843cdb6c24ef3684494617e78745a62a64a29c",
+  "rs-generic-array-013 525f5e7dc3e3e9cab6ee92c2655611c5590675d3",
+  "rs-generic-array-014 a1b3c3cfdf64ad99fd2004c0d8ce81b0e56e5ebe",
+  "rs-typenum b237efbb1da9646435274f63d7290cb7651b031f",
+  "rs-version-check d77ef9f27cc336719b2d839d09ee6635dd22f758"
+ ],
+ "clock_hz": 520000000,
+ "image_base": "0x08029000",
+ "image_bytes": 4796,
+ "image_sha256": "846b9d216f5445b2118830198df67b4c438bf40731388737e761fec3c6650c96",
+ "fw_sha256": "ee1e667c11fcd49253c17279e6b3b60896768b9d8920e47be8af74ab1d9b950c",
+ "bundle": 300,
+ "bundle_sha256": "384fec27b35fef81c18f52381748e99e0b96d58ed310e08d3ddde0a4c19b77e4",
+ "boot_image_sha256": "9a63c25b936a3c59d88c5dba46e83731961aa1c9417eba998b879413d286aaaf",
+ "time": "2026-11-27T07:07:31Z",
+ "host": "lib-lab1",
+ "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+ "attempt": 1,
+ "wait_s": 60.0,
+ "seconds": 60.6,
+ "run_number": "0x997d8e50",
+ "verdict": "pass",
+ "result": {
+  "magic": 1447840049,
+  "version": 1,
+  "done": 1,
+  "clock_hz": 520000000,
+  "board_id": 4,
+  "image_base": 134385664,
+  "nonce": 2575142480,
+  "faults_total": 0,
+  "c": [
+   {
+    "trials": 72552,
+    "inside": 64413,
+    "before": 4148,
+    "after": 3991,
+    "faults": {},
+    "first_fault": 0,
+    "first_case": 0,
+    "first_d": 0,
+    "lat_min": 76,
+    "lat_max": 153,
+    "lat_max_case": 65792,
+    "lat_max_d": 152,
+    "lat_n": 64413,
+    "irq_wait_cycles": 77
+   },
+   {
+    "trials": 21964,
+    "inside": 16344,
+    "before": 1708,
+    "after": 3912,
+    "faults": {},
+    "first_fault": 0,
+    "first_case": 0,
+    "first_d": 0,
+    "lat_min": 18,
+    "lat_max": 55,
+    "lat_max_case": 256,
+    "lat_max_d": 40,
+    "lat_n": 16344,
+    "irq_wait_cycles": 37
+   }
+  ],
+  "cal_lat_min": [
+   76,
+   18
+  ],
+  "cal_lat_n": [
+   183,
+   33
+  ],
+  "cov_outside": 0,
+  "adapter": "adapter_lwip",
+  "class": "within",
+  "coverage_bits": 35
+ },
+ "option_registers": [
+  {
+   "schema": "board-options/1",
+   "board": "stm32h723",
+   "chip": "STM32H723ZG",
+   "time": "2026-11-27T06:26:21Z",
+   "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+   "regions": [
+    {
+     "name": "FLASH_OPTSR_CUR",
+     "address": "0x5200201c",
+     "source": "RM0468 \u00a74.9, offset 0x01C",
+     "words": [
+      "0x0306aad0"
+     ]
+    },
+    {
+     "name": "FLASH_OPTSR2_CUR",
+     "address": "0x52002070",
+     "source": "RM0468 \u00a74.9.24, offset 0x070 (CPUFREQ_BOOST)",
+     "words": [
+      "0x00000000"
+     ]
+    }
+   ]
+  }
+ ],
+ "coverage": {
+  "instructions": 88,
+  "reached": 19,
+  "per_function": {
+   "lwip_alloc": {
+    "reached": 2,
+    "instructions": 3,
+    "unreached": [
+     "0x8029f06"
+    ]
+   },
+   "lwip_free": {
+    "reached": 5,
+    "instructions": 7,
+    "unreached": [
+     "0x8029eee",
+     "0x8029efa"
+    ]
+   },
+   "lwip_init_": {
+    "reached": 0,
+    "instructions": 12,
+    "unreached": [
+     "0x8029f0c",
+     "0x8029f0e",
+     "0x8029f10",
+     "0x8029f14",
+     "0x8029f18",
+     "0x8029f1c",
+     "0x8029f20",
+     "0x8029f24",
+     "0x8029f26",
+     "0x8029f2a",
+     "0x8029f2e",
+     "0x8029f32"
+    ]
+   },
+   "lwip_region": {
+    "reached": 0,
+    "instructions": 5,
+    "unreached": [
+     "0x8029edc",
+     "0x8029ede",
+     "0x8029ee2",
+     "0x8029ee4",
+     "0x8029ee6"
+    ]
+   },
+   "memp_free_pool": {
+    "reached": 4,
+    "instructions": 17,
+    "unreached": [
+     "0x8029f94",
+     "0x8029f96",
+     "0x8029f9a",
+     "0x8029f9c",
+     "0x8029f9e",
+     "0x8029fa2",
+     "0x8029fa6",
+     "0x8029fa8",
+     "0x8029faa",
+     "0x8029fac",
+     "0x8029fae",
+     "0x8029fb2",
+     "0x8029fb6"
+    ]
+   },
+   "memp_init_pool": {
+    "reached": 0,
+    "instructions": 22,
+    "unreached": [
+     "0x8029f38",
+     "0x8029f3a",
+     "0x8029f3c",
+     "0x8029f3e",
+     "0x8029f42",
+     "0x8029f44",
+     "0x8029f46",
+     "0x8029f48",
+     "0x8029f4c",
+     "0x8029f4e",
+     "0x8029f52",
+     "0x8029f54",
+     "0x8029f56",
+     "0x8029f58",
+     "0x8029f5a",
+     "0x8029f5e",
+     "0x8029f60",
+     "0x8029f62",
+     "0x8029f64",
+     "0x8029f66",
+     "0x8029f68",
+     "0x8029f6a"
+    ]
+   },
+   "memp_malloc_pool": {
+    "reached": 5,
+    "instructions": 16,
+    "unreached": [
+     "0x8029f72",
+     "0x8029f76",
+     "0x8029f78",
+     "0x8029f7a",
+     "0x8029f7c",
+     "0x8029f7e",
+     "0x8029f80",
+     "0x8029f82",
+     "0x8029f84",
+     "0x8029f86",
+     "0x8029f88"
+    ]
+   },
+   "sys_arch_protect": {
+    "reached": 2,
+    "instructions": 3,
+    "unreached": [
+     "0x8029fbe"
+    ]
+   },
+   "sys_arch_unprotect": {
+    "reached": 1,
+    "instructions": 3,
+    "unreached": [
+     "0x8029fc0",
+     "0x8029fc6"
+    ]
+   }
+  }
+ }
+}

@@ -79,18 +79,18 @@ a ranking. Each configuration's name links to its record.
 
 10 libraries and 1 configuration of ours on 6 boards, 64 records; series at commit `f12caf72e130`.
 
-<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="onectx"><strong>Use from interrupts was tested</strong> in a series of its own, the concurrency series: an interrupt at every cycle of a call, on every board, with controls that must be caught (<a href="method-pools.html#use-from-interrupts">method</a>). What it observed is in each board's fold-out "Use from interrupts"; a library used in a way it does not document is never called failing. The numbers in the tables are of one context.</div>
 
 <details id="nrf5340-dk" markdown="1">
 <summary><strong>nRF5340 DK</strong>, 64 MHz, method version 3: 10 configurations and a row of ours, <code>pair</code> alloc 10–76 cycles with the cache on</summary>
 
 nRF5340 DK, application core (Cortex-M33), 64 MHz. Method version 3, at 64 MHz, with the board's option registers in every record.
 
-<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="onectx"><strong>Use from interrupts was tested</strong> in a series of its own, the concurrency series: an interrupt at every cycle of a call, on every board, with controls that must be caught (<a href="method-pools.html#use-from-interrupts">method</a>). What it observed is in each board's fold-out "Use from interrupts"; a library used in a way it does not document is never called failing. The numbers in the tables are of one context.</div>
 
 Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost empty. Cycles per call, and of the one call of init: the range over the eight placements, first pass. Flash: code and constants; RAM: beyond the blocks and their canaries.
 
-| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts (not tested) |
+| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/nrf5340/adapter_etl.json) · 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 176 | 25 | 81–93 | 150–172 | 42 | 14 | 84–94 | 42–59 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/nrf5340/adapter_riot.json) · 9c9a6ab (the ring buffers' pin) | none | 128 | 8 | 1175–1188 | 3348–3573 | 10 | 57 | 31–49 | 132–160 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -107,12 +107,36 @@ Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost e
 
 The same numbers with your own weights: the [comparison page for this board](compare-pools.html#board=nrf5340dk&scen=pair).
 
+<details id="nrf5340-dk-use-from-interrupts" markdown="1">
+<summary>Use from interrupts on this board (the concurrency series)</summary>
+
+**Use from interrupts.** What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.
+
+| Configuration | Documented use from interrupts | Observed in the concurrency series | Trials | Instructions reached by an interrupt |
+|---|---|---|---:|---:|
+| [ETL etl::pool (C++)](../../records/pools/nrf5340/adapter_etl.json) | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) | [outside its documentation; observed in 1 of 87 trials: a crash; the sweep stopped at trial 87 with the cache off, in the check after the trial; cache on not run](../../records/pools-isr/nrf5340/adapter_etl.json) | 87 | 3 of 69 |
+| [RIOT memarray (C)](../../records/pools/nrf5340/adapter_riot.json) | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) | [outside its documentation; observed in 3696 of 61104 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/nrf5340/adapter_riot.json) | 61104 | 15 of 49 |
+| [ThreadX block pool (C)](../../records/pools/nrf5340/adapter_threadx.json)[4] | allocate and release allowed from ISRs; allocate from an ISR only with TX_NO_WAIT (source: https://raw.githubusercontent.com/eclipse-threadx/rtos-docs/refs/heads/main/rtos-docs/threadx/chapter4.md (tx_block_allocate, tx_block_release: Allowed From)) | [passed: nothing observed in 74384 trials; an interrupt waited at most 44 cycles with the cache off, 21 with it on](../../records/pools-isr/nrf5340/adapter_threadx.json) | 74384 | 29 of 275 |
+| [CMSIS-RTX osRtxMemoryPool (C)](../../records/pools/nrf5340/adapter_cmsis_rtx.json) | alloc from an ISR with timeout 0; free from an ISR (source: https://arm-software.github.io/CMSIS_6/latest/RTOS2/group__CMSIS__RTOS__PoolMgmt.html (osMemoryPoolAlloc, osMemoryPoolFree: Note)) | [passed: nothing observed in 67708 trials](../../records/pools-isr/nrf5340/adapter_cmsis_rtx.json) | 67708 | 50 of 111 |
+| [Contiki-NG memb (C)](../../records/pools/nrf5340/adapter_contiki.json) | nothing about interrupts or threads (source: os/lib/memb.h at 4ccd1a3 (no statement)) | [outside its documentation; observed in 1008 of 113886 trials: a block although none was free; a block twice](../../records/pools-isr/nrf5340/adapter_contiki.json) | 113886 | 47 of 91 |
+| [C_Allocator fb_allocator (C)](../../records/pools/nrf5340/adapter_c_allocator.json)[3] | may be called from an interrupt with an interrupt-masking lock option; without threads the default is no lock (as built here) (source: README.md:390 and src/LockGuard.h:24-29 at 497b465) | [outside its documentation; observed in 2536 of 90840 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/nrf5340/adapter_c_allocator.json) | 90840 | 73 of 126 |
+| [lwIP memp (C)](../../records/pools/nrf5340/adapter_lwip.json) | protected by SYS_ARCH_PROTECT, by disabling interrupts or a semaphore or mutex as the port does it; here our port: interrupts off (source: src/include/lwip/sys.h:486-489 at 77dcd25; kinds/pools/shims/lwip/sys_arch.c) | [passed: nothing observed in 77936 trials; an interrupt waited at most 60 cycles with the cache off, 28 with it on](../../records/pools-isr/nrf5340/adapter_lwip.json) | 77936 | 23 of 88 |
+| [MemoryPool Fixed (C++)](../../records/pools/nrf5340/adapter_memorypool.json)[1] | without threads not thread safe (#warning); no lock on the boards (source: src/Fixed.h:16 at 5073178) | [outside its documentation; observed in 1600 of 44100 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/nrf5340/adapter_memorypool.json) | 44100 | 12 of 40 |
+| [heapless pool, BoxPool (Rust)](../../records/pools/nrf5340/adapter_heapless.json)[2] | only on ARM cores with LDREX, CLREX and STREX; lock-free (source: src/pool.rs:7 at 1918822) | [passed: nothing observed in 63105 trials](../../records/pools-isr/nrf5340/adapter_heapless.json) | 63105 | 54 of 143 |
+| [atomic-pool (Rust)](../../records/pools/nrf5340/adapter_atomic_pool.json) | atomics through portable-atomic; on cores without CAS its critical-section or unsafe-assume-single-core feature (source: README.md:13-14 at ab88f3c) | [passed: nothing observed in 63736 trials](../../records/pools-isr/nrf5340/adapter_atomic_pool.json) | 63736 | 47 of 164 |
+| [reference free list, interrupts off (ours)](../../records/pools/nrf5340/adapter_ref_primask.json) (our reference free list with interrupts off; not a library) | the reference with interrupts off (PRIMASK) around each call: a row of ours, not a library (source: kinds/pools/adapter_ref.c (POOL_PRIMASK)) | [passed: nothing observed in 43736 trials; an interrupt waited at most 28 cycles with the cache off, 15 with it on](../../records/pools-isr/nrf5340/adapter_ref_primask.json) | 43736 | 4 of 42 |
+| reference free list (ours; the baseline, timed in the same images; not a library); the control without a lock | the baseline: no lock; measured in one context only (source: kinds/pools/adapter_ref.c) | [caught in 784 of 42048 trials](../../records/pools-isr/nrf5340/adapter_ref.json) | 42048 | 12 of 36 |
+| broken: interrupts on too early in alloc (our control) | – | [caught in 1428 of 43248 trials; an interrupt waited at most 26 cycles with the cache off, 13 with it on](../../records/pools-isr/nrf5340/adapter_broken_isr_alloc.json) | 43248 | 7 of 37 |
+| broken: interrupts on too early in free (our control) | – | [caught in 1260 of 43960 trials; an interrupt waited at most 28 cycles with the cache off, 15 with it on](../../records/pools-isr/nrf5340/adapter_broken_isr_free.json) | 43960 | 6 of 37 |
+
+</details>
+
 <details id="nrf5340-dk-every-pattern" markdown="1">
 <summary>Every pattern on this board: bytes and init, and <code>pair</code>, <code>pair_full</code>, <code>fill_drain_lifo</code>, <code>fill_drain_fifo</code>, <code>mixed</code>, <code>empty</code></summary>
 
 **Bytes and init.** Flash: the library's and the adapter's code and constants at `-O2`, measured in the board's images; RAM: beyond the 32 blocks of 32 bytes and the canaries. Init: cycles of one call that creates the pool in the adapter's storage, the range over the eight placements, first pass.
 
-| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts (not tested) |
+| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts |
 |---|---|---|---|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/nrf5340/adapter_etl.json) | ETL | 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 176 | 25 | 81–93 | 150–172 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/nrf5340/adapter_riot.json) | RIOT | 9c9a6ab (the ring buffers' pin) | none | 128 | 8 | 1175–1188 | 3348–3573 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -238,11 +262,11 @@ The same numbers with your own weights: the [comparison page for this board](com
 
 Raspberry Pi Pico 2 H (RP2350A, core 0, Cortex-M33), 150 MHz. Method version 3, at 150 MHz, with the board's option registers in every record.
 
-<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="onectx"><strong>Use from interrupts was tested</strong> in a series of its own, the concurrency series: an interrupt at every cycle of a call, on every board, with controls that must be caught (<a href="method-pools.html#use-from-interrupts">method</a>). What it observed is in each board's fold-out "Use from interrupts"; a library used in a way it does not document is never called failing. The numbers in the tables are of one context.</div>
 
 Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost empty. Cycles per call, and of the one call of init: the range over the eight placements, first pass. Flash: code and constants; RAM: beyond the blocks and their canaries.
 
-| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts (not tested) |
+| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/rp2350/adapter_etl.json) · 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 176 | 25 | 615–848 | 1715–1787 | 34 | 15 | 865–866 | 549–551 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/rp2350/adapter_riot.json) · 9c9a6ab (the ring buffers' pin) | none | 128 | 8 | 2663–2768 | 36340–36409 | 10–11 | 42 | 493–494 | 1410–1412 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -259,12 +283,38 @@ Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost e
 
 The same numbers with your own weights: the [comparison page for this board](compare-pools.html#board=pico2&scen=pair).
 
+<details id="raspberry-pi-pico-2-h-use-from-interrupts" markdown="1">
+<summary>Use from interrupts on this board (the concurrency series)</summary>
+
+**Use from interrupts.** What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.
+
+On this board with the cache off, a call longer than about 2,900 cycles is interrupted only in its first part: the sweep moves the interrupt up to 4,096 cycles after it is armed, and about 1,200 of those come before the call. The record's coverage per function names the instructions no interrupt landed on.
+
+| Configuration | Documented use from interrupts | Observed in the concurrency series | Trials | Instructions reached by an interrupt |
+|---|---|---|---:|---:|
+| [ETL etl::pool (C++)](../../records/pools/rp2350/adapter_etl.json) | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) | [outside its documentation; observed in 7104 of 67181 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 67181 with the cache off, in the check after the trial; cache on not run](../../records/pools-isr/rp2350/adapter_etl.json) | 67181 | 27 of 69 |
+| [RIOT memarray (C)](../../records/pools/rp2350/adapter_riot.json) | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) | [outside its documentation; observed in 30380 of 506364 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/rp2350/adapter_riot.json) | 506364 | 15 of 49 |
+| [ThreadX block pool (C)](../../records/pools/rp2350/adapter_threadx.json)[4] | allocate and release allowed from ISRs; allocate from an ISR only with TX_NO_WAIT (source: https://raw.githubusercontent.com/eclipse-threadx/rtos-docs/refs/heads/main/rtos-docs/threadx/chapter4.md (tx_block_allocate, tx_block_release: Allowed From)) | [passed: nothing observed in 542468 trials; an interrupt waited at most 380 cycles with the cache off, 20 with it on](../../records/pools-isr/rp2350/adapter_threadx.json) | 542468 | 31 of 275 |
+| [CMSIS-RTX osRtxMemoryPool (C)](../../records/pools/rp2350/adapter_cmsis_rtx.json) | alloc from an ISR with timeout 0; free from an ISR (source: https://arm-software.github.io/CMSIS_6/latest/RTOS2/group__CMSIS__RTOS__PoolMgmt.html (osMemoryPoolAlloc, osMemoryPoolFree: Note)) | [passed: nothing observed in 605152 trials](../../records/pools-isr/rp2350/adapter_cmsis_rtx.json) | 605152 | 52 of 111 |
+| [Contiki-NG memb (C)](../../records/pools/rp2350/adapter_contiki.json) | nothing about interrupts or threads (source: os/lib/memb.h at 4ccd1a3 (no statement)) | [outside its documentation; observed in 3616 of 684569 trials: a block although none was free; a block twice](../../records/pools-isr/rp2350/adapter_contiki.json) | 684569 | 46 of 91 |
+| [C_Allocator fb_allocator (C)](../../records/pools/rp2350/adapter_c_allocator.json)[3] | may be called from an interrupt with an interrupt-masking lock option; without threads the default is no lock (as built here) (source: README.md:390 and src/LockGuard.h:24-29 at 497b465) | [outside its documentation; observed in 12868 of 702360 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/rp2350/adapter_c_allocator.json) | 702360 | 77 of 126 |
+| [lwIP memp (C)](../../records/pools/rp2350/adapter_lwip.json) | protected by SYS_ARCH_PROTECT, by disabling interrupts or a semaphore or mutex as the port does it; here our port: interrupts off (source: src/include/lwip/sys.h:486-489 at 77dcd25; kinds/pools/shims/lwip/sys_arch.c) | [passed: nothing observed in 626024 trials; an interrupt waited at most 478 cycles with the cache off, 21 with it on](../../records/pools-isr/rp2350/adapter_lwip.json) | 626024 | 24 of 88 |
+| [MemoryPool Fixed (C++)](../../records/pools/rp2350/adapter_memorypool.json)[1] | without threads not thread safe (#warning); no lock on the boards (source: src/Fixed.h:16 at 5073178) | [outside its documentation; observed in 14516 of 412712 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/rp2350/adapter_memorypool.json) | 412712 | 13 of 40 |
+| [heapless pool, BoxPool (Rust)](../../records/pools/rp2350/adapter_heapless.json)[2] | only on ARM cores with LDREX, CLREX and STREX; lock-free (source: src/pool.rs:7 at 1918822) | [passed: nothing observed in 489480 trials](../../records/pools-isr/rp2350/adapter_heapless.json) | 489480 | 56 of 143 |
+| [atomic-pool (Rust)](../../records/pools/rp2350/adapter_atomic_pool.json) | atomics through portable-atomic; on cores without CAS its critical-section or unsafe-assume-single-core feature (source: README.md:13-14 at ab88f3c) | [passed: nothing observed in 472892 trials](../../records/pools-isr/rp2350/adapter_atomic_pool.json) | 472892 | 50 of 164 |
+| [reference free list, interrupts off (ours)](../../records/pools/rp2350/adapter_ref_primask.json) (our reference free list with interrupts off; not a library) | the reference with interrupts off (PRIMASK) around each call: a row of ours, not a library (source: kinds/pools/adapter_ref.c (POOL_PRIMASK)) | [passed: nothing observed in 420684 trials; an interrupt waited at most 395 cycles with the cache off, 15 with it on](../../records/pools-isr/rp2350/adapter_ref_primask.json) | 420684 | 6 of 42 |
+| reference free list (ours; the baseline, timed in the same images; not a library); the control without a lock | the baseline: no lock; measured in one context only (source: kinds/pools/adapter_ref.c) | [caught in 12740 of 412096 trials](../../records/pools-isr/rp2350/adapter_ref.json) | 412096 | 13 of 36 |
+| broken: interrupts on too early in alloc (our control) | – | [caught in 17272 of 420440 trials; an interrupt waited at most 313 cycles with the cache off, 13 with it on](../../records/pools-isr/rp2350/adapter_broken_isr_alloc.json) | 420440 | 8 of 37 |
+| broken: interrupts on too early in free (our control) | – | [caught in 16920 of 421020 trials; an interrupt waited at most 395 cycles with the cache off, 15 with it on](../../records/pools-isr/rp2350/adapter_broken_isr_free.json) | 421020 | 7 of 37 |
+
+</details>
+
 <details id="raspberry-pi-pico-2-h-every-pattern" markdown="1">
 <summary>Every pattern on this board: bytes and init, and <code>pair</code>, <code>pair_full</code>, <code>fill_drain_lifo</code>, <code>fill_drain_fifo</code>, <code>mixed</code>, <code>empty</code></summary>
 
 **Bytes and init.** Flash: the library's and the adapter's code and constants at `-O2`, measured in the board's images; RAM: beyond the 32 blocks of 32 bytes and the canaries. Init: cycles of one call that creates the pool in the adapter's storage, the range over the eight placements, first pass.
 
-| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts (not tested) |
+| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts |
 |---|---|---|---|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/rp2350/adapter_etl.json) | ETL | 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 176 | 25 | 615–848 | 1715–1787 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/rp2350/adapter_riot.json) | RIOT | 9c9a6ab (the ring buffers' pin) | none | 128 | 8 | 2663–2768 | 36340–36409 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -390,11 +440,11 @@ The same numbers with your own weights: the [comparison page for this board](com
 
 NUCLEO-G474RE (STM32G474RET6, Cortex-M4F), 170 MHz. Method version 3, at 170 MHz, with the board's option registers in every record.
 
-<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="onectx"><strong>Use from interrupts was tested</strong> in a series of its own, the concurrency series: an interrupt at every cycle of a call, on every board, with controls that must be caught (<a href="method-pools.html#use-from-interrupts">method</a>). What it observed is in each board's fold-out "Use from interrupts"; a library used in a way it does not document is never called failing. The numbers in the tables are of one context.</div>
 
 Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost empty. Cycles per call, and of the one call of init: the range over the eight placements, first pass. Flash: code and constants; RAM: beyond the blocks and their canaries.
 
-| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts (not tested) |
+| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/stm32g474/adapter_etl.json) · 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 172 | 25 | 84–90 | 114–121 | 42–46 | 18–22 | 63–68 | 34–39 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/stm32g474/adapter_riot.json) · 9c9a6ab (the ring buffers' pin) | none | 128 | 8 | 1233–1238 | 2954–3237 | 17 | 54 | 28–33 | 106–110 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -411,12 +461,36 @@ Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost e
 
 The same numbers with your own weights: the [comparison page for this board](compare-pools.html#board=nucleo-g474re&scen=pair).
 
+<details id="nucleo-g474re-use-from-interrupts" markdown="1">
+<summary>Use from interrupts on this board (the concurrency series)</summary>
+
+**Use from interrupts.** What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.
+
+| Configuration | Documented use from interrupts | Observed in the concurrency series | Trials | Instructions reached by an interrupt |
+|---|---|---|---:|---:|
+| [ETL etl::pool (C++)](../../records/pools/stm32g474/adapter_etl.json) | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) | [outside its documentation; observed in 704 of 4963 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4963 with the cache off, in the check after the trial; cache on not run](../../records/pools-isr/stm32g474/adapter_etl.json) | 4963 | 27 of 68 |
+| [RIOT memarray (C)](../../records/pools/stm32g474/adapter_riot.json) | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) | [outside its documentation; observed in 3244 of 60308 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32g474/adapter_riot.json) | 60308 | 15 of 49 |
+| [ThreadX block pool (C)](../../records/pools/stm32g474/adapter_threadx.json)[4] | allocate and release allowed from ISRs; allocate from an ISR only with TX_NO_WAIT (source: https://raw.githubusercontent.com/eclipse-threadx/rtos-docs/refs/heads/main/rtos-docs/threadx/chapter4.md (tx_block_allocate, tx_block_release: Allowed From)) | [passed: nothing observed in 73272 trials; an interrupt waited at most 30 cycles with the cache off, 29 with it on](../../records/pools-isr/stm32g474/adapter_threadx.json) | 73272 | 30 of 276 |
+| [CMSIS-RTX osRtxMemoryPool (C)](../../records/pools/stm32g474/adapter_cmsis_rtx.json) | alloc from an ISR with timeout 0; free from an ISR (source: https://arm-software.github.io/CMSIS_6/latest/RTOS2/group__CMSIS__RTOS__PoolMgmt.html (osMemoryPoolAlloc, osMemoryPoolFree: Note)) | [passed: nothing observed in 73088 trials](../../records/pools-isr/stm32g474/adapter_cmsis_rtx.json) | 73088 | 54 of 110 |
+| [Contiki-NG memb (C)](../../records/pools/stm32g474/adapter_contiki.json) | nothing about interrupts or threads (source: os/lib/memb.h at 4ccd1a3 (no statement)) | [outside its documentation; observed in 1088 of 123546 trials: a block although none was free; a block twice](../../records/pools-isr/stm32g474/adapter_contiki.json) | 123546 | 52 of 91 |
+| [C_Allocator fb_allocator (C)](../../records/pools/stm32g474/adapter_c_allocator.json)[3] | may be called from an interrupt with an interrupt-masking lock option; without threads the default is no lock (as built here) (source: README.md:390 and src/LockGuard.h:24-29 at 497b465) | [outside its documentation; observed in 1824 of 83280 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32g474/adapter_c_allocator.json) | 83280 | 75 of 126 |
+| [lwIP memp (C)](../../records/pools/stm32g474/adapter_lwip.json) | protected by SYS_ARCH_PROTECT, by disabling interrupts or a semaphore or mutex as the port does it; here our port: interrupts off (source: src/include/lwip/sys.h:486-489 at 77dcd25; kinds/pools/shims/lwip/sys_arch.c) | [passed: nothing observed in 74236 trials; an interrupt waited at most 35 cycles with the cache off, 18 with it on](../../records/pools-isr/stm32g474/adapter_lwip.json) | 74236 | 24 of 88 |
+| [MemoryPool Fixed (C++)](../../records/pools/stm32g474/adapter_memorypool.json)[1] | without threads not thread safe (#warning); no lock on the boards (source: src/Fixed.h:16 at 5073178) | [outside its documentation; observed in 984 of 47268 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32g474/adapter_memorypool.json) | 47268 | 12 of 38 |
+| [heapless pool, BoxPool (Rust)](../../records/pools/stm32g474/adapter_heapless.json)[2] | only on ARM cores with LDREX, CLREX and STREX; lock-free (source: src/pool.rs:7 at 1918822) | [passed: nothing observed in 67052 trials](../../records/pools-isr/stm32g474/adapter_heapless.json) | 67052 | 56 of 143 |
+| [atomic-pool (Rust)](../../records/pools/stm32g474/adapter_atomic_pool.json) | atomics through portable-atomic; on cores without CAS its critical-section or unsafe-assume-single-core feature (source: README.md:13-14 at ab88f3c) | [passed: nothing observed in 68156 trials](../../records/pools-isr/stm32g474/adapter_atomic_pool.json) | 68156 | 56 of 175 |
+| [reference free list, interrupts off (ours)](../../records/pools/stm32g474/adapter_ref_primask.json) (our reference free list with interrupts off; not a library) | the reference with interrupts off (PRIMASK) around each call: a row of ours, not a library (source: kinds/pools/adapter_ref.c (POOL_PRIMASK)) | [passed: nothing observed in 48904 trials; an interrupt waited at most 17 cycles with the cache off, 12 with it on](../../records/pools-isr/stm32g474/adapter_ref_primask.json) | 48904 | 5 of 40 |
+| reference free list (ours; the baseline, timed in the same images; not a library); the control without a lock | the baseline: no lock; measured in one context only (source: kinds/pools/adapter_ref.c) | [caught in 900 of 46644 trials](../../records/pools-isr/stm32g474/adapter_ref.json) | 46644 | 12 of 34 |
+| broken: interrupts on too early in alloc (our control) | – | [caught in 1496 of 49076 trials; an interrupt waited at most 16 cycles with the cache off, 12 with it on](../../records/pools-isr/stm32g474/adapter_broken_isr_alloc.json) | 49076 | 7 of 37 |
+| broken: interrupts on too early in free (our control) | – | [caught in 1456 of 49524 trials; an interrupt waited at most 18 cycles with the cache off, 12 with it on](../../records/pools-isr/stm32g474/adapter_broken_isr_free.json) | 49524 | 7 of 37 |
+
+</details>
+
 <details id="nucleo-g474re-every-pattern" markdown="1">
 <summary>Every pattern on this board: bytes and init, and <code>pair</code>, <code>pair_full</code>, <code>fill_drain_lifo</code>, <code>fill_drain_fifo</code>, <code>mixed</code>, <code>empty</code></summary>
 
 **Bytes and init.** Flash: the library's and the adapter's code and constants at `-O2`, measured in the board's images; RAM: beyond the 32 blocks of 32 bytes and the canaries. Init: cycles of one call that creates the pool in the adapter's storage, the range over the eight placements, first pass.
 
-| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts (not tested) |
+| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts |
 |---|---|---|---|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/stm32g474/adapter_etl.json) | ETL | 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 172 | 25 | 84–90 | 114–121 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/stm32g474/adapter_riot.json) | RIOT | 9c9a6ab (the ring buffers' pin) | none | 128 | 8 | 1233–1238 | 2954–3237 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -542,11 +616,11 @@ The same numbers with your own weights: the [comparison page for this board](com
 
 NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7), 520 MHz. Method version 3, at 520 MHz, with the board's option registers in every record.
 
-<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="onectx"><strong>Use from interrupts was tested</strong> in a series of its own, the concurrency series: an interrupt at every cycle of a call, on every board, with controls that must be caught (<a href="method-pools.html#use-from-interrupts">method</a>). What it observed is in each board's fold-out "Use from interrupts"; a library used in a way it does not document is never called failing. The numbers in the tables are of one context.</div>
 
 Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost empty. Cycles per call, and of the one call of init: the range over the eight placements, first pass. Flash: code and constants; RAM: beyond the blocks and their canaries.
 
-| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts (not tested) |
+| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/stm32h723/adapter_etl.json) · 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 172 | 25 | 121–160 | 212–250 | 25 | 15 | 68–94 | 52–64 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/stm32h723/adapter_riot.json) · 9c9a6ab (the ring buffers' pin) | none | 128 | 8 | 927–983 | 3688–4784 | 11–14 | 25–31 | 54–64 | 136–154 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -563,12 +637,36 @@ Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost e
 
 The same numbers with your own weights: the [comparison page for this board](compare-pools.html#board=nucleo-h723zg&scen=pair).
 
+<details id="nucleo-h723zg-use-from-interrupts" markdown="1">
+<summary>Use from interrupts on this board (the concurrency series)</summary>
+
+**Use from interrupts.** What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.
+
+| Configuration | Documented use from interrupts | Observed in the concurrency series | Trials | Instructions reached by an interrupt |
+|---|---|---|---:|---:|
+| [ETL etl::pool (C++)](../../records/pools/stm32h723/adapter_etl.json) | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) | [outside its documentation; observed in 442 of 8168 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 8168 with the cache off, in the check after the trial; cache on not run](../../records/pools-isr/stm32h723/adapter_etl.json) | 8168 | 19 of 69 |
+| [RIOT memarray (C)](../../records/pools/stm32h723/adapter_riot.json) | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) | [outside its documentation; observed in 3519 of 79461 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32h723/adapter_riot.json) | 79461 | 13 of 49 |
+| [ThreadX block pool (C)](../../records/pools/stm32h723/adapter_threadx.json)[4] | allocate and release allowed from ISRs; allocate from an ISR only with TX_NO_WAIT (source: https://raw.githubusercontent.com/eclipse-threadx/rtos-docs/refs/heads/main/rtos-docs/threadx/chapter4.md (tx_block_allocate, tx_block_release: Allowed From)) | [passed: nothing observed in 86024 trials; an interrupt waited at most 66 cycles with the cache off, 33 with it on](../../records/pools-isr/stm32h723/adapter_threadx.json) | 86024 | 32 of 277 |
+| [CMSIS-RTX osRtxMemoryPool (C)](../../records/pools/stm32h723/adapter_cmsis_rtx.json) | alloc from an ISR with timeout 0; free from an ISR (source: https://arm-software.github.io/CMSIS_6/latest/RTOS2/group__CMSIS__RTOS__PoolMgmt.html (osMemoryPoolAlloc, osMemoryPoolFree: Note)) | [passed: nothing observed in 94062 trials](../../records/pools-isr/stm32h723/adapter_cmsis_rtx.json) | 94062 | 47 of 111 |
+| [Contiki-NG memb (C)](../../records/pools/stm32h723/adapter_contiki.json) | nothing about interrupts or threads (source: os/lib/memb.h at 4ccd1a3 (no statement)) | [outside its documentation; observed in 1072 of 108150 trials: a block although none was free; a block twice](../../records/pools-isr/stm32h723/adapter_contiki.json) | 108150 | 43 of 91 |
+| [C_Allocator fb_allocator (C)](../../records/pools/stm32h723/adapter_c_allocator.json)[3] | may be called from an interrupt with an interrupt-masking lock option; without threads the default is no lock (as built here) (source: README.md:390 and src/LockGuard.h:24-29 at 497b465) | [outside its documentation; observed in 4312 of 102868 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32h723/adapter_c_allocator.json) | 102868 | 54 of 126 |
+| [lwIP memp (C)](../../records/pools/stm32h723/adapter_lwip.json) | protected by SYS_ARCH_PROTECT, by disabling interrupts or a semaphore or mutex as the port does it; here our port: interrupts off (source: src/include/lwip/sys.h:486-489 at 77dcd25; kinds/pools/shims/lwip/sys_arch.c) | [passed: nothing observed in 94516 trials; an interrupt waited at most 77 cycles with the cache off, 37 with it on](../../records/pools-isr/stm32h723/adapter_lwip.json) | 94516 | 19 of 88 |
+| [MemoryPool Fixed (C++)](../../records/pools/stm32h723/adapter_memorypool.json)[1] | without threads not thread safe (#warning); no lock on the boards (source: src/Fixed.h:16 at 5073178) | [outside its documentation; observed in 392 of 62725 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32h723/adapter_memorypool.json) | 62725 | 9 of 40 |
+| [heapless pool, BoxPool (Rust)](../../records/pools/stm32h723/adapter_heapless.json)[2] | only on ARM cores with LDREX, CLREX and STREX; lock-free (source: src/pool.rs:7 at 1918822) | [passed: nothing observed in 77186 trials](../../records/pools-isr/stm32h723/adapter_heapless.json) | 77186 | 44 of 147 |
+| [atomic-pool (Rust)](../../records/pools/stm32h723/adapter_atomic_pool.json) | atomics through portable-atomic; on cores without CAS its critical-section or unsafe-assume-single-core feature (source: README.md:13-14 at ab88f3c) | [passed: nothing observed in 79104 trials](../../records/pools-isr/stm32h723/adapter_atomic_pool.json) | 79104 | 45 of 177 |
+| [reference free list, interrupts off (ours)](../../records/pools/stm32h723/adapter_ref_primask.json) (our reference free list with interrupts off; not a library) | the reference with interrupts off (PRIMASK) around each call: a row of ours, not a library (source: kinds/pools/adapter_ref.c (POOL_PRIMASK)) | [passed: nothing observed in 67232 trials; an interrupt waited at most 67 cycles with the cache off, 27 with it on](../../records/pools-isr/stm32h723/adapter_ref_primask.json) | 67232 | 6 of 42 |
+| reference free list (ours; the baseline, timed in the same images; not a library); the control without a lock | the baseline: no lock; measured in one context only (source: kinds/pools/adapter_ref.c) | [caught in 452 of 61140 trials](../../records/pools-isr/stm32h723/adapter_ref.json) | 61140 | 11 of 36 |
+| broken: interrupts on too early in alloc (our control) | – | [caught in 3128 of 67068 trials; an interrupt waited at most 41 cycles with the cache off, 24 with it on](../../records/pools-isr/stm32h723/adapter_broken_isr_alloc.json) | 67068 | 8 of 37 |
+| broken: interrupts on too early in free (our control) | – | [caught in 1800 of 67968 trials; an interrupt waited at most 63 cycles with the cache off, 27 with it on](../../records/pools-isr/stm32h723/adapter_broken_isr_free.json) | 67968 | 8 of 37 |
+
+</details>
+
 <details id="nucleo-h723zg-every-pattern" markdown="1">
 <summary>Every pattern on this board: bytes and init, and <code>pair</code>, <code>pair_full</code>, <code>fill_drain_lifo</code>, <code>fill_drain_fifo</code>, <code>mixed</code>, <code>empty</code></summary>
 
 **Bytes and init.** Flash: the library's and the adapter's code and constants at `-O2`, measured in the board's images; RAM: beyond the 32 blocks of 32 bytes and the canaries. Init: cycles of one call that creates the pool in the adapter's storage, the range over the eight placements, first pass.
 
-| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts (not tested) |
+| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts |
 |---|---|---|---|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/stm32h723/adapter_etl.json) | ETL | 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 172 | 25 | 121–160 | 212–250 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/stm32h723/adapter_riot.json) | RIOT | 9c9a6ab (the ring buffers' pin) | none | 128 | 8 | 927–983 | 3688–4784 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -696,11 +794,11 @@ Cache off: The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage s
 
 NUCLEO-G0B1RE (STM32G0B1RET6, Cortex-M0+), 64 MHz. Method version 3, at 64 MHz, with the board's option registers in every record.
 
-<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="onectx"><strong>Use from interrupts was tested</strong> in a series of its own, the concurrency series: an interrupt at every cycle of a call, on every board, with controls that must be caught (<a href="method-pools.html#use-from-interrupts">method</a>). What it observed is in each board's fold-out "Use from interrupts"; a library used in a way it does not document is never called failing. The numbers in the tables are of one context.</div>
 
 Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost empty. Cycles per call, and of the one call of init: the range over the eight placements, first pass. Flash: code and constants; RAM: beyond the blocks and their canaries.
 
-| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts (not tested) |
+| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/stm32g0b1/adapter_etl.json) · 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 172 | 25 | 69–71 | 99 | 56–59 | 28–29 | 67–69 | 32 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/stm32g0b1/adapter_riot.json) · 9c9a6ab (the ring buffers' pin) | none | 140 | 8 | 3349–3350 | 3840 | 22 | 115 | 24 | 128–130 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -716,12 +814,35 @@ Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost e
 
 The same numbers with your own weights: the [comparison page for this board](compare-pools.html#board=nucleo-g0b1re&scen=pair).
 
+<details id="nucleo-g0b1re-use-from-interrupts" markdown="1">
+<summary>Use from interrupts on this board (the concurrency series)</summary>
+
+**Use from interrupts.** What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.
+
+| Configuration | Documented use from interrupts | Observed in the concurrency series | Trials | Instructions reached by an interrupt |
+|---|---|---|---:|---:|
+| [ETL etl::pool (C++)](../../records/pools/stm32g0b1/adapter_etl.json) | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) | [outside its documentation; observed in 689 of 4838 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4838 with the cache off, in the check after the trial; cache on not run](../../records/pools-isr/stm32g0b1/adapter_etl.json) | 4838 | 27 of 76 |
+| [RIOT memarray (C)](../../records/pools/stm32g0b1/adapter_riot.json) | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) | [outside its documentation; observed in 6652 of 70640 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32g0b1/adapter_riot.json) | 70640 | 16 of 59 |
+| [ThreadX block pool (C)](../../records/pools/stm32g0b1/adapter_threadx.json)[4] | allocate and release allowed from ISRs; allocate from an ISR only with TX_NO_WAIT (source: https://raw.githubusercontent.com/eclipse-threadx/rtos-docs/refs/heads/main/rtos-docs/threadx/chapter4.md (tx_block_allocate, tx_block_release: Allowed From)) | [passed: nothing observed in 75808 trials; an interrupt waited at most 31 cycles with the cache off, 25 with it on](../../records/pools-isr/stm32g0b1/adapter_threadx.json) | 75808 | 34 of 336 |
+| [CMSIS-RTX osRtxMemoryPool (C)](../../records/pools/stm32g0b1/adapter_cmsis_rtx.json) | alloc from an ISR with timeout 0; free from an ISR (source: https://arm-software.github.io/CMSIS_6/latest/RTOS2/group__CMSIS__RTOS__PoolMgmt.html (osMemoryPoolAlloc, osMemoryPoolFree: Note)) | [passed: nothing observed in 67892 trials; an interrupt waited at most 22 cycles with the cache off, 16 with it on](../../records/pools-isr/stm32g0b1/adapter_cmsis_rtx.json) | 67892 | 29 of 115 |
+| [Contiki-NG memb (C)](../../records/pools/stm32g0b1/adapter_contiki.json) | nothing about interrupts or threads (source: os/lib/memb.h at 4ccd1a3 (no statement)) | [outside its documentation; observed in 672 of 105496 trials: a block although none was free; a block twice](../../records/pools-isr/stm32g0b1/adapter_contiki.json) | 105496 | 58 of 97 |
+| [C_Allocator fb_allocator (C)](../../records/pools/stm32g0b1/adapter_c_allocator.json)[3] | may be called from an interrupt with an interrupt-masking lock option; without threads the default is no lock (as built here) (source: README.md:390 and src/LockGuard.h:24-29 at 497b465) | [outside its documentation; observed in 3416 of 92392 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32g0b1/adapter_c_allocator.json) | 92392 | 85 of 140 |
+| [lwIP memp (C)](../../records/pools/stm32g0b1/adapter_lwip.json) | protected by SYS_ARCH_PROTECT, by disabling interrupts or a semaphore or mutex as the port does it; here our port: interrupts off (source: src/include/lwip/sys.h:486-489 at 77dcd25; kinds/pools/shims/lwip/sys_arch.c) | [passed: nothing observed in 77200 trials; an interrupt waited at most 30 cycles with the cache off, 23 with it on](../../records/pools-isr/stm32g0b1/adapter_lwip.json) | 77200 | 31 of 105 |
+| [MemoryPool Fixed (C++)](../../records/pools/stm32g0b1/adapter_memorypool.json)[1] | without threads not thread safe (#warning); no lock on the boards (source: src/Fixed.h:16 at 5073178) | [outside its documentation; observed in 1688 of 49664 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/stm32g0b1/adapter_memorypool.json) | 49664 | 19 of 55 |
+| [atomic-pool (Rust)](../../records/pools/stm32g0b1/adapter_atomic_pool.json) | atomics through portable-atomic; on cores without CAS its critical-section or unsafe-assume-single-core feature (source: README.md:13-14 at ab88f3c) | [passed: nothing observed in 79388 trials; an interrupt waited at most 26 cycles with the cache off, 20 with it on](../../records/pools-isr/stm32g0b1/adapter_atomic_pool.json) | 79388 | 55 of 370 |
+| [reference free list, interrupts off (ours)](../../records/pools/stm32g0b1/adapter_ref_primask.json) (our reference free list with interrupts off; not a library) | the reference with interrupts off (PRIMASK) around each call: a row of ours, not a library (source: kinds/pools/adapter_ref.c (POOL_PRIMASK)) | [passed: nothing observed in 52540 trials; an interrupt waited at most 20 cycles with the cache off, 16 with it on](../../records/pools-isr/stm32g0b1/adapter_ref_primask.json) | 52540 | 7 of 48 |
+| reference free list (ours; the baseline, timed in the same images; not a library); the control without a lock | the baseline: no lock; measured in one context only (source: kinds/pools/adapter_ref.c) | [caught in 1552 of 48128 trials](../../records/pools-isr/stm32g0b1/adapter_ref.json) | 48128 | 13 of 42 |
+| broken: interrupts on too early in alloc (our control) | – | [caught in 2448 of 52092 trials; an interrupt waited at most 14 cycles with the cache off, 13 with it on](../../records/pools-isr/stm32g0b1/adapter_broken_isr_alloc.json) | 52092 | 11 of 44 |
+| broken: interrupts on too early in free (our control) | – | [caught in 1620 of 52540 trials; an interrupt waited at most 20 cycles with the cache off, 16 with it on](../../records/pools-isr/stm32g0b1/adapter_broken_isr_free.json) | 52540 | 8 of 44 |
+
+</details>
+
 <details id="nucleo-g0b1re-every-pattern" markdown="1">
 <summary>Every pattern on this board: bytes and init, and <code>pair</code>, <code>pair_full</code>, <code>fill_drain_lifo</code>, <code>fill_drain_fifo</code>, <code>mixed</code>, <code>empty</code></summary>
 
 **Bytes and init.** Flash: the library's and the adapter's code and constants at `-O2`, measured in the board's images; RAM: beyond the 32 blocks of 32 bytes and the canaries. Init: cycles of one call that creates the pool in the adapter's storage, the range over the eight placements, first pass.
 
-| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts (not tested) |
+| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts |
 |---|---|---|---|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/stm32g0b1/adapter_etl.json) | ETL | 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 172 | 25 | 69–71 | 99 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/stm32g0b1/adapter_riot.json) | RIOT | 9c9a6ab (the ring buffers' pin) | none | 140 | 8 | 3349–3350 | 3840 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -840,11 +961,11 @@ The same numbers with your own weights: the [comparison page for this board](com
 
 SAM D20 Xplained Pro (ATSAMD20J18A, Cortex-M0+), 48 MHz. Method version 3, at 48 MHz, with the board's option registers in every record.
 
-<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="onectx"><strong>Use from interrupts was tested</strong> in a series of its own, the concurrency series: an interrupt at every cycle of a call, on every board, with controls that must be caught (<a href="method-pools.html#use-from-interrupts">method</a>). What it observed is in each board's fold-out "Use from interrupts"; a library used in a way it does not document is never called failing. The numbers in the tables are of one context.</div>
 
 Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost empty. Cycles per call, and of the one call of init: the range over the eight placements, first pass. Flash: code and constants; RAM: beyond the blocks and their canaries.
 
-| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts (not tested) |
+| Configuration · pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | alloc, cache on | free, cache on | alloc, cache off | free, cache off | Documented use from interrupts |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/samd20/adapter_etl.json) · 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 172 | 25 | 60–61 | 84 | 56–57 | 26 | 61 | 28 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/samd20/adapter_riot.json) · 9c9a6ab (the ring buffers' pin) | none | 140 | 8 | 3091–3186 | 3540 | 19 | 109 | 20 | 117 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |
@@ -860,12 +981,35 @@ Pattern `pair`: alloc, then free of the same block, 256 times, the pool almost e
 
 The same numbers with your own weights: the [comparison page for this board](compare-pools.html#board=sam-d20-xpro&scen=pair).
 
+<details id="sam-d20-xplained-pro-use-from-interrupts" markdown="1">
+<summary>Use from interrupts on this board (the concurrency series)</summary>
+
+**Use from interrupts.** What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.
+
+| Configuration | Documented use from interrupts | Observed in the concurrency series | Trials | Instructions reached by an interrupt |
+|---|---|---|---:|---:|
+| [ETL etl::pool (C++)](../../records/pools/samd20/adapter_etl.json) | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) | [outside its documentation; observed in 667 of 4217 trials: a block twice; a crash; blocks lost; the sweep stopped at trial 4217 with the cache off, in the check after the trial; cache on not run](../../records/pools-isr/samd20/adapter_etl.json) | 4217 | 27 of 76 |
+| [RIOT memarray (C)](../../records/pools/samd20/adapter_riot.json) | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) | [outside its documentation; observed in 6488 of 62648 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/samd20/adapter_riot.json) | 62648 | 16 of 59 |
+| [ThreadX block pool (C)](../../records/pools/samd20/adapter_threadx.json)[4] | allocate and release allowed from ISRs; allocate from an ISR only with TX_NO_WAIT (source: https://raw.githubusercontent.com/eclipse-threadx/rtos-docs/refs/heads/main/rtos-docs/threadx/chapter4.md (tx_block_allocate, tx_block_release: Allowed From)) | [passed: nothing observed in 69212 trials; an interrupt waited at most 29 cycles with the cache off, 25 with it on](../../records/pools-isr/samd20/adapter_threadx.json) | 69212 | 34 of 336 |
+| [CMSIS-RTX osRtxMemoryPool (C)](../../records/pools/samd20/adapter_cmsis_rtx.json) | alloc from an ISR with timeout 0; free from an ISR (source: https://arm-software.github.io/CMSIS_6/latest/RTOS2/group__CMSIS__RTOS__PoolMgmt.html (osMemoryPoolAlloc, osMemoryPoolFree: Note)) | [passed: nothing observed in 61672 trials; an interrupt waited at most 22 cycles with the cache off, 19 with it on](../../records/pools-isr/samd20/adapter_cmsis_rtx.json) | 61672 | 29 of 115 |
+| [Contiki-NG memb (C)](../../records/pools/samd20/adapter_contiki.json) | nothing about interrupts or threads (source: os/lib/memb.h at 4ccd1a3 (no statement)) | [outside its documentation; observed in 704 of 99060 trials: a block although none was free; a block twice](../../records/pools-isr/samd20/adapter_contiki.json) | 99060 | 58 of 97 |
+| [C_Allocator fb_allocator (C)](../../records/pools/samd20/adapter_c_allocator.json)[3] | may be called from an interrupt with an interrupt-masking lock option; without threads the default is no lock (as built here) (source: README.md:390 and src/LockGuard.h:24-29 at 497b465) | [outside its documentation; observed in 3536 of 84328 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/samd20/adapter_c_allocator.json) | 84328 | 85 of 140 |
+| [lwIP memp (C)](../../records/pools/samd20/adapter_lwip.json) | protected by SYS_ARCH_PROTECT, by disabling interrupts or a semaphore or mutex as the port does it; here our port: interrupts off (source: src/include/lwip/sys.h:486-489 at 77dcd25; kinds/pools/shims/lwip/sys_arch.c) | [passed: nothing observed in 70360 trials; an interrupt waited at most 29 cycles with the cache off, 25 with it on](../../records/pools-isr/samd20/adapter_lwip.json) | 70360 | 31 of 105 |
+| [MemoryPool Fixed (C++)](../../records/pools/samd20/adapter_memorypool.json)[1] | without threads not thread safe (#warning); no lock on the boards (source: src/Fixed.h:16 at 5073178) | [outside its documentation; observed in 1560 of 43128 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost](../../records/pools-isr/samd20/adapter_memorypool.json) | 43128 | 19 of 55 |
+| [atomic-pool (Rust)](../../records/pools/samd20/adapter_atomic_pool.json) | atomics through portable-atomic; on cores without CAS its critical-section or unsafe-assume-single-core feature (source: README.md:13-14 at ab88f3c) | [passed: nothing observed in 74139 trials; an interrupt waited at most 23 cycles with the cache off, 21 with it on](../../records/pools-isr/samd20/adapter_atomic_pool.json) | 74139 | 55 of 370 |
+| [reference free list, interrupts off (ours)](../../records/pools/samd20/adapter_ref_primask.json) (our reference free list with interrupts off; not a library) | the reference with interrupts off (PRIMASK) around each call: a row of ours, not a library (source: kinds/pools/adapter_ref.c (POOL_PRIMASK)) | [passed: nothing observed in 45984 trials; an interrupt waited at most 18 cycles with the cache off, 14 with it on](../../records/pools-isr/samd20/adapter_ref_primask.json) | 45984 | 7 of 48 |
+| reference free list (ours; the baseline, timed in the same images; not a library); the control without a lock | the baseline: no lock; measured in one context only (source: kinds/pools/adapter_ref.c) | [caught in 1688 of 41592 trials](../../records/pools-isr/samd20/adapter_ref.json) | 41592 | 13 of 42 |
+| broken: interrupts on too early in alloc (our control) | – | [caught in 2176 of 45984 trials; an interrupt waited at most 15 cycles with the cache off, 13 with it on](../../records/pools-isr/samd20/adapter_broken_isr_alloc.json) | 45984 | 11 of 44 |
+| broken: interrupts on too early in free (our control) | – | [caught in 1620 of 45984 trials; an interrupt waited at most 18 cycles with the cache off, 14 with it on](../../records/pools-isr/samd20/adapter_broken_isr_free.json) | 45984 | 8 of 44 |
+
+</details>
+
 <details id="sam-d20-xplained-pro-every-pattern" markdown="1">
 <summary>Every pattern on this board: bytes and init, and <code>pair</code>, <code>pair_full</code>, <code>fill_drain_lifo</code>, <code>fill_drain_fifo</code>, <code>mixed</code>, <code>empty</code></summary>
 
 **Bytes and init.** Flash: the library's and the adapter's code and constants at `-O2`, measured in the board's images; RAM: beyond the 32 blocks of 32 bytes and the canaries. Init: cycles of one call that creates the pool in the adapter's storage, the range over the eight placements, first pass.
 
-| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts (not tested) |
+| Configuration | Library | Pin | Lock as built | Flash bytes | RAM bytes | Init, cache on | Init, cache off | Documented use from interrupts |
 |---|---|---|---|---:|---:|---:|---:|---|
 | [ETL etl::pool (C++)](../../records/pools/samd20/adapter_etl.json) | ETL | 20.49.0, 7d604f2 (the ring buffers' pin) | none (the header documents none) | 172 | 25 | 60–61 | 84 | nothing about interrupts or threads (source: include/etl/pool.h at 7d604f2 (no statement)) |
 | [RIOT memarray (C)](../../records/pools/samd20/adapter_riot.json) | RIOT | 9c9a6ab (the ring buffers' pin) | none | 140 | 8 | 3091–3186 | 3540 | nothing about interrupts or threads (source: sys/include/memarray.h at 9c9a6ab (no statement)) |

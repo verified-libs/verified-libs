@@ -55,9 +55,12 @@ git add records/crc records/pools && git commit -q -m "test: a made-up CRC recor
 base=$(git rev-parse HEAD)
 
 fails=0
-# case NAME FILE EXPECT_CRC_STOPPED EXPECT_RB_STOPPED EXPECT_POOLS_STOPPED
+# case NAME FILE EXPECT_CRC_STOPPED EXPECT_RB_STOPPED EXPECT_POOLS_STOPPED [EXPECT_POOLS_ISR_STOPPED]
+# The pools concurrency kind's test sources hold the pools kind's (POOLS_ISR_TEST_SOURCES), so its records
+# (records/pools-isr, of a commit whose sources differ from HEAD's, held by the host fixes) stop wherever the
+# pools records do; the sixth column is given where it differs.
 case_() {
-    local name=$1 file=$2 crc=$3 rb=$4 pools=$5 out rc got_crc=no got_rb=no got_pools=no
+    local name=$1 file=$2 crc=$3 rb=$4 pools=$5 isr=${6:-$5} out rc got_crc=no got_rb=no got_pools=no got_isr=no
     git reset -q --hard "$base"
     if [ -n "$file" ]; then
         printf '\n/* test change */\n' >> "$file"
@@ -67,12 +70,15 @@ case_() {
     grep -q "under records/crc/ name commit" <<<"$out" && got_crc=yes
     grep -q "whose test sources (firmware" <<<"$out" && got_rb=yes
     grep -q "under records/pools/ name commit" <<<"$out" && got_pools=yes
+    grep -q "under records/pools-isr/ name commit" <<<"$out" && got_isr=yes
+    # without records of that kind in the tree, none can stop
+    [ -n "$(git ls-files records/pools-isr | head -1)" ] || isr=no
     local want_rc=0
-    { [ "$crc" = yes ] || [ "$rb" = yes ] || [ "$pools" = yes ]; } && want_rc=1
-    if [ "$got_crc" = "$crc" ] && [ "$got_rb" = "$rb" ] && [ "$got_pools" = "$pools" ] && [ "$rc" = "$want_rc" ]; then
-        echo "ok   $name: CRC records stopped: $got_crc, ring-buffer records stopped: $got_rb, pools records stopped: $got_pools"
+    { [ "$crc" = yes ] || [ "$rb" = yes ] || [ "$pools" = yes ] || [ "$isr" = yes ]; } && want_rc=1
+    if [ "$got_crc" = "$crc" ] && [ "$got_rb" = "$rb" ] && [ "$got_pools" = "$pools" ] && [ "$got_isr" = "$isr" ] && [ "$rc" = "$want_rc" ]; then
+        echo "ok   $name: CRC records stopped: $got_crc, ring-buffer records stopped: $got_rb, pools records stopped: $got_pools, pools concurrency records stopped: $got_isr"
     else
-        echo "FAIL $name: CRC records stopped: $got_crc (want $crc), ring-buffer records stopped: $got_rb (want $rb), pools records stopped: $got_pools (want $pools), rc $rc"
+        echo "FAIL $name: CRC records stopped: $got_crc (want $crc), ring-buffer records stopped: $got_rb (want $rb), pools records stopped: $got_pools (want $pools), pools concurrency records stopped: $got_isr (want $isr), rc $rc"
         sed 's/^/     /' <<<"$out"
         fails=$((fails + 1))
     fi
@@ -96,6 +102,8 @@ case_ "pools: the claims file (claims.tsv)"            kinds/pools/claims.tsv   
 case_ "pools: the repeat script (repeat.sh)"           kinds/pools/repeat.sh                       no  no  no
 case_ "pools: the comparison (bench/poolscompare.py)"  kinds/pools/bench/poolscompare.py           no  no  no
 case_ "pools: control, an adapter (adapter_lwip.c)"    kinds/pools/adapter_lwip.c                  no  no  yes
+case_ "pools concurrency: its image (pools-isr/main.c)" kinds/pools-isr/main.c                     no  no  no  yes
+case_ "pools concurrency: its host check (contract.c)"  kinds/pools-isr/contract.c                  no  no  no
 
 # an archived series whose records have left the tree (method version 3: replaced at their paths by the
 # records measured again) is kept in the public history its entry names: nothing stops; a series only partly
@@ -160,6 +168,25 @@ if [ -f "$T/out/SAME_SOURCES_POOLS" ] && [ "$(cat "$T/out/SAME_SOURCES_POOLS")" 
 else
     echo "FAIL SAME_SOURCES_POOLS is '$(echo $(cat "$T/out/SAME_SOURCES_POOLS" 2>/dev/null))', want '$(echo $want_pools)'"; fails=$((fails + 1))
 fi
+# The ledger's plan (image-ledger.py --plan: what it would rebuild and the checksum each entry would hold,
+# nothing built): a file that only builds the pools kind's images changed, so every real pools record and
+# every pools concurrency record is one to hold. Each must have its kind's checksum (2026-11-27: the ledger
+# took the pools kind's checksum for the concurrency records, whose fields are others, and stopped with a
+# KeyError, in the full test only); a kind without a check of a record would be said as such and not planned
+# (the made-up pools record has no images, so the plan names it as not rebuilt: that is expected).
+git reset -q --hard "$base"
+printf '\n# test change\n' >> kinds/pools/configs.txt; git commit -q -am "test: kinds/pools/configs.txt (the plan)"
+n_p=$(find records/pools -name '*.json' -exec jq -r 'select(.bench_commit != "'"$src"'") | input_filename' {} + | wc -l)
+n_i=$(find records/pools-isr -name '*.json' 2>/dev/null | wc -l)
+out=$(python3 lab/tools/image-ledger.py --plan 2>&1); rc=$?
+got_p=$(grep -c '^would rebuild pools/' <<<"$out"); got_i=$(grep -c '^would rebuild pools-isr/' <<<"$out")
+if [ "$rc" = 0 ] && ! grep -q 'Traceback\|pools concurrency records not rebuilt' <<<"$out" && [ "$got_p" = "$n_p" ] && [ "$got_i" = "$n_i" ]; then
+    echo "ok   the ledger's plan after a pools build file changed: $got_p pools records and $got_i pools concurrency records to rebuild, each with its kind's checksum, rc 0"
+else
+    echo "FAIL the ledger's plan after a pools build file changed: $got_p of $n_p pools records, $got_i of $n_i pools concurrency records planned, rc $rc"
+    sed 's/^/     /' <<<"$out" | grep -v '^     would rebuild' | tail -n 12; fails=$((fails + 1))
+fi
+git reset -q --hard "$base"
 # The same-image rule for CRC records (DECISIONS 2026-11-24): two made-up
 # records of a real build of this commit, on a base of their own.
 if [ "${1:-}" != --quick ]; then
@@ -290,24 +317,34 @@ for n in sys.stdin.read().split():
         # pools (the ledger's pools/ entries, image-ledger.py): a file that only builds images (configs.txt)
         # changed; without a ledger the pools records stop, with one made again from this tree they stand (the
         # made-up pools record, which has no images, is taken out first)
-        pcase() {   # NAME WANT_STOPPED TEXT
-            local name=$1 want=$2 text=$3 out rc got=no want_rc=0
+        # pcase NAME WANT_POOLS_STOPPED WANT_ISR_STOPPED TEXT [ISR_TEXT]: the pools concurrency records are built
+        # from the pools kind's sources too, so the same change touches them
+        pcase() {
+            local name=$1 want=$2 want_i=$3 text=$4 text_i=${5:-} out rc got=no got_i=no want_rc=0
             out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
             grep -q "under records/pools/ name commit" <<<"$out" && got=yes
-            [ "$want" = yes ] && want_rc=1
-            if [ "$got" = "$want" ] && [ "$rc" = "$want_rc" ] && grep -q "$text" <<<"$out"; then
-                echo "ok   $name: pools records stopped: $got"
+            grep -q "under records/pools-isr/ name commit" <<<"$out" && got_i=yes
+            { [ "$want" = yes ] || [ "$want_i" = yes ]; } && want_rc=1
+            if [ "$got" = "$want" ] && [ "$got_i" = "$want_i" ] && [ "$rc" = "$want_rc" ] && grep -q "$text" <<<"$out" &&
+               { [ -z "$text_i" ] || grep -q "$text_i" <<<"$out"; }; then
+                echo "ok   $name: pools records stopped: $got, pools concurrency records stopped: $got_i"
             else
-                echo "FAIL $name: pools records stopped: $got (want $want), rc $rc"; sed 's/^/     /' <<<"$out"; fails=$((fails + 1))
+                echo "FAIL $name: pools records stopped: $got (want $want), pools concurrency records stopped: $got_i (want $want_i), rc $rc"
+                sed 's/^/     /' <<<"$out"; fails=$((fails + 1))
             fi
         }
         git reset -q --hard "$base2"
-        git rm -q records/pools/stm32g474/adapter_test.json; git commit -q -m "test: without the made-up pools record"
+        if git cat-file -e HEAD:records/pools/stm32g474/adapter_test.json 2>/dev/null; then
+            git rm -q records/pools/stm32g474/adapter_test.json; git commit -q -m "test: without the made-up pools record"
+        fi
         n_pools=$(git ls-files records/pools | grep -c '\.json$')
+        n_isr=$(git ls-files records/pools-isr | grep -c '\.json$')
         printf '\n# test change\n' >> kinds/pools/configs.txt; git commit -q -am "test: kinds/pools/configs.txt"
-        pcase "pools: configs.txt changed, no ledger" yes "no rebuild from the sources of HEAD"
+        pcase "pools: configs.txt changed, no ledger" yes yes "$n_pools: no rebuild from the sources of HEAD" "$n_isr: no rebuild from the sources of HEAD"
         ledger_
-        pcase "pools: configs.txt changed, the ledger made again" no "0 pools records ($n_pools more of other commits"
+        pcase "pools: configs.txt changed, the ledger made again" no no "0 pools records ($n_pools more of other commits" \
+            "0 pools concurrency records ($n_isr more of other commits"
+        base3=$(git rev-parse HEAD)
         # a fetch that fails: no mirror, no library at hand, no transport but file: every rebuild fails at its
         # fetch; the held records stop, each with "could not fetch", none as "HEAD builds another image"
         ( export GIT_CONFIG_COUNT=0 VL_CRC_LIBS_FROM=$T/none VL_POOLS_LIBS_FROM=$T/none; unset VL_LIB_MIRROR VL_LIBS_FROM
@@ -323,6 +360,18 @@ for n in sys.stdin.read().split():
             echo "FAIL a fetch that fails: $n_nf of $n_led ledger entries \"could not fetch\", rc $rc; the reasons:"
             sed 's/^/     /' <<<"$why" | cut -c1-300; tail -n 5 "$T/ledger-nofetch.log" | sed 's/^/     /'; fails=$((fails + 1))
         fi
+        # the pools concurrency kind's check of a record (kinds/pools-isr/bench/isrverify.sh) as a control: an image
+        # source of that kind alone changed so that every image's flash bytes change (the result block's magic
+        # number in main.c); with the ledger of before its records stop for want of a rebuild, the pools records
+        # stand; with the ledger made again every one of them stops as one HEAD builds another image of
+        git reset -q --hard "$base3"
+        sed -i 's/^#define RESULT_MAGIC 0x564C4931u/#define RESULT_MAGIC 0x564C4932u/' kinds/pools-isr/main.c
+        git commit -q -am "test: kinds/pools-isr/main.c, other flash bytes"
+        pcase "pools concurrency: an image source changed, ledger of before" no yes "0 pools records ($n_pools more of other commits" \
+            "$n_isr: no rebuild from the sources of HEAD"
+        ledger_
+        pcase "pools concurrency: an image source changed, the ledger made again" no yes "0 pools records ($n_pools more of other commits" \
+            "$n_isr: HEAD builds another image"
     fi
 fi
 [ "$fails" = 0 ] && echo "every case as expected" || echo "$fails cases not as expected"

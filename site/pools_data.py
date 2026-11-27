@@ -7,10 +7,12 @@ what this program writes. As site/crc_data.py for the CRC kind.
 Usage: python3 -I site/pools_data.py [--write | --check]
          (no argument: print the file; --write: write it; --check: exit 1 if
          it is not up to date)
-       python3 -I site/pools_data.py --records DIR --out FILE [--claims FILE]
+       python3 -I site/pools_data.py --records DIR --out FILE [--claims FILE] [--isr DIR]
          (another records directory, such as synthetic records from
          site/pools_synthetic.py, into a file outside site/data; never
-         site/data/pools.json)
+         site/data/pools.json; --isr: the concurrency series' records from
+         another directory, such as synthetic ones from
+         site/pools_isr_synthetic.py)
 
 With no records the file says so ("published": false) and holds no boards,
 configurations or rows: the pages then say the series is not published yet.
@@ -24,6 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import crc_data      # noqa: E402  (the board ids of the site)
+import pools_isr     # noqa: E402
 import pools_tables as t   # noqa: E402
 
 OUT = os.path.join(ROOT, "site/data/pools.json")
@@ -63,8 +66,27 @@ def claims(path):
     return t.claims(path)
 
 
-def build(rdir=None, claims_path=None):
+ISR_ABOUT = {
+    "configurations": ABOUT["configurations"].replace(
+        "shown as documented, NOT tested (the series is one context), and used in no filter and no score",
+        "shown as documented (the timing series is one context; whether it holds is tested by the concurrency series, "
+        "each row's 'isr'), and used in no score"),
+    "isr": "per row: the concurrency series (records/pools-isr, lab/plans/2026-11-27-pools-concurrency.md): class "
+           "('within' its documentation, 'ours', 'outside' its documentation, 'control'); result: for 'within' and "
+           "'ours' passed or what was observed, for 'outside' only what was observed (never a verdict: the library was "
+           "used in a way it does not document), for a control caught or not; trials; observed (kinds); "
+           "irq_wait_cycles {off, on}, where the configuration takes interrupts off as built: the longest time an "
+           "interrupt waited; coverage [instructions reached, instructions]; record. Used in no score; the comparison "
+           "page offers a filter on it. null where the series has no record of the row",
+    "baseline_isr": "per board: the reference free list without a lock, which the concurrency series runs as a "
+                    "control (it must be caught), in the form of 'isr'",
+    "isr_controls": "per board: our two broken interrupts-off builds of the reference, the series' other controls",
+}
+
+
+def build(rdir=None, claims_path=None, isr_dir=None):
     recs, syn = t.load(rdir)
+    isr, isr_syn = pools_isr.load(isr_dir)
     ads, cfg, sets = t.kind_meta()
     cl = claims(claims_path or CLAIMS)
     by_dir = {}
@@ -103,6 +125,9 @@ def build(rdir=None, claims_path=None):
             rows.append({"board": b["id"], "adapter": c["adapter"], "flash_bytes": fl, "ram_bytes": ram,
                          "record": os.path.relpath(f, ROOT) if not syn else "records/pools/" + os.path.relpath(f, rdir),
                          "cycles": t.ranges({p: x["results"] for p, x in pp.items()})})
+            if isr:
+                k = (b["records_dir"], c["adapter"])
+                rows[-1]["isr"] = pools_isr.summary(k[0], *isr[k], rdir=isr_dir) if k in isr else None
             if c["role"] == "library":
                 base.update({(c["adapter"], p): x["baseline"] for p, x in pp.items()})
         if base:
@@ -110,6 +135,9 @@ def build(rdir=None, claims_path=None):
     out = {"schema": "pools-data/1"}
     if syn:
         out["SYNTHETIC"] = "every number in this file is made up (site/pools_synthetic.py); none is a measurement"
+    if isr_syn:
+        out["SYNTHETIC_ISR"] = ("every result of the concurrency series in this file is made up "
+                                "(site/pools_isr_synthetic.py); none is a measurement")
     out.update({"about": ABOUT, "published": bool(recs),
                 "source": {"records": "records/pools", "commits": sorted({r["bench_commit"] for _, r in recs}),
                            "toolchain_image": sorted({r["toolchain_image"] for _, r in recs})},
@@ -118,11 +146,22 @@ def build(rdir=None, claims_path=None):
                 "boards": boards, "configurations": configs, "rows": rows, "baseline": baseline,
                 "baseline_documented": ({k: v for k, v in cl["adapter_ref"].items() if k != "who"}
                                         if recs and "adapter_ref" in cl else None)})
+    if isr:   # only with records of the concurrency series: without them the file is as before
+        out["about"] = dict(ABOUT, **ISR_ABOUT)
+        out["isr_source"] = {"records": "records/pools-isr", "commits": sorted({r["bench_commit"] for _, r in isr.values()}),
+                             "board_notes": {b["id"]: pools_isr.BOARD_NOTE[b["records_dir"]] for b in boards
+                                             if b["records_dir"] in pools_isr.BOARD_NOTE
+                                             and any(k[0] == b["records_dir"] for k in isr)}}
+        out["baseline_isr"] = [{"board": b["id"], **pools_isr.summary(b["records_dir"], *isr[(b["records_dir"], "adapter_ref")], rdir=isr_dir)}
+                               for b in boards if (b["records_dir"], "adapter_ref") in isr]
+        out["isr_controls"] = [{"board": b["id"], "adapter": a, "name": pools_isr.CONTROL_TEXT[a],
+                                **pools_isr.summary(b["records_dir"], *isr[(b["records_dir"], a)], rdir=isr_dir)}
+                               for b in boards for a in pools_isr.CONTROLS[1:] if (b["records_dir"], a) in isr]
     return out
 
 
-def text(rdir=None, claims_path=None):
-    return json.dumps(build(rdir, claims_path), indent=1, ensure_ascii=False) + "\n"
+def text(rdir=None, claims_path=None, isr_dir=None):
+    return json.dumps(build(rdir, claims_path, isr_dir), indent=1, ensure_ascii=False) + "\n"
 
 
 def main():
@@ -137,13 +176,13 @@ def main():
         print(text(), end="")
     elif "--records" in a and "--out" in a:
         opt = dict(zip(a[::2], a[1::2]))
-        if set(opt) - {"--records", "--out", "--claims"} or len(a) % 2:
+        if set(opt) - {"--records", "--out", "--claims", "--isr"} or len(a) % 2:
             sys.exit(__doc__)
         out = os.path.abspath(opt["--out"])
         if os.path.commonpath([out, os.path.join(ROOT, "site")]) == os.path.join(ROOT, "site") or \
                 os.path.commonpath([out, os.path.join(ROOT, "records")]) == os.path.join(ROOT, "records"):
             sys.exit("refused: --out is for a file outside site/ and records/")
-        open(out, "w").write(text(opt["--records"], opt.get("--claims")))
+        open(out, "w").write(text(opt["--records"], opt.get("--claims"), opt.get("--isr")))
     else:
         sys.exit(__doc__)
     return 0

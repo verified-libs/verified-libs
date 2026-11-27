@@ -1,0 +1,295 @@
+{
+ "schema": "pools-isr/1",
+ "kind": "pools-isr",
+ "board": "stm32g474",
+ "board_id": 3,
+ "board_decoded": "NUCLEO-G474RE (STM32G474RET6, Cortex-M4F)",
+ "adapter": "adapter_heapless",
+ "class": "within",
+ "bench_commit": "f344730728a6",
+ "toolchain_image": "verified-libs/toolchain:2026-11-13",
+ "toolchain": {
+  "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+  "ubuntu_snapshot": "20261105T000000Z",
+  "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+  "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+  "cbmc": "6.6.0 (cbmc-6.6.0)",
+  "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+  "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+  "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+  "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+ },
+ "libs_pinned": [
+  "etl 7d604f2e4f7fa79ff49bf675c089656943f9171b",
+  "riot 9c9a6abec901838b1637ef9308427b50ef59ce5c",
+  "threadx 93387b0a60382a29579bbad5045c68328e3751df",
+  "cmsis-rtx b566de42a5bf77d8b080f521cefc38ec7c45a3cc",
+  "cmsis6 af1b110e46a1720349f6f125e386e126767699bd",
+  "cortex-dfp cd38dbb875f7195e70460eee51faa7ab180c24a1",
+  "contiki-ng 4ccd1a3b9e767f168d12ec3df187fe6b7dc736b5",
+  "c-allocator 497b46500e314467d2bc2a3f6623e68d71eab9db",
+  "eccles 02146345a899e29fe53555098848a4584491818c",
+  "memorypool c98ff35f19473b737c4b75817096481327023c02",
+  "atomic-pool ab88f3ccfebd382685bf97239df6828769c5b743",
+  "heapless 19188229ac2b76fc91ad79f57dee01fa362a1e15",
+  "zephyr 41d10b59730406bbab4ca9f1fbbe9e96aafb4966",
+  "lwip 77dcd25a72509eb83f72b033d219b1d40cd8eb95",
+  "memorypool-head 5073178622c3af7b682060a93c4b38ce386f2d59",
+  "as-slice-01 e21f5bd9e629f2bf5641b97f64e582ed745e3ab6",
+  "as-slice-02 c3687342bc9f3c9c202676a5d2e17288ff979c90",
+  "rs-portable-atomic e4595528211f1d53b7f4d93e528ef84b491fc871",
+  "rs-stable-deref-trait 66f9d8a15b7209c45f58edee6c1b6bb497b7bd31",
+  "rs-hash32 d44eb33a01be4582669d9a1fa3f7c58455a21de9",
+  "rs-byteorder ec068eefa042d494475db125c4b034bd8e9e34dd",
+  "rs-generic-array-012 42843cdb6c24ef3684494617e78745a62a64a29c",
+  "rs-generic-array-013 525f5e7dc3e3e9cab6ee92c2655611c5590675d3",
+  "rs-generic-array-014 a1b3c3cfdf64ad99fd2004c0d8ce81b0e56e5ebe",
+  "rs-typenum b237efbb1da9646435274f63d7290cb7651b031f",
+  "rs-version-check d77ef9f27cc336719b2d839d09ee6635dd22f758"
+ ],
+ "clock_hz": 170000000,
+ "image_base": "0x08035000",
+ "image_bytes": 4712,
+ "image_sha256": "89f13ca69e1b62978d6610644c8ce8de0bff7d8713649f388d204b2a366e71a0",
+ "fw_sha256": "da1c2dcb6da9c26210ca9c3256ef2509657b3d55a2e1fb8e946249e6054bf268",
+ "bundle": 300,
+ "bundle_sha256": "8b994c83be10586f93095a0e413bbc2843e53e9fb3711d96070eb35159d3d61e",
+ "boot_image_sha256": "f315864b4fd55fc698a9b0d8a6298673d3320dd1459de27bffce4d66ce823c70",
+ "time": "2026-11-27T07:12:34Z",
+ "host": "lib-lab1",
+ "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+ "attempt": 1,
+ "wait_s": 60.0,
+ "seconds": 60.6,
+ "run_number": "0x1be51e98",
+ "verdict": "pass",
+ "result": {
+  "magic": 1447840049,
+  "version": 1,
+  "done": 1,
+  "clock_hz": 170000000,
+  "board_id": 3,
+  "image_base": 134434816,
+  "nonce": 468000408,
+  "faults_total": 0,
+  "c": [
+   {
+    "trials": 39716,
+    "inside": 31664,
+    "before": 4148,
+    "after": 3904,
+    "faults": {},
+    "first_fault": 0,
+    "first_case": 0,
+    "first_d": 0,
+    "lat_min": 52,
+    "lat_max": 60,
+    "lat_max_case": 256,
+    "lat_max_d": 20,
+    "lat_n": 31664,
+    "irq_wait_cycles": 8
+   },
+   {
+    "trials": 27336,
+    "inside": 20748,
+    "before": 2684,
+    "after": 3904,
+    "faults": {},
+    "first_fault": 0,
+    "first_case": 0,
+    "first_d": 0,
+    "lat_min": 58,
+    "lat_max": 70,
+    "lat_max_case": 66048,
+    "lat_max_d": 80,
+    "lat_n": 20748,
+    "irq_wait_cycles": 12
+   }
+  ],
+  "cal_lat_min": [
+   52,
+   58
+  ],
+  "cal_lat_n": [
+   90,
+   57
+  ],
+  "cov_outside": 0,
+  "adapter": "adapter_heapless",
+  "class": "within",
+  "coverage_bits": 76
+ },
+ "option_registers": [
+  {
+   "schema": "board-options/1",
+   "board": "stm32g474",
+   "chip": "STM32G474RE",
+   "time": "2026-11-27T06:26:21Z",
+   "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+   "regions": [
+    {
+     "name": "FLASH_OPTR",
+     "address": "0x40022020",
+     "source": "RM0440 \u00a73.7.8, offset 0x20",
+     "words": [
+      "0xfbeff8aa"
+     ]
+    }
+   ]
+  }
+ ],
+ "coverage": {
+  "instructions": 143,
+  "reached": 56,
+  "per_function": {
+   "vl_heapless_align": {
+    "reached": 0,
+    "instructions": 4,
+    "unreached": [
+     "0x8035fb4",
+     "0x8035fb6",
+     "0x8035fb8",
+     "0x8035fba"
+    ]
+   },
+   "vl_heapless_alloc": {
+    "reached": 24,
+    "instructions": 37,
+    "unreached": [
+     "0x8035ff6",
+     "0x8035ff8",
+     "0x8035ffc",
+     "0x8035ffe",
+     "0x8036002",
+     "0x8036004",
+     "0x803600c",
+     "0x8036010",
+     "0x8036012",
+     "0x8036016",
+     "0x8036018",
+     "0x803601a",
+     "0x803601c"
+    ]
+   },
+   "vl_heapless_c_alloc": {
+    "reached": 1,
+    "instructions": 1,
+    "unreached": []
+   },
+   "vl_heapless_c_free": {
+    "reached": 1,
+    "instructions": 1,
+    "unreached": []
+   },
+   "vl_heapless_c_init": {
+    "reached": 0,
+    "instructions": 10,
+    "unreached": [
+     "0x8035dc0",
+     "0x8035dc2",
+     "0x8035dc6",
+     "0x8035dca",
+     "0x8035dcc",
+     "0x8035dce",
+     "0x8035dd2",
+     "0x8035dd6",
+     "0x8035dd8",
+     "0x8035ddc"
+    ]
+   },
+   "vl_heapless_c_region": {
+    "reached": 0,
+    "instructions": 1,
+    "unreached": [
+     "0x8035db4"
+    ]
+   },
+   "vl_heapless_canaries": {
+    "reached": 0,
+    "instructions": 8,
+    "unreached": [
+     "0x8036028",
+     "0x803602a",
+     "0x803602c",
+     "0x8036030",
+     "0x8036034",
+     "0x8036036",
+     "0x803603a",
+     "0x803603c"
+    ]
+   },
+   "vl_heapless_free": {
+    "reached": 30,
+    "instructions": 31,
+    "unreached": [
+     "0x8036072"
+    ]
+   },
+   "vl_heapless_init": {
+    "reached": 0,
+    "instructions": 41,
+    "unreached": [
+     "0x8036098",
+     "0x803609a",
+     "0x803609c",
+     "0x80360a0",
+     "0x80360a4",
+     "0x80360a8",
+     "0x80360aa",
+     "0x80360ae",
+     "0x80360b2",
+     "0x80360b4",
+     "0x80360b6",
+     "0x80360b8",
+     "0x80360ba",
+     "0x80360bc",
+     "0x80360be",
+     "0x80360c2",
+     "0x80360c4",
+     "0x80360c6",
+     "0x80360c8",
+     "0x80360cc",
+     "0x80360ce",
+     "0x80360d2",
+     "0x80360d4",
+     "0x80360d6",
+     "0x80360d8",
+     "0x80360dc",
+     "0x80360de",
+     "0x80360e0",
+     "0x80360e2",
+     "0x80360e6",
+     "0x80360e8",
+     "0x80360ec",
+     "0x80360ee",
+     "0x80360f2",
+     "0x80360f4",
+     "0x80360f6",
+     "0x80360f8",
+     "0x80360fa",
+     "0x80360fc",
+     "0x80360fe",
+     "0x8036102"
+    ]
+   },
+   "vl_heapless_region": {
+    "reached": 0,
+    "instructions": 9,
+    "unreached": [
+     "0x8036104",
+     "0x8036106",
+     "0x8036108",
+     "0x803610c",
+     "0x8036110",
+     "0x8036114",
+     "0x8036116",
+     "0x803611a",
+     "0x803611c"
+    ]
+   }
+  }
+ }
+}

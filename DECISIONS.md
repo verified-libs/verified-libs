@@ -2,6 +2,48 @@
 
 Short log of what was decided and why. Newest first.
 
+## 2026-11-27: A recorded host fix may add a host file ("from": "none")
+Decided by the owner (yes, 2026-11-27 evening), on the reviewer's proposal,
+as an extension of the same-image rule (2026-11-22, 2026-11-23). It came up
+because the pools concurrency series got its check of a record,
+`kinds/pools-isr/bench/isrverify.sh`, after its records were made. The
+series' commit `f344730` did not have the file, so its test sources would
+differ from HEAD's for good, and all 82 records would stop although nothing
+they were measured from changed.
+- **What is allowed:**
+  - A recorded host fix in `records/host-fixes.json` may start from
+    `"none"`: it adds a host-side file the records' commit did not have.
+  - The entry names the file's blob at HEAD and says, as every host fix
+    does, what the file does, why no number changes, and its control.
+  - Only files in the kind's host-fixable list qualify: scripts that run,
+    record or check, and build no image.
+  - The extension applies only in the rule of the CRC, pools and pools
+    concurrency kinds (`lab/tools/public-export.py`: `ABSENT`,
+    `crc_host_fixed`, `crc_host_stands`). Never for an image file.
+- **What still stops:**
+  - a new file without such an entry;
+  - an entry whose blob is not HEAD's;
+  - a file removed since the records' commit;
+  - any image file added: it needs a rebuild in the ledger, like any other
+    image change.
+  The ring buffers' rule (`host_fixed`) is unchanged.
+- **Controls** (2026-11-27, in a throwaway clone of `fa4c914`):
+  1. The entry for `isrverify.sh` taken out: the 82 records stop ("the
+     host side of the pools concurrency kind at that commit is not that of
+     HEAD").
+  2. The entry's blob changed to a wrong one: the 82 records stop, for the
+     same reason.
+  3. An image file (`kinds/pools-isr/added.h`) entered with `"from":
+     "none"`: the export refuses the host-fix file outright ("not of a
+     file in HOST_FIXABLE").
+  4. A new host file with no entry: the 82 records stop.
+
+  With the entry as committed, the 82 records stand. Rebuilt from their
+  commit, all 82 match (`isrverify.sh`); records with a changed image or
+  bundle checksum do not. The full export test of `fa4c914` passed (46
+  cases, among them an image source of the series changed: its 82 records
+  stop as images HEAD builds another of).
+
 ## 2026-11-26: Method version 3 as counted, and pxq kept apart
 Decided by the owner ("vi gør som du har foreslået"), on the counted
 proposal of [`lab/plans/2026-11-26-method-version-3.md`](lab/plans/2026-11-26-method-version-3.md)

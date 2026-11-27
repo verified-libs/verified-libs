@@ -34,7 +34,7 @@ import poolstools as pt
 import vlquery as q
 
 SERVER_NAME = "verified-libs"
-SERVER_VERSION = "0.5.0"
+SERVER_VERSION = "0.6.0"
 # Protocol revisions this server answers in. It uses only what all of them
 # have (tools over stdio), plus the optional fields each one added.
 PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"]
@@ -70,8 +70,9 @@ INSTRUCTIONS = (
     "differ only where their ranges do not overlap ('overlaps' names, per number, the rows that are not told "
     "apart). The rows are in the order of the configuration list: there is no ranking, do not present one.\n"
     "Fixed-block memory pools (alloc and free of one block size): list_pool_configurations and compare_pools, with the "
-    "same rules as the CRC tools. They are measured in one context: what a library documents about use from interrupts "
-    "is given as documented, not tested; never present it as a result.")
+    "same rules as the CRC tools. Their cycles are measured in one context; what a library documents about use from "
+    "interrupts is given as documented, and where the concurrency series has records, what it observed is given beside "
+    "it in its classes: never call a library used outside its documentation failing.")
 
 REQUIRE = {   # tool word -> the page's filter
     "zero_stress_errors": ("clean", "0 errors in the ISR stress test on every board tested"),
@@ -652,8 +653,8 @@ def tool_about(D, prov, args):
                    "lock-free concurrency. Everything can be reproduced from the repository. Three kinds of library so "
                    "far: embedded ring buffers (interrupt or DMA to main loop on Cortex-M; the tools *_ring_buffer*), "
                    "CRC calculation (the tools list_crc_configurations and compare_crc) and fixed-block memory pools "
-                   "(the tools list_pool_configurations and compare_pools; measured in one context, use from interrupts "
-                   "not tested). The rest of this answer is about the ring buffers; for CRC see " + SITE +
+                   "(the tools list_pool_configurations and compare_pools; cycles measured in one context, use from "
+                   "interrupts tested in a series of its own). The rest of this answer is about the ring buffers; for CRC see " + SITE +
                    "/method-crc.html, for the memory pools " + SITE + "/method-pools.html.",
         "compared": f"{len(D['libs'])} configurations of ring buffer libraries in {', '.join(langs)}, on {len(D['boards'])} boards. "
                     "A configuration is a library set up one way; some libraries have two or more.",

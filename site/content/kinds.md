@@ -38,8 +38,9 @@ The kinds are in the order they were added.
 - **What is measured:** cycles of alloc and free of one block size (32
   blocks of 32 bytes) in six scenarios and of creating the pool, with the
   cache off and on, and the bytes of flash and RAM it takes; every call is
-  checked on the board. Measured in one context: what a library documents
-  about use from interrupts is shown, not tested.
+  checked on the board. Measured in one context. Use from interrupts is
+  tested in a series of its own, the concurrency series: an interrupt at
+  every cycle of a call, with controls that must be caught.
 - **Libraries:** 10, in 10 configurations, and a row of ours (not a library).
 - **Boards:** 6.
 - **Results:** [results page](results-pools.md)

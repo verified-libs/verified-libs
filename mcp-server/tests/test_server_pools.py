@@ -14,6 +14,7 @@ and compare_pools.
 
     python3 -m unittest discover -s mcp-server/tests
 """
+import json
 import os
 import sys
 import tempfile
@@ -144,6 +145,67 @@ class PoolsSynthetic(unittest.TestCase):
         self.assertIn("reference free list, interrupts off (ours)", [r["name"] for r in every["rows"]])
         self.assertNotIn("reference free list, interrupts off (ours)", [r["name"] for r in libs["rows"]])
         self.assertTrue(all("score" in r for r in every["rows"][:-1]))
+
+
+class PoolsIsrSynthetic(unittest.TestCase):
+    """With SYNTHETIC records of the concurrency series: the tools give what the page shows, the filter is the page's,
+    the classes' wording holds (no verdict word for a library outside its documentation), and the argument exists only
+    where the data has the series."""
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        cls.path = synthetic(cls._tmp.name, isr=True)
+        cls.D, cls.prov = q.load()
+
+    @classmethod
+    def tearDownClass(cls):
+        pt.pools_data(pq.default_data_path())
+        cls._tmp.cleanup()
+
+    def setUp(self):
+        self.P = pt.pools_data(self.path)[0]
+
+    def tool(self, name, args=None):
+        return server.call_tool(self.D, self.prov, name, args or {})
+
+    def test_observed_is_the_page(self):
+        for args in ({}, {"use_from_interrupts": "passed"}, {"board": "pico2", "use_from_interrupts": "passed", "weights": {"alloc": 5}},
+                     {"board": "sam-d20-xpro", "kind": "library"}):
+            out = self.tool("compare_pools", args)
+            st = pq.state_from_hash(self.P, out["same_view_on_the_site"].split("#", 1)[1])
+            self.assertEqual(st["isr"], "passed" if args.get("use_from_interrupts") == "passed" else "", args)
+            view = pq.page_view(self.P, st)
+            self.assertEqual([r["name"] for r in out["rows"]], [r[0][0] for r in view["rows"]], args)
+            for r, cells in zip(out["rows"], view["rows"]):
+                obs = r["use_from_interrupts_observed"]
+                want = cells[-1][0]
+                got = "–" if obs is None else (("our control without a lock: " if r.get("reference_baseline_not_a_library") else "")
+                                                + obs["as_on_the_page"])
+                self.assertEqual(got, want, args)
+                if obs and obs["class"] == "outside":
+                    self.assertFalse(any(w in obs["as_on_the_page"] for w in ("pass", "FAIL", "fail", "caught")))
+            self.assertIn("concurrency series", out["notes"][0])
+            if st["isr"]:
+                self.assertTrue(all(r["use_from_interrupts_observed"]["class"] in ("within", "ours")
+                                    for r in out["rows"] if not r.get("reference_baseline_not_a_library")))
+
+    def test_argument_only_with_the_series(self):
+        names = {t["name"]: t for t in server.tool_list(self.D)}
+        self.assertIn("use_from_interrupts", names["compare_pools"]["inputSchema"]["properties"])
+        with self.assertRaises(server.ToolError):
+            self.tool("compare_pools", {"use_from_interrupts": "yes"})
+        # data without the series (as before its records): no argument
+        bare = json.load(open(pq.default_data_path()))
+        bare.pop("isr_source", None)
+        no_isr = os.path.join(self._tmp.name, "pools-no-isr.json")
+        with open(no_isr, "w") as fh:
+            json.dump(bare, fh)
+        pt.pools_data(no_isr)
+        try:
+            names = {t["name"]: t for t in server.tool_list(self.D)}
+            self.assertNotIn("use_from_interrupts", names["compare_pools"]["inputSchema"]["properties"])
+        finally:
+            pt.pools_data(self.path)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 {
- "about": "Recorded fixes of host-side files that build no image (DECISIONS 2026-11-23, lab/tools/public-export.py). 'from' and 'to' are the git blob ids of the file before and after the fix.",
+ "about": "Recorded fixes of host-side files that build no image (DECISIONS 2026-11-23, lab/tools/public-export.py). 'from' and 'to' are the git blob ids of the file before and after the fix. A 'from' of \"none\" adds a host file the records' commit did not have (a kind's check of a record written after its series; public-export.py ABSENT).",
  "fixes": [
   {
    "file": "firmware/nrf5340-rb-bench/run-one.py",
@@ -45,6 +45,42 @@
    "what": "Method version 3: it takes records of schema crc-bench/2 as well as crc-bench/1.",
    "numbers": "Nothing that is read from the board, worked out or stored per run changes. A record of runs without the board's option registers (options.json) is written byte for byte as before; with them, the record is of the new version and carries them as one field more.",
    "control": "2026-11-26: the ledger of this tree rebuilt every CRC record with it: those of the four boards whose images do not change MATCH."
+  },
+  {
+   "file": "kinds/pools-isr/run-isr.py",
+   "from": "33186f1c13497adb502b75f807365aba98a36ed9",
+   "to": "e862947bfc750a8ca247085a156d45a9959da19d",
+   "date": "2026-11-27",
+   "what": "The pools concurrency series' runner watches the trial counters instead of doubling a wait: a run is judged when done is set, however long it takes while the counters move; a run that stops is read without a write, started once more, and judged. At f344730 ETL's image took a fault in the check after a trial and the doubling gave no file.",
+   "numbers": "Nothing that is read from the board, worked out or stored changes for a run that finishes: its run file has the same fields, the same result block and the same verdict; only wait_s (now the seconds to the first look) and seconds differ. A run that stops (its trial counters stand still, done never set) now gets a run file where it got none: the result block as it stood, what was read without a write (the fault registers, main.c's phase and fired, the exception frame and its symbols), and the stopped trial judged with the host check's crash text (PF_CRASH) or 'a call did not return'.",
+   "control": "2026-11-27: test_runner.py (no board; NUCLEO-G474RE and NUCLEO-G0B1RE): every earlier case passes unchanged, and the new ones: done set late is judged, a slow run whose counters move is not stopped, a stall with a fault and one without are judged as above."
+  },
+  {
+   "file": "kinds/pools-isr/decode.py",
+   "from": "44ea52d4ad5ea720076e8630138223367ae06e48",
+   "to": "3fc93ca7710b97b442a431fba175ac9d2c1b5fcf",
+   "date": "2026-11-27",
+   "what": "The concurrency series' decoder judges a run that stopped (stop(), stop_note()): the stopped trial counts with the host check's crash text, and the verdict says where the sweep stopped and that the cache-on half was not run.",
+   "numbers": "A run that finished is decoded and judged as before, byte for byte. A run that stops (its trial counters stand still, done never set) now gets a run file where it got none: the result block as it stood, what was read without a write (the fault registers, main.c's phase and fired, the exception frame and its symbols), and the stopped trial judged with the host check's crash text (PF_CRASH) or 'a call did not return'.",
+   "control": "2026-11-27: test_runner.py (no board; NUCLEO-G474RE and NUCLEO-G0B1RE): every earlier case passes unchanged, and the new ones: done set late is judged, a slow run whose counters move is not stopped, a stall with a fault and one without are judged as above."
+  },
+  {
+   "file": "kinds/pools-isr/covmap.py",
+   "from": "d3f94faf2f602a0d5919e106c5dcaaabf2aa7d93",
+   "to": "589456c4333b8b31d353240a36965869b82fab17",
+   "date": "2026-11-27",
+   "what": "The coverage map of the concurrency series reads objdump's instruction lines whether or not a space comes before the address. An eight-digit address (the Raspberry Pi Pico 2's 0x1000xxxx) has none, so no instruction of a Pico 2 image was taken: '0 of 0 instructions'.",
+   "numbers": "Nothing read from the board changes. On the five boards whose addresses have fewer digits the map is the same: every one of the 68 records' coverage per function, made again from its run file, is equal. On the Pico 2 the coverage is now counted (the PS2 runs: adapter_ref 13 of 36 instructions).",
+   "control": "2026-11-27: test_decode.py parses an eight-digit, a seven-digit and a four-digit address line and leaves a literal-pool word out; the 68 records' coverage made again with the fix from their run files (records/pools-isr/RUNS.tsv), 0 differ."
+  },
+  {
+   "file": "kinds/pools-isr/bench/isrverify.sh",
+   "from": "none",
+   "to": "55bc6bd1cfa926c1f91bc24b0b26ce6dc303012c",
+   "date": "2026-11-27",
+   "what": "The concurrency series gets a check of a record, as the CRC and pools kinds have: it rebuilds a record's bundle in the toolchain image from the sources of a commit (or of this tree, VL_TREE=1, which the ledger image-ledger.py uses) and compares the record's image (address and flash bytes), the boot stub, the bundle, the toolchain and the libraries' pins. The series' commit did not have the file.",
+   "numbers": "It reads records and builds images; it writes no record, runs nothing on a board and changes nothing that was read from a board, worked out or stored. A record it cannot hold stops the export.",
+   "control": "2026-11-27: all 82 records rebuilt from their commit f344730 (kinds/pools-isr/bench/isrverify.sh, the six boards): 82 MATCH; two NUCLEO-G0B1RE records with a changed image checksum and a changed bundle checksum: DIFFERS for each, the unchanged record beside them MATCH."
   }
  ]
 }

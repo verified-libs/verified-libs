@@ -1,0 +1,236 @@
+{
+ "schema": "pools-isr/1",
+ "kind": "pools-isr",
+ "board": "samd20",
+ "board_id": 5,
+ "board_decoded": "SAM D20 Xplained Pro (ATSAMD20J18A, Cortex-M0+)",
+ "adapter": "adapter_memorypool",
+ "class": "outside",
+ "bench_commit": "f344730728a6",
+ "toolchain_image": "verified-libs/toolchain:2026-11-13",
+ "toolchain": {
+  "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+  "ubuntu_snapshot": "20261105T000000Z",
+  "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+  "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+  "cbmc": "6.6.0 (cbmc-6.6.0)",
+  "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+  "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+  "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+  "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+ },
+ "libs_pinned": [
+  "etl 7d604f2e4f7fa79ff49bf675c089656943f9171b",
+  "riot 9c9a6abec901838b1637ef9308427b50ef59ce5c",
+  "threadx 93387b0a60382a29579bbad5045c68328e3751df",
+  "cmsis-rtx b566de42a5bf77d8b080f521cefc38ec7c45a3cc",
+  "cmsis6 af1b110e46a1720349f6f125e386e126767699bd",
+  "cortex-dfp cd38dbb875f7195e70460eee51faa7ab180c24a1",
+  "contiki-ng 4ccd1a3b9e767f168d12ec3df187fe6b7dc736b5",
+  "c-allocator 497b46500e314467d2bc2a3f6623e68d71eab9db",
+  "eccles 02146345a899e29fe53555098848a4584491818c",
+  "memorypool c98ff35f19473b737c4b75817096481327023c02",
+  "atomic-pool ab88f3ccfebd382685bf97239df6828769c5b743",
+  "heapless 19188229ac2b76fc91ad79f57dee01fa362a1e15",
+  "zephyr 41d10b59730406bbab4ca9f1fbbe9e96aafb4966",
+  "lwip 77dcd25a72509eb83f72b033d219b1d40cd8eb95",
+  "memorypool-head 5073178622c3af7b682060a93c4b38ce386f2d59",
+  "as-slice-01 e21f5bd9e629f2bf5641b97f64e582ed745e3ab6",
+  "as-slice-02 c3687342bc9f3c9c202676a5d2e17288ff979c90",
+  "rs-portable-atomic e4595528211f1d53b7f4d93e528ef84b491fc871",
+  "rs-stable-deref-trait 66f9d8a15b7209c45f58edee6c1b6bb497b7bd31",
+  "rs-hash32 d44eb33a01be4582669d9a1fa3f7c58455a21de9",
+  "rs-byteorder ec068eefa042d494475db125c4b034bd8e9e34dd",
+  "rs-generic-array-012 42843cdb6c24ef3684494617e78745a62a64a29c",
+  "rs-generic-array-013 525f5e7dc3e3e9cab6ee92c2655611c5590675d3",
+  "rs-generic-array-014 a1b3c3cfdf64ad99fd2004c0d8ce81b0e56e5ebe",
+  "rs-typenum b237efbb1da9646435274f63d7290cb7651b031f",
+  "rs-version-check d77ef9f27cc336719b2d839d09ee6635dd22f758"
+ ],
+ "clock_hz": 48005120,
+ "image_base": "0x0002d000",
+ "image_bytes": 5016,
+ "image_sha256": "d151d95e4d1ed18b6d304eab02487eb5946d0bdf7a680305163c9dd13c87a6ae",
+ "fw_sha256": "a51fa20b215cb2cf9b6426acc2c92962c8ce37d099e3ebf208f73d129bedaf8d",
+ "bundle": 300,
+ "bundle_sha256": "7c70d0afcaa0d0d1f2595fe9ead8f329e77a221d32a0d9de362e6eac60ae091a",
+ "boot_image_sha256": "aa22730439b5fee03fabc4e918c36044c4dc0da33d144b6909aa1847d710ce9b",
+ "time": "2026-11-27T07:22:23Z",
+ "host": "lib-lab1",
+ "probe_rs": "openocd 0.12.0 (probe-rs stand-in, common/samd20/bin/probe-rs)",
+ "attempt": 1,
+ "wait_s": 60.0,
+ "seconds": 60.7,
+ "run_number": "0xbd2177e8",
+ "verdict": "outside its documentation; observed in 1560 of 43128 trials: afterwards a block given twice; afterwards fewer than 32 blocks: blocks lost; no order of the calls gives these answers: a block handed out while it is held (a block twice); no order of the calls gives these answers: an alloc gave a block while all 32 were held",
+ "result": {
+  "magic": 1447840049,
+  "version": 1,
+  "done": 1,
+  "clock_hz": 48005120,
+  "board_id": 5,
+  "image_base": 184320,
+  "nonce": 3173087208,
+  "faults_total": 1560,
+  "c": [
+   {
+    "trials": 22540,
+    "inside": 14244,
+    "before": 4392,
+    "after": 3904,
+    "faults": {
+     "no order of the calls gives these answers: a block handed out while it is held (a block twice)": 320,
+     "no order of the calls gives these answers: an alloc gave a block while all 32 were held": 64,
+     "afterwards a block given twice": 200,
+     "afterwards fewer than 32 blocks: blocks lost": 260
+    },
+    "first_fault": 6,
+    "first_case": 256,
+    "first_d": 55,
+    "lat_min": 45,
+    "lat_max": 47,
+    "lat_max_case": 256,
+    "lat_max_d": 21,
+    "lat_n": 14244,
+    "first": {
+     "fault": "no order of the calls gives these answers: a block handed out while it is held (a block twice)",
+     "held": 0,
+     "main": "alloc",
+     "interrupt": 0,
+     "rotation": 0,
+     "d": 55
+    },
+    "irq_wait_cycles": 2
+   },
+   {
+    "trials": 20588,
+    "inside": 12780,
+    "before": 3904,
+    "after": 3904,
+    "faults": {
+     "no order of the calls gives these answers: a block handed out while it is held (a block twice)": 280,
+     "no order of the calls gives these answers: an alloc gave a block while all 32 were held": 56,
+     "afterwards a block given twice": 160,
+     "afterwards fewer than 32 blocks: blocks lost": 220
+    },
+    "first_fault": 6,
+    "first_case": 256,
+    "first_d": 50,
+    "lat_min": 43,
+    "lat_max": 45,
+    "lat_max_case": 256,
+    "lat_max_d": 19,
+    "lat_n": 12780,
+    "first": {
+     "fault": "no order of the calls gives these answers: a block handed out while it is held (a block twice)",
+     "held": 0,
+     "main": "alloc",
+     "interrupt": 0,
+     "rotation": 0,
+     "d": 50
+    },
+    "irq_wait_cycles": 2
+   }
+  ],
+  "cal_lat_min": [
+   45,
+   43
+  ],
+  "cal_lat_n": [
+   57,
+   53
+  ],
+  "cov_outside": 0,
+  "adapter": "adapter_memorypool",
+  "class": "outside",
+  "coverage_bits": 41
+ },
+ "option_registers": [
+  {
+   "schema": "board-options/1",
+   "board": "samd20",
+   "chip": "ATSAMD20J18A",
+   "time": "2026-11-27T07:21:12Z",
+   "probe_rs": "openocd 0.12.0 (probe-rs stand-in, common/samd20/bin/probe-rs)",
+   "regions": [
+    {
+     "name": "NVM User Row",
+     "address": "0x00804000",
+     "source": "DS60001504K \u00a79.4: the NVM User Row, read at 0x804000",
+     "words": [
+      "0x48e0c7cf",
+      "0xffffff5d"
+     ]
+    }
+   ]
+  }
+ ],
+ "coverage": {
+  "instructions": 55,
+  "reached": 19,
+  "per_function": {
+   "_ZN12_GLOBAL__N_17mp_freeEjj": {
+    "reached": 10,
+    "instructions": 10,
+    "unreached": []
+   },
+   "_ZN12_GLOBAL__N_17mp_initEv": {
+    "reached": 0,
+    "instructions": 27,
+    "unreached": [
+     "0x2dfd8",
+     "0x2dfda",
+     "0x2dfdc",
+     "0x2dfde",
+     "0x2dfe0",
+     "0x2dfe2",
+     "0x2dfe4",
+     "0x2dfe6",
+     "0x2dfe8",
+     "0x2dfec",
+     "0x2dfee",
+     "0x2dff0",
+     "0x2dff2",
+     "0x2dff4",
+     "0x2dff6",
+     "0x2dff8",
+     "0x2dffa",
+     "0x2dffc",
+     "0x2dffe",
+     "0x2e000",
+     "0x2e002",
+     "0x2e004",
+     "0x2e006",
+     "0x2e008",
+     "0x2e00a",
+     "0x2e00c",
+     "0x2e00e"
+    ]
+   },
+   "_ZN12_GLOBAL__N_18mp_allocEjj": {
+    "reached": 9,
+    "instructions": 10,
+    "unreached": [
+     "0x2dfa2"
+    ]
+   },
+   "_ZN12_GLOBAL__N_19mp_regionEPjS0_": {
+    "reached": 0,
+    "instructions": 8,
+    "unreached": [
+     "0x2dfc0",
+     "0x2dfc2",
+     "0x2dfc4",
+     "0x2dfc6",
+     "0x2dfc8",
+     "0x2dfca",
+     "0x2dfcc",
+     "0x2dfce"
+    ]
+   }
+  }
+ }
+}

@@ -1,8 +1,9 @@
 <p class="kindsw">Kind: <a href="compare.html">Ring buffers</a> | <a href="compare-crc.html">CRC</a> | <strong>Memory pools</strong></p>
 <h1>Compare fixed-block memory pools</h1>
-<p><strong>Measured in one context.</strong> Whether a pool is safe when an interrupt calls it is not
-tested in this series. The last column gives what each library documents about use from interrupts,
-with its source: it is shown as documented, not tested, and no filter and no score uses it.</p>
+<p><strong>Measured in one context.</strong> The cycles are timed with no interrupt calling the pool.
+Whether a pool stays correct when an interrupt calls it is tested by a series of its own, the
+concurrency series (<a href="method-pools.html#use-from-interrupts">method</a>). The column of what each
+library documents about use from interrupts gives its own words, with their source; no score uses it.</p>
 <p>Pick a board, a scenario and the cache, and set weights for what you care about. There is no
 ranking of ours: without weights the rows are in the order of the configuration list, and any order
 is the result of your weights, which are stored in the address so the view can be linked. Every
@@ -25,7 +26,7 @@ blocks of 32 bytes. All numbers and how they were measured:
 </fieldset>
 <fieldset><legend>Filters</legend>
 <label>Language <select id="pools-lang"><option value="">any</option><option value="C">C</option><option value="C++">C++</option><option value="Rust">Rust</option></select></label>
-<label>Kind of row <select id="pools-kind"><option value="">any</option><option value="library">library</option><option value="ours">ours (interrupts off; not a library)</option></select></label>
+<label>Kind of row <select id="pools-kind"><option value="">any</option><option value="library">library</option><option value="ours">ours (interrupts off; not a library)</option></select></label><span id="pools-isr-box"></span>
 </fieldset>
 <fieldset><legend>Weights (0 = ignore, 10 = most important)</legend>
 <div id="pools-weights"></div>
@@ -34,7 +35,7 @@ blocks of 32 bytes. All numbers and how they were measured:
 </form>
 <p id="cmp-note"></p>
 <p id="cmp-count" class="mute" aria-live="polite"></p>
-<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="onectx" id="pools-onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
 <div class="tw"><table id="cmp-table" class="cmp"></table></div>
 <p class="mute">A range is min–max over eight placements of the code. Two rows differ only where their
 ranges do not overlap. With a configuration chosen, "overlaps" marks the rows whose range overlaps
@@ -70,7 +71,7 @@ which is not a release itself (<a href="method-pools.html">why</a>). <strong>Loc
 what the library takes around a call in the build measured. <strong>Flash bytes</strong>: the library's and the
 adapter's code and constant data at <code>-O2</code>, measured in the board's images;
 <strong>RAM bytes</strong>: what the pool needs beyond the 32 blocks of 32 bytes and their canaries. <strong>Documented use from interrupts</strong>: the library's own words, with
-their source; not tested here. The row "reference free list, interrupts off (ours)" is our free list
+their source; what the concurrency series observed is beside it, and no score uses either. The row "reference free list, interrupts off (ours)" is our free list
 with interrupts off around each call: the price of the simplest lock on the core, not a library. The
 last row, apart, is the reference free list without a lock, timed in the same images: the baseline,
 not a library. The second pass and the minimum, maximum and first call of each scenario are in the

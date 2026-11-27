@@ -43,15 +43,21 @@ CLAIMS = ("# a test file of the columns of kinds/pools/claims.tsv\nadapter\twho\
           "adapter_etl\tlibrary\tnothing about interrupts or threads (test text)\t–\n")
 
 
-def synthetic(tmp):
-    """Make synthetic records and their pools.json in tmp; return the path of the file."""
+def synthetic(tmp, isr=False):
+    """Make synthetic records and their pools.json in tmp; return the path of the file. isr: with synthetic records
+    of the concurrency series too (site/pools_isr_synthetic.py)."""
     subprocess.run([sys.executable, "-I", os.path.join(ROOT, "site", "pools_synthetic.py"), os.path.join(tmp, "syn")],
                    check=True, capture_output=True)
     with open(os.path.join(tmp, "claims.tsv"), "w") as fh:
         fh.write(CLAIMS)
     out = os.path.join(tmp, "pools-synthetic.json")
+    extra = []
+    if isr:
+        subprocess.run([sys.executable, "-I", os.path.join(ROOT, "site", "pools_isr_synthetic.py"), os.path.join(tmp, "isr")],
+                       check=True, capture_output=True)
+        extra = ["--isr", os.path.join(tmp, "isr")]
     subprocess.run([sys.executable, "-I", os.path.join(ROOT, "site", "pools_data.py"), "--records",
-                    os.path.join(tmp, "syn", "records"), "--out", out, "--claims", os.path.join(tmp, "claims.tsv")],
+                    os.path.join(tmp, "syn", "records"), "--out", out, "--claims", os.path.join(tmp, "claims.tsv")] + extra,
                    check=True, capture_output=True)
     return out
 
@@ -83,13 +89,18 @@ def fragments(P, seed=20261126, random_views=1500):
             out += [base + "&w=" + w, base + "&w=" + w + "&cache=off&scen=mixed", base + "&w=" + w + "&scen=empty",
                     base + "&w=" + w + "&row=" + enc(ads[len(w) % len(ads)]) if ads else base,
                     base + "&w=" + w + "&sort=-flash"]
+    if pq.has_isr(P):   # the filter on the concurrency series, alone and with the others
+        out += ["#isr=passed", "#isr=nosuch", "#isr=passed&kind=library", "#isr=passed&w=3,3,3",
+                "#isr=passed&sort=-flash", "#isr=passed&row=adapter_etl"]
+        out += [f"#board={b}&isr=passed" + x for b in boards for x in ("", "&cache=off", "&w=10,0,0", "&kind=ours")]
     rnd = random.Random(seed)
     for _ in range(random_views if boards else 50):
         parts = ["board=" + (rnd.choice(boards) if boards else "x")]
         for key, vals, p in (("scen", pq.SCENS, 0.7), ("cache", ["on", "off"], 0.5), ("lang", pq.LANGS, 0.2),
                              ("kind", pq.KINDS, 0.2), ("row", ads or ["adapter_etl"], 0.5),
                              ("sort", [d + k for k in pq.SORTS for d in ("", "-")], 0.3),
-                             ("w", [",".join(str(rnd.choice([0, 0, 1, 3, 5, 10])) for _ in range(3)) for _ in range(4)], 0.6)):
+                             ("w", [",".join(str(rnd.choice([0, 0, 1, 3, 5, 10])) for _ in range(3)) for _ in range(4)], 0.6),
+                             ("isr", ["passed"], 0.3 if pq.has_isr(P) else 0)):
             if rnd.random() < p:
                 parts.append(key + "=" + enc(rnd.choice(vals)))
         rnd.shuffle(parts)
@@ -141,7 +152,9 @@ class _Parity:
             stats["chosen"] += any("chosen" in r[0] for r in port["rows"])
             stats["above"] += sum(1 for r in port["rows"] for c in r if pq.ABOVE_TEXT in c)
             stats["scored"] += "Score (your weights)" in port["header"]
-            stats["claims"] += sum(1 for r in port["rows"] if any(x.startswith("source: ") for x in r[-1]))
+            # the claims cell: the last, or before the concurrency series' two cells where the data has them
+            stats["claims"] += sum(1 for r in port["rows"]
+                                   if any(isinstance(c, list) and any(str(x).startswith("source: ") for x in c) for c in r))
         return stats
 
     def test_address_round_trip(self):
@@ -239,6 +252,45 @@ class ParityPoolsSynthetic(_Parity, unittest.TestCase):
         finally:
             pq.score_overlap = raw
         self.assertGreater(differ, 0)
+
+
+@unittest.skipUnless(shutil.which("gjs"), "gjs is not installed: the website's script cannot be run here")
+class ParityPoolsIsrSynthetic(_Parity, unittest.TestCase):
+    """SYNTHETIC data with SYNTHETIC records of the concurrency series: the second column, the baseline's control,
+    the filter, and that the series' results are in no score."""
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        cls.data_path = synthetic(cls._tmp.name, isr=True)
+        super().setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def test_every_view_is_the_same(self):
+        self.assertTrue(pq.has_isr(self.P))
+        stats = self.compare_all()
+        self.assertEqual(stats["shown"], {c["name"] for c in self.P["configurations"]} | {pq.BASE_NAME})
+
+    def test_isr_column_filter_and_no_score(self):
+        P = self.P
+        P0 = dict(P, rows=[{k: v for k, v in r.items() if k != "isr"} for r in P["rows"]])
+        for frag in fragments(P, random_views=300):
+            st = pq.state_from_hash(P, frag)
+            v = pq.page_view(P, st)
+            self.assertEqual(v["header"][-2:], pq.ISR_HEADERS, frag)
+            _, rs = pq.shown(P, st)
+            if st["isr"]:
+                self.assertTrue(all(x["r"]["isr"]["passed"] for x in rs), frag)
+                self.assertTrue(all(x["r"]["isr"]["class"] in ("within", "ours") for x in rs), frag)
+            else:   # without the filter the series changes nothing of the order or the scores
+                _, r0 = pq.shown(P0, st)
+                self.assertEqual([(x["c"]["adapter"], x.get("score")) for x in rs],
+                                 [(x["c"]["adapter"], x.get("score")) for x in r0], frag)
+        outside = [r["isr"]["text"] for r in P["rows"] if r.get("isr") and r["isr"]["class"] == "outside"]
+        self.assertTrue(outside)
+        self.assertFalse([t for t in outside if any(w in t for w in ("pass", "FAIL", "fail", "caught"))])
 
 
 if __name__ == "__main__":

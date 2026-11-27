@@ -1,0 +1,288 @@
+{
+ "schema": "pools-isr/1",
+ "kind": "pools-isr",
+ "board": "stm32h723",
+ "board_id": 4,
+ "board_decoded": "NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7)",
+ "adapter": "adapter_etl",
+ "class": "outside",
+ "bench_commit": "f344730728a6",
+ "toolchain_image": "verified-libs/toolchain:2026-11-13",
+ "toolchain": {
+  "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+  "ubuntu_snapshot": "20261105T000000Z",
+  "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+  "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+  "cbmc": "6.6.0 (cbmc-6.6.0)",
+  "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+  "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+  "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+  "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+ },
+ "libs_pinned": [
+  "etl 7d604f2e4f7fa79ff49bf675c089656943f9171b",
+  "riot 9c9a6abec901838b1637ef9308427b50ef59ce5c",
+  "threadx 93387b0a60382a29579bbad5045c68328e3751df",
+  "cmsis-rtx b566de42a5bf77d8b080f521cefc38ec7c45a3cc",
+  "cmsis6 af1b110e46a1720349f6f125e386e126767699bd",
+  "cortex-dfp cd38dbb875f7195e70460eee51faa7ab180c24a1",
+  "contiki-ng 4ccd1a3b9e767f168d12ec3df187fe6b7dc736b5",
+  "c-allocator 497b46500e314467d2bc2a3f6623e68d71eab9db",
+  "eccles 02146345a899e29fe53555098848a4584491818c",
+  "memorypool c98ff35f19473b737c4b75817096481327023c02",
+  "atomic-pool ab88f3ccfebd382685bf97239df6828769c5b743",
+  "heapless 19188229ac2b76fc91ad79f57dee01fa362a1e15",
+  "zephyr 41d10b59730406bbab4ca9f1fbbe9e96aafb4966",
+  "lwip 77dcd25a72509eb83f72b033d219b1d40cd8eb95",
+  "memorypool-head 5073178622c3af7b682060a93c4b38ce386f2d59",
+  "as-slice-01 e21f5bd9e629f2bf5641b97f64e582ed745e3ab6",
+  "as-slice-02 c3687342bc9f3c9c202676a5d2e17288ff979c90",
+  "rs-portable-atomic e4595528211f1d53b7f4d93e528ef84b491fc871",
+  "rs-stable-deref-trait 66f9d8a15b7209c45f58edee6c1b6bb497b7bd31",
+  "rs-hash32 d44eb33a01be4582669d9a1fa3f7c58455a21de9",
+  "rs-byteorder ec068eefa042d494475db125c4b034bd8e9e34dd",
+  "rs-generic-array-012 42843cdb6c24ef3684494617e78745a62a64a29c",
+  "rs-generic-array-013 525f5e7dc3e3e9cab6ee92c2655611c5590675d3",
+  "rs-generic-array-014 a1b3c3cfdf64ad99fd2004c0d8ce81b0e56e5ebe",
+  "rs-typenum b237efbb1da9646435274f63d7290cb7651b031f",
+  "rs-version-check d77ef9f27cc336719b2d839d09ee6635dd22f758"
+ ],
+ "clock_hz": 520000000,
+ "image_base": "0x08011000",
+ "image_bytes": 4736,
+ "image_sha256": "a356d3cd6d948691f59201804ff428213855e17a9a845edbff8f8d3426dfff6b",
+ "fw_sha256": "d420d963acd764c2362b55614275d451f33300ecba2f05a3d0b7aca93284d308",
+ "bundle": 300,
+ "bundle_sha256": "384fec27b35fef81c18f52381748e99e0b96d58ed310e08d3ddde0a4c19b77e4",
+ "boot_image_sha256": "9a63c25b936a3c59d88c5dba46e83731961aa1c9417eba998b879413d286aaaf",
+ "time": "2026-11-27T07:44:17Z",
+ "host": "lib-lab1",
+ "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+ "attempt": 2,
+ "wait_s": 10.0,
+ "seconds": 41.1,
+ "run_number": "0x65f82b1a",
+ "verdict": "outside its documentation; observed in 442 of 8168 trials: afterwards fewer than 32 blocks: blocks lost; no order of the calls gives these answers: a block handed out while it is held (a block twice); the program crashed: a call followed the pool's corrupted state outside memory; the sweep stopped at trial 8168 with the cache off, in the check after the trial (a usage fault in (anonymous namespace)::etl_alloc(unsigned int, unsigned int)); cache on not run: the image sweeps the cache on only after the cache off",
+ "result": {
+  "magic": 1447840049,
+  "version": 1,
+  "done": 0,
+  "clock_hz": 520000000,
+  "board_id": 4,
+  "image_base": 134287360,
+  "nonce": 1710762778,
+  "faults_total": 442,
+  "c": [
+   {
+    "trials": 8168,
+    "inside": 7095,
+    "before": 561,
+    "after": 512,
+    "faults": {
+     "no order of the calls gives these answers: a block handed out while it is held (a block twice)": 160,
+     "afterwards fewer than 32 blocks: blocks lost": 281,
+     "the program crashed: a call followed the pool's corrupted state outside memory": 1
+    },
+    "first_fault": 13,
+    "first_case": 256,
+    "first_d": 129,
+    "lat_min": 74,
+    "lat_max": 107,
+    "lat_max_case": 66048,
+    "lat_max_d": 52,
+    "lat_n": 7094,
+    "first": {
+     "fault": "afterwards fewer than 32 blocks: blocks lost",
+     "held": 0,
+     "main": "alloc",
+     "interrupt": 0,
+     "rotation": 0,
+     "d": 129
+    },
+    "irq_wait_cycles": 33
+   },
+   {
+    "trials": 0,
+    "inside": 0,
+    "before": 0,
+    "after": 0,
+    "faults": {},
+    "first_fault": 0,
+    "first_case": 0,
+    "first_d": 0,
+    "lat_min": 0,
+    "lat_max": 0,
+    "lat_max_case": 0,
+    "lat_max_d": 0,
+    "lat_n": 0,
+    "irq_wait_cycles": null
+   }
+  ],
+  "cal_lat_min": [
+   74,
+   0
+  ],
+  "cal_lat_n": [
+   183,
+   0
+  ],
+  "cov_outside": 0,
+  "adapter": "adapter_etl",
+  "class": "outside",
+  "coverage_bits": 32,
+  "stopped": {
+   "read": "2026-11-27T07:44:16Z",
+   "icsr": "0x00000803",
+   "cfsr": "0x01000000",
+   "hfsr": "0x40000000",
+   "dfsr": "0x00000001",
+   "mmfar": "0x00000000",
+   "bfar": "0x00000000",
+   "phase": 2,
+   "fired": 1,
+   "fired_phase": 1,
+   "frames": [
+    {
+     "at": "0x2001fde0",
+     "pc": "0x08011f4c",
+     "lr": "0x08011483",
+     "xpsr": "0x21008c00"
+    }
+   ],
+   "fault": true,
+   "pc": "0x08011f4c",
+   "lr": "0x08011483",
+   "pc_symbol": "(anonymous namespace)::etl_alloc(unsigned int, unsigned int)",
+   "lr_symbol": "verdict",
+   "ipsr": 0,
+   "where": "the check after the trial",
+   "desc": "a usage fault",
+   "starts": [
+    {
+     "attempt": 1,
+     "trials": 8167,
+     "seconds": 40.6
+    },
+    {
+     "attempt": 2,
+     "trials": 8167,
+     "seconds": 40.6
+    }
+   ],
+   "cache": "off",
+   "trial": 8168,
+   "in_sweep": true,
+   "text": "the program crashed: a call followed the pool's corrupted state outside memory"
+  }
+ },
+ "option_registers": [
+  {
+   "schema": "board-options/1",
+   "board": "stm32h723",
+   "chip": "STM32H723ZG",
+   "time": "2026-11-27T07:42:52Z",
+   "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+   "regions": [
+    {
+     "name": "FLASH_OPTSR_CUR",
+     "address": "0x5200201c",
+     "source": "RM0468 \u00a74.9, offset 0x01C",
+     "words": [
+      "0x0306aad0"
+     ]
+    },
+    {
+     "name": "FLASH_OPTSR2_CUR",
+     "address": "0x52002070",
+     "source": "RM0468 \u00a74.9.24, offset 0x070 (CPUFREQ_BOOST)",
+     "words": [
+      "0x00000000"
+     ]
+    }
+   ]
+  }
+ ],
+ "coverage": {
+  "instructions": 69,
+  "reached": 19,
+  "per_function": {
+   "_ZN12_GLOBAL__N_110etl_regionEPjS0_": {
+    "reached": 0,
+    "instructions": 5,
+    "unreached": [
+     "0x8011f78",
+     "0x8011f7a",
+     "0x8011f7e",
+     "0x8011f80",
+     "0x8011f82"
+    ]
+   },
+   "_ZN12_GLOBAL__N_18etl_freeEjj": {
+    "reached": 4,
+    "instructions": 9,
+    "unreached": [
+     "0x8011f66",
+     "0x8011f6a",
+     "0x8011f6c",
+     "0x8011f70",
+     "0x8011f72"
+    ]
+   },
+   "_ZN12_GLOBAL__N_18etl_initEv": {
+    "reached": 0,
+    "instructions": 23,
+    "unreached": [
+     "0x8011edc",
+     "0x8011ede",
+     "0x8011ee0",
+     "0x8011ee2",
+     "0x8011ee4",
+     "0x8011ee6",
+     "0x8011ee8",
+     "0x8011eea",
+     "0x8011eec",
+     "0x8011eee",
+     "0x8011ef0",
+     "0x8011ef4",
+     "0x8011ef6",
+     "0x8011ef8",
+     "0x8011efa",
+     "0x8011efc",
+     "0x8011efe",
+     "0x8011f02",
+     "0x8011f04",
+     "0x8011f06",
+     "0x8011f08",
+     "0x8011f0c",
+     "0x8011f0e"
+    ]
+   },
+   "_ZN12_GLOBAL__N_19etl_allocEjj": {
+    "reached": 15,
+    "instructions": 32,
+    "unreached": [
+     "0x8011f20",
+     "0x8011f28",
+     "0x8011f2a",
+     "0x8011f2c",
+     "0x8011f2e",
+     "0x8011f30",
+     "0x8011f34",
+     "0x8011f36",
+     "0x8011f38",
+     "0x8011f3a",
+     "0x8011f3e",
+     "0x8011f42",
+     "0x8011f4a",
+     "0x8011f4e",
+     "0x8011f56",
+     "0x8011f58",
+     "0x8011f5a"
+    ]
+   }
+  }
+ }
+}

@@ -13,8 +13,10 @@ Three kinds of library so far:
   in C, C++ and Rust that compute it in software and, on the boards that
   have one, by the board's CRC unit beside them.
 - **Fixed-block memory pools**: alloc and free of one block size on
-  Cortex-M, in C, C++ and Rust, measured in one context (what a library
-  documents about interrupts is shown, not tested).
+  Cortex-M, in C, C++ and Rust, measured in one context, and their use
+  from interrupts tested in a series of its own (an interrupt at every
+  cycle of a call; a library used in a way it does not document is never
+  called failing).
 
 *Run by AI, with a human who is accountable.*
 

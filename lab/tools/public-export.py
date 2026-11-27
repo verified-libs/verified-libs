@@ -137,6 +137,28 @@ buffers' nor the CRC kind's records, and the reverse. Its ledger entries
 (pools/<board>/<file>, held by "sources_pools") are not made yet by
 image-ledger.py: until they are, a pools record of a commit with other
 test sources than HEAD's (but for recorded host fixes) stops the export.
+
+The pools concurrency series (records/pools-isr, kinds/pools-isr,
+lab/plans/2026-11-27-pools-concurrency.md) is held by the same rule with
+lists of its own: POOLS_ISR_TEST_SOURCES (its directory and every test
+source of the pools kind, whose adapters, libraries and build its images
+are made of), POOLS_ISR_NOT_SOURCES (its host check and the files only that
+uses, its no-board tests, its job and smoke scripts, and the pools kind's
+own POOLS_NOT_SOURCES),
+POOLS_ISR_BUILT_BY (build.py, onebuild.sh, .gitignore, and the pools kind's
+POOLS_BUILT_BY) and POOLS_ISR_HOST_FIXABLE (run-isr.py, isrrecords.py,
+decode.py, covmap.py, bench/isrverify.sh). Its records' commits go to
+SAME_SOURCES_POOLS_ISR. Its check of a record (bench/isrverify.sh) came
+after the series: a recorded host fix from "none" (ABSENT) adds a host file
+the record's commit did not have.
+Its records carry one image each, not an image list: they are held by
+isr_images_digest (the image's address and bytes, the boot stub, the bundle
+and the toolchain image), not by crc_images_digest. A kind is held by the
+ledger only if it has a check of a record (its "verify" in KINDS, the script
+image-ledger.py rebuilds its records with); a kind without one fails
+closed: a record of a commit whose sources differ from HEAD's stops the
+export ("no check of a record ..."), whatever the ledger holds for it.
+Nothing of the other kinds changes.
 """
 import hashlib
 import json
@@ -189,14 +211,31 @@ POOLS_BUILT_BY = tuple("kinds/pools/" + n for n in (
     "boards.txt", "fetch.sh")) + ("firmware/common/bundle.py", "firmware/common/libc-objs.sh") + tuple(
     "firmware/nrf5340-rb-bench/" + n for n in ("onebundle.py", "oneslots.py")) + ("lab/tools/source-commit.sh",)
 POOLS_HOST_FIXABLE = ("kinds/pools/bench/run-pools.py", "kinds/pools/bench/poolrecords.py", "kinds/pools/bench/poolverify.sh")
+# The pools concurrency series (records/pools-isr): its images are built from the pools kind's sources and its
+# own directory, so both count; its host check and tests do not.
+POOLS_ISR_RECORDS = "records/pools-isr/"
+POOLS_ISR_TEST_SOURCES = ["kinds/pools-isr"] + POOLS_TEST_SOURCES
+POOLS_ISR_NOT_SOURCES = tuple("kinds/pools-isr/" + n for n in (
+    "contract.c", "excl_host.h", "rtx_excl_prelude.h", "ARMCM_isr.h", "no_gthreads.h", "Makefile", "run.sh",
+    "test_decode.py", "test_runner.py", "enqueue.sh", "smoke-check.sh")) + POOLS_NOT_SOURCES
+POOLS_ISR_BUILT_BY = tuple("kinds/pools-isr/" + n for n in ("build.py", "onebuild.sh", ".gitignore")) + POOLS_BUILT_BY
+POOLS_ISR_HOST_FIXABLE = tuple("kinds/pools-isr/" + n for n in (
+    "run-isr.py", "isrrecords.py", "decode.py", "covmap.py", "bench/isrverify.sh"))
 # The kinds with test sources of their own: kind -> what holds its records (the ring buffers are the rest
 # of records/). "name" is the kind as the output says it, "same" the file of the export that lists the
 # records' commits with HEAD's test sources (the kind's verify script reads it).
+# "digest" is the checksum over what a record was measured from (a function of the record, set below, after the
+# functions), "verify" the kind's check of a record, which image-ledger.py rebuilds its records with (None: the
+# kind has none, and the ledger holds none of its records: they fail closed).
 KINDS = {
     "crc": {"records": CRC_RECORDS, "sources": CRC_TEST_SOURCES, "not": CRC_NOT_SOURCES, "built_by": CRC_BUILT_BY,
-            "name": "CRC", "same": "SAME_SOURCES_CRC"},
+            "name": "CRC", "same": "SAME_SOURCES_CRC", "verify": "kinds/crc/bench/crcverify.sh"},
     "pools": {"records": POOLS_RECORDS, "sources": POOLS_TEST_SOURCES, "not": POOLS_NOT_SOURCES,
-              "built_by": POOLS_BUILT_BY, "name": "pools", "same": "SAME_SOURCES_POOLS"},
+              "built_by": POOLS_BUILT_BY, "name": "pools", "same": "SAME_SOURCES_POOLS",
+              "verify": "kinds/pools/bench/poolverify.sh"},
+    "pools-isr": {"records": POOLS_ISR_RECORDS, "sources": POOLS_ISR_TEST_SOURCES, "not": POOLS_ISR_NOT_SOURCES,
+                  "built_by": POOLS_ISR_BUILT_BY, "name": "pools concurrency", "same": "SAME_SOURCES_POOLS_ISR",
+                  "verify": "kinds/pools-isr/bench/isrverify.sh"},
 }
 RECORD_COMMIT = re.compile(r'"(?:source_commit|bench_commit)":\s*"([0-9a-f]{12,40})"|"commits":\s*\[([^\]]*)\]')
 
@@ -214,7 +253,7 @@ HOST_FIXES = "records/host-fixes.json"
 # The host-side files a recorded fix may change without a new series: they
 # run images and write, collect and check records, and build nothing.
 HOST_FIXABLE = ("firmware/nrf5340-rb-bench/run-one.py", "firmware/nrf5340-rb-bench/onerecords.py",
-                "firmware/nrf5340-rb-bench/oneverify.sh") + CRC_HOST_FIXABLE + POOLS_HOST_FIXABLE
+                "firmware/nrf5340-rb-bench/oneverify.sh") + CRC_HOST_FIXABLE + POOLS_HOST_FIXABLE + POOLS_ISR_HOST_FIXABLE
 # Benchmark version 2 (records/bench-v2): the host-side files its images are
 # built by. A change in one of them is held like a change in a source file:
 # the record stands if the tree still builds its images, byte for byte, at
@@ -241,6 +280,17 @@ def crc_images_digest(rec):
     return hashlib.sha256("\n".join([v2_images_digest(rec)] + extra).encode()).hexdigest()
 
 
+def isr_images_digest(rec):
+    """One checksum for what a pools concurrency record (pools-isr/1) was
+    measured from: one image per record, so its address and flash bytes,
+    the boot stub, the whole bundle the image was in, and the toolchain
+    image. KeyError if a field is missing."""
+    lines = [f"image_base {int(rec['image_base'], 16):#x}", f"image_sha256 {rec['image_sha256']}",
+             f"boot_image_sha256 {rec['boot_image_sha256']}", f"bundle {rec['bundle']} {rec['bundle_sha256']}",
+             f"toolchain_image {rec['toolchain_image']}"]
+    return hashlib.sha256("\n".join(lines).encode()).hexdigest()
+
+
 def side(path):
     """Which side of the test a file under TEST_SOURCES is on: "image"
     (compiled or linked into an image), None (documentation), or "host"
@@ -251,6 +301,18 @@ def side(path):
     if path.endswith(IMAGE_SUFFIXES) or os.path.basename(path) == "Makefile":
         return "image"
     return "host"
+
+
+KINDS["crc"]["digest"] = KINDS["pools"]["digest"] = crc_images_digest
+KINDS["pools-isr"]["digest"] = isr_images_digest
+
+
+def kind_digest(rec, kind):
+    """The kind's checksum of a record (KINDS "digest"), or None if the record lacks a field it needs."""
+    try:
+        return KINDS[kind]["digest"](rec)
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return None
 
 
 _ids = {}
@@ -371,10 +433,15 @@ def v2_host_stands(commit):
     return True
 
 
+# The "from" of a recorded host fix that adds a host file the record's commit did not have (a kind's check of a
+# record written after its series). Only the kinds' rule (crc_host_fixed, crc_host_stands) reads it.
+ABSENT = "none"
+
+
 def crc_fix_leads(a, b, path):
-    """True if the blob of path at a leads to its blob at b by recorded host fixes."""
+    """True if the blob of path at a (ABSENT if a has no such file) leads to its blob at b by recorded host fixes."""
     steps = host_fixes()
-    at, seen = a[path][1], set()
+    at, seen = (a[path][1] if path in a else ABSENT), set()
     while at != b[path][1] and at in steps.get(path, {}) and at not in seen:
         seen.add(at)
         at = steps[path][at]
@@ -387,9 +454,10 @@ def crc_host_fixed(commit, kind="crc"):
     and every one that differs is host side and leads to HEAD's by the steps
     of host-fixes.json."""
     a, b = blobs(commit, kind), blobs("HEAD", kind)
-    if not a or set(a) != set(b):
+    if not a or set(a) - set(b):
         return False
-    return all(a[p] == b[p] or (a[p][0] == "host" and crc_fix_leads(a, b, p)) for p in a)
+    return all(a.get(p) == b[p] or (b[p][0] == "host" and (p not in a or a[p][0] == "host") and crc_fix_leads(a, b, p))
+               for p in b)
 
 
 def crc_host_stands(commit, kind="crc"):
@@ -403,7 +471,7 @@ def crc_host_stands(commit, kind="crc"):
     for path in set(a) | set(b):
         if a.get(path) == b.get(path) or (a.get(path) or b[path])[0] in ("image", "built by"):
             continue
-        if path not in a or path not in b or not crc_fix_leads(a, b, path):
+        if path not in b or (path in a and a[path][0] != "host") or b[path][0] != "host" or not crc_fix_leads(a, b, path):
             return False
     return True
 
@@ -524,10 +592,7 @@ def main():
         if text is not None and kind and f.endswith(".json"):
             rec = json.loads(text)
             c = rec.get("bench_commit") or "unknown"
-            try:
-                digest = crc_images_digest(rec)   # the same fields in every kind's record
-            except (KeyError, TypeError, ValueError):
-                digest = None
+            digest = kind_digest(rec, kind)
             k_commits[kind].setdefault(c[:12], []).append((f[len("records/"):], digest))
             k_files[kind].setdefault(c[:12], []).append((f, hashlib.sha256(data).hexdigest()))
         elif text is not None and f.startswith("records/") and f.endswith(".json"):
@@ -617,6 +682,9 @@ def main():
                 e = led_k.get(name)
                 if not crc_host_stands(c, kind):
                     why = f"the host side of the {kv['name']} kind at that commit is not that of HEAD (or the commit is unknown)"
+                elif not kv.get("verify"):
+                    why = (f"the {kv['name']} kind has no check of a record yet (no rebuild script), "
+                           f"so no rebuild in {LEDGER} can hold it")
                 elif digest is None:
                     why = "the record has no image checksums"
                 elif e is None:

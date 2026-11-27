@@ -14,7 +14,8 @@ the numbers). Our reference free list with interrupts off (role "ours": not
 a library) is a row of the same table, labelled in its name cell every
 time; with weights it is scored like any row, and the filter on the kind of
 row leaves it out. What each library documents about use from interrupts is
-shown as documented, not tested, and used in no filter and no score. The
+shown as documented and used in no score; what the concurrency series
+observed, where it has records, is beside it with a filter of its own. The
 reference free list, the baseline, stays apart, last.
 
 Python 3.9 or newer, standard library only.
@@ -44,6 +45,8 @@ BASE_NAME = "reference free list (ours)"
 NOT_PUBLISHED = ("The first board series of this kind is not published yet: there are no records, so there is nothing "
                  "to compare.")
 CLAIM_HEADER = "Documented use from interrupts (not tested)"
+ISR_HEADERS = ["Use from interrupts: documented", "Use from interrupts: observed (concurrency series)"]
+ISR_FILTER = "use from interrupts: tested within its documentation, and passed"
 
 
 def default_data_path():
@@ -96,7 +99,12 @@ def score_text(r):
 
 def default_state(P):
     return {"board": P["boards"][0]["id"] if P["boards"] else "", "scen": "pair", "cache": "on", "lang": "", "kind": "",
-            "sort": "", "dir": 1, "row": "", "w": {m: 0 for m in WEIGHT_IDS}}
+            "isr": "", "sort": "", "dir": 1, "row": "", "w": {m: 0 for m in WEIGHT_IDS}}
+
+
+def has_isr(P):
+    """True where the data holds records of the concurrency series (the page then shows its column and filter)."""
+    return bool(P.get("isr_source"))
 
 
 def is_ours(c):
@@ -143,6 +151,8 @@ def state_from_hash(P, fragment):
             st["lang"] = v
         elif k == "kind" and v in KINDS:
             st["kind"] = v
+        elif k == "isr" and has_isr(P) and v == "passed":
+            st["isr"] = v
         elif k == "sort":
             s = v[1:] if v.startswith("-") else v
             if s in SORTS:
@@ -164,6 +174,8 @@ def hash_of(st):
         parts.append("lang=" + _enc(st["lang"]))
     if st["kind"]:
         parts.append("kind=" + st["kind"])
+    if st.get("isr"):
+        parts.append("isr=" + st["isr"])
     if st["sort"]:
         parts.append("sort=" + ("-" if st["dir"] < 0 else "") + st["sort"])
     if st["row"]:
@@ -241,7 +253,8 @@ def shown(P, st):
         if r:
             every.append({"c": c, "r": r, "i": i})
     out = [x for x in every if not (st["lang"] and x["c"]["lang"] != st["lang"])
-           and not (st["kind"] and x["c"].get("role") != st["kind"])]
+           and not (st["kind"] and x["c"].get("role") != st["kind"])
+           and not (st.get("isr") and not ((x["r"].get("isr") or {}).get("passed")))]
     if weighted(st):
         score(st, out)
     if not st["sort"] and weighted(st):
@@ -290,12 +303,13 @@ def overlaps(st, rs, base, x):
     return out
 
 
-def header(st):
+def header(st, isr=False):
     def h(key, text):
         return text + (" ↓" if st["dir"] < 0 else " ↑") if st["sort"] == key else text
     return ([h("name", "Configuration")] + (["Score (your weights)"] if weighted(st) else [])
             + ["Library", "Version", "Lang.", "Lock as built", h("flash", "Flash bytes"), h("ram", "RAM bytes"),
-               "Cycles, init", "Cycles, alloc (" + st["scen"] + ")", "Cycles, free (" + st["scen"] + ")", CLAIM_HEADER])
+               "Cycles, init", "Cycles, alloc (" + st["scen"] + ")", "Cycles, free (" + st["scen"] + ")"]
+            + (ISR_HEADERS if isr else [CLAIM_HEADER]))
 
 
 def _nb(v):
@@ -317,6 +331,8 @@ def page_view(P, st):
         return {"header": [], "rows": [], "seps": [], "count": NOT_PUBLISHED, "note": "", "src": ""}
     every, rs = shown(P, st)
     base = baseline_of(P, st)
+    isr = has_isr(P)
+    bi = next((x for x in P.get("baseline_isr", []) if x["board"] == st["board"]), None)
     ch = chosen_of(st, rs)
     wd = weighted(st)
     cs = ch["score"] if ch and wd else None
@@ -345,11 +361,12 @@ def page_view(P, st):
         rows.append([first] + ([sc] if wd else [])
                     + [["–" if c["library"] is None else c["library"]], ["–" if c["pin"] is None else c["pin"]], [c["lang"]],
                        ["–" if c["lock"] is None else c["lock"]], [_nb(r["flash_bytes"])], [_nb(r["ram_bytes"])]]
-                    + numbers(r, x is ch) + [claim_cell(c)])
+                    + numbers(r, x is ch) + [claim_cell(c)] + ([[r["isr"]["text"] if r.get("isr") else "–"]] if isr else []))
     if base:
         seps.append([len(rows), BASE_TEXT])
         rows.append([[s] for s in (BASE_NAME,) + (("–",) if wd else ()) + ("–", "–", "C", "none", "–", "–")]
-                    + numbers(base, False) + [claim_cell({"documented_interrupts": P.get("baseline_documented")})])
+                    + numbers(base, False) + [claim_cell({"documented_interrupts": P.get("baseline_documented")})]
+                    + ([[("our control without a lock: " + bi["text"]) if bi else "–"]] if isr else []))
     count = (f"{len(rs)} of {len(every)} rows shown, "
              + ("sorted by " + SORT_TEXT[st["sort"]] + (", descending" if st["dir"] < 0 else "") if st["sort"]
                 else "ordered by the score of your weights, its highest end first; a score marked “overlaps above” "
@@ -358,6 +375,9 @@ def page_view(P, st):
              + (". The chosen configuration is not shown: nothing is marked" if st["row"] and not ch else "") + ".")
     bd = board_of(P, st)
     note = " ".join(t for t in ("SYNTHETIC: " + P["SYNTHETIC"] + "." if P.get("SYNTHETIC") else "",
+                                "SYNTHETIC: " + P["SYNTHETIC_ISR"] + "." if P.get("SYNTHETIC_ISR") else "",
+                                ("Shown: the rows that passed the concurrency series within their documentation ("
+                                 + ISR_FILTER + "); not a score.") if st.get("isr") else "",
                                 st["scen"] + ": " + scenario_text(P, st) + ".",
                                 "No block is freed in this scenario." if st["scen"] == "empty" else "",
                                 bd["note_cache_off"] if st["cache"] == "off" and bd.get("note_cache_off") else "") if t)
@@ -365,4 +385,4 @@ def page_view(P, st):
            f"series at commit {', '.join(P['source']['commits'])}, toolchain {', '.join(P['source']['toolchain_image'])}. "
            "Each number is the mean of the scenario's calls, the first included, in cycles less the counter-read overhead, "
            "as min–max over the eight placements, first pass; init is one call.")
-    return {"header": header(st), "rows": rows, "seps": seps, "count": count, "note": note, "src": src}
+    return {"header": header(st, isr), "rows": rows, "seps": seps, "count": count, "note": note, "src": src}

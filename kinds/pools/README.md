@@ -91,7 +91,9 @@ again on 2026-11-26.
 ## What each library documents about interrupts
 
 For the column "documented use from interrupts" (plan, section 4). It is
-shown, not tested: the first series is one context. `claims.tsv` holds the
+shown as documented: the first series is one context. Whether it holds is
+tested by the concurrency series (`kinds/pools-isr`, records under
+`records/pools-isr`). `claims.tsv` holds the
 same, one line per configuration with its source (file and line at the pin,
 or the documentation's URL), for the pages to read; keep the two the same.
 

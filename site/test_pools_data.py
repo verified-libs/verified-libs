@@ -46,6 +46,8 @@ def sections(block):
         elif line.startswith("<summary><strong>") and depth == 1:
             cur = re.match(r"<summary><strong>(.+?)</strong>", line).group(1)
             out[cur], sub = {"": []}, ""
+        elif cur and depth == 2 and line.startswith("**Use from interrupts.**"):
+            sub = "Use from interrupts"; out[cur][sub] = []
         elif cur and depth == 2 and line.startswith("**Bytes and init.**"):
             sub = "Bytes and init"; out[cur][sub] = []
         elif cur and depth == 2 and line.startswith("**`"):
@@ -165,6 +167,42 @@ def main():
                     fails.append(f"refused for another reason: {e}")
             finally:
                 t.RECORDS = keep
+        # with synthetic records of the concurrency series too: the tables as before, and each board's fold-out
+        # "Use from interrupts" saying what the data says
+        p = subprocess.run([sys.executable, "-I", os.path.join(HERE, "pools_isr_synthetic.py"), os.path.join(d, "isr")],
+                           capture_output=True, text=True)
+        if p.returncode:
+            fails.append("pools_isr_synthetic.py failed: " + p.stdout + p.stderr)
+        else:
+            idir = os.path.join(d, "isr")
+            data = pools_data.build(rd, isr_dir=idir)
+            blk = t.block(rd, isr_dir=idir)
+            n2, f2 = compare(data, blk, blk)
+            fails += f2
+            n1 += n2
+            sec = sections(blk)
+            names = {c["adapter"]: c["name"] for c in data["configurations"]}
+            for b in data["boards"]:
+                rows = sec.get(b["name"], {}).get("Use from interrupts", [])
+                want = [(names[r["adapter"]], r["isr"]["text"]) for r in data["rows"] if r["board"] == b["id"]]
+                base = next(x for x in data["baseline_isr"] if x["board"] == b["id"])
+                want.append((t.BASE_LABEL, base["text"]))
+                want += [(x["name"], x["text"]) for x in data["isr_controls"] if x["board"] == b["id"]]
+                if len(rows) != len(want):
+                    fails.append(f"{b['id']}: {len(rows)} rows in 'Use from interrupts', {len(want)} in the data")
+                    continue
+                for got, (name, text) in zip(rows, want):
+                    n1 += 1
+                    # synthetic records lie outside the tree: the cell is the text, not linked
+                    if not got[0].startswith(("[" + name + "]", name)) or got[2] != text.replace("|", "\\|"):
+                        fails.append(f"{b['id']} {name}: 'Use from interrupts' says {got[2][:80]!r}, the data {text[:80]!r}")
+            if "SYNTHETIC: every result of the concurrency series" not in blk or "SYNTHETIC_ISR" not in data:
+                fails.append("synthetic results of the concurrency series not marked SYNTHETIC")
+            if "Use from interrupts was tested" not in blk or t.ONE_CONTEXT_HTML in blk:
+                fails.append("with the concurrency series, the box above the tables is not reworded")
+            if [x for x in data["rows"] if x.get("isr") and x["isr"]["class"] == "outside"
+                    and any(w in x["isr"]["text"] for w in ("pass", "FAIL", "fail", "caught"))]:
+                fails.append("a verdict word for a library outside its documentation")
     for f in fails:
         print("FAIL " + f)
     print(f"committed records: {n0} cells compared; synthetic records: {n1} cells compared; {len(fails)} failed")

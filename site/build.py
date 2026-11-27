@@ -227,10 +227,12 @@ DESCRIPTIONS = {
                        "every call compared with a reference, host tests and CBMC proofs.",
     "results-pools.html": "Results for fixed-block memory pool libraries on six microcontroller boards: cycles per "
                           "alloc and free in six scenarios, cache on and off, flash and RAM bytes, measured in one "
-                          "context, each with its record.",
+                          "context, and what the concurrency series observed with an interrupt at every cycle of a "
+                          "call, each with its record.",
     "method-pools.html": "How the fixed-block memory pools are measured and checked: one image per configuration and "
                          "placement, every call checked on the board, host tests with broken controls, a CBMC proof of "
-                         "the reference; one context, interrupt claims documented, not tested.",
+                         "the reference; use from interrupts tested in a series of its own, with an interrupt at every cycle "
+                         "of a call.",
     "reproduce.html": "How to rebuild the firmware bit for bit and repeat the measurements: every number comes from a "
                       "record that names the commit, the toolchain, the flags and the pinned library versions.",
     "repeats.html": "Repeats of the tests by people outside the project, and how to send in your own.",
@@ -307,10 +309,14 @@ def main():
         sys.exit("build refused: site/data/crc.json is not up to date (python3 -I site/crc_data.py --write)")
     # The pools kind's data (site/data/pools.json) is written from records/pools by site/pools_data.py, and the
     # tables of its results page by site/pools_tables.py; a synthetic record under records/pools stops both.
-    if open(os.path.join(SITE, "data/pools.json")).read() != pools_data.text():
+    # A preview of the concurrency series' pages before its records exist (--preview and VL_POOLS_ISR_SYNTHETIC,
+    # a directory of site/pools_isr_synthetic.py outside the tree): the data and the results page must be those of
+    # the synthetic records, and every page says SYNTHETIC. Never without --preview.
+    isr_syn = os.environ.get("VL_POOLS_ISR_SYNTHETIC") if preview else None
+    if open(os.path.join(SITE, "data/pools.json")).read() != pools_data.text(isr_dir=isr_syn):
         sys.exit("build refused: site/data/pools.json is not up to date (python3 -I site/pools_data.py --write)")
     for pg in pools_data.t.PAGES.values():
-        if len(set(pools_data.t.page_text(os.path.join(ROOT, pg)))) != 1:
+        if len(set(pools_data.t.page_text(os.path.join(ROOT, pg), isr_dir=isr_syn))) != 1:
             sys.exit(f"build refused: {pg} is not up to date (python3 -I site/pools_tables.py --write {pg})")
     pages = {}
     for src, dst in pagemap.items():
@@ -368,7 +374,7 @@ def main():
         + f'<script>{open(os.path.join(SITE, "compare-pools.js")).read()}</script>'), "compare",
         "Compare fixed-block memory pool libraries for microcontrollers by board, scenario and cache: cycles per alloc "
         "and free as ranges over eight code placements, flash and RAM bytes, what each library documents about "
-        "interrupts (not tested); measured in one context; no ranking.")
+        "interrupts and what the concurrency series observed; no ranking.")
 
     # What the server shows for an address that does not exist (GitHub Pages serves 404.html).
     pages["404.html"] = page("404", "Page not found", (
@@ -408,6 +414,10 @@ def main():
                   'PREVIEW - contains embargoed material, not for publication</div>')
         for name in {n for n, _ in bad}:
             pages[name] = pages[name].replace("<header>", banner + "<header>", 1)
+    if isr_syn:
+        banner = ('<div style="background:#b3261e;color:#fff;padding:10px 16px;font-weight:600">'
+                  'PREVIEW - SYNTHETIC results of the pools concurrency series (made up), not for publication</div>')
+        pages = {n: b.replace("<header>", banner + "<header>", 1) for n, b in pages.items()}
     for name, body in {**pages, **files}.items():
         os.makedirs(os.path.dirname(os.path.join(out, name)), exist_ok=True)
         open(os.path.join(out, name), "w").write(body)

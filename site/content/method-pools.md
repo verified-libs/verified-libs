@@ -24,20 +24,91 @@ library whose pool is not of one block size, or that cannot be built
 without its kernel, is left out, with the reason in the kind's README
 ("Left out").
 
-## Measured in one context
+## Use from interrupts
 
-**This series measures one context only: no interrupt calls a pool while
-it is measured.** Whether a pool is safe when an interrupt calls it is not
-tested. Several libraries document use from interrupts, or a lock; the
-comparison page shows what each documents, with its source, as documented,
-not tested, and no filter and no score uses it. A later series, with its
-own plan and the owner's decision, may test those claims (an interrupt
-stress test with a deliberately broken pool as the control, and a check of
-an interrupt at every instruction on a host model) and measure the time a
-pool keeps interrupts off ([plan](../../lab/plans/2026-11-26-pools-kind.md),
-section 4).
+**The numbers of these pages are of one context:** no interrupt calls a pool
+while it is timed. Whether a pool stays correct when an interrupt calls it
+is tested by a series of its own, the concurrency series
+([plan](../../lab/plans/2026-11-27-pools-concurrency.md); records under
+[`records/pools-isr`](../../records/README.md)). What it observed is in
+each board's fold-out "Use from interrupts" on the
+[results page](results-pools.md) and in a column of the
+[comparison page](compare-pools.html); it is part of no score.
 
-What the series does show about locking: the **lock as built**, the
+- **What it asks.** An interrupt calls `alloc` or `free` on the same pool
+  while the main context is inside its own `alloc` or `free`. Is a block
+  then handed out twice, or lost? Is the pool's state corrupted, or an
+  answer given that no order of the calls gives? And, where a
+  configuration takes interrupts off, how long does an interrupt wait?
+- **How, on the boards.** SysTick is a one-shot interrupt, armed d cycles
+  before main's call, for d = 1, 2, 3 … until the interrupt has come after
+  the call 16 times in a row: so the interrupt comes at every cycle of the
+  call. This is done for:
+  - seven start states (0 to 32 blocks held);
+  - main's alloc or free;
+  - five patterns of the interrupt's calls;
+  - four arrangements of the free list;
+  - the cache off and on.
+
+  Every trial is judged by the same code as the host check
+  (`kinds/pools-isr/verdict.h`). The record also says which instructions
+  of the configuration's code an interrupt came at.
+- **On the host,** the same trials with an interrupt at every instruction
+  (x86 single-step). CMSIS-RTX's LDREX/STREX variant, which the
+  Cortex-M4, M7 and M33 boards run, is checked there on a model of the
+  exclusive monitor.
+- **Each library as it documents itself** (`kinds/pools/claims.tsv`), in
+  three classes:
+  - *within its documentation:* passed, or a finding;
+  - *outside its documentation:* the library documents no use from
+    interrupts, or only with a lock it is not built with. It is run all
+    the same and only what was observed is reported; it is never called
+    failing;
+  - *ours:* our reference with interrupts off.
+- **Controls.** On every board, three builds of ours must be caught:
+  - our reference without a lock;
+  - two builds with interrupts on again too early, in `alloc` and in `free`.
+
+  A board whose controls were not all caught has no records.
+- **The interrupts-off time.** It is read in the same sweep: when the
+  interrupt runs, it reads how many cycles ago SysTick ran out. The
+  largest such latency of a configuration, less the smallest of the
+  reference without a lock in the same image, is the longest an interrupt
+  waited because the configuration had interrupts off. It is for this
+  pool shape and these calls, cache off and on; it is not a bound for
+  every use.
+- **What it cannot show:**
+  - more than one core;
+  - a thread waiting for a block (the pools run without their kernels);
+  - two interrupts in one call, or nested interrupts;
+  - another compiler or optimisation level.
+  - on some cores, the one instruction right after a library turns
+    interrupts on again. Whether the sweep reaches it depends on the core
+    family, as the coverage of our controls showed:
+    - Cortex-M0+ (NUCLEO-G0B1RE, SAM D20 Xplained Pro) and Cortex-M7
+      (NUCLEO-H723ZG): yes, an interrupt landed on it;
+    - Cortex-M4 (NUCLEO-G474RE) and Cortex-M33 (nRF5340 DK): no, an
+      interrupt pending there was taken only after it.
+
+    The architecture allows both (Armv7-M B5.2.3, Armv8-M B3.18). The host
+    check, which takes the interrupt at the unmask itself, covers that
+    instruction. Every record lists, per function of the configuration, the
+    instructions that no interrupt landed on (`coverage`, `per_function`,
+    `unreached`), so for each row a reader can see what the sweep did not
+    reach.
+  - on the Raspberry Pi Pico 2 with the cache off, the later part of a long
+    call. The sweep moves the interrupt up to 4,096 cycles after it is armed,
+    and there about 1,200 of those come before the call. So a call longer
+    than about 2,900 cycles is interrupted only in its first part. Of the
+    first series' calls, Contiki-NG's longest (a mean of up to 7,436 cycles)
+    and perhaps C_Allocator's (up to 2,539) are that long. On every other
+    board the longest call with the cache off is 1,132 cycles. The record's
+    coverage per function (`unreached`) names the instructions no interrupt
+    landed on.
+
+  It is not a proof: a trial covers the states it tried.
+
+What the timed series shows about locking: the **lock as built**, the
 library's own code around a call in the build measured (interrupts off,
 LDREX/STREX, an atomic bitmap, or none), and its cost in cycles, which is
 part of every number. Our own row "reference free list, interrupts off"

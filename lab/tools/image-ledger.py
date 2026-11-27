@@ -35,12 +35,26 @@ The records of the pools kind (records/pools) are held the same way, with
 kinds/pools/bench/poolverify.sh, entries pools/<board>/<file> and the
 checksum of the pools test sources (sources_pools); libraries from
 VL_POOLS_LIBS_FROM (default ~/vl-next/kind-pools).
+The records of the pools concurrency series (records/pools-isr) too, with
+kinds/pools-isr/bench/isrverify.sh, entries pools-isr/<board>/<file> held
+by isr_images_digest and the checksum of that kind's test sources
+(sources_pools-isr); libraries as the pools kind's.
+A kind of public-export.py's KINDS is rebuilt only if it has a check of a
+record (its "verify" there, with its libraries' place in KIND_LIBS here);
+the records of a kind without one are not rebuilt (a line says how many),
+and the export stops them: the ledger never holds one. Each kind's records
+are held by the kind's own checksum (KINDS "digest"; the pools concurrency
+series: public-export.py isr_images_digest); a record without the fields
+for it is not rebuilt either.
 
 --all   rebuild every record with an image checksum, also those the
         export takes without one, but for archived series, which
         the tree is not meant to build (a check of the whole tree; about
         20 seconds per record, half a minute per board for version 2)
 --out   write there instead of records/rebuilt.json
+--plan  only say what would be rebuilt, each record with the checksum
+        its ledger entry would hold; nothing is built or written (seconds:
+        the quick export test runs it)
 
 VL_LIB_MIRROR=DIR: fetch the libraries from that local mirror only
 (lab/tools/lib-mirror.py; it must hold every pin, or nothing is rebuilt), not
@@ -70,9 +84,11 @@ spec = importlib.util.spec_from_file_location("lib_mirror", os.path.join(HERE, "
 lm = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(lm)
 
-# per kind of pe.KINDS: the check of a record (VL_TREE=1) and where its libraries are copied from
-KIND_VERIFY = {"crc": ("kinds/crc/bench/crcverify.sh", "VL_CRC_LIBS_FROM", "~/vl-next/kind-crc"),
-               "pools": ("kinds/pools/bench/poolverify.sh", "VL_POOLS_LIBS_FROM", "~/vl-next/kind-pools")}
+# per kind of pe.KINDS with a check of a record (its "verify", run with VL_TREE=1): where its libraries are copied
+# from. A kind of KINDS without "verify" is not rebuilt; one with a "verify" but no entry here is an error.
+KIND_LIBS = {"crc": ("VL_CRC_LIBS_FROM", "~/vl-next/kind-crc"), "pools": ("VL_POOLS_LIBS_FROM", "~/vl-next/kind-pools"),
+             "pools-isr": ("VL_POOLS_LIBS_FROM", "~/vl-next/kind-pools")}
+KIND_VERIFY = {k: (v["verify"], *KIND_LIBS[k]) for k, v in pe.KINDS.items() if v.get("verify")}
 # a fetch of the libraries that failed, in the note of a record "not checked" (git's own words, and the verify scripts')
 FETCH_FAULT = re.compile(r"could not be fetched|could not fetch|fatal: early EOF|fetch-pack|could not read from remote|"
                          r"Could not resolve host|unable to access|transport '\w+' not allowed|remote end hung up|"
@@ -86,8 +102,8 @@ def git(*args):
 
 def main():
     args = sys.argv[1:]
-    every = "--all" in args
-    args = [a for a in args if a != "--all"]
+    every, plan = "--all" in args, "--plan" in args
+    args = [a for a in args if a not in ("--all", "--plan")]
     out = os.path.join(ROOT, pe.LEDGER)
     if args[:1] == ["--out"] and len(args) == 2:
         out = os.path.abspath(args[1])
@@ -141,6 +157,7 @@ def main():
                     fh.write(text)
         todo3 = {}   # <kind>/<board>/<file> -> checksum over the record's images, for every kind of pe.KINDS
         for kind, kv in pe.KINDS.items():
+            no_check, no_digest = [], []
             for f in git("ls-tree", "-r", "--name-only", "HEAD", "--", kv["records"].rstrip("/")).split("\n"):
                 if not f.endswith(".json"):
                     continue
@@ -152,10 +169,29 @@ def main():
                 same = pe.source_ids(c, kind)[0] is not None and pe.source_ids(c, kind)[0] == pe.source_ids("HEAD", kind)[0]
                 if every or (not same and not pe.crc_host_fixed(c, kind) and pe.crc_host_stands(c, kind)):
                     name = f[len("records/"):]
-                    todo3[name] = pe.crc_images_digest(rec)
+                    digest = pe.kind_digest(rec, kind)
+                    if kind not in KIND_VERIFY:
+                        no_check.append(name)
+                        continue
+                    if digest is None:
+                        no_digest.append(name)
+                        continue
+                    todo3[name] = digest
                     os.makedirs(os.path.dirname(os.path.join(work, name)), exist_ok=True)
                     with open(os.path.join(work, name), "w") as fh:
                         fh.write(text)
+            if no_check:
+                print(f"{len(no_check)} {kv['name']} records not rebuilt: the kind has no check of a record "
+                      f"(the export stops them)", flush=True)
+            if no_digest:
+                print(f"{len(no_digest)} {kv['name']} records not rebuilt: without the fields of the kind's image "
+                      f"checksum (the export stops them): {', '.join(no_digest[:8])}", flush=True)
+        if plan:
+            for n, d in sorted({**todo, **todo2, **todo3}.items()):
+                print(f"would rebuild {n} {d}")
+            print(f"would rebuild {len(todo) + len(todo2) + len(todo3)} records from the sources of {head[:12]} "
+                  f"(--plan: nothing built or written)")
+            return 0
         if not todo and not todo2 and not todo3:
             print("nothing to rebuild: every record with an image checksum is one the export takes as it is (the sources of HEAD, a recorded host fix, or an archived series)")
             if os.path.exists(out):
