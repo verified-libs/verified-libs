@@ -40,14 +40,28 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 .sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
 .tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
 </style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html" class=on>Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
 <main><h1 id="results-crc-calculation">Results: CRC calculation</h1>
-<p>The results of one of the two kinds of library so far; the other is embedded
-ring buffers (<a href="kinds.html">all kinds</a>, <a href="results.html">ring buffer results</a>).
-The same numbers by CRC, board, message and cache, with every length and both
-starts: <a href="compare-crc.html">Compare</a>.</p>
+<p>The results of one of the three kinds of library so far; the others are
+embedded ring buffers and fixed-block memory pools (<a href="kinds.html">all kinds</a>,
+<a href="results.html">ring buffer results</a>, <a href="results-pools.html">memory pool results</a>).</p>
+<p>Cycles and bytes of CRC calculation on six boards: libraries that compute
+a CRC in software and, on four boards, the board's CRC unit beside them,
+for three CRCs; every number comes from a record. Every number is the range
+over eight placements of the code: two rows whose ranges overlap are not
+told apart. The same numbers by CRC, board and message, with every length
+and both starts:</p>
+<p><strong><a href="compare-crc.html">Compare them with your own weights →</a></strong></p>
+<p>Each part below opens with a click.</p>
+<details id="what-was-measured">
+<summary><strong>What was measured</strong>: the configurations, the checks, the series and their commits, the compiler</summary>
 <blockquote>
 <p><strong>Status: the kind's first and second board series.</strong> Every number comes from a
 record under <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/crc</code></a> that can be rebuilt
@@ -65,18 +79,28 @@ CRC unit, driven by our code; it is not a library, and its name cell says
 so.</p>
 <p>Every configuration was checked against a reference before it was timed,
 and every timed call's result was compared with the reference's on the
-board (<a href="method-crc.html">method</a>). Two series, two passes each:
+board (<a href="method-crc.html">method</a>). Two series, two passes each, and the
+two boards that method version 3 changed measured again:
 - the first, commit <code>6301058</code>, 2026-11-24 to 2026-11-25
   (<a href="report-2026-11-25-crc-first-series.html">report</a>);
 - the second (tables in RAM and the boards' CRC units), commits <code>04a2197</code>
   and <code>40f1958</code>, 2026-11-25
-  (<a href="report-2026-11-25-crc-second-series.html">report</a>).
-Compiler: arm-none-eabi-gcc 14.2.1, <code>-O2 -DNDEBUG</code>, newlib-nano; the Rust
+  (<a href="report-2026-11-25-crc-second-series.html">report</a>);
+- method version 3: every configuration of the nRF5340 DK and the
+  NUCLEO-H723ZG, both series' configurations, commit <code>4032f80</code>,
+  2026-11-26 (<a href="method-crc.html#method-version-3">method</a>). Their records of
+  the two series before it are archived series, linked under each board
+  below.</p>
+<p>What the series reports left unexplained, studied later in the same data:
+<a href="report-2026-11-27-crc-unexplained.html">report of 2026-11-27</a>.</p>
+<p>Compiler: arm-none-eabi-gcc 14.2.1, <code>-O2 -DNDEBUG</code>, newlib-nano; the Rust
 crate with rustc 1.99.1 at the same optimisation level; pinned <a href="https://github.com/verified-libs/verified-libs/blob/main/toolchain/README.md">toolchain image</a>. The
 libraries are fetched at the commits in
 <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/libs.lock"><code>kinds/crc/libs.lock</code></a>, never copied into this
 repository.</p>
-<h2 id="how-to-read-the-tables">How to read the tables</h2>
+</details>
+<details id="how-to-read-the-tables">
+<summary><strong>How to read the tables</strong>: the columns, the board's CRC unit, the ranges, what is only in the records</summary>
 <p>One table per board, CRC and cache setting: the cache on first, then off.
 One row per configuration, in the order of
 <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/configs.txt"><code>kinds/crc/configs.txt</code></a>; the order is not a
@@ -114,11 +138,15 @@ every scenario, and the baseline (the bitwise reference, timed in the same
 image) are in the records. The 1-byte figures are not shown: at an 8-byte
 boundary with the cache on, that scenario is the first one after the cache
 is switched on (<a href="method-crc.html">method</a>, "A mean includes the first call").</p>
+</details>
 <!-- table:crc -->
 
-<h2 id="nrf5340-dk">nRF5340 DK</h2>
+<details id="nrf5340-dk">
+<summary><strong>nRF5340 DK</strong>, 64 MHz, method version 3: 35 configurations, a call on 16 bytes 112–1033 cycles with the cache on</summary>
 <p>nRF5340 DK, application core (Cortex-M33), 64 MHz.</p>
-<h3 id="crc-32iso-hdlc-nrf5340-dk-cache-on">CRC-32/ISO-HDLC, nRF5340 DK, cache on</h3>
+<p>Method version 3, at 64 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series <a href="https://github.com/verified-libs/verified-libs/tree/fc7e8ad78c8949684c2e5920d72f957edd431ca8/records/crc/nrf5340">"CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"</a> (public commit <code>fc7e8ad</code>); the archived series <a href="https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/crc/nrf5340">"CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"</a> (public commit <code>be1da88</code>).</p>
+<details id="crc-32iso-hdlc-nrf5340-dk-cache-on">
+<summary>CRC-32/ISO-HDLC, cache on: 16 rows, 16 bytes 174–1033 cycles, 5.5–61.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -279,7 +307,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-32iso-hdlc-nrf5340-dk-cache-off">CRC-32/ISO-HDLC, nRF5340 DK, cache off</h3>
+</details>
+<details id="crc-32iso-hdlc-nrf5340-dk-cache-off">
+<summary>CRC-32/ISO-HDLC, cache off: 16 rows, 16 bytes 376–3734 cycles, 13.0–226.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -440,7 +470,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-nrf5340-dk-cache-on">CRC-16/IBM-3740, nRF5340 DK, cache on</h3>
+</details>
+<details id="crc-16ibm-3740-nrf5340-dk-cache-on">
+<summary>CRC-16/IBM-3740, cache on: 9 rows, 16 bytes 190–294 cycles, 10.0–17.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -538,7 +570,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-nrf5340-dk-cache-off">CRC-16/IBM-3740, nRF5340 DK, cache off</h3>
+</details>
+<details id="crc-16ibm-3740-nrf5340-dk-cache-off">
+<summary>CRC-16/IBM-3740, cache off: 9 rows, 16 bytes 432–1202 cycles, 22.0–72.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -636,7 +670,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-nrf5340-dk-cache-on">CRC-8/SMBUS, nRF5340 DK, cache on</h3>
+</details>
+<details id="crc-8smbus-nrf5340-dk-cache-on">
+<summary>CRC-8/SMBUS, cache on: 10 rows, 16 bytes 112–293 cycles, 6.0–17.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -743,7 +779,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-nrf5340-dk-cache-off">CRC-8/SMBUS, nRF5340 DK, cache off</h3>
+</details>
+<details id="crc-8smbus-nrf5340-dk-cache-off">
+<summary>CRC-8/SMBUS, cache off: 10 rows, 16 bytes 151–1182 cycles, 6.0–69.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -850,9 +888,14 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h2 id="raspberry-pi-pico-2-h">Raspberry Pi Pico 2 H</h2>
+</details>
+</details>
+<details id="raspberry-pi-pico-2-h">
+<summary><strong>Raspberry Pi Pico 2 H</strong>, 150 MHz, method version 2: 35 configurations and the board's CRC unit, a call on 16 bytes 50–1012 cycles with the cache on</summary>
 <p>Raspberry Pi Pico 2 H (RP2350A, core 0, Cortex-M33), 150 MHz.</p>
-<h3 id="crc-32iso-hdlc-raspberry-pi-pico-2-h-cache-on">CRC-32/ISO-HDLC, Raspberry Pi Pico 2 H, cache on</h3>
+<p>Method version 2, at 150 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.</p>
+<details id="crc-32iso-hdlc-raspberry-pi-pico-2-h-cache-on">
+<summary>CRC-32/ISO-HDLC, cache on: 17 rows, 16 bytes 50–1012 cycles, 1.2–61.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -1022,7 +1065,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-32iso-hdlc-raspberry-pi-pico-2-h-cache-off">CRC-32/ISO-HDLC, Raspberry Pi Pico 2 H, cache off</h3>
+</details>
+<details id="crc-32iso-hdlc-raspberry-pi-pico-2-h-cache-off">
+<summary>CRC-32/ISO-HDLC, cache off: 17 rows, 16 bytes 1081–31697 cycles, 1.2–1910.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -1192,7 +1237,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-raspberry-pi-pico-2-h-cache-on">CRC-16/IBM-3740, Raspberry Pi Pico 2 H, cache on</h3>
+</details>
+<details id="crc-16ibm-3740-raspberry-pi-pico-2-h-cache-on">
+<summary>CRC-16/IBM-3740, cache on: 10 rows, 16 bytes 51–285 cycles, 1.2–17.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -1299,7 +1346,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-raspberry-pi-pico-2-h-cache-off">CRC-16/IBM-3740, Raspberry Pi Pico 2 H, cache off</h3>
+</details>
+<details id="crc-16ibm-3740-raspberry-pi-pico-2-h-cache-off">
+<summary>CRC-16/IBM-3740, cache off: 10 rows, 16 bytes 764–12131 cycles, 1.4–730.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -1406,7 +1455,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-raspberry-pi-pico-2-h-cache-on">CRC-8/SMBUS, Raspberry Pi Pico 2 H, cache on</h3>
+</details>
+<details id="crc-8smbus-raspberry-pi-pico-2-h-cache-on">
+<summary>CRC-8/SMBUS, cache on: 10 rows, 16 bytes 106–283 cycles, 6.0–17.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -1513,7 +1564,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-raspberry-pi-pico-2-h-cache-off">CRC-8/SMBUS, Raspberry Pi Pico 2 H, cache off</h3>
+</details>
+<details id="crc-8smbus-raspberry-pi-pico-2-h-cache-off">
+<summary>CRC-8/SMBUS, cache off: 10 rows, 16 bytes 3298–11060 cycles, 178.0–663.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -1620,9 +1673,14 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h2 id="nucleo-g474re">NUCLEO-G474RE</h2>
+</details>
+</details>
+<details id="nucleo-g474re">
+<summary><strong>NUCLEO-G474RE</strong>, 170 MHz, method version 2: 35 configurations and the board's CRC unit, a call on 16 bytes 96–1025 cycles with the cache on</summary>
 <p>NUCLEO-G474RE (STM32G474RET6, Cortex-M4F), 170 MHz.</p>
-<h3 id="crc-32iso-hdlc-nucleo-g474re-cache-on">CRC-32/ISO-HDLC, NUCLEO-G474RE, cache on</h3>
+<p>Method version 2, at 170 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.</p>
+<details id="crc-32iso-hdlc-nucleo-g474re-cache-on">
+<summary>CRC-32/ISO-HDLC, cache on: 17 rows, 16 bytes 96–1025 cycles, 2.2–61.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -1792,7 +1850,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-32iso-hdlc-nucleo-g474re-cache-off">CRC-32/ISO-HDLC, NUCLEO-G474RE, cache off</h3>
+</details>
+<details id="crc-32iso-hdlc-nucleo-g474re-cache-off">
+<summary>CRC-32/ISO-HDLC, cache off: 17 rows, 16 bytes 184–3002 cycles, 4.2–182.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -1962,7 +2022,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-nucleo-g474re-cache-on">CRC-16/IBM-3740, NUCLEO-G474RE, cache on</h3>
+</details>
+<details id="crc-16ibm-3740-nucleo-g474re-cache-on">
+<summary>CRC-16/IBM-3740, cache on: 10 rows, 16 bytes 96–325 cycles, 2.2–19.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2069,7 +2131,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-nucleo-g474re-cache-off">CRC-16/IBM-3740, NUCLEO-G474RE, cache off</h3>
+</details>
+<details id="crc-16ibm-3740-nucleo-g474re-cache-off">
+<summary>CRC-16/IBM-3740, cache off: 10 rows, 16 bytes 184–820 cycles, 4.2–49.5 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2176,7 +2240,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-nucleo-g474re-cache-on">CRC-8/SMBUS, NUCLEO-G474RE, cache on</h3>
+</details>
+<details id="crc-8smbus-nucleo-g474re-cache-on">
+<summary>CRC-8/SMBUS, cache on: 11 rows, 16 bytes 96–322 cycles, 2.2–19.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2292,7 +2358,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-nucleo-g474re-cache-off">CRC-8/SMBUS, NUCLEO-G474RE, cache off</h3>
+</details>
+<details id="crc-8smbus-nucleo-g474re-cache-off">
+<summary>CRC-8/SMBUS, cache off: 11 rows, 16 bytes 184–689 cycles, 4.2–41.3 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2408,9 +2476,14 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h2 id="nucleo-h723zg">NUCLEO-H723ZG</h2>
-<p>NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7), 64 MHz.</p>
-<h3 id="crc-32iso-hdlc-nucleo-h723zg-cache-on">CRC-32/ISO-HDLC, NUCLEO-H723ZG, cache on</h3>
+</details>
+</details>
+<details id="nucleo-h723zg">
+<summary><strong>NUCLEO-H723ZG</strong>, 520 MHz, method version 3: 35 configurations and the board's CRC unit, a call on 16 bytes 85–718 cycles with the cache on</summary>
+<p>NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7), 520 MHz.</p>
+<p>Method version 3, at 520 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series <a href="https://github.com/verified-libs/verified-libs/tree/fc7e8ad78c8949684c2e5920d72f957edd431ca8/records/crc/stm32h723">"CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"</a> (public commit <code>fc7e8ad</code>); the archived series <a href="https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/crc/stm32h723">"CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"</a> (public commit <code>be1da88</code>).</p>
+<details id="crc-32iso-hdlc-nucleo-h723zg-cache-on">
+<summary>CRC-32/ISO-HDLC, cache on: 17 rows, 16 bytes 85–718 cycles, 2.8–42.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2485,7 +2558,7 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash (4 KB)</td>
 <td style="text-align: right;">4296</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">96–98</td>
+<td style="text-align: right;">97–99</td>
 <td style="text-align: right;">2.8</td>
 </tr>
 <tr>
@@ -2575,13 +2648,15 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">212</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">55</td>
-<td style="text-align: right;">1.5</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">3.0</td>
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-32iso-hdlc-nucleo-h723zg-cache-off">CRC-32/ISO-HDLC, NUCLEO-H723ZG, cache off</h3>
-<p>The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the board's 64 MHz build leaves <code>FLASH_ACR</code> as after reset (<code>firmware/common/stm32h723/board.h</code>). RM0468 (Table 16) allows 0 or 1 wait states at 64 MHz. The numbers with the cache off carry the 7 wait states; fewer were not measured.</p>
+</details>
+<details id="crc-32iso-hdlc-nucleo-h723zg-cache-off">
+<summary>CRC-32/ISO-HDLC, cache off: 17 rows, 16 bytes 167–4316 cycles, 3.0–258.0 cycles per byte</summary>
+<p>The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as ST's template for the board sets it (<code>firmware/common/stm32h723/board.h</code>, method version 3). RM0468 (Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 wait states.</p>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2602,8 +2677,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">1072</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">336–569</td>
-<td style="text-align: right;">18.8–34.0</td>
+<td style="text-align: right;">371–720</td>
+<td style="text-align: right;">19.8–42.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_byte.json">crcany crc32iso_hdlc_byte (C)</a>[1]</td>
@@ -2611,8 +2686,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">4168</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">431–673</td>
-<td style="text-align: right;">18.8–34.0</td>
+<td style="text-align: right;">488–804</td>
+<td style="text-align: right;">19.8–42.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_libcrc_crc32.json">libcrc crc_32 (C)</a>[2]</td>
@@ -2620,8 +2695,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM, built at the first call</td>
 <td style="text-align: right;">144</td>
 <td style="text-align: right;">1025</td>
-<td style="text-align: right;">208–501</td>
-<td style="text-align: right;">8.0–26.0</td>
+<td style="text-align: right;">226–590</td>
+<td style="text-align: right;">8.0–32.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_rust_crc32_table1.json">crc (Rust) Table&lt;1&gt;</a></td>
@@ -2629,8 +2704,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash, computed at compile time</td>
 <td style="text-align: right;">1254</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">424–484</td>
-<td style="text-align: right;">19.2–23.7</td>
+<td style="text-align: right;">501–558</td>
+<td style="text-align: right;">22.5–27.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t16.json">etl crc32_t16 (C++)</a></td>
@@ -2638,8 +2713,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">132</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">685–893</td>
-<td style="text-align: right;">40.0–54.0</td>
+<td style="text-align: right;">832–1106</td>
+<td style="text-align: right;">48.0–66.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc32_ieee.json">zephyr crc32_ieee (C)</a></td>
@@ -2647,8 +2722,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">152</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">758–965</td>
-<td style="text-align: right;">40.0–54.0</td>
+<td style="text-align: right;">902–1172</td>
+<td style="text-align: right;">48.0–66.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_word.json">crcany crc32iso_hdlc_word (C)</a></td>
@@ -2656,8 +2731,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash (4 KB)</td>
 <td style="text-align: right;">4296</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">474–522</td>
-<td style="text-align: right;">18.4–19.8</td>
+<td style="text-align: right;">564–618</td>
+<td style="text-align: right;">20.7–23.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zlib_crc32.json">zlib crc32 (C)</a></td>
@@ -2665,8 +2740,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">5820</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">439–479</td>
-<td style="text-align: right;">20.3–22.3</td>
+<td style="text-align: right;">510–539</td>
+<td style="text-align: right;">23.8–26.1</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_bit.json">crcany crc32iso_hdlc_bit (C)</a></td>
@@ -2674,8 +2749,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">96</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">808–3736</td>
-<td style="text-align: right;">41.0–225.0</td>
+<td style="text-align: right;">814–4316</td>
+<td style="text-align: right;">41.0–258.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t256_ram.json">etl crc32_t256 (C++), table in RAM</a></td>
@@ -2683,8 +2758,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">1072</td>
 <td style="text-align: right;">1024</td>
-<td style="text-align: right;">167–441</td>
-<td style="text-align: right;">8.0–27.0</td>
+<td style="text-align: right;">184–562</td>
+<td style="text-align: right;">8.0–34.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_byte_ram.json">crcany crc32iso_hdlc_byte (C), table in RAM</a></td>
@@ -2692,8 +2767,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">4168</td>
 <td style="text-align: right;">4096</td>
-<td style="text-align: right;">261–536</td>
-<td style="text-align: right;">8.0–27.0</td>
+<td style="text-align: right;">300–684</td>
+<td style="text-align: right;">8.0–34.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_rust_crc32_table1_ram.json">crc (Rust) Table&lt;1&gt;, table in RAM</a></td>
@@ -2701,8 +2776,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">1254</td>
 <td style="text-align: right;">1028</td>
-<td style="text-align: right;">262–288</td>
-<td style="text-align: right;">10.2–13.2</td>
+<td style="text-align: right;">320–360</td>
+<td style="text-align: right;">12.5–16.5</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t16_ram.json">etl crc32_t16 (C++), table in RAM</a></td>
@@ -2710,8 +2785,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">132</td>
 <td style="text-align: right;">64</td>
-<td style="text-align: right;">433–626</td>
-<td style="text-align: right;">25.0–39.0</td>
+<td style="text-align: right;">536–786</td>
+<td style="text-align: right;">30.0–48.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc32_ieee_ram.json">zephyr crc32_ieee (C), table in RAM</a></td>
@@ -2719,8 +2794,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">152</td>
 <td style="text-align: right;">64</td>
-<td style="text-align: right;">511–703</td>
-<td style="text-align: right;">26.0–39.0</td>
+<td style="text-align: right;">626–852</td>
+<td style="text-align: right;">32.0–48.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc32_word_ram.json">crcany crc32iso_hdlc_word (C), table in RAM</a></td>
@@ -2728,8 +2803,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">4296</td>
 <td style="text-align: right;">4096</td>
-<td style="text-align: right;">305–359</td>
-<td style="text-align: right;">7.2–10.5</td>
+<td style="text-align: right;">385–438</td>
+<td style="text-align: right;">9.0–13.5</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zlib_crc32_ram.json">zlib crc32 (C), table in RAM</a></td>
@@ -2737,8 +2812,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">5820</td>
 <td style="text-align: right;">5120</td>
-<td style="text-align: right;">261–285</td>
-<td style="text-align: right;">10.0–12.1</td>
+<td style="text-align: right;">330–364</td>
+<td style="text-align: right;">12.7–14.7</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc32.json">the board's CRC unit, CRC-32 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
@@ -2746,12 +2821,14 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">212</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">130–218</td>
-<td style="text-align: right;">1.5–6.5</td>
+<td style="text-align: right;">167–251</td>
+<td style="text-align: right;">3.0–8.0</td>
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-nucleo-h723zg-cache-on">CRC-16/IBM-3740, NUCLEO-H723ZG, cache on</h3>
+</details>
+<details id="crc-16ibm-3740-nucleo-h723zg-cache-on">
+<summary>CRC-16/IBM-3740, cache on: 10 rows, 16 bytes 85–233 cycles, 3.0–14.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2781,7 +2858,7 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">594</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">153–154</td>
+<td style="text-align: right;">153–155</td>
 <td style="text-align: right;">7.0</td>
 </tr>
 <tr>
@@ -2817,7 +2894,7 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">72</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">225–226</td>
+<td style="text-align: right;">225–227</td>
 <td style="text-align: right;">13.0</td>
 </tr>
 <tr>
@@ -2835,7 +2912,7 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">594</td>
 <td style="text-align: right;">512</td>
-<td style="text-align: right;">153–154</td>
+<td style="text-align: right;">153–155</td>
 <td style="text-align: right;">7.0</td>
 </tr>
 <tr>
@@ -2853,13 +2930,15 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">212</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">55</td>
-<td style="text-align: right;">1.5</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">3.0</td>
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-nucleo-h723zg-cache-off">CRC-16/IBM-3740, NUCLEO-H723ZG, cache off</h3>
-<p>The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the board's 64 MHz build leaves <code>FLASH_ACR</code> as after reset (<code>firmware/common/stm32h723/board.h</code>). RM0468 (Table 16) allows 0 or 1 wait states at 64 MHz. The numbers with the cache off carry the 7 wait states; fewer were not measured.</p>
+</details>
+<details id="crc-16ibm-3740-nucleo-h723zg-cache-off">
+<summary>CRC-16/IBM-3740, cache off: 10 rows, 16 bytes 167–1150 cycles, 3.0–68.0 cycles per byte</summary>
+<p>The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as ST's template for the board sets it (<code>firmware/common/stm32h723/board.h</code>, method version 3). RM0468 (Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 wait states.</p>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2880,8 +2959,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">568</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">317–574</td>
-<td style="text-align: right;">17.5–34.0</td>
+<td style="text-align: right;">369–720</td>
+<td style="text-align: right;">19.6–44.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc16_byte.json">crcany crc16ibm_3740_byte (C)</a></td>
@@ -2889,8 +2968,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">594</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">423–689</td>
-<td style="text-align: right;">17.6–34.0</td>
+<td style="text-align: right;">495–850</td>
+<td style="text-align: right;">19.6–42.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_libcrc_ccitt_ffff.json">libcrc crc_ccitt_ffff (C)</a>[3]</td>
@@ -2898,8 +2977,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM, built at the first call</td>
 <td style="text-align: right;">180</td>
 <td style="text-align: right;">513</td>
-<td style="text-align: right;">210–513</td>
-<td style="text-align: right;">7.0–27.0</td>
+<td style="text-align: right;">226–632</td>
+<td style="text-align: right;">7.0–34.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcpp_ccittfalse_table.json">crcpp CRC_16_CCITTFALSE Table (C++)</a></td>
@@ -2907,8 +2986,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM, built by the table's constructor</td>
 <td style="text-align: right;">344</td>
 <td style="text-align: right;">524</td>
-<td style="text-align: right;">469–519</td>
-<td style="text-align: right;">25.0–28.0</td>
+<td style="text-align: right;">576–666</td>
+<td style="text-align: right;">30.0–36.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc16_t16.json">etl crc16_ccitt_t16 (C++)</a></td>
@@ -2916,8 +2995,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">112</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">683–902</td>
-<td style="text-align: right;">40.0–54.0</td>
+<td style="text-align: right;">830–1150</td>
+<td style="text-align: right;">48.0–68.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc16_itu_t.json">zephyr crc16_itu_t (C)</a></td>
@@ -2925,8 +3004,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">72</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">485–696</td>
-<td style="text-align: right;">26.0–40.0</td>
+<td style="text-align: right;">606–876</td>
+<td style="text-align: right;">32.0–50.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc16_t256_ram.json">etl crc16_ccitt_t256 (C++), table in RAM</a></td>
@@ -2934,8 +3013,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">568</td>
 <td style="text-align: right;">512</td>
-<td style="text-align: right;">150–447</td>
-<td style="text-align: right;">7.0–27.0</td>
+<td style="text-align: right;">168–578</td>
+<td style="text-align: right;">7.0–34.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc16_byte_ram.json">crcany crc16ibm_3740_byte (C), table in RAM</a></td>
@@ -2943,8 +3022,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">594</td>
 <td style="text-align: right;">512</td>
-<td style="text-align: right;">257–561</td>
-<td style="text-align: right;">7.0–27.0</td>
+<td style="text-align: right;">290–704</td>
+<td style="text-align: right;">7.0–34.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc16_t16_ram.json">etl crc16_ccitt_t16 (C++), table in RAM</a></td>
@@ -2952,8 +3031,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">112</td>
 <td style="text-align: right;">32</td>
-<td style="text-align: right;">482–653</td>
-<td style="text-align: right;">27.0–40.0</td>
+<td style="text-align: right;">608–824</td>
+<td style="text-align: right;">34.0–50.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc16.json">the board's CRC unit, CRC-16 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
@@ -2961,12 +3040,14 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">212</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">130–218</td>
-<td style="text-align: right;">1.5–6.5</td>
+<td style="text-align: right;">167–251</td>
+<td style="text-align: right;">3.0–8.0</td>
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-nucleo-h723zg-cache-on">CRC-8/SMBUS, NUCLEO-H723ZG, cache on</h3>
+</details>
+<details id="crc-8smbus-nucleo-h723zg-cache-on">
+<summary>CRC-8/SMBUS, cache on: 11 rows, 16 bytes 85–234 cycles, 3.0–14.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -2996,7 +3077,7 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">1090</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">123–124</td>
+<td style="text-align: right;">123–125</td>
 <td style="text-align: right;">5.0</td>
 </tr>
 <tr>
@@ -3023,7 +3104,7 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">100</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">231–232</td>
+<td style="text-align: right;">231–233</td>
 <td style="text-align: right;">13.0</td>
 </tr>
 <tr>
@@ -3041,7 +3122,7 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">1090</td>
 <td style="text-align: right;">1024</td>
-<td style="text-align: right;">123–124</td>
+<td style="text-align: right;">123–125</td>
 <td style="text-align: right;">5.0</td>
 </tr>
 <tr>
@@ -3068,7 +3149,7 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">100</td>
 <td style="text-align: right;">16</td>
-<td style="text-align: right;">231–232</td>
+<td style="text-align: right;">231–233</td>
 <td style="text-align: right;">13.0</td>
 </tr>
 <tr>
@@ -3077,13 +3158,15 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">208</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">55</td>
-<td style="text-align: right;">1.5</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">3.0</td>
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-nucleo-h723zg-cache-off">CRC-8/SMBUS, NUCLEO-H723ZG, cache off</h3>
-<p>The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the board's 64 MHz build leaves <code>FLASH_ACR</code> as after reset (<code>firmware/common/stm32h723/board.h</code>). RM0468 (Table 16) allows 0 or 1 wait states at 64 MHz. The numbers with the cache off carry the 7 wait states; fewer were not measured.</p>
+</details>
+<details id="crc-8smbus-nucleo-h723zg-cache-off">
+<summary>CRC-8/SMBUS, cache off: 11 rows, 16 bytes 128–1168 cycles, 3.0–66.0 cycles per byte</summary>
+<p>The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as ST's template for the board sets it (<code>firmware/common/stm32h723/board.h</code>, method version 3). RM0468 (Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 wait states.</p>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -3104,8 +3187,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">296</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">272–569</td>
-<td style="text-align: right;">15.0–34.0</td>
+<td style="text-align: right;">321–690</td>
+<td style="text-align: right;">17.2–42.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc8_byte.json">crcany crc8smbus_byte (C)</a></td>
@@ -3113,8 +3196,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">1090</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">380–678</td>
-<td style="text-align: right;">15.1–34.0</td>
+<td style="text-align: right;">438–820</td>
+<td style="text-align: right;">17.2–42.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_acecrc_crc8_byte.json">acecrc crc8_byte (C++)</a></td>
@@ -3122,8 +3205,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">304</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">311–617</td>
-<td style="text-align: right;">15.0–34.0</td>
+<td style="text-align: right;">370–738</td>
+<td style="text-align: right;">17.2–42.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc8_t16.json">etl crc8_ccitt_t16 (C++)</a></td>
@@ -3131,8 +3214,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">92</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">683–893</td>
-<td style="text-align: right;">40.0–54.0</td>
+<td style="text-align: right;">832–1106</td>
+<td style="text-align: right;">48.0–66.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc8_ccitt.json">zephyr crc8_ccitt (C)</a></td>
@@ -3140,8 +3223,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>flash</td>
 <td style="text-align: right;">100</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">729–952</td>
-<td style="text-align: right;">40.0–54.0</td>
+<td style="text-align: right;">880–1168</td>
+<td style="text-align: right;">48.0–66.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc8_t256_ram.json">etl crc8_ccitt_t256 (C++), table in RAM</a></td>
@@ -3149,8 +3232,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">296</td>
 <td style="text-align: right;">256</td>
-<td style="text-align: right;">112–425</td>
-<td style="text-align: right;">5.0–25.0</td>
+<td style="text-align: right;">128–502</td>
+<td style="text-align: right;">5.0–30.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_crcany_crc8_byte_ram.json">crcany crc8smbus_byte (C), table in RAM</a></td>
@@ -3158,8 +3241,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">1090</td>
 <td style="text-align: right;">1024</td>
-<td style="text-align: right;">216–534</td>
-<td style="text-align: right;">5.0–26.0</td>
+<td style="text-align: right;">244–664</td>
+<td style="text-align: right;">5.0–32.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_acecrc_crc8_byte_ram.json">acecrc crc8_byte (C++), table in RAM</a></td>
@@ -3167,8 +3250,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">304</td>
 <td style="text-align: right;">256</td>
-<td style="text-align: right;">150–473</td>
-<td style="text-align: right;">5.0–25.0</td>
+<td style="text-align: right;">176–550</td>
+<td style="text-align: right;">5.0–30.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc8_t16_ram.json">etl crc8_ccitt_t16 (C++), table in RAM</a></td>
@@ -3176,8 +3259,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">92</td>
 <td style="text-align: right;">16</td>
-<td style="text-align: right;">451–648</td>
-<td style="text-align: right;">26.0–39.0</td>
+<td style="text-align: right;">568–788</td>
+<td style="text-align: right;">32.0–48.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_zephyr_crc8_ccitt_ram.json">zephyr crc8_ccitt (C), table in RAM</a></td>
@@ -3185,8 +3268,8 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>RAM (copied at start by the image)</td>
 <td style="text-align: right;">100</td>
 <td style="text-align: right;">16</td>
-<td style="text-align: right;">502–682</td>
-<td style="text-align: right;">26.0–39.0</td>
+<td style="text-align: right;">624–852</td>
+<td style="text-align: right;">32.0–48.0</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc8.json">the board's CRC unit, CRC-8 (our code)</a> (the board's CRC unit, driven by our code; not a library)</td>
@@ -3194,14 +3277,20 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <td>none</td>
 <td style="text-align: right;">208</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">130–218</td>
-<td style="text-align: right;">1.5–6.5</td>
+<td style="text-align: right;">167–251</td>
+<td style="text-align: right;">3.0–8.0</td>
 </tr>
 </tbody>
 </table></div>
-<h2 id="nucleo-g0b1re">NUCLEO-G0B1RE</h2>
+</details>
+<p>The board's CRC unit is reached over a bus that runs at half the core clock since method version 3, so its cycles per byte are 3.0 where the archived series at 64 MHz had 1.5; in time it is faster: 1024 bytes take 3109 cycles at 520 MHz (6.0 µs) against 1567 at 64 MHz (24.5 µs) (<a href="method-crc.html#the-nucleo-h723zg-at-520-mhz">method</a>).</p>
+</details>
+<details id="nucleo-g0b1re">
+<summary><strong>NUCLEO-G0B1RE</strong>, 64 MHz, method version 2: 35 configurations and the board's CRC unit, a call on 16 bytes 128–1524 cycles with the cache on</summary>
 <p>NUCLEO-G0B1RE (STM32G0B1RET6, Cortex-M0+), 64 MHz.</p>
-<h3 id="crc-32iso-hdlc-nucleo-g0b1re-cache-on">CRC-32/ISO-HDLC, NUCLEO-G0B1RE, cache on</h3>
+<p>Method version 2, at 64 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.</p>
+<details id="crc-32iso-hdlc-nucleo-g0b1re-cache-on">
+<summary>CRC-32/ISO-HDLC, cache on: 17 rows, 16 bytes 128–1524 cycles, 2.0–90.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -3371,7 +3460,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-32iso-hdlc-nucleo-g0b1re-cache-off">CRC-32/ISO-HDLC, NUCLEO-G0B1RE, cache off</h3>
+</details>
+<details id="crc-32iso-hdlc-nucleo-g0b1re-cache-off">
+<summary>CRC-32/ISO-HDLC, cache off: 17 rows, 16 bytes 156–2511 cycles, 3.0–151.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -3541,7 +3632,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-nucleo-g0b1re-cache-on">CRC-16/IBM-3740, NUCLEO-G0B1RE, cache on</h3>
+</details>
+<details id="crc-16ibm-3740-nucleo-g0b1re-cache-on">
+<summary>CRC-16/IBM-3740, cache on: 10 rows, 16 bytes 129–544 cycles, 2.0–32.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -3648,7 +3741,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-nucleo-g0b1re-cache-off">CRC-16/IBM-3740, NUCLEO-G0B1RE, cache off</h3>
+</details>
+<details id="crc-16ibm-3740-nucleo-g0b1re-cache-off">
+<summary>CRC-16/IBM-3740, cache off: 10 rows, 16 bytes 157–738 cycles, 3.0–44.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -3755,7 +3850,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-nucleo-g0b1re-cache-on">CRC-8/SMBUS, NUCLEO-G0B1RE, cache on</h3>
+</details>
+<details id="crc-8smbus-nucleo-g0b1re-cache-on">
+<summary>CRC-8/SMBUS, cache on: 11 rows, 16 bytes 128–522 cycles, 2.0–31.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -3871,7 +3968,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-nucleo-g0b1re-cache-off">CRC-8/SMBUS, NUCLEO-G0B1RE, cache off</h3>
+</details>
+<details id="crc-8smbus-nucleo-g0b1re-cache-off">
+<summary>CRC-8/SMBUS, cache off: 11 rows, 16 bytes 157–655 cycles, 3.0–39.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -3987,9 +4086,14 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h2 id="sam-d20-xplained-pro">SAM D20 Xplained Pro</h2>
+</details>
+</details>
+<details id="sam-d20-xplained-pro">
+<summary><strong>SAM D20 Xplained Pro</strong>, 48 MHz, method version 2: 35 configurations, a call on 16 bytes 166–1476 cycles with the cache on</summary>
 <p>SAM D20 Xplained Pro (ATSAMD20J18A, Cortex-M0+), 48 MHz.</p>
-<h3 id="crc-32iso-hdlc-sam-d20-xplained-pro-cache-on">CRC-32/ISO-HDLC, SAM D20 Xplained Pro, cache on</h3>
+<p>Method version 2, at 48 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.</p>
+<details id="crc-32iso-hdlc-sam-d20-xplained-pro-cache-on">
+<summary>CRC-32/ISO-HDLC, cache on: 16 rows, 16 bytes 234–1476 cycles, 10.0–87.0 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -4150,7 +4254,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-32iso-hdlc-sam-d20-xplained-pro-cache-off">CRC-32/ISO-HDLC, SAM D20 Xplained Pro, cache off</h3>
+</details>
+<details id="crc-32iso-hdlc-sam-d20-xplained-pro-cache-off">
+<summary>CRC-32/ISO-HDLC, cache off: 16 rows, 16 bytes 301–2279 cycles, 13.8–137.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -4311,7 +4417,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-sam-d20-xplained-pro-cache-on">CRC-16/IBM-3740, SAM D20 Xplained Pro, cache on</h3>
+</details>
+<details id="crc-16ibm-3740-sam-d20-xplained-pro-cache-on">
+<summary>CRC-16/IBM-3740, cache on: 9 rows, 16 bytes 252–482 cycles, 14.0–27.8 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -4409,7 +4517,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-16ibm-3740-sam-d20-xplained-pro-cache-off">CRC-16/IBM-3740, SAM D20 Xplained Pro, cache off</h3>
+</details>
+<details id="crc-16ibm-3740-sam-d20-xplained-pro-cache-off">
+<summary>CRC-16/IBM-3740, cache off: 9 rows, 16 bytes 361–623 cycles, 20.0–37.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -4507,7 +4617,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-sam-d20-xplained-pro-cache-on">CRC-8/SMBUS, SAM D20 Xplained Pro, cache on</h3>
+</details>
+<details id="crc-8smbus-sam-d20-xplained-pro-cache-on">
+<summary>CRC-8/SMBUS, cache on: 10 rows, 16 bytes 166–431 cycles, 9.0–25.1 cycles per byte</summary>
 <p>Cycles, cache on: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -4614,7 +4726,9 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
-<h3 id="crc-8smbus-sam-d20-xplained-pro-cache-off">CRC-8/SMBUS, SAM D20 Xplained Pro, cache off</h3>
+</details>
+<details id="crc-8smbus-sam-d20-xplained-pro-cache-off">
+<summary>CRC-8/SMBUS, cache off: 10 rows, 16 bytes 229–539 cycles, 13.0–32.0 cycles per byte</summary>
 <p>Cycles, cache off: the range over the eight placements (min–max), first pass.</p>
 <div class="tw"><table>
 <thead>
@@ -4721,13 +4835,19 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 </tr>
 </tbody>
 </table></div>
+</details>
+</details>
+<details id="notes-to-the-tables">
+<summary>Notes [1] to [3] to the tables</summary>
 <p>[1] crcany's generated crc32iso_hdlc.c defines <code>table_byte</code> as <code>table_word[0]</code> (<code>#define table_byte table_word[0]</code>, build/gen/src/crc32iso_hdlc.c line 29): the byte code reads the first row of the word table, so the whole word table (4 x 256 x 4 = 4096 bytes, one symbol <code>table_word</code> in the image) is linked in. The flash bytes count it.</p>
 <p>[2] libcrc builds its table in RAM at its first call. The adapter's init() makes that call (kinds/crc/adapter_libcrc.c, lc32_init) and bench/main.c calls init() before the timed calls (line 156), so the 256 calls of a scenario find the table built; the building is not measured.</p>
 <p>[3] As libcrc crc_32: the table is built by init() (lc16_init) before the timed calls; the building is not measured.</p>
+</details>
 <!-- /table:crc -->
 
-<h2 id="what-the-tables-show">What the tables show</h2>
-<p>Each sentence names the rows it rests on; the rows are those of the tables above.</p>
+<details id="what-the-tables-show">
+<summary><strong>What the tables show</strong>: the same class from two libraries, the table in flash or in RAM, the placements with the cache off</summary>
+<p>Each sentence names the rows it rests on; the rows are those of the tables above (open a board).</p>
 <ul>
 <li><strong>The same class from two libraries.</strong> With the cache on, ETL
   <code>crc32_t256</code> and crcany <code>crc32iso_hdlc_byte</code>, both a CRC-32 table of 256
@@ -4746,9 +4866,29 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <li><strong>The placements, with the cache off.</strong> On the SAM D20 Xplained Pro
   every row of the cache-off tables is one number: the eight placements
   agree. On the NUCLEO-H723ZG, crcany <code>crc32iso_hdlc_bit</code> (CRC-32,
-  bitwise) costs 41.0–225.0 cycles per byte with the cache off and
-  41.0–42.0 with it on: at its best placements the same with the cache off
-  as on (the report, check 7).</li>
-</ul></main>
-<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+  bitwise) costs 41.0–258.0 cycles per byte with the cache off and
+  41.0–42.0 with it on, at 520 MHz (method version 3): at its best
+  placements the same with the cache off as on. The first series, at
+  64 MHz, gave 41.0–225.0 with the cache off (the report, check 7).</li>
+</ul>
+</details></main><script>(function () {
+  function show() {
+    var id = decodeURIComponent(location.hash.slice(1)), e = id && document.getElementById(id), t = e;
+    for (; e; e = e.parentElement) if (e.tagName === "DETAILS") e.open = true;
+    if (t) t.scrollIntoView();
+  }
+  window.addEventListener("hashchange", show); show();
+  var all = document.querySelectorAll("main details"), h = document.querySelector("main h1");
+  if (all.length < 2 || !h) return;
+  var p = document.createElement("p"); p.className = "foldall";
+  [["open all", true], ["close all", false]].forEach(function (x, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { all.forEach(function (d) { d.open = x[1]; }); });
+    if (i) p.appendChild(document.createTextNode(" · ")); p.appendChild(b);
+  });
+  h.parentNode.insertBefore(p, h.nextSibling);
+})();</script>
+
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

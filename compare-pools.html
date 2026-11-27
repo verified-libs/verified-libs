@@ -1,0 +1,8457 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Compare fixed-block memory pool libraries for microcontrollers by board, scenario and cache: cycles per alloc and free as ranges over eight code placements, flash and RAM bytes, what each library documents about interrupts (not tested); measured in one context; no ranking.">
+<link rel="canonical" href="https://verified-libs.org/compare-pools.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Compare fixed-block memory pools - verified-libs">
+<meta property="og:description" content="Compare fixed-block memory pool libraries for microcontrollers by board, scenario and cache: cycles per alloc and free as ranges over eight code placements, flash and RAM bytes, what each library documents about interrupts (not tested); measured in one context; no ranking.">
+<meta property="og:url" content="https://verified-libs.org/compare-pools.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Compare fixed-block memory pools - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html" class=on>Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
+<main><p class="kindsw">Kind: <a href="compare.html">Ring buffers</a> | <a href="compare-crc.html">CRC</a> | <strong>Memory pools</strong></p>
+<h1>Compare fixed-block memory pools</h1>
+<p><strong>Measured in one context.</strong> Whether a pool is safe when an interrupt calls it is not
+tested in this series. The last column gives what each library documents about use from interrupts,
+with its source: it is shown as documented, not tested, and no filter and no score uses it.</p>
+<p>Pick a board, a scenario and the cache, and set weights for what you care about. There is no
+ranking of ours: without weights the rows are in the order of the configuration list, and any order
+is the result of your weights, which are stored in the address so the view can be linked. Every
+number is the range over eight placements of the code (min–max), first pass, and so is the score.
+Choose a configuration's name to mark the rows whose range overlaps its range. One pool shape: 32
+blocks of 32 bytes. All numbers and how they were measured:
+<a href="results-pools.html">Memory pool results</a> and <a href="method-pools.html">Method</a>.</p>
+<noscript><p><strong>This page needs JavaScript.</strong> The same numbers are in the tables on the
+<a href="results-pools.html">memory pool results</a> page.</p></noscript>
+<form class="cmp" onsubmit="return false">
+<fieldset><legend>Board, scenario and cache</legend>
+<label>Numbers from <select id="pools-board"></select></label>
+<label>Scenario <select id="pools-scen"><option value="pair">pair: alloc then free, the pool almost empty</option>
+<option value="pair_full">pair_full: the same, 31 of 32 blocks held</option>
+<option value="fill_drain_lifo">fill_drain_lifo: 32 allocs, 32 frees in reverse order</option>
+<option value="fill_drain_fifo">fill_drain_fifo: 32 allocs, 32 frees in the same order</option>
+<option value="mixed">mixed: a fixed-seed sequence, 25–75 % full</option>
+<option value="empty">empty: alloc on an exhausted pool</option></select></label>
+<label>Cache <select id="pools-cache"><option value="on">on</option><option value="off">off</option></select></label>
+</fieldset>
+<fieldset><legend>Filters</legend>
+<label>Language <select id="pools-lang"><option value="">any</option><option value="C">C</option><option value="C++">C++</option><option value="Rust">Rust</option></select></label>
+<label>Kind of row <select id="pools-kind"><option value="">any</option><option value="library">library</option><option value="ours">ours (interrupts off; not a library)</option></select></label>
+</fieldset>
+<fieldset><legend>Weights (0 = ignore, 10 = most important)</legend>
+<div id="pools-weights"></div>
+<button type="button" id="pools-reset">Reset weights and choices</button>
+</fieldset>
+</form>
+<p id="cmp-note"></p>
+<p id="cmp-count" class="mute" aria-live="polite"></p>
+<div class="onectx"><strong>Measured in one context.</strong> Use from interrupts is not tested in this series; the last column is what each library documents.</div>
+<div class="tw"><table id="cmp-table" class="cmp"></table></div>
+<p class="mute">A range is min–max over eight placements of the code. Two rows differ only where their
+ranges do not overlap. With a configuration chosen, "overlaps" marks the rows whose range overlaps
+its range in that column, compared as the numbers are shown (whole cycles): this series does not
+tell those rows apart from the chosen one. With weights, a score marked "overlaps above" overlaps
+the score of the row above it: this series does not tell the two apart. The score's marks are
+judged on the score before rounding, so two rows can show the same score without a mark when they
+differ by less than the rounding.</p>
+<p id="cmp-src" class="mute"></p>
+<h2>How the score is computed</h2>
+<p>With a weight above 0, each row gets a score from 0 to 100, as on the other comparison pages: for
+each weighted value, the smallest value among the rows shown divided by the row's own, then the mean
+weighted by your weights, times 100, shown to one decimal. The values are the cycles of one alloc
+and of one free in the chosen scenario, and the bytes of flash and RAM together. The cycles are
+ranges, so the score is a range too: the smallest value is the smallest lower end among the rows
+shown; a row's lowest score uses its own upper ends, its highest score its lower ends. Bytes are
+exact. A value a row does not have (no free in the scenario <code>empty</code>) counts 0. The rows
+are ordered by the highest end of the score, ties in list order, and a score whose range overlaps
+the one above it is marked "overlaps above". Our row with interrupts off is scored like any row;
+choose "library" under "Kind of row" for the scores among the libraries only. The reference free
+list has no score, is never the smallest value a score is taken against, and stays apart as the
+last row. Sorting by name, flash or RAM bytes (the column headers) overrides the score order.</p>
+<p>What the score does not say: every call of every row was checked on the board (a block given
+exactly when one is free, in the pool, aligned, not given twice, its contents and the pool's
+canaries intact), so correctness is not a weight. Nor is what a library documents about
+interrupts, which this series does not test, nor language, licence, the lock or how the API looks.
+Those are for you to judge, with the filter and the records.</p>
+<h2>What the columns are</h2>
+<p><strong>Cycles</strong>: the mean of the scenario's calls (the first call included), in CPU cycles
+less the counter-read overhead; <strong>init</strong> is one call that creates the pool.
+<strong>Version</strong>: the pin measured; MemoryPool is measured at a commit after its only release,
+which is not a release itself (<a href="method-pools.html">why</a>). <strong>Lock as built</strong>:
+what the library takes around a call in the build measured. <strong>Flash bytes</strong>: the library's and the
+adapter's code and constant data at <code>-O2</code>, measured in the board's images;
+<strong>RAM bytes</strong>: what the pool needs beyond the 32 blocks of 32 bytes and their canaries. <strong>Documented use from interrupts</strong>: the library's own words, with
+their source; not tested here. The row "reference free list, interrupts off (ours)" is our free list
+with interrupts off around each call: the price of the simplest lock on the core, not a library. The
+last row, apart, is the reference free list without a lock, timed in the same images: the baseline,
+not a library. The second pass and the minimum, maximum and first call of each scenario are in the
+records, one per row.</p>
+<script type="application/json" id="poolsdata">{
+ "schema": "pools-data/1",
+ "about": {
+  "published": "false while there are no records under records/pools: the first board series is not published yet",
+  "boards": "per board directory of records/pools (records_dir): id (the board's id on the site's other kinds), the record's board, board_decoded, core and clock_hz; note_cache_off: the sentence the CRC results page puts above the board's cache-off numbers (site/crc_tables.py, before_off), or null",
+  "scenarios": "the scenarios of kinds/pools/README.md (\"The image\"), with what is timed, in one line each; 'init' is one call",
+  "configurations": "per adapter, in the order of kinds/pools/configs.txt: its name (the record's), language (column 2), and from the table \"The set\" of kinds/pools/README.md its library, pin, licence and the lock as built; role: 'library', or 'ours' for our reference free list with interrupts off (not a library, labelled in its name cell every time; scored like any row; a filter on the kind of row leaves it out); documented_interrupts: what the library documents about use from interrupts, with its source (kinds/pools/claims.tsv): shown as documented, NOT tested (the series is one context), and used in no filter and no score",
+  "baseline_documented": "the claims file's row of the baseline (adapter_ref), shown in the baseline's row",
+  "rows": "per board and configuration: flash_bytes (the record's sizes.flash_bytes: code and constant data) and ram_bytes (the record's sizes.ram_overhead_bytes: RAM beyond the 1056 bytes of blocks and canaries; kinds/pools/README.md, \"Sizes\"), the record's path, and cycles",
+  "cycles": "cycles[cache][key]: [min, max] over the eight placements, first pass, of the mean of the scenario's calls (the first call included), in cycles, the counter-read overhead subtracted; key 'init' (one call) or '<scenario>/<alloc|free>'; null where the scenario has no such call (empty/free)",
+  "baseline": "per board: the reference free list (ours, not a library), timed in the same images (the records' baseline), cycles over all images of the board's library configurations",
+  "ranges": "a difference between two rows is a difference only where their ranges do not overlap (DECISIONS 2026-11-25); the rows are in the order of kinds/pools/configs.txt, not ranked",
+  "not_here": "the second pass and the minimum, maximum and first call of each scenario: in the records"
+ },
+ "published": true,
+ "source": {
+  "records": "records/pools",
+  "commits": [
+   "f12caf72e130"
+  ],
+  "toolchain_image": [
+   "verified-libs/toolchain:2026-11-13"
+  ]
+ },
+ "blocks": 32,
+ "block_size": 32,
+ "scenarios": [
+  {
+   "key": "init",
+   "text": "one call that creates the pool in the adapter's storage"
+  },
+  {
+   "key": "pair",
+   "text": "alloc, then free of the same block, 256 times, the pool almost empty"
+  },
+  {
+   "key": "pair_full",
+   "text": "the same with 31 of the 32 blocks held"
+  },
+  {
+   "key": "fill_drain_lifo",
+   "text": "8 times: 32 allocs, then 32 frees in reverse order"
+  },
+  {
+   "key": "fill_drain_fifo",
+   "text": "8 times: 32 allocs, then 32 frees in the order of the allocs"
+  },
+  {
+   "key": "mixed",
+   "text": "512 calls from a fixed seed, the pool between 25 % and 75 % full"
+  },
+  {
+   "key": "empty",
+   "text": "256 allocs on an exhausted pool, each of which must fail; no free"
+  }
+ ],
+ "boards": [
+  {
+   "id": "nrf5340dk",
+   "records_dir": "nrf5340",
+   "name": "nRF5340 DK",
+   "board_decoded": "nRF5340 DK, application core (Cortex-M33)",
+   "core": "application (Cortex-M33)",
+   "clock_hz": 64000000,
+   "note_cache_off": null
+  },
+  {
+   "id": "pico2",
+   "records_dir": "rp2350",
+   "name": "Raspberry Pi Pico 2 H",
+   "board_decoded": "Raspberry Pi Pico 2 H (RP2350A, core 0, Cortex-M33)",
+   "core": "RP2350 core 0 (Cortex-M33)",
+   "clock_hz": 150000000,
+   "note_cache_off": null
+  },
+  {
+   "id": "nucleo-g474re",
+   "records_dir": "stm32g474",
+   "name": "NUCLEO-G474RE",
+   "board_decoded": "NUCLEO-G474RE (STM32G474RET6, Cortex-M4F)",
+   "core": "Cortex-M4F",
+   "clock_hz": 170000000,
+   "note_cache_off": null
+  },
+  {
+   "id": "nucleo-h723zg",
+   "records_dir": "stm32h723",
+   "name": "NUCLEO-H723ZG",
+   "board_decoded": "NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7)",
+   "core": "Cortex-M7",
+   "clock_hz": 520000000,
+   "note_cache_off": "The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as ST's template for the board sets it (`firmware/common/stm32h723/board.h`, method version 3). RM0468 (Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 wait states."
+  },
+  {
+   "id": "nucleo-g0b1re",
+   "records_dir": "stm32g0b1",
+   "name": "NUCLEO-G0B1RE",
+   "board_decoded": "NUCLEO-G0B1RE (STM32G0B1RET6, Cortex-M0+)",
+   "core": "Cortex-M0+",
+   "clock_hz": 64000000,
+   "note_cache_off": null
+  },
+  {
+   "id": "sam-d20-xpro",
+   "records_dir": "samd20",
+   "name": "SAM D20 Xplained Pro",
+   "board_decoded": "SAM D20 Xplained Pro (ATSAMD20J18A, Cortex-M0+)",
+   "core": "Cortex-M0+",
+   "clock_hz": 48005120,
+   "note_cache_off": null
+  }
+ ],
+ "configurations": [
+  {
+   "adapter": "adapter_etl",
+   "name": "ETL etl::pool (C++)",
+   "lang": "C++",
+   "library": "ETL",
+   "pin": "20.49.0, 7d604f2 (the ring buffers' pin)",
+   "licence": "MIT",
+   "lock": "none (the header documents none)",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "nothing about interrupts or threads",
+    "source": "include/etl/pool.h at 7d604f2 (no statement)"
+   }
+  },
+  {
+   "adapter": "adapter_riot",
+   "name": "RIOT memarray (C)",
+   "lang": "C",
+   "library": "RIOT",
+   "pin": "9c9a6ab (the ring buffers' pin)",
+   "licence": "LGPL-2.1",
+   "lock": "none",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "nothing about interrupts or threads",
+    "source": "sys/include/memarray.h at 9c9a6ab (no statement)"
+   }
+  },
+  {
+   "adapter": "adapter_threadx",
+   "name": "ThreadX block pool (C)",
+   "lang": "C",
+   "library": "Eclipse ThreadX",
+   "pin": "v6.5.2.202603_rel, 93387b0",
+   "licence": "MIT",
+   "lock": "interrupts off (TX_DISABLE), the release's port for each core",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "allocate and release allowed from ISRs; allocate from an ISR only with TX_NO_WAIT",
+    "source": "https://raw.githubusercontent.com/eclipse-threadx/rtos-docs/refs/heads/main/rtos-docs/threadx/chapter4.md (tx_block_allocate, tx_block_release: Allowed From)"
+   }
+  },
+  {
+   "adapter": "adapter_cmsis_rtx",
+   "name": "CMSIS-RTX osRtxMemoryPool (C)",
+   "lang": "C",
+   "library": "CMSIS-RTX",
+   "pin": "v5.9.1, b566de4 (with CMSIS 6 af1b110, Cortex_DFP cd38dbb)",
+   "licence": "Apache-2.0",
+   "lock": "LDREX/STREX on Armv7-M and Armv8-M; interrupts off on Armv6-M",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "alloc from an ISR with timeout 0; free from an ISR",
+    "source": "https://arm-software.github.io/CMSIS_6/latest/RTOS2/group__CMSIS__RTOS__PoolMgmt.html (osMemoryPoolAlloc, osMemoryPoolFree: Note)"
+   }
+  },
+  {
+   "adapter": "adapter_contiki",
+   "name": "Contiki-NG memb (C)",
+   "lang": "C",
+   "library": "Contiki-NG",
+   "pin": "release/v5.2, 4ccd1a3",
+   "licence": "BSD-3-Clause",
+   "lock": "none (cooperative processes)",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "nothing about interrupts or threads",
+    "source": "os/lib/memb.h at 4ccd1a3 (no statement)"
+   }
+  },
+  {
+   "adapter": "adapter_c_allocator",
+   "name": "C_Allocator fb_allocator (C)",
+   "lang": "C",
+   "library": "endurodave/C_Allocator",
+   "pin": "v2.1.0, 497b465",
+   "licence": "MIT",
+   "lock": "ALLOC_LOCK_NONE, the library's default without threads",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "may be called from an interrupt with an interrupt-masking lock option; without threads the default is no lock (as built here)",
+    "source": "README.md:390 and src/LockGuard.h:24-29 at 497b465"
+   }
+  },
+  {
+   "adapter": "adapter_lwip",
+   "name": "lwIP memp (C)",
+   "lang": "C",
+   "library": "lwIP",
+   "pin": "STABLE-2_2_1_RELEASE, 77dcd25",
+   "licence": "BSD-3-Clause",
+   "lock": "SYS_ARCH_PROTECT: our port, interrupts off (shims/lwip/sys_arch.c)",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "protected by SYS_ARCH_PROTECT, by disabling interrupts or a semaphore or mutex as the port does it; here our port: interrupts off",
+    "source": "src/include/lwip/sys.h:486-489 at 77dcd25; kinds/pools/shims/lwip/sys_arch.c"
+   }
+  },
+  {
+   "adapter": "adapter_memorypool",
+   "name": "MemoryPool Fixed (C++)",
+   "lang": "C++",
+   "library": "bertmelis/MemoryPool",
+   "pin": "main 5073178 (unreleased; after v0.1.0)",
+   "licence": "MIT",
+   "lock": "none on the boards; std::mutex on the host",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "without threads not thread safe (#warning); no lock on the boards",
+    "source": "src/Fixed.h:16 at 5073178"
+   }
+  },
+  {
+   "adapter": "adapter_heapless",
+   "name": "heapless pool, BoxPool (Rust)",
+   "lang": "Rust",
+   "library": "heapless",
+   "pin": "1918822 (the ring buffers' pin, version 0.9.1)",
+   "licence": "MIT OR Apache-2.0",
+   "lock": "lock-free: LL/SC on the boards, a tagged CAS on the host; not on Cortex-M0+",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "only on ARM cores with LDREX, CLREX and STREX; lock-free",
+    "source": "src/pool.rs:7 at 1918822"
+   }
+  },
+  {
+   "adapter": "adapter_atomic_pool",
+   "name": "atomic-pool (Rust)",
+   "lang": "Rust",
+   "library": "embassy-rs/atomic-pool",
+   "pin": "2.0.1, ab88f3c (the head; no tag v2.0.1 exists)",
+   "licence": "MIT OR Apache-2.0",
+   "lock": "atomic bitmap; on Cortex-M0+ portable-atomic's unsafe-assume-single-core",
+   "role": "library",
+   "documented_interrupts": {
+    "text": "atomics through portable-atomic; on cores without CAS its critical-section or unsafe-assume-single-core feature",
+    "source": "README.md:13-14 at ab88f3c"
+   }
+  },
+  {
+   "adapter": "adapter_ref_primask",
+   "name": "reference free list, interrupts off (ours)",
+   "lang": "C",
+   "library": null,
+   "pin": null,
+   "licence": null,
+   "lock": "PRIMASK around each call: a row of ours, not a library",
+   "role": "ours",
+   "documented_interrupts": {
+    "text": "the reference with interrupts off (PRIMASK) around each call: a row of ours, not a library",
+    "source": "kinds/pools/adapter_ref.c (POOL_PRIMASK)"
+   },
+   "note": "our reference free list with interrupts off; not a library"
+  }
+ ],
+ "rows": [
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_etl",
+   "flash_bytes": 176,
+   "ram_bytes": 25,
+   "record": "records/pools/nrf5340/adapter_etl.json",
+   "cycles": {
+    "on": {
+     "init": [
+      81.0,
+      93.0
+     ],
+     "pair/alloc": [
+      42.035,
+      42.082
+     ],
+     "pair/free": [
+      14.0,
+      14.004
+     ],
+     "pair_full/alloc": [
+      40.0,
+      40.0
+     ],
+     "pair_full/free": [
+      14.0,
+      14.0
+     ],
+     "fill_drain_lifo/alloc": [
+      40.969,
+      40.969
+     ],
+     "fill_drain_lifo/free": [
+      14.0,
+      14.0
+     ],
+     "fill_drain_fifo/alloc": [
+      40.969,
+      40.969
+     ],
+     "fill_drain_fifo/free": [
+      14.0,
+      14.0
+     ],
+     "mixed/alloc": [
+      41.0,
+      41.0
+     ],
+     "mixed/free": [
+      14.0,
+      14.0
+     ],
+     "empty/alloc": [
+      13.0,
+      13.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      150.0,
+      172.0
+     ],
+     "pair/alloc": [
+      83.875,
+      93.875
+     ],
+     "pair/free": [
+      42.0,
+      59.0
+     ],
+     "pair_full/alloc": [
+      83.0,
+      92.0
+     ],
+     "pair_full/free": [
+      42.0,
+      59.0
+     ],
+     "fill_drain_lifo/alloc": [
+      83.0,
+      92.969
+     ],
+     "fill_drain_lifo/free": [
+      42.0,
+      59.0
+     ],
+     "fill_drain_fifo/alloc": [
+      83.0,
+      92.969
+     ],
+     "fill_drain_fifo/free": [
+      42.0,
+      59.0
+     ],
+     "mixed/alloc": [
+      83.0,
+      93.0
+     ],
+     "mixed/free": [
+      42.0,
+      59.0
+     ],
+     "empty/alloc": [
+      52.0,
+      66.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_riot",
+   "flash_bytes": 128,
+   "ram_bytes": 8,
+   "record": "records/pools/nrf5340/adapter_riot.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1175.0,
+      1188.0
+     ],
+     "pair/alloc": [
+      10.027,
+      10.047
+     ],
+     "pair/free": [
+      57.0,
+      57.0
+     ],
+     "pair_full/alloc": [
+      10.0,
+      10.0
+     ],
+     "pair_full/free": [
+      57.0,
+      57.0
+     ],
+     "fill_drain_lifo/alloc": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_lifo/free": [
+      57.0,
+      57.0
+     ],
+     "fill_drain_fifo/alloc": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_fifo/free": [
+      57.0,
+      57.0
+     ],
+     "mixed/alloc": [
+      10.0,
+      10.0
+     ],
+     "mixed/free": [
+      57.0,
+      57.0
+     ],
+     "empty/alloc": [
+      10.0,
+      10.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      3348.0,
+      3573.0
+     ],
+     "pair/alloc": [
+      31.0,
+      49.0
+     ],
+     "pair/free": [
+      132.0,
+      160.0
+     ],
+     "pair_full/alloc": [
+      31.0,
+      49.0
+     ],
+     "pair_full/free": [
+      132.0,
+      160.0
+     ],
+     "fill_drain_lifo/alloc": [
+      31.0,
+      49.0
+     ],
+     "fill_drain_lifo/free": [
+      132.0,
+      160.0
+     ],
+     "fill_drain_fifo/alloc": [
+      31.0,
+      49.0
+     ],
+     "fill_drain_fifo/free": [
+      132.0,
+      160.0
+     ],
+     "mixed/alloc": [
+      31.0,
+      49.0
+     ],
+     "mixed/free": [
+      132.0,
+      160.0
+     ],
+     "empty/alloc": [
+      31.0,
+      50.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_threadx",
+   "flash_bytes": 732,
+   "ram_bytes": 192,
+   "record": "records/pools/nrf5340/adapter_threadx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      691.0,
+      707.0
+     ],
+     "pair/alloc": [
+      76.059,
+      76.102
+     ],
+     "pair/free": [
+      40.051,
+      41.121
+     ],
+     "pair_full/alloc": [
+      76.0,
+      76.0
+     ],
+     "pair_full/free": [
+      40.0,
+      41.0
+     ],
+     "fill_drain_lifo/alloc": [
+      76.0,
+      76.0
+     ],
+     "fill_drain_lifo/free": [
+      40.0,
+      41.0
+     ],
+     "fill_drain_fifo/alloc": [
+      76.0,
+      76.0
+     ],
+     "fill_drain_fifo/free": [
+      40.0,
+      41.0
+     ],
+     "mixed/alloc": [
+      76.0,
+      76.0
+     ],
+     "mixed/free": [
+      40.0,
+      41.004
+     ],
+     "empty/alloc": [
+      71.02,
+      72.039
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1112.0,
+      1167.0
+     ],
+     "pair/alloc": [
+      128.0,
+      141.0
+     ],
+     "pair/free": [
+      97.0,
+      109.0
+     ],
+     "pair_full/alloc": [
+      128.0,
+      141.0
+     ],
+     "pair_full/free": [
+      97.0,
+      109.0
+     ],
+     "fill_drain_lifo/alloc": [
+      128.0,
+      141.0
+     ],
+     "fill_drain_lifo/free": [
+      97.0,
+      109.0
+     ],
+     "fill_drain_fifo/alloc": [
+      128.0,
+      141.0
+     ],
+     "fill_drain_fifo/free": [
+      97.0,
+      109.0
+     ],
+     "mixed/alloc": [
+      128.0,
+      141.0
+     ],
+     "mixed/free": [
+      97.0,
+      109.0
+     ],
+     "empty/alloc": [
+      130.0,
+      154.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_cmsis_rtx",
+   "flash_bytes": 288,
+   "ram_bytes": 24,
+   "record": "records/pools/nrf5340/adapter_cmsis_rtx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      296.0,
+      310.0
+     ],
+     "pair/alloc": [
+      34.059,
+      34.117
+     ],
+     "pair/free": [
+      66.023,
+      66.051
+     ],
+     "pair_full/alloc": [
+      34.0,
+      34.0
+     ],
+     "pair_full/free": [
+      66.0,
+      66.0
+     ],
+     "fill_drain_lifo/alloc": [
+      34.0,
+      34.0
+     ],
+     "fill_drain_lifo/free": [
+      66.0,
+      66.0
+     ],
+     "fill_drain_fifo/alloc": [
+      34.0,
+      34.0
+     ],
+     "fill_drain_fifo/free": [
+      66.0,
+      66.0
+     ],
+     "mixed/alloc": [
+      35.0,
+      36.0
+     ],
+     "mixed/free": [
+      66.0,
+      67.0
+     ],
+     "empty/alloc": [
+      24.0,
+      24.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      737.0,
+      783.0
+     ],
+     "pair/alloc": [
+      77.0,
+      105.0
+     ],
+     "pair/free": [
+      122.0,
+      151.0
+     ],
+     "pair_full/alloc": [
+      77.0,
+      105.0
+     ],
+     "pair_full/free": [
+      122.0,
+      151.0
+     ],
+     "fill_drain_lifo/alloc": [
+      77.0,
+      105.0
+     ],
+     "fill_drain_lifo/free": [
+      122.0,
+      151.0
+     ],
+     "fill_drain_fifo/alloc": [
+      77.0,
+      105.0
+     ],
+     "fill_drain_fifo/free": [
+      122.0,
+      151.0
+     ],
+     "mixed/alloc": [
+      77.0,
+      105.0
+     ],
+     "mixed/free": [
+      122.0,
+      151.0
+     ],
+     "empty/alloc": [
+      69.0,
+      82.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_contiki",
+   "flash_bytes": 232,
+   "ram_bytes": 44,
+   "record": "records/pools/nrf5340/adapter_contiki.json",
+   "cycles": {
+    "on": {
+     "init": [
+      852.0,
+      858.0
+     ],
+     "pair/alloc": [
+      33.023,
+      33.074
+     ],
+     "pair/free": [
+      46.051,
+      46.066
+     ],
+     "pair_full/alloc": [
+      281.0,
+      281.0
+     ],
+     "pair_full/free": [
+      263.0,
+      263.0
+     ],
+     "fill_drain_lifo/alloc": [
+      157.0,
+      157.0
+     ],
+     "fill_drain_lifo/free": [
+      154.5,
+      154.5
+     ],
+     "fill_drain_fifo/alloc": [
+      157.0,
+      157.027
+     ],
+     "fill_drain_fifo/free": [
+      154.5,
+      154.5
+     ],
+     "mixed/alloc": [
+      108.223,
+      110.219
+     ],
+     "mixed/free": [
+      112.375,
+      113.352
+     ],
+     "empty/alloc": [
+      283.0,
+      283.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1690.0,
+      1709.0
+     ],
+     "pair/alloc": [
+      68.0,
+      76.0
+     ],
+     "pair/free": [
+      96.0,
+      111.0
+     ],
+     "pair_full/alloc": [
+      688.0,
+      758.0
+     ],
+     "pair_full/free": [
+      716.0,
+      750.0
+     ],
+     "fill_drain_lifo/alloc": [
+      378.0,
+      417.0
+     ],
+     "fill_drain_lifo/free": [
+      406.0,
+      424.5
+     ],
+     "fill_drain_fifo/alloc": [
+      378.0,
+      417.0
+     ],
+     "fill_drain_fifo/free": [
+      406.0,
+      424.5
+     ],
+     "mixed/alloc": [
+      256.047,
+      282.852
+     ],
+     "mixed/free": [
+      282.719,
+      297.719
+     ],
+     "empty/alloc": [
+      698.0,
+      781.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_c_allocator",
+   "flash_bytes": 336,
+   "ram_bytes": 45,
+   "record": "records/pools/nrf5340/adapter_c_allocator.json",
+   "cycles": {
+    "on": {
+     "init": [
+      91.0,
+      101.0
+     ],
+     "pair/alloc": [
+      69.199,
+      69.273
+     ],
+     "pair/free": [
+      73.023,
+      73.117
+     ],
+     "pair_full/alloc": [
+      69.047,
+      69.047
+     ],
+     "pair_full/free": [
+      73.0,
+      73.0
+     ],
+     "fill_drain_lifo/alloc": [
+      69.0,
+      69.0
+     ],
+     "fill_drain_lifo/free": [
+      73.0,
+      73.0
+     ],
+     "fill_drain_fifo/alloc": [
+      69.008,
+      69.031
+     ],
+     "fill_drain_fifo/free": [
+      73.0,
+      73.938
+     ],
+     "mixed/alloc": [
+      69.0,
+      70.0
+     ],
+     "mixed/free": [
+      73.0,
+      73.516
+     ],
+     "empty/alloc": [
+      77.035,
+      78.035
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      141.0,
+      166.0
+     ],
+     "pair/alloc": [
+      153.148,
+      170.145
+     ],
+     "pair/free": [
+      150.0,
+      173.0
+     ],
+     "pair_full/alloc": [
+      153.148,
+      170.145
+     ],
+     "pair_full/free": [
+      150.0,
+      173.0
+     ],
+     "fill_drain_lifo/alloc": [
+      153.0,
+      170.0
+     ],
+     "fill_drain_lifo/free": [
+      150.0,
+      173.0
+     ],
+     "fill_drain_fifo/alloc": [
+      153.0,
+      170.0
+     ],
+     "fill_drain_fifo/free": [
+      150.0,
+      173.0
+     ],
+     "mixed/alloc": [
+      153.0,
+      170.0
+     ],
+     "mixed/free": [
+      150.0,
+      173.0
+     ],
+     "empty/alloc": [
+      206.0,
+      238.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_lwip",
+   "flash_bytes": 236,
+   "ram_bytes": 20,
+   "record": "records/pools/nrf5340/adapter_lwip.json",
+   "cycles": {
+    "on": {
+     "init": [
+      333.0,
+      349.0
+     ],
+     "pair/alloc": [
+      43.012,
+      43.109
+     ],
+     "pair/free": [
+      68.0,
+      68.031
+     ],
+     "pair_full/alloc": [
+      43.0,
+      43.0
+     ],
+     "pair_full/free": [
+      68.0,
+      68.0
+     ],
+     "fill_drain_lifo/alloc": [
+      43.0,
+      43.0
+     ],
+     "fill_drain_lifo/free": [
+      68.0,
+      68.0
+     ],
+     "fill_drain_fifo/alloc": [
+      43.0,
+      43.0
+     ],
+     "fill_drain_fifo/free": [
+      68.0,
+      68.0
+     ],
+     "mixed/alloc": [
+      44.0,
+      45.0
+     ],
+     "mixed/free": [
+      68.516,
+      69.516
+     ],
+     "empty/alloc": [
+      39.0,
+      39.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      765.0,
+      833.0
+     ],
+     "pair/alloc": [
+      110.0,
+      131.0
+     ],
+     "pair/free": [
+      137.0,
+      156.0
+     ],
+     "pair_full/alloc": [
+      110.0,
+      131.0
+     ],
+     "pair_full/free": [
+      137.0,
+      156.0
+     ],
+     "fill_drain_lifo/alloc": [
+      110.0,
+      131.0
+     ],
+     "fill_drain_lifo/free": [
+      137.0,
+      156.0
+     ],
+     "fill_drain_fifo/alloc": [
+      110.0,
+      131.0
+     ],
+     "fill_drain_fifo/free": [
+      137.0,
+      156.0
+     ],
+     "mixed/alloc": [
+      110.0,
+      131.0
+     ],
+     "mixed/free": [
+      137.0,
+      156.0
+     ],
+     "empty/alloc": [
+      108.0,
+      127.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_memorypool",
+   "flash_bytes": 124,
+   "ram_bytes": 5,
+   "record": "records/pools/nrf5340/adapter_memorypool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      932.0,
+      945.0
+     ],
+     "pair/alloc": [
+      11.043,
+      11.074
+     ],
+     "pair/free": [
+      10.0,
+      10.043
+     ],
+     "pair_full/alloc": [
+      11.0,
+      11.0
+     ],
+     "pair_full/free": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_lifo/alloc": [
+      11.0,
+      11.0
+     ],
+     "fill_drain_lifo/free": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_fifo/alloc": [
+      11.0,
+      11.0
+     ],
+     "fill_drain_fifo/free": [
+      10.0,
+      10.0
+     ],
+     "mixed/alloc": [
+      11.0,
+      11.0
+     ],
+     "mixed/free": [
+      10.0,
+      10.0
+     ],
+     "empty/alloc": [
+      10.0,
+      10.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      2125.0,
+      2133.0
+     ],
+     "pair/alloc": [
+      39.0,
+      51.0
+     ],
+     "pair/free": [
+      38.0,
+      58.0
+     ],
+     "pair_full/alloc": [
+      39.0,
+      51.0
+     ],
+     "pair_full/free": [
+      38.0,
+      58.0
+     ],
+     "fill_drain_lifo/alloc": [
+      39.0,
+      51.0
+     ],
+     "fill_drain_lifo/free": [
+      38.0,
+      58.0
+     ],
+     "fill_drain_fifo/alloc": [
+      39.0,
+      51.0
+     ],
+     "fill_drain_fifo/free": [
+      38.0,
+      58.0
+     ],
+     "mixed/alloc": [
+      39.0,
+      51.0
+     ],
+     "mixed/free": [
+      38.0,
+      58.0
+     ],
+     "empty/alloc": [
+      38.0,
+      51.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_heapless",
+   "flash_bytes": 404,
+   "ram_bytes": 136,
+   "record": "records/pools/nrf5340/adapter_heapless.json",
+   "cycles": {
+    "on": {
+     "init": [
+      369.0,
+      388.0
+     ],
+     "pair/alloc": [
+      43.055,
+      43.082
+     ],
+     "pair/free": [
+      47.031,
+      47.082
+     ],
+     "pair_full/alloc": [
+      43.0,
+      43.0
+     ],
+     "pair_full/free": [
+      47.0,
+      47.0
+     ],
+     "fill_drain_lifo/alloc": [
+      43.0,
+      43.0
+     ],
+     "fill_drain_lifo/free": [
+      47.0,
+      47.0
+     ],
+     "fill_drain_fifo/alloc": [
+      43.031,
+      44.027
+     ],
+     "fill_drain_fifo/free": [
+      47.0,
+      47.0
+     ],
+     "mixed/alloc": [
+      43.004,
+      45.0
+     ],
+     "mixed/free": [
+      48.0,
+      49.0
+     ],
+     "empty/alloc": [
+      29.004,
+      29.043
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1553.0,
+      1775.0
+     ],
+     "pair/alloc": [
+      96.0,
+      104.0
+     ],
+     "pair/free": [
+      101.0,
+      108.0
+     ],
+     "pair_full/alloc": [
+      96.0,
+      104.0
+     ],
+     "pair_full/free": [
+      101.0,
+      108.0
+     ],
+     "fill_drain_lifo/alloc": [
+      96.0,
+      104.0
+     ],
+     "fill_drain_lifo/free": [
+      101.0,
+      108.0
+     ],
+     "fill_drain_fifo/alloc": [
+      96.0,
+      104.0
+     ],
+     "fill_drain_fifo/free": [
+      101.0,
+      108.0
+     ],
+     "mixed/alloc": [
+      96.0,
+      104.0
+     ],
+     "mixed/free": [
+      101.0,
+      108.0
+     ],
+     "empty/alloc": [
+      71.0,
+      85.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_atomic_pool",
+   "flash_bytes": 560,
+   "ram_bytes": 4,
+   "record": "records/pools/nrf5340/adapter_atomic_pool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      127.0,
+      146.0
+     ],
+     "pair/alloc": [
+      55.055,
+      55.102
+     ],
+     "pair/free": [
+      41.023,
+      41.051
+     ],
+     "pair_full/alloc": [
+      55.0,
+      55.0
+     ],
+     "pair_full/free": [
+      41.0,
+      41.0
+     ],
+     "fill_drain_lifo/alloc": [
+      55.0,
+      55.0
+     ],
+     "fill_drain_lifo/free": [
+      41.0,
+      41.0
+     ],
+     "fill_drain_fifo/alloc": [
+      55.031,
+      55.117
+     ],
+     "fill_drain_fifo/free": [
+      41.0,
+      41.941
+     ],
+     "mixed/alloc": [
+      55.0,
+      56.004
+     ],
+     "mixed/free": [
+      41.0,
+      41.0
+     ],
+     "empty/alloc": [
+      45.0,
+      46.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      204.0,
+      225.0
+     ],
+     "pair/alloc": [
+      108.0,
+      124.0
+     ],
+     "pair/free": [
+      86.0,
+      94.0
+     ],
+     "pair_full/alloc": [
+      108.0,
+      124.0
+     ],
+     "pair_full/free": [
+      86.0,
+      94.0
+     ],
+     "fill_drain_lifo/alloc": [
+      108.0,
+      124.0
+     ],
+     "fill_drain_lifo/free": [
+      86.0,
+      94.0
+     ],
+     "fill_drain_fifo/alloc": [
+      108.0,
+      124.0
+     ],
+     "fill_drain_fifo/free": [
+      86.0,
+      94.0
+     ],
+     "mixed/alloc": [
+      108.0,
+      124.0
+     ],
+     "mixed/free": [
+      86.0,
+      94.0
+     ],
+     "empty/alloc": [
+      92.0,
+      101.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nrf5340dk",
+   "adapter": "adapter_ref_primask",
+   "flash_bytes": 120,
+   "ram_bytes": 12,
+   "record": "records/pools/nrf5340/adapter_ref_primask.json",
+   "cycles": {
+    "on": {
+     "init": [
+      264.0,
+      272.0
+     ],
+     "pair/alloc": [
+      14.027,
+      14.027
+     ],
+     "pair/free": [
+      12.0,
+      12.0
+     ],
+     "pair_full/alloc": [
+      14.0,
+      14.0
+     ],
+     "pair_full/free": [
+      12.0,
+      12.0
+     ],
+     "fill_drain_lifo/alloc": [
+      14.0,
+      14.0
+     ],
+     "fill_drain_lifo/free": [
+      12.0,
+      12.0
+     ],
+     "fill_drain_fifo/alloc": [
+      14.0,
+      14.0
+     ],
+     "fill_drain_fifo/free": [
+      12.0,
+      12.0
+     ],
+     "mixed/alloc": [
+      14.0,
+      14.0
+     ],
+     "mixed/free": [
+      12.0,
+      12.0
+     ],
+     "empty/alloc": [
+      13.0,
+      13.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      712.0,
+      755.0
+     ],
+     "pair/alloc": [
+      42.0,
+      59.0
+     ],
+     "pair/free": [
+      40.0,
+      59.0
+     ],
+     "pair_full/alloc": [
+      42.0,
+      59.0
+     ],
+     "pair_full/free": [
+      40.0,
+      59.0
+     ],
+     "fill_drain_lifo/alloc": [
+      42.0,
+      59.0
+     ],
+     "fill_drain_lifo/free": [
+      40.0,
+      59.0
+     ],
+     "fill_drain_fifo/alloc": [
+      42.0,
+      59.0
+     ],
+     "fill_drain_fifo/free": [
+      40.0,
+      59.0
+     ],
+     "mixed/alloc": [
+      42.0,
+      59.0
+     ],
+     "mixed/free": [
+      40.0,
+      59.0
+     ],
+     "empty/alloc": [
+      41.0,
+      60.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_etl",
+   "flash_bytes": 176,
+   "ram_bytes": 25,
+   "record": "records/pools/rp2350/adapter_etl.json",
+   "cycles": {
+    "on": {
+     "init": [
+      615.0,
+      848.0
+     ],
+     "pair/alloc": [
+      33.59,
+      33.598
+     ],
+     "pair/free": [
+      14.617,
+      14.82
+     ],
+     "pair_full/alloc": [
+      29.0,
+      29.0
+     ],
+     "pair_full/free": [
+      14.0,
+      14.0
+     ],
+     "fill_drain_lifo/alloc": [
+      29.969,
+      29.969
+     ],
+     "fill_drain_lifo/free": [
+      14.0,
+      14.0
+     ],
+     "fill_drain_fifo/alloc": [
+      29.969,
+      29.969
+     ],
+     "fill_drain_fifo/free": [
+      14.0,
+      14.0
+     ],
+     "mixed/alloc": [
+      30.0,
+      30.0
+     ],
+     "mixed/free": [
+      14.0,
+      14.0
+     ],
+     "empty/alloc": [
+      13.0,
+      13.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1715.0,
+      1787.0
+     ],
+     "pair/alloc": [
+      864.75,
+      865.75
+     ],
+     "pair/free": [
+      549.0,
+      551.0
+     ],
+     "pair_full/alloc": [
+      860.0,
+      861.0
+     ],
+     "pair_full/free": [
+      549.0,
+      551.0
+     ],
+     "fill_drain_lifo/alloc": [
+      860.0,
+      861.0
+     ],
+     "fill_drain_lifo/free": [
+      549.0,
+      551.0
+     ],
+     "fill_drain_fifo/alloc": [
+      860.0,
+      861.0
+     ],
+     "fill_drain_fifo/free": [
+      549.0,
+      551.0
+     ],
+     "mixed/alloc": [
+      860.0,
+      861.0
+     ],
+     "mixed/free": [
+      549.0,
+      551.0
+     ],
+     "empty/alloc": [
+      644.0,
+      645.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_riot",
+   "flash_bytes": 128,
+   "ram_bytes": 8,
+   "record": "records/pools/rp2350/adapter_riot.json",
+   "cycles": {
+    "on": {
+     "init": [
+      2663.0,
+      2768.0
+     ],
+     "pair/alloc": [
+      10.457,
+      10.664
+     ],
+     "pair/free": [
+      41.605,
+      41.801
+     ],
+     "pair_full/alloc": [
+      10.0,
+      10.0
+     ],
+     "pair_full/free": [
+      41.0,
+      41.0
+     ],
+     "fill_drain_lifo/alloc": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_lifo/free": [
+      41.0,
+      41.0
+     ],
+     "fill_drain_fifo/alloc": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_fifo/free": [
+      41.0,
+      41.0
+     ],
+     "mixed/alloc": [
+      10.0,
+      10.0
+     ],
+     "mixed/free": [
+      41.0,
+      41.0
+     ],
+     "empty/alloc": [
+      10.0,
+      10.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      36340.0,
+      36409.0
+     ],
+     "pair/alloc": [
+      493.0,
+      494.0
+     ],
+     "pair/free": [
+      1410.0,
+      1412.0
+     ],
+     "pair_full/alloc": [
+      493.0,
+      494.0
+     ],
+     "pair_full/free": [
+      1410.0,
+      1412.0
+     ],
+     "fill_drain_lifo/alloc": [
+      493.0,
+      494.0
+     ],
+     "fill_drain_lifo/free": [
+      1410.0,
+      1412.0
+     ],
+     "fill_drain_fifo/alloc": [
+      493.0,
+      494.0
+     ],
+     "fill_drain_fifo/free": [
+      1410.0,
+      1412.0
+     ],
+     "mixed/alloc": [
+      493.0,
+      494.0
+     ],
+     "mixed/free": [
+      1410.0,
+      1412.0
+     ],
+     "empty/alloc": [
+      590.0,
+      591.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_threadx",
+   "flash_bytes": 732,
+   "ram_bytes": 192,
+   "record": "records/pools/rp2350/adapter_threadx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      4316.0,
+      4419.0
+     ],
+     "pair/alloc": [
+      48.699,
+      49.172
+     ],
+     "pair/free": [
+      34.32,
+      35.414
+     ],
+     "pair_full/alloc": [
+      46.0,
+      46.0
+     ],
+     "pair_full/free": [
+      32.0,
+      32.0
+     ],
+     "fill_drain_lifo/alloc": [
+      46.0,
+      46.0
+     ],
+     "fill_drain_lifo/free": [
+      32.0,
+      32.0
+     ],
+     "fill_drain_fifo/alloc": [
+      46.0,
+      46.0
+     ],
+     "fill_drain_fifo/free": [
+      32.0,
+      32.43
+     ],
+     "mixed/alloc": [
+      46.0,
+      47.758
+     ],
+     "mixed/free": [
+      32.0,
+      32.0
+     ],
+     "empty/alloc": [
+      43.605,
+      44.738
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      11443.0,
+      11649.0
+     ],
+     "pair/alloc": [
+      1093.0,
+      1094.0
+     ],
+     "pair/free": [
+      970.0,
+      970.0
+     ],
+     "pair_full/alloc": [
+      1093.0,
+      1094.0
+     ],
+     "pair_full/free": [
+      970.0,
+      970.0
+     ],
+     "fill_drain_lifo/alloc": [
+      1093.0,
+      1094.0
+     ],
+     "fill_drain_lifo/free": [
+      970.0,
+      970.0
+     ],
+     "fill_drain_fifo/alloc": [
+      1093.0,
+      1094.0
+     ],
+     "fill_drain_fifo/free": [
+      970.0,
+      970.0
+     ],
+     "mixed/alloc": [
+      1093.0,
+      1094.0
+     ],
+     "mixed/free": [
+      970.0,
+      970.0
+     ],
+     "empty/alloc": [
+      1314.0,
+      1315.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_cmsis_rtx",
+   "flash_bytes": 288,
+   "ram_bytes": 24,
+   "record": "records/pools/rp2350/adapter_cmsis_rtx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1191.0,
+      1316.0
+     ],
+     "pair/alloc": [
+      33.281,
+      33.477
+     ],
+     "pair/free": [
+      51.414,
+      51.801
+     ],
+     "pair_full/alloc": [
+      31.0,
+      31.0
+     ],
+     "pair_full/free": [
+      49.0,
+      49.0
+     ],
+     "fill_drain_lifo/alloc": [
+      31.0,
+      31.0
+     ],
+     "fill_drain_lifo/free": [
+      49.0,
+      49.0
+     ],
+     "fill_drain_fifo/alloc": [
+      31.0,
+      31.0
+     ],
+     "fill_drain_fifo/free": [
+      49.0,
+      49.852
+     ],
+     "mixed/alloc": [
+      31.0,
+      31.469
+     ],
+     "mixed/free": [
+      49.0,
+      49.426
+     ],
+     "empty/alloc": [
+      21.0,
+      21.469
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      7844.0,
+      7913.0
+     ],
+     "pair/alloc": [
+      1190.0,
+      1191.0
+     ],
+     "pair/free": [
+      1503.0,
+      1572.0
+     ],
+     "pair_full/alloc": [
+      1190.0,
+      1191.0
+     ],
+     "pair_full/free": [
+      1503.0,
+      1572.0
+     ],
+     "fill_drain_lifo/alloc": [
+      1190.0,
+      1191.0
+     ],
+     "fill_drain_lifo/free": [
+      1503.0,
+      1572.0
+     ],
+     "fill_drain_fifo/alloc": [
+      1190.0,
+      1191.0
+     ],
+     "fill_drain_fifo/free": [
+      1503.0,
+      1572.0
+     ],
+     "mixed/alloc": [
+      1190.0,
+      1191.0
+     ],
+     "mixed/free": [
+      1503.0,
+      1572.0
+     ],
+     "empty/alloc": [
+      931.0,
+      932.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_contiki",
+   "flash_bytes": 232,
+   "ram_bytes": 44,
+   "record": "records/pools/rp2350/adapter_contiki.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1787.0,
+      1836.0
+     ],
+     "pair/alloc": [
+      27.883,
+      27.887
+     ],
+     "pair/free": [
+      35.113,
+      35.422
+     ],
+     "pair_full/alloc": [
+      274.0,
+      274.0
+     ],
+     "pair_full/free": [
+      250.0,
+      250.43
+     ],
+     "fill_drain_lifo/alloc": [
+      150.0,
+      150.0
+     ],
+     "fill_drain_lifo/free": [
+      141.5,
+      141.5
+     ],
+     "fill_drain_fifo/alloc": [
+      150.0,
+      150.0
+     ],
+     "fill_drain_fifo/free": [
+      141.5,
+      141.5
+     ],
+     "mixed/alloc": [
+      101.219,
+      102.293
+     ],
+     "mixed/free": [
+      98.352,
+      98.352
+     ],
+     "empty/alloc": [
+      276.0,
+      276.426
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      17155.0,
+      17225.0
+     ],
+     "pair/alloc": [
+      791.0,
+      792.0
+     ],
+     "pair/free": [
+      1012.0,
+      1081.0
+     ],
+     "pair_full/alloc": [
+      7146.0,
+      7147.0
+     ],
+     "pair_full/free": [
+      7367.0,
+      7436.0
+     ],
+     "fill_drain_lifo/alloc": [
+      3968.5,
+      3969.5
+     ],
+     "fill_drain_lifo/free": [
+      4189.5,
+      4258.5
+     ],
+     "fill_drain_fifo/alloc": [
+      3968.5,
+      3969.5
+     ],
+     "fill_drain_fifo/free": [
+      4189.5,
+      4258.5
+     ],
+     "mixed/alloc": [
+      2718.48,
+      2719.48
+     ],
+     "mixed/free": [
+      2925.867,
+      2994.867
+     ],
+     "empty/alloc": [
+      7340.0,
+      7341.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_c_allocator",
+   "flash_bytes": 336,
+   "ram_bytes": 45,
+   "record": "records/pools/rp2350/adapter_c_allocator.json",
+   "cycles": {
+    "on": {
+     "init": [
+      785.0,
+      840.0
+     ],
+     "pair/alloc": [
+      59.129,
+      59.668
+     ],
+     "pair/free": [
+      51.984,
+      53.727
+     ],
+     "pair_full/alloc": [
+      53.047,
+      53.047
+     ],
+     "pair_full/free": [
+      49.0,
+      50.0
+     ],
+     "fill_drain_lifo/alloc": [
+      53.0,
+      53.0
+     ],
+     "fill_drain_lifo/free": [
+      49.0,
+      50.0
+     ],
+     "fill_drain_fifo/alloc": [
+      53.0,
+      53.0
+     ],
+     "fill_drain_fifo/free": [
+      49.0,
+      50.43
+     ],
+     "mixed/alloc": [
+      53.0,
+      55.758
+     ],
+     "mixed/free": [
+      49.0,
+      50.414
+     ],
+     "empty/alloc": [
+      61.625,
+      63.598
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1825.0,
+      1896.0
+     ],
+     "pair/alloc": [
+      1615.496,
+      1616.496
+     ],
+     "pair/free": [
+      1629.0,
+      1632.0
+     ],
+     "pair_full/alloc": [
+      1615.496,
+      1616.496
+     ],
+     "pair_full/free": [
+      1629.0,
+      1632.0
+     ],
+     "fill_drain_lifo/alloc": [
+      1614.0,
+      1615.0
+     ],
+     "fill_drain_lifo/free": [
+      1629.0,
+      1632.0
+     ],
+     "fill_drain_fifo/alloc": [
+      1614.0,
+      1615.0
+     ],
+     "fill_drain_fifo/free": [
+      1629.0,
+      1632.0
+     ],
+     "mixed/alloc": [
+      1614.0,
+      1615.0
+     ],
+     "mixed/free": [
+      1629.0,
+      1632.0
+     ],
+     "empty/alloc": [
+      2538.0,
+      2539.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_lwip",
+   "flash_bytes": 236,
+   "ram_bytes": 20,
+   "record": "records/pools/rp2350/adapter_lwip.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1373.0,
+      1423.0
+     ],
+     "pair/alloc": [
+      39.359,
+      39.363
+     ],
+     "pair/free": [
+      45.645,
+      46.828
+     ],
+     "pair_full/alloc": [
+      36.0,
+      36.0
+     ],
+     "pair_full/free": [
+      44.0,
+      45.0
+     ],
+     "fill_drain_lifo/alloc": [
+      36.0,
+      36.0
+     ],
+     "fill_drain_lifo/free": [
+      44.0,
+      45.0
+     ],
+     "fill_drain_fifo/alloc": [
+      36.0,
+      36.0
+     ],
+     "fill_drain_fifo/free": [
+      44.0,
+      45.0
+     ],
+     "mixed/alloc": [
+      36.0,
+      36.0
+     ],
+     "mixed/free": [
+      44.0,
+      45.0
+     ],
+     "empty/alloc": [
+      32.0,
+      32.469
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      8202.0,
+      8271.0
+     ],
+     "pair/alloc": [
+      1287.0,
+      1288.0
+     ],
+     "pair/free": [
+      1437.0,
+      1438.0
+     ],
+     "pair_full/alloc": [
+      1287.0,
+      1288.0
+     ],
+     "pair_full/free": [
+      1437.0,
+      1438.0
+     ],
+     "fill_drain_lifo/alloc": [
+      1287.0,
+      1288.0
+     ],
+     "fill_drain_lifo/free": [
+      1437.0,
+      1438.0
+     ],
+     "fill_drain_fifo/alloc": [
+      1287.0,
+      1288.0
+     ],
+     "fill_drain_fifo/free": [
+      1437.0,
+      1438.0
+     ],
+     "mixed/alloc": [
+      1287.0,
+      1288.0
+     ],
+     "mixed/free": [
+      1437.0,
+      1438.0
+     ],
+     "empty/alloc": [
+      1330.0,
+      1331.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_memorypool",
+   "flash_bytes": 124,
+   "ram_bytes": 5,
+   "record": "records/pools/rp2350/adapter_memorypool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1769.0,
+      1770.0
+     ],
+     "pair/alloc": [
+      11.855,
+      12.051
+     ],
+     "pair/free": [
+      10.621,
+      10.621
+     ],
+     "pair_full/alloc": [
+      11.0,
+      11.0
+     ],
+     "pair_full/free": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_lifo/alloc": [
+      11.0,
+      11.0
+     ],
+     "fill_drain_lifo/free": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_fifo/alloc": [
+      11.0,
+      11.0
+     ],
+     "fill_drain_fifo/free": [
+      10.0,
+      10.0
+     ],
+     "mixed/alloc": [
+      11.0,
+      11.0
+     ],
+     "mixed/free": [
+      10.0,
+      10.0
+     ],
+     "empty/alloc": [
+      10.0,
+      10.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      21885.0,
+      21955.0
+     ],
+     "pair/alloc": [
+      547.0,
+      547.0
+     ],
+     "pair/free": [
+      547.0,
+      549.0
+     ],
+     "pair_full/alloc": [
+      547.0,
+      547.0
+     ],
+     "pair_full/free": [
+      547.0,
+      549.0
+     ],
+     "fill_drain_lifo/alloc": [
+      547.0,
+      547.0
+     ],
+     "fill_drain_lifo/free": [
+      547.0,
+      549.0
+     ],
+     "fill_drain_fifo/alloc": [
+      547.0,
+      547.0
+     ],
+     "fill_drain_fifo/free": [
+      547.0,
+      549.0
+     ],
+     "mixed/alloc": [
+      547.0,
+      547.0
+     ],
+     "mixed/free": [
+      547.0,
+      549.0
+     ],
+     "empty/alloc": [
+      617.0,
+      617.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_heapless",
+   "flash_bytes": 404,
+   "ram_bytes": 136,
+   "record": "records/pools/rp2350/adapter_heapless.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1784.0,
+      1975.0
+     ],
+     "pair/alloc": [
+      37.156,
+      37.691
+     ],
+     "pair/free": [
+      41.148,
+      41.152
+     ],
+     "pair_full/alloc": [
+      35.0,
+      35.0
+     ],
+     "pair_full/free": [
+      39.0,
+      39.0
+     ],
+     "fill_drain_lifo/alloc": [
+      35.0,
+      35.0
+     ],
+     "fill_drain_lifo/free": [
+      39.0,
+      39.0
+     ],
+     "fill_drain_fifo/alloc": [
+      35.0,
+      35.469
+     ],
+     "fill_drain_fifo/free": [
+      39.0,
+      40.695
+     ],
+     "mixed/alloc": [
+      35.0,
+      37.227
+     ],
+     "mixed/free": [
+      39.0,
+      39.422
+     ],
+     "empty/alloc": [
+      21.43,
+      21.809
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      16320.0,
+      16322.0
+     ],
+     "pair/alloc": [
+      954.0,
+      954.0
+     ],
+     "pair/free": [
+      965.0,
+      965.0
+     ],
+     "pair_full/alloc": [
+      954.0,
+      954.0
+     ],
+     "pair_full/free": [
+      965.0,
+      965.0
+     ],
+     "fill_drain_lifo/alloc": [
+      954.0,
+      954.0
+     ],
+     "fill_drain_lifo/free": [
+      965.0,
+      965.0
+     ],
+     "fill_drain_fifo/alloc": [
+      954.0,
+      954.0
+     ],
+     "fill_drain_fifo/free": [
+      965.0,
+      965.0
+     ],
+     "mixed/alloc": [
+      954.0,
+      954.0
+     ],
+     "mixed/free": [
+      965.0,
+      965.0
+     ],
+     "empty/alloc": [
+      711.0,
+      711.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_atomic_pool",
+   "flash_bytes": 560,
+   "ram_bytes": 4,
+   "record": "records/pools/rp2350/adapter_atomic_pool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1145.0,
+      1192.0
+     ],
+     "pair/alloc": [
+      41.25,
+      41.715
+     ],
+     "pair/free": [
+      34.75,
+      36.07
+     ],
+     "pair_full/alloc": [
+      39.0,
+      39.0
+     ],
+     "pair_full/free": [
+      33.0,
+      33.0
+     ],
+     "fill_drain_lifo/alloc": [
+      39.0,
+      39.0
+     ],
+     "fill_drain_lifo/free": [
+      33.0,
+      33.0
+     ],
+     "fill_drain_fifo/alloc": [
+      39.0,
+      39.406
+     ],
+     "fill_drain_fifo/free": [
+      33.0,
+      33.0
+     ],
+     "mixed/alloc": [
+      39.0,
+      41.238
+     ],
+     "mixed/free": [
+      33.0,
+      33.43
+     ],
+     "empty/alloc": [
+      29.0,
+      29.41
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1958.0,
+      1960.0
+     ],
+     "pair/alloc": [
+      954.0,
+      954.0
+     ],
+     "pair/free": [
+      803.0,
+      803.0
+     ],
+     "pair_full/alloc": [
+      954.0,
+      954.0
+     ],
+     "pair_full/free": [
+      803.0,
+      803.0
+     ],
+     "fill_drain_lifo/alloc": [
+      954.0,
+      954.0
+     ],
+     "fill_drain_lifo/free": [
+      803.0,
+      803.0
+     ],
+     "fill_drain_fifo/alloc": [
+      954.0,
+      954.0
+     ],
+     "fill_drain_fifo/free": [
+      803.0,
+      803.0
+     ],
+     "mixed/alloc": [
+      954.0,
+      954.0
+     ],
+     "mixed/free": [
+      803.0,
+      803.0
+     ],
+     "empty/alloc": [
+      792.0,
+      792.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "adapter": "adapter_ref_primask",
+   "flash_bytes": 120,
+   "ram_bytes": 12,
+   "record": "records/pools/rp2350/adapter_ref_primask.json",
+   "cycles": {
+    "on": {
+     "init": [
+      846.0,
+      957.0
+     ],
+     "pair/alloc": [
+      14.855,
+      15.586
+     ],
+     "pair/free": [
+      12.812,
+      12.816
+     ],
+     "pair_full/alloc": [
+      14.0,
+      14.0
+     ],
+     "pair_full/free": [
+      12.0,
+      12.0
+     ],
+     "fill_drain_lifo/alloc": [
+      14.0,
+      14.0
+     ],
+     "fill_drain_lifo/free": [
+      12.0,
+      12.0
+     ],
+     "fill_drain_fifo/alloc": [
+      14.0,
+      14.0
+     ],
+     "fill_drain_fifo/free": [
+      12.0,
+      12.0
+     ],
+     "mixed/alloc": [
+      14.0,
+      14.0
+     ],
+     "mixed/free": [
+      12.0,
+      12.0
+     ],
+     "empty/alloc": [
+      13.0,
+      13.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      7793.0,
+      7864.0
+     ],
+     "pair/alloc": [
+      574.0,
+      576.0
+     ],
+     "pair/free": [
+      574.0,
+      576.0
+     ],
+     "pair_full/alloc": [
+      574.0,
+      576.0
+     ],
+     "pair_full/free": [
+      574.0,
+      576.0
+     ],
+     "fill_drain_lifo/alloc": [
+      574.0,
+      576.0
+     ],
+     "fill_drain_lifo/free": [
+      574.0,
+      576.0
+     ],
+     "fill_drain_fifo/alloc": [
+      574.0,
+      576.0
+     ],
+     "fill_drain_fifo/free": [
+      574.0,
+      576.0
+     ],
+     "mixed/alloc": [
+      574.0,
+      576.0
+     ],
+     "mixed/free": [
+      574.0,
+      576.0
+     ],
+     "empty/alloc": [
+      671.0,
+      673.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_etl",
+   "flash_bytes": 172,
+   "ram_bytes": 25,
+   "record": "records/pools/stm32g474/adapter_etl.json",
+   "cycles": {
+    "on": {
+     "init": [
+      84.0,
+      90.0
+     ],
+     "pair/alloc": [
+      42.18,
+      46.168
+     ],
+     "pair/free": [
+      18.027,
+      22.027
+     ],
+     "pair_full/alloc": [
+      41.0,
+      44.984
+     ],
+     "pair_full/free": [
+      18.0,
+      22.0
+     ],
+     "fill_drain_lifo/alloc": [
+      41.0,
+      41.125
+     ],
+     "fill_drain_lifo/free": [
+      18.0,
+      18.125
+     ],
+     "fill_drain_fifo/alloc": [
+      41.219,
+      41.562
+     ],
+     "fill_drain_fifo/free": [
+      18.0,
+      18.125
+     ],
+     "mixed/alloc": [
+      41.0,
+      43.047
+     ],
+     "mixed/free": [
+      18.0,
+      20.062
+     ],
+     "empty/alloc": [
+      15.0,
+      15.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      114.0,
+      121.0
+     ],
+     "pair/alloc": [
+      63.25,
+      67.625
+     ],
+     "pair/free": [
+      34.0,
+      39.0
+     ],
+     "pair_full/alloc": [
+      62.0,
+      66.0
+     ],
+     "pair_full/free": [
+      34.0,
+      39.0
+     ],
+     "fill_drain_lifo/alloc": [
+      62.0,
+      66.0
+     ],
+     "fill_drain_lifo/free": [
+      34.0,
+      39.0
+     ],
+     "fill_drain_fifo/alloc": [
+      62.0,
+      66.0
+     ],
+     "fill_drain_fifo/free": [
+      34.0,
+      39.0
+     ],
+     "mixed/alloc": [
+      62.0,
+      66.0
+     ],
+     "mixed/free": [
+      34.0,
+      39.0
+     ],
+     "empty/alloc": [
+      39.0,
+      39.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_riot",
+   "flash_bytes": 128,
+   "ram_bytes": 8,
+   "record": "records/pools/stm32g474/adapter_riot.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1233.0,
+      1238.0
+     ],
+     "pair/alloc": [
+      17.027,
+      17.027
+     ],
+     "pair/free": [
+      54.008,
+      54.039
+     ],
+     "pair_full/alloc": [
+      16.984,
+      16.984
+     ],
+     "pair_full/free": [
+      54.0,
+      54.0
+     ],
+     "fill_drain_lifo/alloc": [
+      13.125,
+      13.125
+     ],
+     "fill_drain_lifo/free": [
+      50.125,
+      50.125
+     ],
+     "fill_drain_fifo/alloc": [
+      13.234,
+      13.316
+     ],
+     "fill_drain_fifo/free": [
+      50.125,
+      50.125
+     ],
+     "mixed/alloc": [
+      15.047,
+      15.047
+     ],
+     "mixed/free": [
+      52.152,
+      52.152
+     ],
+     "empty/alloc": [
+      13.0,
+      13.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      2954.0,
+      3237.0
+     ],
+     "pair/alloc": [
+      28.0,
+      33.0
+     ],
+     "pair/free": [
+      106.0,
+      110.0
+     ],
+     "pair_full/alloc": [
+      28.0,
+      33.0
+     ],
+     "pair_full/free": [
+      106.0,
+      110.0
+     ],
+     "fill_drain_lifo/alloc": [
+      28.0,
+      33.0
+     ],
+     "fill_drain_lifo/free": [
+      106.0,
+      110.0
+     ],
+     "fill_drain_fifo/alloc": [
+      28.0,
+      33.0
+     ],
+     "fill_drain_fifo/free": [
+      106.0,
+      110.0
+     ],
+     "mixed/alloc": [
+      28.0,
+      33.0
+     ],
+     "mixed/free": [
+      106.0,
+      110.0
+     ],
+     "empty/alloc": [
+      29.0,
+      38.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_threadx",
+   "flash_bytes": 724,
+   "ram_bytes": 192,
+   "record": "records/pools/stm32g474/adapter_threadx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      720.0,
+      723.0
+     ],
+     "pair/alloc": [
+      64.062,
+      68.066
+     ],
+     "pair/free": [
+      50.074,
+      50.113
+     ],
+     "pair_full/alloc": [
+      64.0,
+      67.984
+     ],
+     "pair_full/free": [
+      50.0,
+      50.074
+     ],
+     "fill_drain_lifo/alloc": [
+      64.031,
+      64.25
+     ],
+     "fill_drain_lifo/free": [
+      50.0,
+      50.375
+     ],
+     "fill_drain_fifo/alloc": [
+      64.234,
+      64.645
+     ],
+     "fill_drain_fifo/free": [
+      50.0,
+      50.594
+     ],
+     "mixed/alloc": [
+      64.0,
+      68.094
+     ],
+     "mixed/free": [
+      50.047,
+      59.797
+     ],
+     "empty/alloc": [
+      59.027,
+      59.09
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      935.0,
+      978.0
+     ],
+     "pair/alloc": [
+      89.0,
+      98.0
+     ],
+     "pair/free": [
+      83.0,
+      87.0
+     ],
+     "pair_full/alloc": [
+      89.0,
+      98.0
+     ],
+     "pair_full/free": [
+      83.0,
+      87.0
+     ],
+     "fill_drain_lifo/alloc": [
+      89.0,
+      98.0
+     ],
+     "fill_drain_lifo/free": [
+      83.0,
+      87.0
+     ],
+     "fill_drain_fifo/alloc": [
+      89.0,
+      98.0
+     ],
+     "fill_drain_fifo/free": [
+      83.0,
+      87.0
+     ],
+     "mixed/alloc": [
+      89.0,
+      98.0
+     ],
+     "mixed/free": [
+      83.0,
+      87.0
+     ],
+     "empty/alloc": [
+      102.0,
+      103.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_cmsis_rtx",
+   "flash_bytes": 288,
+   "ram_bytes": 24,
+   "record": "records/pools/stm32g474/adapter_cmsis_rtx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      305.0,
+      307.0
+     ],
+     "pair/alloc": [
+      41.07,
+      49.039
+     ],
+     "pair/free": [
+      68.035,
+      72.043
+     ],
+     "pair_full/alloc": [
+      41.0,
+      48.969
+     ],
+     "pair_full/free": [
+      68.0,
+      72.0
+     ],
+     "fill_drain_lifo/alloc": [
+      41.0,
+      41.25
+     ],
+     "fill_drain_lifo/free": [
+      68.0,
+      68.125
+     ],
+     "fill_drain_fifo/alloc": [
+      41.164,
+      41.562
+     ],
+     "fill_drain_fifo/free": [
+      68.0,
+      68.125
+     ],
+     "mixed/alloc": [
+      41.0,
+      45.094
+     ],
+     "mixed/free": [
+      68.016,
+      70.105
+     ],
+     "empty/alloc": [
+      28.0,
+      28.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      650.0,
+      675.0
+     ],
+     "pair/alloc": [
+      72.0,
+      91.0
+     ],
+     "pair/free": [
+      105.0,
+      127.0
+     ],
+     "pair_full/alloc": [
+      72.0,
+      91.0
+     ],
+     "pair_full/free": [
+      105.0,
+      127.0
+     ],
+     "fill_drain_lifo/alloc": [
+      72.0,
+      91.0
+     ],
+     "fill_drain_lifo/free": [
+      105.0,
+      127.0
+     ],
+     "fill_drain_fifo/alloc": [
+      72.0,
+      91.0
+     ],
+     "fill_drain_fifo/free": [
+      105.0,
+      127.0
+     ],
+     "mixed/alloc": [
+      72.0,
+      91.0
+     ],
+     "mixed/free": [
+      105.0,
+      127.0
+     ],
+     "empty/alloc": [
+      67.0,
+      67.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_contiki",
+   "flash_bytes": 232,
+   "ram_bytes": 44,
+   "record": "records/pools/stm32g474/adapter_contiki.json",
+   "cycles": {
+    "on": {
+     "init": [
+      969.0,
+      975.0
+     ],
+     "pair/alloc": [
+      38.043,
+      46.047
+     ],
+     "pair/free": [
+      46.078,
+      50.082
+     ],
+     "pair_full/alloc": [
+      348.0,
+      355.969
+     ],
+     "pair_full/free": [
+      325.0,
+      329.0
+     ],
+     "fill_drain_lifo/alloc": [
+      193.0,
+      193.25
+     ],
+     "fill_drain_lifo/free": [
+      185.5,
+      185.625
+     ],
+     "fill_drain_fifo/alloc": [
+      193.109,
+      193.426
+     ],
+     "fill_drain_fifo/free": [
+      185.5,
+      185.625
+     ],
+     "mixed/alloc": [
+      132.023,
+      136.117
+     ],
+     "mixed/free": [
+      130.055,
+      132.145
+     ],
+     "empty/alloc": [
+      348.0,
+      348.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1491.0,
+      1492.0
+     ],
+     "pair/alloc": [
+      64.0,
+      67.0
+     ],
+     "pair/free": [
+      79.0,
+      82.0
+     ],
+     "pair_full/alloc": [
+      591.0,
+      811.0
+     ],
+     "pair_full/free": [
+      606.0,
+      764.0
+     ],
+     "fill_drain_lifo/alloc": [
+      327.5,
+      439.0
+     ],
+     "fill_drain_lifo/free": [
+      342.5,
+      423.0
+     ],
+     "fill_drain_fifo/alloc": [
+      327.5,
+      439.0
+     ],
+     "fill_drain_fifo/free": [
+      342.5,
+      423.0
+     ],
+     "mixed/alloc": [
+      223.84,
+      292.656
+     ],
+     "mixed/free": [
+      237.711,
+      287.391
+     ],
+     "empty/alloc": [
+      601.0,
+      822.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_c_allocator",
+   "flash_bytes": 336,
+   "ram_bytes": 45,
+   "record": "records/pools/stm32g474/adapter_c_allocator.json",
+   "cycles": {
+    "on": {
+     "init": [
+      113.0,
+      118.0
+     ],
+     "pair/alloc": [
+      75.188,
+      90.113
+     ],
+     "pair/free": [
+      72.039,
+      82.012
+     ],
+     "pair_full/alloc": [
+      75.027,
+      89.969
+     ],
+     "pair_full/free": [
+      72.027,
+      81.98
+     ],
+     "fill_drain_lifo/alloc": [
+      67.281,
+      67.719
+     ],
+     "fill_drain_lifo/free": [
+      64.289,
+      64.562
+     ],
+     "fill_drain_fifo/alloc": [
+      67.5,
+      67.93
+     ],
+     "fill_drain_fifo/free": [
+      64.562,
+      64.688
+     ],
+     "mixed/alloc": [
+      75.188,
+      82.848
+     ],
+     "mixed/free": [
+      73.281,
+      75.344
+     ],
+     "empty/alloc": [
+      76.145,
+      76.203
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      121.0,
+      122.0
+     ],
+     "pair/alloc": [
+      121.129,
+      125.133
+     ],
+     "pair/free": [
+      111.0,
+      117.0
+     ],
+     "pair_full/alloc": [
+      121.129,
+      125.133
+     ],
+     "pair_full/free": [
+      111.0,
+      117.0
+     ],
+     "fill_drain_lifo/alloc": [
+      121.0,
+      125.0
+     ],
+     "fill_drain_lifo/free": [
+      111.0,
+      117.0
+     ],
+     "fill_drain_fifo/alloc": [
+      121.0,
+      125.0
+     ],
+     "fill_drain_fifo/free": [
+      111.0,
+      117.0
+     ],
+     "mixed/alloc": [
+      121.0,
+      125.0
+     ],
+     "mixed/free": [
+      111.0,
+      117.0
+     ],
+     "empty/alloc": [
+      176.0,
+      176.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_lwip",
+   "flash_bytes": 236,
+   "ram_bytes": 20,
+   "record": "records/pools/stm32g474/adapter_lwip.json",
+   "cycles": {
+    "on": {
+     "init": [
+      373.0,
+      383.0
+     ],
+     "pair/alloc": [
+      44.09,
+      52.074
+     ],
+     "pair/free": [
+      57.027,
+      61.023
+     ],
+     "pair_full/alloc": [
+      44.0,
+      51.969
+     ],
+     "pair_full/free": [
+      57.0,
+      61.0
+     ],
+     "fill_drain_lifo/alloc": [
+      44.0,
+      44.262
+     ],
+     "fill_drain_lifo/free": [
+      57.0,
+      57.125
+     ],
+     "fill_drain_fifo/alloc": [
+      44.082,
+      44.344
+     ],
+     "fill_drain_fifo/free": [
+      57.0,
+      57.125
+     ],
+     "mixed/alloc": [
+      44.0,
+      48.094
+     ],
+     "mixed/free": [
+      57.012,
+      59.09
+     ],
+     "empty/alloc": [
+      41.0,
+      41.016
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      667.0,
+      827.0
+     ],
+     "pair/alloc": [
+      96.0,
+      97.0
+     ],
+     "pair/free": [
+      104.0,
+      114.0
+     ],
+     "pair_full/alloc": [
+      96.0,
+      97.0
+     ],
+     "pair_full/free": [
+      104.0,
+      114.0
+     ],
+     "fill_drain_lifo/alloc": [
+      96.0,
+      97.0
+     ],
+     "fill_drain_lifo/free": [
+      104.0,
+      114.0
+     ],
+     "fill_drain_fifo/alloc": [
+      96.0,
+      97.0
+     ],
+     "fill_drain_fifo/free": [
+      104.0,
+      114.0
+     ],
+     "mixed/alloc": [
+      96.0,
+      97.0
+     ],
+     "mixed/free": [
+      104.0,
+      114.0
+     ],
+     "empty/alloc": [
+      95.0,
+      95.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_memorypool",
+   "flash_bytes": 120,
+   "ram_bytes": 5,
+   "record": "records/pools/stm32g474/adapter_memorypool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1039.0,
+      1050.0
+     ],
+     "pair/alloc": [
+      13.043,
+      17.031
+     ],
+     "pair/free": [
+      13.043,
+      17.031
+     ],
+     "pair_full/alloc": [
+      13.0,
+      16.984
+     ],
+     "pair_full/free": [
+      13.0,
+      17.0
+     ],
+     "fill_drain_lifo/alloc": [
+      13.0,
+      13.125
+     ],
+     "fill_drain_lifo/free": [
+      13.0,
+      13.125
+     ],
+     "fill_drain_fifo/alloc": [
+      13.109,
+      13.344
+     ],
+     "fill_drain_fifo/free": [
+      13.0,
+      13.125
+     ],
+     "mixed/alloc": [
+      13.0,
+      15.047
+     ],
+     "mixed/free": [
+      13.0,
+      15.062
+     ],
+     "empty/alloc": [
+      13.0,
+      13.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1741.0,
+      1833.0
+     ],
+     "pair/alloc": [
+      32.0,
+      34.0
+     ],
+     "pair/free": [
+      30.0,
+      33.0
+     ],
+     "pair_full/alloc": [
+      32.0,
+      34.0
+     ],
+     "pair_full/free": [
+      30.0,
+      33.0
+     ],
+     "fill_drain_lifo/alloc": [
+      32.0,
+      34.0
+     ],
+     "fill_drain_lifo/free": [
+      30.0,
+      33.0
+     ],
+     "fill_drain_fifo/alloc": [
+      32.0,
+      34.0
+     ],
+     "fill_drain_fifo/free": [
+      30.0,
+      33.0
+     ],
+     "mixed/alloc": [
+      32.0,
+      34.0
+     ],
+     "mixed/free": [
+      30.0,
+      33.0
+     ],
+     "empty/alloc": [
+      30.0,
+      33.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_heapless",
+   "flash_bytes": 404,
+   "ram_bytes": 136,
+   "record": "records/pools/stm32g474/adapter_heapless.json",
+   "cycles": {
+    "on": {
+     "init": [
+      392.0,
+      406.0
+     ],
+     "pair/alloc": [
+      44.059,
+      45.055
+     ],
+     "pair/free": [
+      49.051,
+      49.074
+     ],
+     "pair_full/alloc": [
+      44.0,
+      45.0
+     ],
+     "pair_full/free": [
+      49.0,
+      49.105
+     ],
+     "fill_drain_lifo/alloc": [
+      44.074,
+      44.844
+     ],
+     "fill_drain_lifo/free": [
+      49.066,
+      49.762
+     ],
+     "fill_drain_fifo/alloc": [
+      44.52,
+      44.844
+     ],
+     "fill_drain_fifo/free": [
+      49.531,
+      49.844
+     ],
+     "mixed/alloc": [
+      44.0,
+      57.816
+     ],
+     "mixed/free": [
+      49.066,
+      62.922
+     ],
+     "empty/alloc": [
+      29.059,
+      29.059
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1475.0,
+      1541.0
+     ],
+     "pair/alloc": [
+      79.0,
+      88.0
+     ],
+     "pair/free": [
+      84.0,
+      99.0
+     ],
+     "pair_full/alloc": [
+      79.0,
+      88.0
+     ],
+     "pair_full/free": [
+      84.0,
+      99.0
+     ],
+     "fill_drain_lifo/alloc": [
+      79.0,
+      88.0
+     ],
+     "fill_drain_lifo/free": [
+      84.0,
+      99.0
+     ],
+     "fill_drain_fifo/alloc": [
+      79.0,
+      88.0
+     ],
+     "fill_drain_fifo/free": [
+      84.0,
+      99.0
+     ],
+     "mixed/alloc": [
+      79.0,
+      88.0
+     ],
+     "mixed/free": [
+      84.0,
+      99.0
+     ],
+     "empty/alloc": [
+      53.0,
+      62.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_atomic_pool",
+   "flash_bytes": 604,
+   "ram_bytes": 4,
+   "record": "records/pools/stm32g474/adapter_atomic_pool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      141.0,
+      141.0
+     ],
+     "pair/alloc": [
+      50.074,
+      71.988
+     ],
+     "pair/free": [
+      43.039,
+      61.984
+     ],
+     "pair_full/alloc": [
+      50.0,
+      71.914
+     ],
+     "pair_full/free": [
+      43.0,
+      62.0
+     ],
+     "fill_drain_lifo/alloc": [
+      50.07,
+      50.906
+     ],
+     "fill_drain_lifo/free": [
+      43.039,
+      43.594
+     ],
+     "fill_drain_fifo/alloc": [
+      50.656,
+      50.906
+     ],
+     "fill_drain_fifo/free": [
+      43.312,
+      43.594
+     ],
+     "mixed/alloc": [
+      50.0,
+      64.855
+     ],
+     "mixed/free": [
+      43.055,
+      52.797
+     ],
+     "empty/alloc": [
+      37.016,
+      37.023
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      152.0,
+      156.0
+     ],
+     "pair/alloc": [
+      97.0,
+      98.0
+     ],
+     "pair/free": [
+      81.0,
+      82.0
+     ],
+     "pair_full/alloc": [
+      97.0,
+      98.0
+     ],
+     "pair_full/free": [
+      81.0,
+      82.0
+     ],
+     "fill_drain_lifo/alloc": [
+      97.0,
+      98.0
+     ],
+     "fill_drain_lifo/free": [
+      81.0,
+      82.0
+     ],
+     "fill_drain_fifo/alloc": [
+      97.0,
+      98.0
+     ],
+     "fill_drain_fifo/free": [
+      81.0,
+      82.0
+     ],
+     "mixed/alloc": [
+      97.0,
+      98.0
+     ],
+     "mixed/free": [
+      81.0,
+      82.0
+     ],
+     "empty/alloc": [
+      66.0,
+      73.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "adapter": "adapter_ref_primask",
+   "flash_bytes": 116,
+   "ram_bytes": 12,
+   "record": "records/pools/stm32g474/adapter_ref_primask.json",
+   "cycles": {
+    "on": {
+     "init": [
+      270.0,
+      276.0
+     ],
+     "pair/alloc": [
+      17.047,
+      21.031
+     ],
+     "pair/free": [
+      16.035,
+      20.023
+     ],
+     "pair_full/alloc": [
+      17.0,
+      20.984
+     ],
+     "pair_full/free": [
+      16.0,
+      20.0
+     ],
+     "fill_drain_lifo/alloc": [
+      17.0,
+      17.125
+     ],
+     "fill_drain_lifo/free": [
+      16.0,
+      16.125
+     ],
+     "fill_drain_fifo/alloc": [
+      17.109,
+      17.371
+     ],
+     "fill_drain_fifo/free": [
+      16.0,
+      16.125
+     ],
+     "mixed/alloc": [
+      17.0,
+      19.047
+     ],
+     "mixed/free": [
+      16.0,
+      18.062
+     ],
+     "empty/alloc": [
+      17.0,
+      17.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      584.0,
+      621.0
+     ],
+     "pair/alloc": [
+      34.0,
+      38.0
+     ],
+     "pair/free": [
+      34.0,
+      36.0
+     ],
+     "pair_full/alloc": [
+      34.0,
+      38.0
+     ],
+     "pair_full/free": [
+      34.0,
+      36.0
+     ],
+     "fill_drain_lifo/alloc": [
+      34.0,
+      38.0
+     ],
+     "fill_drain_lifo/free": [
+      34.0,
+      36.0
+     ],
+     "fill_drain_fifo/alloc": [
+      34.0,
+      38.0
+     ],
+     "fill_drain_fifo/free": [
+      34.0,
+      36.0
+     ],
+     "mixed/alloc": [
+      34.0,
+      38.0
+     ],
+     "mixed/free": [
+      34.0,
+      36.0
+     ],
+     "empty/alloc": [
+      35.0,
+      39.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_etl",
+   "flash_bytes": 172,
+   "ram_bytes": 25,
+   "record": "records/pools/stm32h723/adapter_etl.json",
+   "cycles": {
+    "on": {
+     "init": [
+      121.0,
+      160.0
+     ],
+     "pair/alloc": [
+      25.035,
+      25.145
+     ],
+     "pair/free": [
+      15.012,
+      15.113
+     ],
+     "pair_full/alloc": [
+      24.02,
+      24.02
+     ],
+     "pair_full/free": [
+      15.0,
+      15.0
+     ],
+     "fill_drain_lifo/alloc": [
+      18.23,
+      18.242
+     ],
+     "fill_drain_lifo/free": [
+      9.199,
+      9.203
+     ],
+     "fill_drain_fifo/alloc": [
+      18.34,
+      18.348
+     ],
+     "fill_drain_fifo/free": [
+      9.199,
+      9.312
+     ],
+     "mixed/alloc": [
+      21.156,
+      21.223
+     ],
+     "mixed/free": [
+      12.105,
+      12.109
+     ],
+     "empty/alloc": [
+      7.074,
+      7.074
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      212.0,
+      250.0
+     ],
+     "pair/alloc": [
+      68.117,
+      94.234
+     ],
+     "pair/free": [
+      52.32,
+      64.32
+     ],
+     "pair_full/alloc": [
+      68.125,
+      93.977
+     ],
+     "pair_full/free": [
+      54.0,
+      64.0
+     ],
+     "fill_drain_lifo/alloc": [
+      48.828,
+      60.789
+     ],
+     "fill_drain_lifo/free": [
+      25.008,
+      35.039
+     ],
+     "fill_drain_fifo/alloc": [
+      49.078,
+      61.266
+     ],
+     "fill_drain_fifo/free": [
+      24.938,
+      35.203
+     ],
+     "mixed/alloc": [
+      58.438,
+      72.664
+     ],
+     "mixed/free": [
+      39.539,
+      49.539
+     ],
+     "empty/alloc": [
+      32.305,
+      50.281
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_riot",
+   "flash_bytes": 128,
+   "ram_bytes": 8,
+   "record": "records/pools/stm32h723/adapter_riot.json",
+   "cycles": {
+    "on": {
+     "init": [
+      927.0,
+      983.0
+     ],
+     "pair/alloc": [
+      11.062,
+      13.609
+     ],
+     "pair/free": [
+      25.109,
+      30.582
+     ],
+     "pair_full/alloc": [
+      11.039,
+      13.52
+     ],
+     "pair_full/free": [
+      25.07,
+      30.566
+     ],
+     "fill_drain_lifo/alloc": [
+      5.207,
+      5.324
+     ],
+     "fill_drain_lifo/free": [
+      20.312,
+      20.543
+     ],
+     "fill_drain_fifo/alloc": [
+      5.324,
+      5.344
+     ],
+     "fill_drain_fifo/free": [
+      21.102,
+      21.141
+     ],
+     "mixed/alloc": [
+      8.113,
+      10.672
+     ],
+     "mixed/free": [
+      22.723,
+      28.289
+     ],
+     "empty/alloc": [
+      4.09,
+      4.09
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      3688.0,
+      4784.0
+     ],
+     "pair/alloc": [
+      54.031,
+      64.008
+     ],
+     "pair/free": [
+      136.156,
+      154.164
+     ],
+     "pair_full/alloc": [
+      54.062,
+      64.086
+     ],
+     "pair_full/free": [
+      136.094,
+      154.094
+     ],
+     "fill_drain_lifo/alloc": [
+      21.195,
+      35.055
+     ],
+     "fill_drain_lifo/free": [
+      113.07,
+      133.109
+     ],
+     "fill_drain_fifo/alloc": [
+      21.5,
+      35.758
+     ],
+     "fill_drain_fifo/free": [
+      115.719,
+      135.469
+     ],
+     "mixed/alloc": [
+      37.562,
+      51.789
+     ],
+     "mixed/free": [
+      124.625,
+      147.297
+     ],
+     "empty/alloc": [
+      19.414,
+      34.398
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_threadx",
+   "flash_bytes": 720,
+   "ram_bytes": 192,
+   "record": "records/pools/stm32h723/adapter_threadx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      662.0,
+      722.0
+     ],
+     "pair/alloc": [
+      48.191,
+      50.18
+     ],
+     "pair/free": [
+      47.223,
+      49.238
+     ],
+     "pair_full/alloc": [
+      48.082,
+      50.027
+     ],
+     "pair_full/free": [
+      47.023,
+      49.047
+     ],
+     "fill_drain_lifo/alloc": [
+      43.156,
+      45.156
+     ],
+     "fill_drain_lifo/free": [
+      42.203,
+      43.23
+     ],
+     "fill_drain_fifo/alloc": [
+      43.348,
+      45.152
+     ],
+     "fill_drain_fifo/free": [
+      42.363,
+      43.383
+     ],
+     "mixed/alloc": [
+      46.605,
+      48.531
+     ],
+     "mixed/free": [
+      46.43,
+      48.156
+     ],
+     "empty/alloc": [
+      41.16,
+      42.137
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      716.0,
+      1580.0
+     ],
+     "pair/alloc": [
+      122.078,
+      152.0
+     ],
+     "pair/free": [
+      120.094,
+      164.07
+     ],
+     "pair_full/alloc": [
+      122.062,
+      152.016
+     ],
+     "pair_full/free": [
+      120.062,
+      164.047
+     ],
+     "fill_drain_lifo/alloc": [
+      98.906,
+      121.008
+     ],
+     "fill_drain_lifo/free": [
+      102.688,
+      133.133
+     ],
+     "fill_drain_fifo/alloc": [
+      99.266,
+      121.227
+     ],
+     "fill_drain_fifo/free": [
+      103.0,
+      133.328
+     ],
+     "mixed/alloc": [
+      112.375,
+      136.727
+     ],
+     "mixed/free": [
+      111.492,
+      148.688
+     ],
+     "empty/alloc": [
+      112.297,
+      144.305
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_cmsis_rtx",
+   "flash_bytes": 292,
+   "ram_bytes": 24,
+   "record": "records/pools/stm32h723/adapter_cmsis_rtx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      272.0,
+      314.0
+     ],
+     "pair/alloc": [
+      36.121,
+      38.152
+     ],
+     "pair/free": [
+      51.09,
+      62.012
+     ],
+     "pair_full/alloc": [
+      36.0,
+      42.711
+     ],
+     "pair_full/free": [
+      50.363,
+      58.477
+     ],
+     "fill_drain_lifo/alloc": [
+      31.234,
+      31.523
+     ],
+     "fill_drain_lifo/free": [
+      45.547,
+      47.309
+     ],
+     "fill_drain_fifo/alloc": [
+      31.391,
+      31.664
+     ],
+     "fill_drain_fifo/free": [
+      45.852,
+      47.723
+     ],
+     "mixed/alloc": [
+      33.578,
+      40.52
+     ],
+     "mixed/free": [
+      51.043,
+      55.852
+     ],
+     "empty/alloc": [
+      18.09,
+      18.121
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      314.0,
+      1208.0
+     ],
+     "pair/alloc": [
+      88.445,
+      140.164
+     ],
+     "pair/free": [
+      128.477,
+      178.32
+     ],
+     "pair_full/alloc": [
+      88.07,
+      140.266
+     ],
+     "pair_full/free": [
+      128.383,
+      178.0
+     ],
+     "fill_drain_lifo/alloc": [
+      86.852,
+      113.195
+     ],
+     "fill_drain_lifo/free": [
+      117.305,
+      131.031
+     ],
+     "fill_drain_fifo/alloc": [
+      87.352,
+      114.562
+     ],
+     "fill_drain_fifo/free": [
+      119.68,
+      132.328
+     ],
+     "mixed/alloc": [
+      88.008,
+      146.922
+     ],
+     "mixed/free": [
+      141.531,
+      163.367
+     ],
+     "empty/alloc": [
+      84.344,
+      98.164
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_contiki",
+   "flash_bytes": 232,
+   "ram_bytes": 44,
+   "record": "records/pools/stm32h723/adapter_contiki.json",
+   "cycles": {
+    "on": {
+     "init": [
+      583.0,
+      623.0
+     ],
+     "pair/alloc": [
+      29.117,
+      37.082
+     ],
+     "pair/free": [
+      32.117,
+      43.215
+     ],
+     "pair_full/alloc": [
+      220.051,
+      233.949
+     ],
+     "pair_full/free": [
+      162.141,
+      180.965
+     ],
+     "fill_drain_lifo/alloc": [
+      122.414,
+      122.477
+     ],
+     "fill_drain_lifo/free": [
+      95.496,
+      97.73
+     ],
+     "fill_drain_fifo/alloc": [
+      122.387,
+      122.406
+     ],
+     "fill_drain_fifo/free": [
+      95.711,
+      96.527
+     ],
+     "mixed/alloc": [
+      88.508,
+      94.039
+     ],
+     "mixed/free": [
+      75.613,
+      82.18
+     ],
+     "empty/alloc": [
+      215.02,
+      215.07
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      852.0,
+      880.0
+     ],
+     "pair/alloc": [
+      78.047,
+      133.0
+     ],
+     "pair/free": [
+      112.117,
+      182.047
+     ],
+     "pair_full/alloc": [
+      272.328,
+      1113.984
+     ],
+     "pair_full/free": [
+      250.281,
+      1132.5
+     ],
+     "fill_drain_lifo/alloc": [
+      179.055,
+      588.242
+     ],
+     "fill_drain_lifo/free": [
+      176.148,
+      605.164
+     ],
+     "fill_drain_fifo/alloc": [
+      178.156,
+      588.25
+     ],
+     "fill_drain_fifo/free": [
+      176.484,
+      605.188
+     ],
+     "mixed/alloc": [
+      144.156,
+      421.68
+     ],
+     "mixed/free": [
+      159.992,
+      424.266
+     ],
+     "empty/alloc": [
+      270.055,
+      1110.195
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_c_allocator",
+   "flash_bytes": 336,
+   "ram_bytes": 45,
+   "record": "records/pools/stm32h723/adapter_c_allocator.json",
+   "cycles": {
+    "on": {
+     "init": [
+      198.0,
+      232.0
+     ],
+     "pair/alloc": [
+      55.359,
+      58.906
+     ],
+     "pair/free": [
+      46.188,
+      47.18
+     ],
+     "pair_full/alloc": [
+      55.484,
+      58.406
+     ],
+     "pair_full/free": [
+      46.547,
+      47.055
+     ],
+     "fill_drain_lifo/alloc": [
+      37.598,
+      37.746
+     ],
+     "fill_drain_lifo/free": [
+      35.414,
+      36.633
+     ],
+     "fill_drain_fifo/alloc": [
+      37.617,
+      37.699
+     ],
+     "fill_drain_fifo/free": [
+      35.598,
+      36.695
+     ],
+     "mixed/alloc": [
+      46.871,
+      48.594
+     ],
+     "mixed/free": [
+      41.203,
+      42.203
+     ],
+     "empty/alloc": [
+      44.137,
+      45.199
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      244.0,
+      270.0
+     ],
+     "pair/alloc": [
+      178.391,
+      220.32
+     ],
+     "pair/free": [
+      174.125,
+      212.102
+     ],
+     "pair_full/alloc": [
+      191.117,
+      224.031
+     ],
+     "pair_full/free": [
+      174.0,
+      218.016
+     ],
+     "fill_drain_lifo/alloc": [
+      155.453,
+      188.68
+     ],
+     "fill_drain_lifo/free": [
+      132.0,
+      189.18
+     ],
+     "fill_drain_fifo/alloc": [
+      156.258,
+      189.023
+     ],
+     "fill_drain_fifo/free": [
+      132.211,
+      189.508
+     ],
+     "mixed/alloc": [
+      173.891,
+      200.672
+     ],
+     "mixed/free": [
+      159.469,
+      205.469
+     ],
+     "empty/alloc": [
+      250.289,
+      290.062
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_lwip",
+   "flash_bytes": 236,
+   "ram_bytes": 20,
+   "record": "records/pools/stm32h723/adapter_lwip.json",
+   "cycles": {
+    "on": {
+     "init": [
+      298.0,
+      344.0
+     ],
+     "pair/alloc": [
+      56.129,
+      59.992
+     ],
+     "pair/free": [
+      54.141,
+      59.867
+     ],
+     "pair_full/alloc": [
+      56.0,
+      56.641
+     ],
+     "pair_full/free": [
+      54.0,
+      56.699
+     ],
+     "fill_drain_lifo/alloc": [
+      50.188,
+      50.312
+     ],
+     "fill_drain_lifo/free": [
+      45.348,
+      46.426
+     ],
+     "fill_drain_fifo/alloc": [
+      50.312,
+      50.488
+     ],
+     "fill_drain_fifo/free": [
+      45.562,
+      46.727
+     ],
+     "mixed/alloc": [
+      53.094,
+      55.137
+     ],
+     "mixed/free": [
+      49.914,
+      53.332
+     ],
+     "empty/alloc": [
+      48.059,
+      49.066
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      384.0,
+      1268.0
+     ],
+     "pair/alloc": [
+      178.078,
+      216.031
+     ],
+     "pair/free": [
+      184.062,
+      252.102
+     ],
+     "pair_full/alloc": [
+      177.961,
+      219.969
+     ],
+     "pair_full/free": [
+      188.0,
+      252.039
+     ],
+     "fill_drain_lifo/alloc": [
+      162.602,
+      194.883
+     ],
+     "fill_drain_lifo/free": [
+      155.258,
+      190.078
+     ],
+     "fill_drain_fifo/alloc": [
+      163.211,
+      195.336
+     ],
+     "fill_drain_fifo/free": [
+      155.75,
+      191.125
+     ],
+     "mixed/alloc": [
+      170.219,
+      207.359
+     ],
+     "mixed/free": [
+      174.328,
+      222.797
+     ],
+     "empty/alloc": [
+      162.289,
+      184.375
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_memorypool",
+   "flash_bytes": 124,
+   "ram_bytes": 5,
+   "record": "records/pools/stm32h723/adapter_memorypool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      568.0,
+      620.0
+     ],
+     "pair/alloc": [
+      11.094,
+      11.16
+     ],
+     "pair/free": [
+      10.02,
+      10.066
+     ],
+     "pair_full/alloc": [
+      11.02,
+      11.02
+     ],
+     "pair_full/free": [
+      10.0,
+      10.02
+     ],
+     "fill_drain_lifo/alloc": [
+      5.188,
+      5.324
+     ],
+     "fill_drain_lifo/free": [
+      5.176,
+      5.176
+     ],
+     "fill_drain_fifo/alloc": [
+      5.207,
+      5.367
+     ],
+     "fill_drain_fifo/free": [
+      5.215,
+      5.312
+     ],
+     "mixed/alloc": [
+      8.113,
+      8.152
+     ],
+     "mixed/free": [
+      7.578,
+      7.715
+     ],
+     "empty/alloc": [
+      4.09,
+      4.09
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      762.0,
+      1574.0
+     ],
+     "pair/alloc": [
+      44.125,
+      64.031
+     ],
+     "pair/free": [
+      38.117,
+      56.039
+     ],
+     "pair_full/alloc": [
+      44.102,
+      64.047
+     ],
+     "pair_full/free": [
+      38.0,
+      56.0
+     ],
+     "fill_drain_lifo/alloc": [
+      20.852,
+      34.984
+     ],
+     "fill_drain_lifo/free": [
+      19.664,
+      34.781
+     ],
+     "fill_drain_fifo/alloc": [
+      20.758,
+      35.32
+     ],
+     "fill_drain_fifo/free": [
+      19.918,
+      35.18
+     ],
+     "mixed/alloc": [
+      32.516,
+      49.516
+     ],
+     "mixed/free": [
+      28.957,
+      45.344
+     ],
+     "empty/alloc": [
+      19.328,
+      34.43
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_heapless",
+   "flash_bytes": 412,
+   "ram_bytes": 136,
+   "record": "records/pools/stm32h723/adapter_heapless.json",
+   "cycles": {
+    "on": {
+     "init": [
+      344.0,
+      392.0
+     ],
+     "pair/alloc": [
+      39.133,
+      40.18
+     ],
+     "pair/free": [
+      44.066,
+      45.133
+     ],
+     "pair_full/alloc": [
+      39.0,
+      39.0
+     ],
+     "pair_full/free": [
+      44.0,
+      45.02
+     ],
+     "fill_drain_lifo/alloc": [
+      34.176,
+      34.176
+     ],
+     "fill_drain_lifo/free": [
+      39.273,
+      39.312
+     ],
+     "fill_drain_fifo/alloc": [
+      34.484,
+      34.484
+     ],
+     "fill_drain_fifo/free": [
+      39.391,
+      39.469
+     ],
+     "mixed/alloc": [
+      36.605,
+      36.742
+     ],
+     "mixed/free": [
+      41.578,
+      41.598
+     ],
+     "empty/alloc": [
+      21.066,
+      21.09
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      820.0,
+      1700.0
+     ],
+     "pair/alloc": [
+      108.055,
+      128.164
+     ],
+     "pair/free": [
+      98.141,
+      130.148
+     ],
+     "pair_full/alloc": [
+      107.914,
+      127.883
+     ],
+     "pair_full/free": [
+      98.0,
+      130.133
+     ],
+     "fill_drain_lifo/alloc": [
+      96.438,
+      106.805
+     ],
+     "fill_drain_lifo/free": [
+      98.578,
+      113.75
+     ],
+     "fill_drain_fifo/alloc": [
+      96.625,
+      107.445
+     ],
+     "fill_drain_fifo/free": [
+      98.984,
+      113.75
+     ],
+     "mixed/alloc": [
+      102.102,
+      117.242
+     ],
+     "mixed/free": [
+      98.141,
+      121.414
+     ],
+     "empty/alloc": [
+      74.297,
+      92.156
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_atomic_pool",
+   "flash_bytes": 608,
+   "ram_bytes": 4,
+   "record": "records/pools/stm32h723/adapter_atomic_pool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      202.0,
+      236.0
+     ],
+     "pair/alloc": [
+      55.125,
+      59.035
+     ],
+     "pair/free": [
+      47.078,
+      48.105
+     ],
+     "pair_full/alloc": [
+      55.02,
+      55.02
+     ],
+     "pair_full/free": [
+      47.023,
+      48.023
+     ],
+     "fill_drain_lifo/alloc": [
+      50.293,
+      50.312
+     ],
+     "fill_drain_lifo/free": [
+      42.18,
+      42.184
+     ],
+     "fill_drain_fifo/alloc": [
+      50.312,
+      50.332
+     ],
+     "fill_drain_fifo/free": [
+      42.18,
+      42.199
+     ],
+     "mixed/alloc": [
+      54.316,
+      54.531
+     ],
+     "mixed/free": [
+      44.578,
+      44.578
+     ],
+     "empty/alloc": [
+      30.059,
+      30.078
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      292.0,
+      334.0
+     ],
+     "pair/alloc": [
+      120.039,
+      148.023
+     ],
+     "pair/free": [
+      94.133,
+      126.055
+     ],
+     "pair_full/alloc": [
+      119.93,
+      147.883
+     ],
+     "pair_full/free": [
+      94.0,
+      126.0
+     ],
+     "fill_drain_lifo/alloc": [
+      106.516,
+      119.102
+     ],
+     "fill_drain_lifo/free": [
+      94.133,
+      108.617
+     ],
+     "fill_drain_fifo/alloc": [
+      106.891,
+      119.492
+     ],
+     "fill_drain_fifo/free": [
+      94.117,
+      108.609
+     ],
+     "mixed/alloc": [
+      113.219,
+      133.461
+     ],
+     "mixed/free": [
+      94.0,
+      117.289
+     ],
+     "empty/alloc": [
+      86.164,
+      106.07
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "adapter": "adapter_ref_primask",
+   "flash_bytes": 120,
+   "ram_bytes": 12,
+   "record": "records/pools/stm32h723/adapter_ref_primask.json",
+   "cycles": {
+    "on": {
+     "init": [
+      219.0,
+      275.0
+     ],
+     "pair/alloc": [
+      24.043,
+      24.102
+     ],
+     "pair/free": [
+      25.012,
+      25.062
+     ],
+     "pair_full/alloc": [
+      24.02,
+      24.02
+     ],
+     "pair_full/free": [
+      25.0,
+      25.0
+     ],
+     "fill_drain_lifo/alloc": [
+      20.141,
+      20.145
+     ],
+     "fill_drain_lifo/free": [
+      21.137,
+      21.137
+     ],
+     "fill_drain_fifo/alloc": [
+      20.125,
+      20.277
+     ],
+     "fill_drain_fifo/free": [
+      21.125,
+      21.219
+     ],
+     "mixed/alloc": [
+      22.082,
+      22.102
+     ],
+     "mixed/free": [
+      23.062,
+      23.086
+     ],
+     "empty/alloc": [
+      19.066,
+      19.066
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      294.0,
+      1186.0
+     ],
+     "pair/alloc": [
+      55.105,
+      79.02
+     ],
+     "pair/free": [
+      50.117,
+      70.086
+     ],
+     "pair_full/alloc": [
+      55.176,
+      79.051
+     ],
+     "pair_full/free": [
+      50.0,
+      70.0
+     ],
+     "fill_drain_lifo/alloc": [
+      34.922,
+      50.055
+     ],
+     "fill_drain_lifo/free": [
+      34.703,
+      50.773
+     ],
+     "fill_drain_fifo/alloc": [
+      35.281,
+      50.305
+     ],
+     "fill_drain_fifo/free": [
+      34.648,
+      51.055
+     ],
+     "mixed/alloc": [
+      46.547,
+      64.609
+     ],
+     "mixed/free": [
+      43.281,
+      60.367
+     ],
+     "empty/alloc": [
+      34.43,
+      48.508
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_etl",
+   "flash_bytes": 172,
+   "ram_bytes": 25,
+   "record": "records/pools/stm32g0b1/adapter_etl.json",
+   "cycles": {
+    "on": {
+     "init": [
+      69.0,
+      71.0
+     ],
+     "pair/alloc": [
+      56.25,
+      59.0
+     ],
+     "pair/free": [
+      28.0,
+      29.0
+     ],
+     "pair_full/alloc": [
+      50.0,
+      52.0
+     ],
+     "pair_full/free": [
+      28.0,
+      29.0
+     ],
+     "fill_drain_lifo/alloc": [
+      54.844,
+      57.812
+     ],
+     "fill_drain_lifo/free": [
+      28.0,
+      29.0
+     ],
+     "fill_drain_fifo/alloc": [
+      54.844,
+      57.812
+     ],
+     "fill_drain_fifo/free": [
+      28.0,
+      29.0
+     ],
+     "mixed/alloc": [
+      55.0,
+      58.0
+     ],
+     "mixed/free": [
+      28.0,
+      29.0
+     ],
+     "empty/alloc": [
+      39.0,
+      41.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      99.0,
+      99.0
+     ],
+     "pair/alloc": [
+      67.0,
+      68.75
+     ],
+     "pair/free": [
+      32.0,
+      32.0
+     ],
+     "pair_full/alloc": [
+      56.0,
+      58.0
+     ],
+     "pair_full/free": [
+      32.0,
+      32.0
+     ],
+     "fill_drain_lifo/alloc": [
+      64.719,
+      66.719
+     ],
+     "fill_drain_lifo/free": [
+      32.0,
+      32.0
+     ],
+     "fill_drain_fifo/alloc": [
+      64.719,
+      66.719
+     ],
+     "fill_drain_fifo/free": [
+      32.0,
+      32.0
+     ],
+     "mixed/alloc": [
+      65.0,
+      67.0
+     ],
+     "mixed/free": [
+      32.0,
+      32.0
+     ],
+     "empty/alloc": [
+      40.0,
+      42.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_riot",
+   "flash_bytes": 140,
+   "ram_bytes": 8,
+   "record": "records/pools/stm32g0b1/adapter_riot.json",
+   "cycles": {
+    "on": {
+     "init": [
+      3349.0,
+      3350.0
+     ],
+     "pair/alloc": [
+      22.0,
+      22.0
+     ],
+     "pair/free": [
+      115.0,
+      115.0
+     ],
+     "pair_full/alloc": [
+      22.0,
+      22.0
+     ],
+     "pair_full/free": [
+      115.0,
+      115.0
+     ],
+     "fill_drain_lifo/alloc": [
+      22.0,
+      22.0
+     ],
+     "fill_drain_lifo/free": [
+      115.0,
+      115.0
+     ],
+     "fill_drain_fifo/alloc": [
+      22.0,
+      22.0
+     ],
+     "fill_drain_fifo/free": [
+      115.0,
+      115.0
+     ],
+     "mixed/alloc": [
+      22.0,
+      22.0
+     ],
+     "mixed/free": [
+      115.0,
+      115.0
+     ],
+     "empty/alloc": [
+      19.0,
+      20.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      3840.0,
+      3840.0
+     ],
+     "pair/alloc": [
+      24.0,
+      24.0
+     ],
+     "pair/free": [
+      128.0,
+      130.0
+     ],
+     "pair_full/alloc": [
+      24.0,
+      24.0
+     ],
+     "pair_full/free": [
+      128.0,
+      130.0
+     ],
+     "fill_drain_lifo/alloc": [
+      24.0,
+      24.0
+     ],
+     "fill_drain_lifo/free": [
+      128.0,
+      130.0
+     ],
+     "fill_drain_fifo/alloc": [
+      24.0,
+      24.0
+     ],
+     "fill_drain_fifo/free": [
+      128.0,
+      130.0
+     ],
+     "mixed/alloc": [
+      24.0,
+      24.0
+     ],
+     "mixed/free": [
+      128.0,
+      130.0
+     ],
+     "empty/alloc": [
+      21.0,
+      21.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_threadx",
+   "flash_bytes": 780,
+   "ram_bytes": 192,
+   "record": "records/pools/stm32g0b1/adapter_threadx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      940.0,
+      943.0
+     ],
+     "pair/alloc": [
+      76.0,
+      77.0
+     ],
+     "pair/free": [
+      66.0,
+      71.0
+     ],
+     "pair_full/alloc": [
+      76.0,
+      77.0
+     ],
+     "pair_full/free": [
+      66.0,
+      71.0
+     ],
+     "fill_drain_lifo/alloc": [
+      76.0,
+      77.0
+     ],
+     "fill_drain_lifo/free": [
+      66.0,
+      71.0
+     ],
+     "fill_drain_fifo/alloc": [
+      76.0,
+      77.0
+     ],
+     "fill_drain_fifo/free": [
+      66.0,
+      71.0
+     ],
+     "mixed/alloc": [
+      76.0,
+      77.0
+     ],
+     "mixed/free": [
+      66.0,
+      71.0
+     ],
+     "empty/alloc": [
+      76.0,
+      78.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1202.0,
+      1264.0
+     ],
+     "pair/alloc": [
+      90.0,
+      92.0
+     ],
+     "pair/free": [
+      75.0,
+      77.0
+     ],
+     "pair_full/alloc": [
+      90.0,
+      92.0
+     ],
+     "pair_full/free": [
+      75.0,
+      77.0
+     ],
+     "fill_drain_lifo/alloc": [
+      90.0,
+      92.0
+     ],
+     "fill_drain_lifo/free": [
+      75.0,
+      77.0
+     ],
+     "fill_drain_fifo/alloc": [
+      90.0,
+      92.0
+     ],
+     "fill_drain_fifo/free": [
+      75.0,
+      77.0
+     ],
+     "mixed/alloc": [
+      90.0,
+      92.0
+     ],
+     "mixed/free": [
+      75.0,
+      77.0
+     ],
+     "empty/alloc": [
+      87.0,
+      89.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_cmsis_rtx",
+   "flash_bytes": 256,
+   "ram_bytes": 24,
+   "record": "records/pools/stm32g0b1/adapter_cmsis_rtx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      355.0,
+      355.0
+     ],
+     "pair/alloc": [
+      50.0,
+      53.0
+     ],
+     "pair/free": [
+      65.0,
+      66.0
+     ],
+     "pair_full/alloc": [
+      50.0,
+      53.0
+     ],
+     "pair_full/free": [
+      65.0,
+      66.0
+     ],
+     "fill_drain_lifo/alloc": [
+      50.0,
+      53.0
+     ],
+     "fill_drain_lifo/free": [
+      65.0,
+      66.0
+     ],
+     "fill_drain_fifo/alloc": [
+      50.0,
+      53.0
+     ],
+     "fill_drain_fifo/free": [
+      65.0,
+      66.0
+     ],
+     "mixed/alloc": [
+      50.0,
+      53.0
+     ],
+     "mixed/free": [
+      65.0,
+      66.0
+     ],
+     "empty/alloc": [
+      44.0,
+      47.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      499.0,
+      557.0
+     ],
+     "pair/alloc": [
+      58.0,
+      60.0
+     ],
+     "pair/free": [
+      79.0,
+      83.0
+     ],
+     "pair_full/alloc": [
+      58.0,
+      60.0
+     ],
+     "pair_full/free": [
+      79.0,
+      83.0
+     ],
+     "fill_drain_lifo/alloc": [
+      58.0,
+      60.0
+     ],
+     "fill_drain_lifo/free": [
+      79.0,
+      83.0
+     ],
+     "fill_drain_fifo/alloc": [
+      58.0,
+      60.0
+     ],
+     "fill_drain_fifo/free": [
+      79.0,
+      83.0
+     ],
+     "mixed/alloc": [
+      58.0,
+      60.0
+     ],
+     "mixed/free": [
+      79.0,
+      83.0
+     ],
+     "empty/alloc": [
+      50.0,
+      50.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_contiki",
+   "flash_bytes": 224,
+   "ram_bytes": 44,
+   "record": "records/pools/stm32g0b1/adapter_contiki.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1021.0,
+      1025.0
+     ],
+     "pair/alloc": [
+      57.0,
+      59.0
+     ],
+     "pair/free": [
+      66.0,
+      68.0
+     ],
+     "pair_full/alloc": [
+      305.0,
+      307.0
+     ],
+     "pair_full/free": [
+      345.0,
+      347.0
+     ],
+     "fill_drain_lifo/alloc": [
+      181.0,
+      183.0
+     ],
+     "fill_drain_lifo/free": [
+      205.5,
+      207.5
+     ],
+     "fill_drain_fifo/alloc": [
+      181.0,
+      183.0
+     ],
+     "fill_drain_fifo/free": [
+      205.5,
+      207.5
+     ],
+     "mixed/alloc": [
+      132.219,
+      134.219
+     ],
+     "mixed/free": [
+      150.023,
+      152.023
+     ],
+     "empty/alloc": [
+      302.0,
+      304.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1441.0,
+      1443.0
+     ],
+     "pair/alloc": [
+      69.0,
+      69.0
+     ],
+     "pair/free": [
+      79.0,
+      79.0
+     ],
+     "pair_full/alloc": [
+      441.0,
+      503.0
+     ],
+     "pair_full/free": [
+      544.0,
+      544.0
+     ],
+     "fill_drain_lifo/alloc": [
+      255.0,
+      286.0
+     ],
+     "fill_drain_lifo/free": [
+      311.5,
+      311.5
+     ],
+     "fill_drain_fifo/alloc": [
+      255.0,
+      286.0
+     ],
+     "fill_drain_fifo/free": [
+      311.5,
+      311.5
+     ],
+     "mixed/alloc": [
+      181.828,
+      200.633
+     ],
+     "mixed/free": [
+      219.039,
+      219.039
+     ],
+     "empty/alloc": [
+      436.0,
+      500.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_c_allocator",
+   "flash_bytes": 356,
+   "ram_bytes": 45,
+   "record": "records/pools/stm32g0b1/adapter_c_allocator.json",
+   "cycles": {
+    "on": {
+     "init": [
+      84.0,
+      92.0
+     ],
+     "pair/alloc": [
+      106.113,
+      106.113
+     ],
+     "pair/free": [
+      93.0,
+      99.0
+     ],
+     "pair_full/alloc": [
+      106.113,
+      106.113
+     ],
+     "pair_full/free": [
+      93.0,
+      99.0
+     ],
+     "fill_drain_lifo/alloc": [
+      106.0,
+      106.0
+     ],
+     "fill_drain_lifo/free": [
+      93.0,
+      99.0
+     ],
+     "fill_drain_fifo/alloc": [
+      106.0,
+      106.0
+     ],
+     "fill_drain_fifo/free": [
+      93.0,
+      99.0
+     ],
+     "mixed/alloc": [
+      106.0,
+      106.0
+     ],
+     "mixed/free": [
+      93.0,
+      99.0
+     ],
+     "empty/alloc": [
+      131.0,
+      138.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      94.0,
+      102.0
+     ],
+     "pair/alloc": [
+      124.141,
+      130.148
+     ],
+     "pair/free": [
+      113.0,
+      115.0
+     ],
+     "pair_full/alloc": [
+      124.141,
+      130.148
+     ],
+     "pair_full/free": [
+      113.0,
+      115.0
+     ],
+     "fill_drain_lifo/alloc": [
+      124.0,
+      130.0
+     ],
+     "fill_drain_lifo/free": [
+      113.0,
+      115.0
+     ],
+     "fill_drain_fifo/alloc": [
+      124.0,
+      130.0
+     ],
+     "fill_drain_fifo/free": [
+      113.0,
+      115.0
+     ],
+     "mixed/alloc": [
+      124.0,
+      130.0
+     ],
+     "mixed/free": [
+      113.0,
+      115.0
+     ],
+     "empty/alloc": [
+      148.0,
+      152.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_lwip",
+   "flash_bytes": 260,
+   "ram_bytes": 20,
+   "record": "records/pools/stm32g0b1/adapter_lwip.json",
+   "cycles": {
+    "on": {
+     "init": [
+      404.0,
+      406.0
+     ],
+     "pair/alloc": [
+      72.0,
+      76.988
+     ],
+     "pair/free": [
+      78.0,
+      82.0
+     ],
+     "pair_full/alloc": [
+      72.0,
+      76.988
+     ],
+     "pair_full/free": [
+      78.0,
+      82.0
+     ],
+     "fill_drain_lifo/alloc": [
+      72.0,
+      74.188
+     ],
+     "fill_drain_lifo/free": [
+      78.0,
+      82.0
+     ],
+     "fill_drain_fifo/alloc": [
+      72.0,
+      76.906
+     ],
+     "fill_drain_fifo/free": [
+      78.0,
+      82.0
+     ],
+     "mixed/alloc": [
+      72.0,
+      76.883
+     ],
+     "mixed/free": [
+      78.0,
+      82.0
+     ],
+     "empty/alloc": [
+      69.0,
+      71.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      609.0,
+      615.0
+     ],
+     "pair/alloc": [
+      82.0,
+      90.0
+     ],
+     "pair/free": [
+      96.0,
+      98.0
+     ],
+     "pair_full/alloc": [
+      82.0,
+      90.0
+     ],
+     "pair_full/free": [
+      96.0,
+      98.0
+     ],
+     "fill_drain_lifo/alloc": [
+      82.0,
+      90.0
+     ],
+     "fill_drain_lifo/free": [
+      96.0,
+      98.0
+     ],
+     "fill_drain_fifo/alloc": [
+      82.0,
+      90.0
+     ],
+     "fill_drain_fifo/free": [
+      96.0,
+      98.0
+     ],
+     "mixed/alloc": [
+      82.0,
+      90.0
+     ],
+     "mixed/free": [
+      96.0,
+      98.0
+     ],
+     "empty/alloc": [
+      76.0,
+      82.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_memorypool",
+   "flash_bytes": 136,
+   "ram_bytes": 5,
+   "record": "records/pools/stm32g0b1/adapter_memorypool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1127.0,
+      1128.0
+     ],
+     "pair/alloc": [
+      23.0,
+      23.0
+     ],
+     "pair/free": [
+      25.0,
+      25.0
+     ],
+     "pair_full/alloc": [
+      23.0,
+      23.0
+     ],
+     "pair_full/free": [
+      25.0,
+      25.0
+     ],
+     "fill_drain_lifo/alloc": [
+      23.0,
+      23.0
+     ],
+     "fill_drain_lifo/free": [
+      25.0,
+      25.0
+     ],
+     "fill_drain_fifo/alloc": [
+      23.0,
+      23.0
+     ],
+     "fill_drain_fifo/free": [
+      25.0,
+      25.0
+     ],
+     "mixed/alloc": [
+      23.0,
+      23.0
+     ],
+     "mixed/free": [
+      25.0,
+      25.0
+     ],
+     "empty/alloc": [
+      20.0,
+      21.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1652.0,
+      1712.0
+     ],
+     "pair/alloc": [
+      26.0,
+      28.0
+     ],
+     "pair/free": [
+      27.0,
+      29.0
+     ],
+     "pair_full/alloc": [
+      26.0,
+      28.0
+     ],
+     "pair_full/free": [
+      27.0,
+      29.0
+     ],
+     "fill_drain_lifo/alloc": [
+      26.0,
+      28.0
+     ],
+     "fill_drain_lifo/free": [
+      27.0,
+      29.0
+     ],
+     "fill_drain_fifo/alloc": [
+      26.0,
+      28.0
+     ],
+     "fill_drain_fifo/free": [
+      27.0,
+      29.0
+     ],
+     "mixed/alloc": [
+      26.0,
+      28.0
+     ],
+     "mixed/free": [
+      27.0,
+      29.0
+     ],
+     "empty/alloc": [
+      23.0,
+      25.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_atomic_pool",
+   "flash_bytes": 948,
+   "ram_bytes": 4,
+   "record": "records/pools/stm32g0b1/adapter_atomic_pool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      110.0,
+      117.0
+     ],
+     "pair/alloc": [
+      101.0,
+      101.0
+     ],
+     "pair/free": [
+      65.0,
+      65.0
+     ],
+     "pair_full/alloc": [
+      101.0,
+      101.0
+     ],
+     "pair_full/free": [
+      65.0,
+      65.0
+     ],
+     "fill_drain_lifo/alloc": [
+      101.0,
+      101.0
+     ],
+     "fill_drain_lifo/free": [
+      65.0,
+      65.0
+     ],
+     "fill_drain_fifo/alloc": [
+      101.0,
+      101.0
+     ],
+     "fill_drain_fifo/free": [
+      65.0,
+      65.0
+     ],
+     "mixed/alloc": [
+      101.0,
+      101.0
+     ],
+     "mixed/free": [
+      65.0,
+      65.0
+     ],
+     "empty/alloc": [
+      59.0,
+      60.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      131.0,
+      131.0
+     ],
+     "pair/alloc": [
+      122.0,
+      122.0
+     ],
+     "pair/free": [
+      77.0,
+      79.0
+     ],
+     "pair_full/alloc": [
+      122.0,
+      122.0
+     ],
+     "pair_full/free": [
+      77.0,
+      79.0
+     ],
+     "fill_drain_lifo/alloc": [
+      122.0,
+      122.0
+     ],
+     "fill_drain_lifo/free": [
+      77.0,
+      79.0
+     ],
+     "fill_drain_fifo/alloc": [
+      122.0,
+      122.0
+     ],
+     "fill_drain_fifo/free": [
+      77.0,
+      79.0
+     ],
+     "mixed/alloc": [
+      122.0,
+      122.0
+     ],
+     "mixed/free": [
+      77.0,
+      79.0
+     ],
+     "empty/alloc": [
+      66.0,
+      66.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "adapter": "adapter_ref_primask",
+   "flash_bytes": 120,
+   "ram_bytes": 12,
+   "record": "records/pools/stm32g0b1/adapter_ref_primask.json",
+   "cycles": {
+    "on": {
+     "init": [
+      316.0,
+      317.0
+     ],
+     "pair/alloc": [
+      28.0,
+      31.0
+     ],
+     "pair/free": [
+      28.0,
+      28.0
+     ],
+     "pair_full/alloc": [
+      28.0,
+      31.0
+     ],
+     "pair_full/free": [
+      28.0,
+      28.0
+     ],
+     "fill_drain_lifo/alloc": [
+      28.0,
+      31.0
+     ],
+     "fill_drain_lifo/free": [
+      28.0,
+      28.0
+     ],
+     "fill_drain_fifo/alloc": [
+      28.0,
+      31.0
+     ],
+     "fill_drain_fifo/free": [
+      28.0,
+      28.0
+     ],
+     "mixed/alloc": [
+      28.0,
+      31.0
+     ],
+     "mixed/free": [
+      28.0,
+      28.0
+     ],
+     "empty/alloc": [
+      25.0,
+      28.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      454.0,
+      512.0
+     ],
+     "pair/alloc": [
+      33.0,
+      35.0
+     ],
+     "pair/free": [
+      32.0,
+      32.0
+     ],
+     "pair_full/alloc": [
+      33.0,
+      35.0
+     ],
+     "pair_full/free": [
+      32.0,
+      32.0
+     ],
+     "fill_drain_lifo/alloc": [
+      33.0,
+      35.0
+     ],
+     "fill_drain_lifo/free": [
+      32.0,
+      32.0
+     ],
+     "fill_drain_fifo/alloc": [
+      33.0,
+      35.0
+     ],
+     "fill_drain_fifo/free": [
+      32.0,
+      32.0
+     ],
+     "mixed/alloc": [
+      33.0,
+      35.0
+     ],
+     "mixed/free": [
+      32.0,
+      32.0
+     ],
+     "empty/alloc": [
+      30.0,
+      32.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_etl",
+   "flash_bytes": 172,
+   "ram_bytes": 25,
+   "record": "records/pools/samd20/adapter_etl.json",
+   "cycles": {
+    "on": {
+     "init": [
+      60.0,
+      61.0
+     ],
+     "pair/alloc": [
+      55.75,
+      56.625
+     ],
+     "pair/free": [
+      26.0,
+      26.0
+     ],
+     "pair_full/alloc": [
+      49.0,
+      49.0
+     ],
+     "pair_full/free": [
+      26.0,
+      26.0
+     ],
+     "fill_drain_lifo/alloc": [
+      53.844,
+      54.812
+     ],
+     "fill_drain_lifo/free": [
+      26.0,
+      26.0
+     ],
+     "fill_drain_fifo/alloc": [
+      53.844,
+      54.812
+     ],
+     "fill_drain_fifo/free": [
+      26.0,
+      26.0
+     ],
+     "mixed/alloc": [
+      54.0,
+      55.0
+     ],
+     "mixed/free": [
+      26.0,
+      26.0
+     ],
+     "empty/alloc": [
+      34.0,
+      34.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      84.0,
+      84.0
+     ],
+     "pair/alloc": [
+      61.0,
+      61.0
+     ],
+     "pair/free": [
+      28.0,
+      28.0
+     ],
+     "pair_full/alloc": [
+      52.0,
+      52.0
+     ],
+     "pair_full/free": [
+      28.0,
+      28.0
+     ],
+     "fill_drain_lifo/alloc": [
+      58.781,
+      58.781
+     ],
+     "fill_drain_lifo/free": [
+      28.0,
+      28.0
+     ],
+     "fill_drain_fifo/alloc": [
+      58.781,
+      58.781
+     ],
+     "fill_drain_fifo/free": [
+      28.0,
+      28.0
+     ],
+     "mixed/alloc": [
+      59.0,
+      59.0
+     ],
+     "mixed/free": [
+      28.0,
+      28.0
+     ],
+     "empty/alloc": [
+      35.0,
+      35.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_riot",
+   "flash_bytes": 140,
+   "ram_bytes": 8,
+   "record": "records/pools/samd20/adapter_riot.json",
+   "cycles": {
+    "on": {
+     "init": [
+      3091.0,
+      3186.0
+     ],
+     "pair/alloc": [
+      19.0,
+      19.0
+     ],
+     "pair/free": [
+      109.0,
+      109.0
+     ],
+     "pair_full/alloc": [
+      19.0,
+      19.0
+     ],
+     "pair_full/free": [
+      109.0,
+      109.0
+     ],
+     "fill_drain_lifo/alloc": [
+      19.0,
+      19.0
+     ],
+     "fill_drain_lifo/free": [
+      109.0,
+      109.0
+     ],
+     "fill_drain_fifo/alloc": [
+      19.0,
+      19.0
+     ],
+     "fill_drain_fifo/free": [
+      109.0,
+      109.0
+     ],
+     "mixed/alloc": [
+      19.0,
+      19.0
+     ],
+     "mixed/free": [
+      109.0,
+      109.0
+     ],
+     "empty/alloc": [
+      16.0,
+      17.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      3540.0,
+      3540.0
+     ],
+     "pair/alloc": [
+      20.0,
+      20.0
+     ],
+     "pair/free": [
+      117.0,
+      117.0
+     ],
+     "pair_full/alloc": [
+      20.0,
+      20.0
+     ],
+     "pair_full/free": [
+      117.0,
+      117.0
+     ],
+     "fill_drain_lifo/alloc": [
+      20.0,
+      20.0
+     ],
+     "fill_drain_lifo/free": [
+      117.0,
+      117.0
+     ],
+     "fill_drain_fifo/alloc": [
+      20.0,
+      20.0
+     ],
+     "fill_drain_fifo/free": [
+      117.0,
+      117.0
+     ],
+     "mixed/alloc": [
+      20.0,
+      20.0
+     ],
+     "mixed/free": [
+      117.0,
+      117.0
+     ],
+     "empty/alloc": [
+      17.0,
+      17.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_threadx",
+   "flash_bytes": 780,
+   "ram_bytes": 192,
+   "record": "records/pools/samd20/adapter_threadx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      941.0,
+      942.0
+     ],
+     "pair/alloc": [
+      77.0,
+      77.0
+     ],
+     "pair/free": [
+      64.0,
+      66.0
+     ],
+     "pair_full/alloc": [
+      77.0,
+      77.0
+     ],
+     "pair_full/free": [
+      64.0,
+      66.0
+     ],
+     "fill_drain_lifo/alloc": [
+      77.0,
+      77.0
+     ],
+     "fill_drain_lifo/free": [
+      64.0,
+      66.0
+     ],
+     "fill_drain_fifo/alloc": [
+      77.0,
+      77.0
+     ],
+     "fill_drain_fifo/free": [
+      64.0,
+      66.0
+     ],
+     "mixed/alloc": [
+      77.0,
+      77.0
+     ],
+     "mixed/free": [
+      64.0,
+      66.0
+     ],
+     "empty/alloc": [
+      72.0,
+      72.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1127.0,
+      1127.0
+     ],
+     "pair/alloc": [
+      87.0,
+      87.0
+     ],
+     "pair/free": [
+      70.0,
+      70.0
+     ],
+     "pair_full/alloc": [
+      87.0,
+      87.0
+     ],
+     "pair_full/free": [
+      70.0,
+      70.0
+     ],
+     "fill_drain_lifo/alloc": [
+      87.0,
+      87.0
+     ],
+     "fill_drain_lifo/free": [
+      70.0,
+      70.0
+     ],
+     "fill_drain_fifo/alloc": [
+      87.0,
+      87.0
+     ],
+     "fill_drain_fifo/free": [
+      70.0,
+      70.0
+     ],
+     "mixed/alloc": [
+      87.0,
+      87.0
+     ],
+     "mixed/free": [
+      70.0,
+      70.0
+     ],
+     "empty/alloc": [
+      82.0,
+      82.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_cmsis_rtx",
+   "flash_bytes": 256,
+   "ram_bytes": 24,
+   "record": "records/pools/samd20/adapter_cmsis_rtx.json",
+   "cycles": {
+    "on": {
+     "init": [
+      353.0,
+      355.0
+     ],
+     "pair/alloc": [
+      49.0,
+      50.0
+     ],
+     "pair/free": [
+      66.0,
+      66.0
+     ],
+     "pair_full/alloc": [
+      49.0,
+      50.0
+     ],
+     "pair_full/free": [
+      66.0,
+      66.0
+     ],
+     "fill_drain_lifo/alloc": [
+      49.0,
+      50.0
+     ],
+     "fill_drain_lifo/free": [
+      66.0,
+      66.0
+     ],
+     "fill_drain_fifo/alloc": [
+      49.0,
+      50.0
+     ],
+     "fill_drain_fifo/free": [
+      66.0,
+      66.0
+     ],
+     "mixed/alloc": [
+      49.0,
+      50.0
+     ],
+     "mixed/free": [
+      66.0,
+      66.0
+     ],
+     "empty/alloc": [
+      41.0,
+      41.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      485.0,
+      485.0
+     ],
+     "pair/alloc": [
+      55.0,
+      55.0
+     ],
+     "pair/free": [
+      74.0,
+      74.0
+     ],
+     "pair_full/alloc": [
+      55.0,
+      55.0
+     ],
+     "pair_full/free": [
+      74.0,
+      74.0
+     ],
+     "fill_drain_lifo/alloc": [
+      55.0,
+      55.0
+     ],
+     "fill_drain_lifo/free": [
+      74.0,
+      74.0
+     ],
+     "fill_drain_fifo/alloc": [
+      55.0,
+      55.0
+     ],
+     "fill_drain_fifo/free": [
+      74.0,
+      74.0
+     ],
+     "mixed/alloc": [
+      55.0,
+      55.0
+     ],
+     "mixed/free": [
+      74.0,
+      74.0
+     ],
+     "empty/alloc": [
+      45.0,
+      45.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_contiki",
+   "flash_bytes": 224,
+   "ram_bytes": 44,
+   "record": "records/pools/samd20/adapter_contiki.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1005.0,
+      1008.0
+     ],
+     "pair/alloc": [
+      57.0,
+      57.0
+     ],
+     "pair/free": [
+      65.0,
+      67.0
+     ],
+     "pair_full/alloc": [
+      305.0,
+      305.0
+     ],
+     "pair_full/free": [
+      345.0,
+      347.0
+     ],
+     "fill_drain_lifo/alloc": [
+      181.0,
+      181.0
+     ],
+     "fill_drain_lifo/free": [
+      205.469,
+      207.469
+     ],
+     "fill_drain_fifo/alloc": [
+      181.0,
+      181.0
+     ],
+     "fill_drain_fifo/free": [
+      205.469,
+      207.469
+     ],
+     "mixed/alloc": [
+      132.219,
+      132.219
+     ],
+     "mixed/free": [
+      149.977,
+      151.977
+     ],
+     "empty/alloc": [
+      298.0,
+      299.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1293.0,
+      1293.0
+     ],
+     "pair/alloc": [
+      63.0,
+      63.0
+     ],
+     "pair/free": [
+      72.0,
+      72.0
+     ],
+     "pair_full/alloc": [
+      435.0,
+      435.0
+     ],
+     "pair_full/free": [
+      506.0,
+      506.0
+     ],
+     "fill_drain_lifo/alloc": [
+      249.0,
+      249.0
+     ],
+     "fill_drain_lifo/free": [
+      289.0,
+      289.0
+     ],
+     "fill_drain_fifo/alloc": [
+      249.0,
+      249.0
+     ],
+     "fill_drain_fifo/free": [
+      289.0,
+      289.0
+     ],
+     "mixed/alloc": [
+      175.828,
+      175.828
+     ],
+     "mixed/free": [
+      202.703,
+      202.703
+     ],
+     "empty/alloc": [
+      429.0,
+      429.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_c_allocator",
+   "flash_bytes": 356,
+   "ram_bytes": 45,
+   "record": "records/pools/samd20/adapter_c_allocator.json",
+   "cycles": {
+    "on": {
+     "init": [
+      74.0,
+      79.0
+     ],
+     "pair/alloc": [
+      104.109,
+      107.113
+     ],
+     "pair/free": [
+      94.0,
+      94.0
+     ],
+     "pair_full/alloc": [
+      104.109,
+      107.113
+     ],
+     "pair_full/free": [
+      94.0,
+      94.0
+     ],
+     "fill_drain_lifo/alloc": [
+      104.0,
+      107.0
+     ],
+     "fill_drain_lifo/free": [
+      94.0,
+      94.0
+     ],
+     "fill_drain_fifo/alloc": [
+      104.0,
+      107.0
+     ],
+     "fill_drain_fifo/free": [
+      94.0,
+      94.0
+     ],
+     "mixed/alloc": [
+      104.0,
+      107.0
+     ],
+     "mixed/free": [
+      94.0,
+      94.0
+     ],
+     "empty/alloc": [
+      118.0,
+      119.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      83.0,
+      83.0
+     ],
+     "pair/alloc": [
+      116.129,
+      116.129
+     ],
+     "pair/free": [
+      102.0,
+      102.0
+     ],
+     "pair_full/alloc": [
+      116.129,
+      116.129
+     ],
+     "pair_full/free": [
+      102.0,
+      102.0
+     ],
+     "fill_drain_lifo/alloc": [
+      116.0,
+      116.0
+     ],
+     "fill_drain_lifo/free": [
+      102.0,
+      102.0
+     ],
+     "fill_drain_fifo/alloc": [
+      116.0,
+      116.0
+     ],
+     "fill_drain_fifo/free": [
+      102.0,
+      102.0
+     ],
+     "mixed/alloc": [
+      116.0,
+      116.0
+     ],
+     "mixed/free": [
+      102.0,
+      102.0
+     ],
+     "empty/alloc": [
+      130.0,
+      130.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_lwip",
+   "flash_bytes": 260,
+   "ram_bytes": 20,
+   "record": "records/pools/samd20/adapter_lwip.json",
+   "cycles": {
+    "on": {
+     "init": [
+      397.0,
+      400.0
+     ],
+     "pair/alloc": [
+      67.0,
+      73.0
+     ],
+     "pair/free": [
+      79.0,
+      82.0
+     ],
+     "pair_full/alloc": [
+      67.0,
+      73.0
+     ],
+     "pair_full/free": [
+      79.0,
+      82.0
+     ],
+     "fill_drain_lifo/alloc": [
+      67.0,
+      73.0
+     ],
+     "fill_drain_lifo/free": [
+      79.0,
+      82.0
+     ],
+     "fill_drain_fifo/alloc": [
+      67.0,
+      73.0
+     ],
+     "fill_drain_fifo/free": [
+      79.0,
+      82.0
+     ],
+     "mixed/alloc": [
+      67.0,
+      73.0
+     ],
+     "mixed/free": [
+      79.0,
+      82.0
+     ],
+     "empty/alloc": [
+      62.0,
+      66.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      564.0,
+      564.0
+     ],
+     "pair/alloc": [
+      77.0,
+      77.0
+     ],
+     "pair/free": [
+      87.0,
+      87.0
+     ],
+     "pair_full/alloc": [
+      77.0,
+      77.0
+     ],
+     "pair_full/free": [
+      87.0,
+      87.0
+     ],
+     "fill_drain_lifo/alloc": [
+      77.0,
+      77.0
+     ],
+     "fill_drain_lifo/free": [
+      87.0,
+      87.0
+     ],
+     "fill_drain_fifo/alloc": [
+      77.0,
+      77.0
+     ],
+     "fill_drain_fifo/free": [
+      87.0,
+      87.0
+     ],
+     "mixed/alloc": [
+      77.0,
+      77.0
+     ],
+     "mixed/free": [
+      87.0,
+      87.0
+     ],
+     "empty/alloc": [
+      69.0,
+      69.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_memorypool",
+   "flash_bytes": 136,
+   "ram_bytes": 5,
+   "record": "records/pools/samd20/adapter_memorypool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      1120.0,
+      1123.0
+     ],
+     "pair/alloc": [
+      20.0,
+      21.0
+     ],
+     "pair/free": [
+      22.0,
+      22.0
+     ],
+     "pair_full/alloc": [
+      20.0,
+      21.0
+     ],
+     "pair_full/free": [
+      22.0,
+      22.0
+     ],
+     "fill_drain_lifo/alloc": [
+      20.0,
+      21.0
+     ],
+     "fill_drain_lifo/free": [
+      22.0,
+      22.0
+     ],
+     "fill_drain_fifo/alloc": [
+      20.0,
+      21.0
+     ],
+     "fill_drain_fifo/free": [
+      22.0,
+      22.0
+     ],
+     "mixed/alloc": [
+      20.0,
+      21.0
+     ],
+     "mixed/free": [
+      22.0,
+      22.0
+     ],
+     "empty/alloc": [
+      17.0,
+      18.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1510.0,
+      1510.0
+     ],
+     "pair/alloc": [
+      23.0,
+      23.0
+     ],
+     "pair/free": [
+      24.0,
+      24.0
+     ],
+     "pair_full/alloc": [
+      23.0,
+      23.0
+     ],
+     "pair_full/free": [
+      24.0,
+      24.0
+     ],
+     "fill_drain_lifo/alloc": [
+      23.0,
+      23.0
+     ],
+     "fill_drain_lifo/free": [
+      24.0,
+      24.0
+     ],
+     "fill_drain_fifo/alloc": [
+      23.0,
+      23.0
+     ],
+     "fill_drain_fifo/free": [
+      24.0,
+      24.0
+     ],
+     "mixed/alloc": [
+      23.0,
+      23.0
+     ],
+     "mixed/free": [
+      24.0,
+      24.0
+     ],
+     "empty/alloc": [
+      20.0,
+      20.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_atomic_pool",
+   "flash_bytes": 948,
+   "ram_bytes": 4,
+   "record": "records/pools/samd20/adapter_atomic_pool.json",
+   "cycles": {
+    "on": {
+     "init": [
+      99.0,
+      103.0
+     ],
+     "pair/alloc": [
+      99.0,
+      101.0
+     ],
+     "pair/free": [
+      66.0,
+      66.0
+     ],
+     "pair_full/alloc": [
+      99.0,
+      102.0
+     ],
+     "pair_full/free": [
+      66.0,
+      66.0
+     ],
+     "fill_drain_lifo/alloc": [
+      99.5,
+      101.875
+     ],
+     "fill_drain_lifo/free": [
+      66.0,
+      66.0
+     ],
+     "fill_drain_fifo/alloc": [
+      99.5,
+      101.875
+     ],
+     "fill_drain_fifo/free": [
+      66.0,
+      66.0
+     ],
+     "mixed/alloc": [
+      99.648,
+      101.836
+     ],
+     "mixed/free": [
+      66.0,
+      66.0
+     ],
+     "empty/alloc": [
+      55.0,
+      56.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      111.0,
+      111.0
+     ],
+     "pair/alloc": [
+      114.0,
+      114.0
+     ],
+     "pair/free": [
+      72.0,
+      72.0
+     ],
+     "pair_full/alloc": [
+      114.0,
+      114.0
+     ],
+     "pair_full/free": [
+      72.0,
+      72.0
+     ],
+     "fill_drain_lifo/alloc": [
+      114.0,
+      114.0
+     ],
+     "fill_drain_lifo/free": [
+      72.0,
+      72.0
+     ],
+     "fill_drain_fifo/alloc": [
+      114.0,
+      114.0
+     ],
+     "fill_drain_fifo/free": [
+      72.0,
+      72.0
+     ],
+     "mixed/alloc": [
+      114.0,
+      114.0
+     ],
+     "mixed/free": [
+      72.0,
+      72.0
+     ],
+     "empty/alloc": [
+      60.0,
+      60.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "adapter": "adapter_ref_primask",
+   "flash_bytes": 120,
+   "ram_bytes": 12,
+   "record": "records/pools/samd20/adapter_ref_primask.json",
+   "cycles": {
+    "on": {
+     "init": [
+      312.0,
+      313.0
+     ],
+     "pair/alloc": [
+      26.0,
+      27.0
+     ],
+     "pair/free": [
+      25.0,
+      25.0
+     ],
+     "pair_full/alloc": [
+      26.0,
+      27.0
+     ],
+     "pair_full/free": [
+      25.0,
+      25.0
+     ],
+     "fill_drain_lifo/alloc": [
+      26.0,
+      27.0
+     ],
+     "fill_drain_lifo/free": [
+      25.0,
+      25.0
+     ],
+     "fill_drain_fifo/alloc": [
+      26.0,
+      27.0
+     ],
+     "fill_drain_fifo/free": [
+      25.0,
+      25.0
+     ],
+     "mixed/alloc": [
+      26.0,
+      27.0
+     ],
+     "mixed/free": [
+      25.0,
+      25.0
+     ],
+     "empty/alloc": [
+      23.0,
+      24.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      441.0,
+      441.0
+     ],
+     "pair/alloc": [
+      31.0,
+      31.0
+     ],
+     "pair/free": [
+      29.0,
+      29.0
+     ],
+     "pair_full/alloc": [
+      31.0,
+      31.0
+     ],
+     "pair_full/free": [
+      29.0,
+      29.0
+     ],
+     "fill_drain_lifo/alloc": [
+      31.0,
+      31.0
+     ],
+     "fill_drain_lifo/free": [
+      29.0,
+      29.0
+     ],
+     "fill_drain_fifo/alloc": [
+      31.0,
+      31.0
+     ],
+     "fill_drain_fifo/free": [
+      29.0,
+      29.0
+     ],
+     "mixed/alloc": [
+      31.0,
+      31.0
+     ],
+     "mixed/free": [
+      29.0,
+      29.0
+     ],
+     "empty/alloc": [
+      28.0,
+      28.0
+     ],
+     "empty/free": null
+    }
+   }
+  }
+ ],
+ "baseline": [
+  {
+   "board": "nrf5340dk",
+   "cycles": {
+    "on": {
+     "init": [
+      257.0,
+      257.0
+     ],
+     "pair/alloc": [
+      10.027,
+      10.027
+     ],
+     "pair/free": [
+      9.0,
+      9.0
+     ],
+     "pair_full/alloc": [
+      10.0,
+      10.0
+     ],
+     "pair_full/free": [
+      9.0,
+      9.0
+     ],
+     "fill_drain_lifo/alloc": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_lifo/free": [
+      9.0,
+      9.0
+     ],
+     "fill_drain_fifo/alloc": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_fifo/free": [
+      9.0,
+      9.0
+     ],
+     "mixed/alloc": [
+      10.0,
+      10.0
+     ],
+     "mixed/free": [
+      9.0,
+      9.0
+     ],
+     "empty/alloc": [
+      10.0,
+      10.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      729.0,
+      729.0
+     ],
+     "pair/alloc": [
+      49.0,
+      49.0
+     ],
+     "pair/free": [
+      37.0,
+      37.0
+     ],
+     "pair_full/alloc": [
+      49.0,
+      49.0
+     ],
+     "pair_full/free": [
+      37.0,
+      37.0
+     ],
+     "fill_drain_lifo/alloc": [
+      49.0,
+      49.0
+     ],
+     "fill_drain_lifo/free": [
+      37.0,
+      37.0
+     ],
+     "fill_drain_fifo/alloc": [
+      49.0,
+      49.0
+     ],
+     "fill_drain_fifo/free": [
+      37.0,
+      37.0
+     ],
+     "mixed/alloc": [
+      49.0,
+      49.0
+     ],
+     "mixed/free": [
+      37.0,
+      37.0
+     ],
+     "empty/alloc": [
+      50.0,
+      50.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "pico2",
+   "cycles": {
+    "on": {
+     "init": [
+      1069.0,
+      1069.0
+     ],
+     "pair/alloc": [
+      10.66,
+      10.66
+     ],
+     "pair/free": [
+      9.656,
+      9.656
+     ],
+     "pair_full/alloc": [
+      10.0,
+      10.0
+     ],
+     "pair_full/free": [
+      9.0,
+      9.0
+     ],
+     "fill_drain_lifo/alloc": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_lifo/free": [
+      9.0,
+      9.0
+     ],
+     "fill_drain_fifo/alloc": [
+      10.0,
+      10.0
+     ],
+     "fill_drain_fifo/free": [
+      9.0,
+      9.0
+     ],
+     "mixed/alloc": [
+      10.0,
+      10.0
+     ],
+     "mixed/free": [
+      9.0,
+      9.0
+     ],
+     "empty/alloc": [
+      10.0,
+      10.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      7790.0,
+      7790.0
+     ],
+     "pair/alloc": [
+      493.0,
+      493.0
+     ],
+     "pair/free": [
+      520.0,
+      520.0
+     ],
+     "pair_full/alloc": [
+      493.0,
+      493.0
+     ],
+     "pair_full/free": [
+      520.0,
+      520.0
+     ],
+     "fill_drain_lifo/alloc": [
+      493.0,
+      493.0
+     ],
+     "fill_drain_lifo/free": [
+      520.0,
+      520.0
+     ],
+     "fill_drain_fifo/alloc": [
+      493.0,
+      493.0
+     ],
+     "fill_drain_fifo/free": [
+      520.0,
+      520.0
+     ],
+     "mixed/alloc": [
+      493.0,
+      493.0
+     ],
+     "mixed/free": [
+      520.0,
+      520.0
+     ],
+     "empty/alloc": [
+      590.0,
+      590.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g474re",
+   "cycles": {
+    "on": {
+     "init": [
+      270.0,
+      270.0
+     ],
+     "pair/alloc": [
+      17.027,
+      17.027
+     ],
+     "pair/free": [
+      17.027,
+      17.027
+     ],
+     "pair_full/alloc": [
+      16.984,
+      16.984
+     ],
+     "pair_full/free": [
+      17.0,
+      17.0
+     ],
+     "fill_drain_lifo/alloc": [
+      13.125,
+      13.125
+     ],
+     "fill_drain_lifo/free": [
+      13.0,
+      13.0
+     ],
+     "fill_drain_fifo/alloc": [
+      13.125,
+      13.125
+     ],
+     "fill_drain_fifo/free": [
+      13.0,
+      13.0
+     ],
+     "mixed/alloc": [
+      15.047,
+      15.047
+     ],
+     "mixed/free": [
+      13.0,
+      13.0
+     ],
+     "empty/alloc": [
+      13.0,
+      13.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      584.0,
+      584.0
+     ],
+     "pair/alloc": [
+      33.0,
+      33.0
+     ],
+     "pair/free": [
+      31.0,
+      31.0
+     ],
+     "pair_full/alloc": [
+      33.0,
+      33.0
+     ],
+     "pair_full/free": [
+      31.0,
+      31.0
+     ],
+     "fill_drain_lifo/alloc": [
+      33.0,
+      33.0
+     ],
+     "fill_drain_lifo/free": [
+      31.0,
+      31.0
+     ],
+     "fill_drain_fifo/alloc": [
+      33.0,
+      33.0
+     ],
+     "fill_drain_fifo/free": [
+      31.0,
+      31.0
+     ],
+     "mixed/alloc": [
+      33.0,
+      33.0
+     ],
+     "mixed/free": [
+      31.0,
+      31.0
+     ],
+     "empty/alloc": [
+      29.0,
+      29.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-h723zg",
+   "cycles": {
+    "on": {
+     "init": [
+      225.0,
+      225.0
+     ],
+     "pair/alloc": [
+      11.129,
+      11.129
+     ],
+     "pair/free": [
+      11.012,
+      11.012
+     ],
+     "pair_full/alloc": [
+      11.02,
+      11.02
+     ],
+     "pair_full/free": [
+      11.0,
+      11.0
+     ],
+     "fill_drain_lifo/alloc": [
+      5.227,
+      5.227
+     ],
+     "fill_drain_lifo/free": [
+      5.199,
+      5.199
+     ],
+     "fill_drain_fifo/alloc": [
+      5.324,
+      5.324
+     ],
+     "fill_drain_fifo/free": [
+      5.188,
+      5.188
+     ],
+     "mixed/alloc": [
+      8.133,
+      8.133
+     ],
+     "mixed/free": [
+      8.094,
+      8.094
+     ],
+     "empty/alloc": [
+      4.09,
+      4.09
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      1110.0,
+      1110.0
+     ],
+     "pair/alloc": [
+      54.031,
+      54.031
+     ],
+     "pair/free": [
+      38.109,
+      38.109
+     ],
+     "pair_full/alloc": [
+      54.125,
+      54.125
+     ],
+     "pair_full/free": [
+      38.0,
+      38.0
+     ],
+     "fill_drain_lifo/alloc": [
+      34.695,
+      34.695
+     ],
+     "fill_drain_lifo/free": [
+      20.734,
+      20.734
+     ],
+     "fill_drain_fifo/alloc": [
+      34.844,
+      34.844
+     ],
+     "fill_drain_fifo/free": [
+      20.695,
+      20.695
+     ],
+     "mixed/alloc": [
+      44.414,
+      44.414
+     ],
+     "mixed/free": [
+      29.281,
+      29.281
+     ],
+     "empty/alloc": [
+      34.414,
+      34.414
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "nucleo-g0b1re",
+   "cycles": {
+    "on": {
+     "init": [
+      317.0,
+      317.0
+     ],
+     "pair/alloc": [
+      22.0,
+      22.0
+     ],
+     "pair/free": [
+      21.0,
+      21.0
+     ],
+     "pair_full/alloc": [
+      22.0,
+      22.0
+     ],
+     "pair_full/free": [
+      21.0,
+      21.0
+     ],
+     "fill_drain_lifo/alloc": [
+      22.0,
+      22.0
+     ],
+     "fill_drain_lifo/free": [
+      21.0,
+      21.0
+     ],
+     "fill_drain_fifo/alloc": [
+      22.0,
+      22.0
+     ],
+     "fill_drain_fifo/free": [
+      21.0,
+      21.0
+     ],
+     "mixed/alloc": [
+      22.0,
+      22.0
+     ],
+     "mixed/free": [
+      21.0,
+      21.0
+     ],
+     "empty/alloc": [
+      19.0,
+      19.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      454.0,
+      454.0
+     ],
+     "pair/alloc": [
+      24.0,
+      24.0
+     ],
+     "pair/free": [
+      21.0,
+      21.0
+     ],
+     "pair_full/alloc": [
+      24.0,
+      24.0
+     ],
+     "pair_full/free": [
+      21.0,
+      21.0
+     ],
+     "fill_drain_lifo/alloc": [
+      24.0,
+      24.0
+     ],
+     "fill_drain_lifo/free": [
+      21.0,
+      21.0
+     ],
+     "fill_drain_fifo/alloc": [
+      24.0,
+      24.0
+     ],
+     "fill_drain_fifo/free": [
+      21.0,
+      21.0
+     ],
+     "mixed/alloc": [
+      24.0,
+      24.0
+     ],
+     "mixed/free": [
+      21.0,
+      21.0
+     ],
+     "empty/alloc": [
+      21.0,
+      21.0
+     ],
+     "empty/free": null
+    }
+   }
+  },
+  {
+   "board": "sam-d20-xpro",
+   "cycles": {
+    "on": {
+     "init": [
+      312.0,
+      312.0
+     ],
+     "pair/alloc": [
+      19.0,
+      19.0
+     ],
+     "pair/free": [
+      18.0,
+      18.0
+     ],
+     "pair_full/alloc": [
+      19.0,
+      19.0
+     ],
+     "pair_full/free": [
+      18.0,
+      18.0
+     ],
+     "fill_drain_lifo/alloc": [
+      19.0,
+      19.0
+     ],
+     "fill_drain_lifo/free": [
+      18.0,
+      18.0
+     ],
+     "fill_drain_fifo/alloc": [
+      19.0,
+      19.0
+     ],
+     "fill_drain_fifo/free": [
+      18.0,
+      18.0
+     ],
+     "mixed/alloc": [
+      19.0,
+      19.0
+     ],
+     "mixed/free": [
+      18.0,
+      18.0
+     ],
+     "empty/alloc": [
+      16.0,
+      16.0
+     ],
+     "empty/free": null
+    },
+    "off": {
+     "init": [
+      441.0,
+      441.0
+     ],
+     "pair/alloc": [
+      20.0,
+      20.0
+     ],
+     "pair/free": [
+      18.0,
+      18.0
+     ],
+     "pair_full/alloc": [
+      20.0,
+      20.0
+     ],
+     "pair_full/free": [
+      18.0,
+      18.0
+     ],
+     "fill_drain_lifo/alloc": [
+      20.0,
+      20.0
+     ],
+     "fill_drain_lifo/free": [
+      18.0,
+      18.0
+     ],
+     "fill_drain_fifo/alloc": [
+      20.0,
+      20.0
+     ],
+     "fill_drain_fifo/free": [
+      18.0,
+      18.0
+     ],
+     "mixed/alloc": [
+      20.0,
+      20.0
+     ],
+     "mixed/free": [
+      18.0,
+      18.0
+     ],
+     "empty/alloc": [
+      17.0,
+      17.0
+     ],
+     "empty/free": null
+    }
+   }
+  }
+ ],
+ "baseline_documented": {
+  "text": "the baseline: no lock; measured in one context only",
+  "source": "kinds/pools/adapter_ref.c"
+ }
+}
+</script><script>// Interactive comparison of the pools kind (compare-pools.html). Data: the JSON
+// in #poolsdata, written by site/pools_data.py from records/pools. No external
+// code. State lives in the URL fragment, so a view can be linked. No ranking of
+// ours: without weights the rows are in the order of the configuration list (or
+// sorted by name or an exact column, flash or RAM bytes); with the reader's
+// weights they are ordered by a score that is a range, as the numbers are, and
+// a score that overlaps the one above it is marked. Our reference free list
+// with interrupts off (role "ours": not a library) is a row of the same table,
+// labelled in its name cell every time; with weights it is scored like any
+// row, and the filter on the kind of row leaves it out. What each library
+// documents about use from interrupts is shown as documented, not tested, and
+// is used in no filter and no score. The reference free list, the baseline,
+// stays apart, last. mcp-server/poolsquery.py is a port of this script, tested
+// against it.
+(function () {
+  "use strict";
+  var D = JSON.parse(document.getElementById("poolsdata").textContent);
+  var REPO = "https://github.com/verified-libs/verified-libs/blob/main/";
+  var SCENS = ["pair", "pair_full", "fill_drain_lifo", "fill_drain_fifo", "mixed", "empty"];
+  var SORTS = ["name", "flash", "ram"];
+  var SORT_TEXT = { name: "name", flash: "flash bytes", ram: "RAM bytes" };
+  var LANGS = ["C", "C++", "Rust"];
+  var KINDS = ["library", "ours"];
+  // The weights: cycles of one alloc and of one free in the chosen scenario, bytes (flash + RAM).
+  var WEIGHTS = [{ id: "alloc", label: "Cycles, one alloc" }, { id: "free", label: "Cycles, one free" },
+                 { id: "bytes", label: "Bytes, flash + RAM" }];
+  var OURS_LABEL = "our reference free list with interrupts off; not a library";
+  var BASE_TEXT = "Reference free list (baseline), not a library";
+  var NOT_PUBLISHED = "The first board series of this kind is not published yet: there are no records, so there is nothing to compare.";
+  var st;
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, text, cls) {
+    var e = document.createElement(tag);
+    if (text != null) e.textContent = text;
+    if (cls) e.className = cls;
+    return e;
+  }
+  function num(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f"); }
+  function dec1(n) { return n.toFixed(1); }
+  // A range as shown: one number where both ends show the same.
+  function rangeText(r, f) {
+    if (!r) return "–";
+    var a = f(r[0]), b = f(r[1]);
+    return a === b ? a : a + "–" + b;
+  }
+  // The ends of a range as shown (whole cycles), for the overlap marks.
+  function shownCycles(r) { return r ? [Math.round(r[0]), Math.round(r[1])] : null; }
+  function overlap(a, b) { return !!a && !!b && a[0] <= b[1] && b[0] <= a[1]; }
+  // The score is shown to one decimal; its marks are judged on the score before rounding (closed ranges),
+  // so that a mark never says "not told apart" where the series tells the rows apart.
+  function scoreOverlap(a, b) { return overlap(a, b); }
+  function scoreText(r) { return r ? rangeText(r, dec1) : "–"; }
+
+  function defaults() {
+    return { board: D.boards.length ? D.boards[0].id : "", scen: "pair", cache: "on", lang: "", kind: "",
+             sort: "", dir: 1, row: "", w: { alloc: 0, free: 0, bytes: 0 } };
+  }
+  function dec(v) { try { return decodeURIComponent(v); } catch (e) { return null; } }
+
+  function readHash() {
+    st = defaults();
+    location.hash.replace(/^#/, "").split("&").forEach(function (kv) {
+      var p = kv.split("="), k = p[0], v = dec(p[1] || "");
+      if (v === null) return;
+      if (k === "board" && D.boards.some(function (b) { return b.id === v; })) st.board = v;
+      else if (k === "scen" && SCENS.indexOf(v) >= 0) st.scen = v;
+      else if (k === "cache" && (v === "on" || v === "off")) st.cache = v;
+      else if (k === "lang" && LANGS.indexOf(v) >= 0) st.lang = v;
+      else if (k === "kind" && KINDS.indexOf(v) >= 0) st.kind = v;
+      else if (k === "sort") {
+        var s = v.replace(/^-/, "");
+        if (SORTS.indexOf(s) >= 0) { st.sort = s; st.dir = v.charAt(0) === "-" ? -1 : 1; }
+      }
+      else if (k === "row") st.row = v;
+      else if (k === "w") v.split(",").forEach(function (x, i) { if (WEIGHTS[i]) st.w[WEIGHTS[i].id] = Math.max(0, Math.min(10, parseInt(x, 10) || 0)); });
+    });
+    tidy();
+  }
+  // A chosen configuration that is not measured on the chosen board is dropped.
+  function tidy() { if (!rowOf(st.board, st.row)) st.row = ""; }
+  function hashOf() {
+    var parts = ["board=" + st.board, "scen=" + st.scen, "cache=" + st.cache];
+    if (weighted()) parts.push("w=" + WEIGHTS.map(function (m) { return st.w[m.id]; }).join(","));
+    if (st.lang) parts.push("lang=" + encodeURIComponent(st.lang));
+    if (st.kind) parts.push("kind=" + st.kind);
+    if (st.sort) parts.push("sort=" + (st.dir < 0 ? "-" : "") + st.sort);
+    if (st.row) parts.push("row=" + encodeURIComponent(st.row));
+    return "#" + parts.join("&");
+  }
+
+  function rowOf(board, adapter) {
+    for (var i = 0; i < D.rows.length; i++) if (D.rows[i].board === board && D.rows[i].adapter === adapter) return D.rows[i];
+    return null;
+  }
+  function baselineOf() {
+    for (var i = 0; i < D.baseline.length; i++) if (D.baseline[i].board === st.board) return D.baseline[i];
+    return null;
+  }
+  function weighted() { return WEIGHTS.some(function (m) { return st.w[m.id] > 0; }); }
+  function cyc(r, op) { return r.cycles[st.cache][op === "init" ? "init" : st.scen + "/" + op]; }
+  function bytesOf(r) { return r.flash_bytes == null || r.ram_bytes == null ? null : r.flash_bytes + r.ram_bytes; }
+  // A row's value of each weight as a range [lower end, upper end]; bytes are exact.
+  function valuesOf(r) {
+    var b = bytesOf(r);
+    return { alloc: cyc(r, "alloc"), free: cyc(r, "free"), bytes: b == null ? null : [b, b] };
+  }
+  // The score as on the other comparison pages (smallest value / own value, weighted mean x 100), as a range:
+  // the smallest value is the smallest lower end among the rows shown; a row's lowest score uses its upper
+  // ends, its highest score its lower ends. A value that is missing counts 0.
+  function score(xs) {
+    var wsum = WEIGHTS.reduce(function (a, m) { return a + st.w[m.id]; }, 0), best = {};
+    WEIGHTS.forEach(function (m) {
+      xs.forEach(function (x) {
+        var v = valuesOf(x.r)[m.id];
+        if (v && v[0] > 0 && (best[m.id] == null || v[0] < best[m.id])) best[m.id] = v[0];
+      });
+    });
+    xs.forEach(function (x) {
+      var lo = 0, hi = 0, v = valuesOf(x.r);
+      WEIGHTS.forEach(function (m) {
+        if (!st.w[m.id] || !v[m.id] || !(v[m.id][0] > 0)) return;
+        lo += st.w[m.id] * best[m.id] / v[m.id][1];
+        hi += st.w[m.id] * best[m.id] / v[m.id][0];
+      });
+      x.score = [100 * lo / wsum, 100 * hi / wsum];
+    });
+  }
+
+  // The configurations measured on the chosen board, filtered, in list order or sorted.
+  function shown() {
+    var all = [], out;
+    D.configurations.forEach(function (c, i) { var r = rowOf(st.board, c.adapter); if (r) all.push({ c: c, r: r, i: i }); });
+    out = all.filter(function (x) {
+      if (st.lang && x.c.lang !== st.lang) return false;
+      if (st.kind && x.c.role !== st.kind) return false;
+      return true;
+    });
+    if (weighted()) score(out);
+    if (!st.sort && weighted()) out.sort(function (a, b) {
+      var c = b.score[1] - a.score[1];
+      return (c > 0) - (c < 0) || a.i - b.i;
+    });
+    if (st.sort) out.sort(function (a, b) {
+      var c = 0;
+      if (st.sort === "name") c = st.dir * a.c.name.localeCompare(b.c.name);
+      else {
+        var k = st.sort === "flash" ? "flash_bytes" : "ram_bytes", x = a.r[k], y = b.r[k];
+        if (x == null && y == null) c = 0;
+        else if (x == null) return 1;
+        else if (y == null) return -1;
+        else c = st.dir * (x - y);
+      }
+      return c || a.i - b.i;
+    });
+    return { all: all, rows: out };
+  }
+
+  function header() {
+    function h(key, text) { return st.sort === key ? text + (st.dir < 0 ? " ↓" : " ↑") : text; }
+    return [h("name", "Configuration")].concat(weighted() ? ["Score (your weights)"] : []).concat(
+      ["Library", "Version", "Lang.", "Lock as built", h("flash", "Flash bytes"), h("ram", "RAM bytes"),
+       "Cycles, init", "Cycles, alloc (" + st.scen + ")", "Cycles, free (" + st.scen + ")",
+       "Documented use from interrupts (not tested)"]);
+  }
+  function claimCell(td, c) {
+    var d = c.documented_interrupts;
+    td.appendChild(el("span", d ? d.text : "–"));
+    if (d && d.source) td.appendChild(el("div", "source: " + d.source, "sub"));
+  }
+
+  function render() {
+    var t = $("cmp-table");
+    t.textContent = "";
+    if (!D.published) {
+      $("cmp-count").textContent = NOT_PUBLISHED;
+      $("cmp-note").textContent = "";
+      $("cmp-src").textContent = "";
+      return;
+    }
+    var v = shown(), rs = v.rows, base = baselineOf();
+    var chosen = null;
+    rs.forEach(function (x) { if (x.c.adapter === st.row) chosen = x; });
+    var thead = el("thead"), htr = el("tr");
+    var wd = weighted() ? 1 : 0;
+    header().forEach(function (text, i) {
+      var th = el("th"), key = i === 0 ? "name" : i === 5 + wd ? "flash" : i === 6 + wd ? "ram" : null;
+      if (key) {
+        var b = el("button", text, "sortb");
+        b.type = "button";
+        b.addEventListener("click", function () {
+          if (st.sort !== key) { st.sort = key; st.dir = 1; }
+          else if (st.dir > 0) st.dir = -1;
+          else { st.sort = ""; st.dir = 1; }
+          update();
+        });
+        th.appendChild(b);
+      } else th.textContent = text;
+      htr.appendChild(th);
+    });
+    thead.appendChild(htr);
+    t.appendChild(thead);
+    var tb = el("tbody");
+    var cs = chosen && wd ? chosen.score : null, byScore = wd && !st.sort;
+    function numbers(tr, r, isChosen) {
+      ["init", "alloc", "free"].forEach(function (op) {
+        var td = el("td", rangeText(cyc(r, op), num), "n");
+        if (chosen && !isChosen && overlap(shownCycles(cyc(chosen.r, op)), shownCycles(cyc(r, op)))) td.appendChild(el("div", "overlaps", "sub"));
+        tr.appendChild(td);
+      });
+    }
+    rs.forEach(function (x, j) {
+      var tr = el("tr"), c = x.c, r = x.r, td = el("td"), isChosen = chosen === x;
+      var nb = el("button", c.name, "sortb");
+      nb.type = "button";
+      nb.addEventListener("click", function () { st.row = st.row === c.adapter ? "" : c.adapter; update(); });
+      td.appendChild(nb);
+      var rec = el("div", null, "sub"), a = el("a", "record");
+      a.href = REPO + r.record;
+      rec.appendChild(a);
+      td.appendChild(rec);
+      if (c.role === "ours") td.appendChild(el("div", OURS_LABEL, "sub"));
+      if (isChosen) td.appendChild(el("div", "chosen", "sub"));
+      tr.appendChild(td);
+      if (wd) {
+        var sc = el("td", scoreText(x.score), "n score");
+        if (byScore && j > 0 && scoreOverlap(rs[j - 1].score, x.score)) sc.appendChild(el("div", "overlaps above", "sub"));
+        if (cs && !isChosen && scoreOverlap(cs, x.score)) sc.appendChild(el("div", "overlaps", "sub"));
+        tr.appendChild(sc);
+      }
+      tr.appendChild(el("td", c.library == null ? "–" : c.library));
+      tr.appendChild(el("td", c.pin == null ? "–" : c.pin));
+      tr.appendChild(el("td", c.lang));
+      tr.appendChild(el("td", c.lock == null ? "–" : c.lock));
+      tr.appendChild(el("td", r.flash_bytes == null ? "–" : num(r.flash_bytes), "n"));
+      tr.appendChild(el("td", r.ram_bytes == null ? "–" : num(r.ram_bytes), "n"));
+      numbers(tr, r, isChosen);
+      var ct = el("td");
+      claimCell(ct, c);
+      tr.appendChild(ct);
+      tb.appendChild(tr);
+    });
+    if (base) {
+      var sep = el("tr", null, "sep"), std = el("td", BASE_TEXT);
+      std.colSpan = 11 + wd;
+      sep.appendChild(std);
+      tb.appendChild(sep);
+      var btr = el("tr");
+      ["reference free list (ours)"].concat(wd ? ["–"] : []).concat(["–", "–", "C", "none", "–", "–"]).forEach(function (s) { btr.appendChild(el("td", s)); });
+      numbers(btr, base, false);
+      var bc = el("td");
+      claimCell(bc, { documented_interrupts: D.baseline_documented });
+      btr.appendChild(bc);
+      tb.appendChild(btr);
+    }
+    t.appendChild(tb);
+    $("cmp-count").textContent = rs.length + " of " + v.all.length + " rows shown, " +
+      (st.sort ? "sorted by " + SORT_TEXT[st.sort] + (st.dir < 0 ? ", descending" : "")
+               : wd ? "ordered by the score of your weights, its highest end first; a score marked “overlaps above” is not told apart from the row above by this series"
+               : "in the order of the configuration list; this is not a ranking") +
+      (st.row && !chosen ? ". The chosen configuration is not shown: nothing is marked" : "") + ".";
+    var bd = D.boards.filter(function (x) { return x.id === st.board; })[0];
+    var sc = D.scenarios.filter(function (x) { return x.key === st.scen; })[0];
+    $("cmp-note").textContent = [D.SYNTHETIC ? "SYNTHETIC: " + D.SYNTHETIC + "." : "",
+      st.scen + ": " + sc.text + ".", st.scen === "empty" ? "No block is freed in this scenario." : "",
+      st.cache === "off" && bd.note_cache_off ? bd.note_cache_off : ""]
+      .filter(function (x) { return x; }).join(" ");
+    $("cmp-src").textContent = bd.name + " (" + bd.core + ", " + Math.round(bd.clock_hz / 1e6) + " MHz). Records: " +
+      D.source.records + ", series at commit " + D.source.commits.join(", ") + ", toolchain " + D.source.toolchain_image.join(", ") +
+      ". Each number is the mean of the scenario's calls, the first included, in cycles less the counter-read overhead, " +
+      "as min–max over the eight placements, first pass; init is one call.";
+  }
+
+  function syncControls() {
+    WEIGHTS.forEach(function (m) { $("w-" + m.id).value = st.w[m.id]; $("wv-" + m.id).textContent = st.w[m.id]; });
+    $("pools-board").value = st.board; $("pools-scen").value = st.scen; $("pools-cache").value = st.cache;
+    $("pools-lang").value = st.lang; $("pools-kind").value = st.kind;
+  }
+  function update() { tidy(); syncControls(); history.replaceState(null, "", hashOf()); render(); }
+
+  function build() {
+    var bs = $("pools-board");
+    D.boards.forEach(function (b) { var o = el("option", b.name + " (" + b.core + ")"); o.value = b.id; bs.appendChild(o); });
+    [["pools-board", "board"], ["pools-scen", "scen"], ["pools-cache", "cache"], ["pools-lang", "lang"],
+     ["pools-kind", "kind"]].forEach(function (p) {
+      $(p[0]).addEventListener("change", function (e) { st[p[1]] = e.target.value; update(); });
+    });
+    var wbox = $("pools-weights");
+    WEIGHTS.forEach(function (m) {
+      var lab = el("label", null, "w"), inp = el("input"), out = el("output", "0");
+      lab.appendChild(el("span", m.label));
+      inp.type = "range"; inp.min = 0; inp.max = 10; inp.step = 1; inp.id = "w-" + m.id; out.id = "wv-" + m.id;
+      inp.addEventListener("input", function () { st.w[m.id] = parseInt(inp.value, 10); update(); });
+      lab.appendChild(inp); lab.appendChild(out); wbox.appendChild(lab);
+    });
+    $("pools-reset").addEventListener("click", function () { st = defaults(); update(); });
+    readHash();
+    update();
+    window.addEventListener("hashchange", function () { readHash(); syncControls(); render(); });
+  }
+  build();
+})();
+</script></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body></html>

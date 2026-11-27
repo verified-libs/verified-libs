@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How the fixed-block memory pools are measured and checked: one image per configuration and placement, every call checked on the board, host tests with broken controls, a CBMC proof of the reference; one context, interrupt claims documented, not tested.">
+<link rel="canonical" href="https://verified-libs.org/method-pools.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Method: how fixed-block memory pools are measured and checked - verified-libs">
+<meta property="og:description" content="How the fixed-block memory pools are measured and checked: one image per configuration and placement, every call checked on the board, host tests with broken controls, a CBMC proof of the reference; one context, interrupt claims documented, not tested.">
+<meta property="og:url" content="https://verified-libs.org/method-pools.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Method: how fixed-block memory pools are measured and checked - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html" class=on>Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
+<main><h1 id="method-how-fixed-block-memory-pools-are-measured-and-checked">Method: how fixed-block memory pools are measured and checked</h1>
+<p>The method of one of the three kinds of library so far (<a href="kinds.html">all kinds</a>);
+the other kinds': <a href="method.html">embedded ring buffers</a> and
+<a href="method-crc.html">CRC calculation</a>.</p>
+<p>The numbers are on the <a href="results-pools.html">results page</a> and the
+<a href="compare-pools.html">comparison page</a>. The details, the host checks' output
+and the sizes from the cross builds are in
+<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md"><code>kinds/pools/README.md</code></a>; the plan and its
+decisions in <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-26-pools-kind.md"><code>lab/plans/2026-11-26-pools-kind.md</code></a>
+and <a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a> (2026-11-26). This page says what
+they add up to.</p>
+<h2 id="what-a-pool-is-here">What a pool is here</h2>
+<p>A library that hands out blocks of one size from storage fixed at start,
+with <code>alloc</code> (a block, or none left) and <code>free</code>. Each configuration is one
+pool of one block size behind one small interface
+(<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/pool.h"><code>kinds/pools/pool.h</code></a>): <code>init</code>, <code>alloc</code>, <code>free</code>,
+the region the blocks lie in and the alignment the library promises (taken
+from its code). One shape is measured: <strong>32 blocks of 32 bytes</strong>. A
+library whose pool is not of one block size, or that cannot be built
+without its kernel, is left out, with the reason in the kind's README
+("Left out").</p>
+<h2 id="measured-in-one-context">Measured in one context</h2>
+<p><strong>This series measures one context only: no interrupt calls a pool while
+it is measured.</strong> Whether a pool is safe when an interrupt calls it is not
+tested. Several libraries document use from interrupts, or a lock; the
+comparison page shows what each documents, with its source, as documented,
+not tested, and no filter and no score uses it. A later series, with its
+own plan and the owner's decision, may test those claims (an interrupt
+stress test with a deliberately broken pool as the control, and a check of
+an interrupt at every instruction on a host model) and measure the time a
+pool keeps interrupts off (<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-26-pools-kind.md">plan</a>,
+section 4).</p>
+<p>What the series does show about locking: the <strong>lock as built</strong>, the
+library's own code around a call in the build measured (interrupts off,
+LDREX/STREX, an atomic bitmap, or none), and its cost in cycles, which is
+part of every number. Our own row "reference free list, interrupts off"
+gives the price of the simplest lock on each core.</p>
+<h2 id="what-is-measured">What is measured</h2>
+<p>One image per configuration and placement, under method version 3
+(DECISIONS 2026-11-26: each board at the clock of the vendor's start-up
+code or template, with the fewest flash wait states its manual allows at
+that clock, and the board's option registers recorded with every record). In each image the board's <code>time_call()</code>
+counts the cycles of every call, less the board's counter-read overhead.
+After one timed <code>init</code>, six scenarios, with the cache off, then on:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>What is timed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pair</code></td>
+<td>256 times alloc, then free of the same block, the pool almost empty</td>
+</tr>
+<tr>
+<td><code>pair_full</code></td>
+<td>the same with 31 of the 32 blocks held</td>
+</tr>
+<tr>
+<td><code>fill_drain_lifo</code></td>
+<td>8 times: 32 allocs, then 32 frees in reverse order</td>
+</tr>
+<tr>
+<td><code>fill_drain_fifo</code></td>
+<td>8 times: 32 allocs, then 32 frees in the order of the allocs</td>
+</tr>
+<tr>
+<td><code>mixed</code></td>
+<td>512 calls from a fixed seed, the pool between 25 % and 75 % full</td>
+</tr>
+<tr>
+<td><code>empty</code></td>
+<td>256 allocs on an exhausted pool (each must fail); no free</td>
+</tr>
+</tbody>
+</table></div>
+<p>A number on the pages is the mean of a scenario's calls (the first call
+included) as the range over <strong>eight placements</strong> of the code (the same
+configuration built eight times with its code moved by 0, 4 ... 28
+bytes), first pass. Each image runs in two passes. Two rows differ only
+where their ranges do not overlap: where the code lies can move a number
+more than repetition does (<a href="method-crc.html">CRC method</a>, "What the
+placements show").</p>
+<p><strong>Bytes</strong>, measured in the board images themselves: each image's link map
+is compared with that of a null image (the same harness and reference with a
+pool that does nothing), so the harness, the reference and the start-up code
+count for no configuration (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">README</a>, "Sizes").
+Flash: the library's and the adapter's code and constant data at <code>-O2</code>.
+RAM: what the pool needs beyond the 32 blocks of 32 bytes and the canaries
+around them (1056 bytes, the same for every library): its control data and
+any overhead per block.</p>
+<h2 id="what-is-checked-on-every-call">What is checked on every call</h2>
+<p>Every call is checked on the board, outside the timed window, as in the
+host test:
+- <code>alloc</code> gives a block exactly when fewer than 32 are held, and none when
+  all 32 are;
+- the block lies in the pool's region, at the promised alignment, and is
+  not one already held;
+- each holder writes a pattern of its own into its block and finds it
+  intact at the free, which catches overlapping blocks;
+- canary words before and after the pool's memory are intact after every
+  call;
+- all blocks come back at the end.</p>
+<p>A fault stops the run's result from counting: a run with a fault gives no
+run file, and a configuration without every run gives no record.</p>
+<h2 id="the-reference-and-our-row">The reference, and our row</h2>
+<p><strong>The reference free list</strong> (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/adapter_ref.c"><code>adapter_ref.c</code></a>):
+a singly linked list threaded through the free blocks, no lock, one load
+and one store per operation. It is ours, not a library, and has three
+parts:
+- <em>the baseline</em> of every image, timed in the same image as the
+  configuration, and shown as the last row of every table;
+- <em>the reference</em> of the host test: the same random sequence must give the
+  same answers (a block or none, and the count held);
+- <em>the control</em>: four broken builds of it (a block handed out twice, a
+  block lost, a write outside the pool, a misaligned block) must fail the
+  host test, and do.</p>
+<p><strong>Our row with interrupts off</strong>: the same list with interrupts off
+(PRIMASK) around each call, a configuration of its own, labelled "not a
+library" in every row. It is scored like any row on the comparison page,
+and the filter "Kind of row" takes it out.</p>
+<h2 id="the-libraries-and-their-versions">The libraries and their versions</h2>
+<p>The set, the pins and the licences are in the kind's README ("The set");
+the libraries are fetched at the commits in
+<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/libs.lock"><code>kinds/pools/libs.lock</code></a>, never copied into
+this repository.</p>
+<p><strong>MemoryPool is measured at a commit that is not a release.</strong>
+- The project's only release, v0.1.0, spaces the blocks of
+  <code>MemoryPool::Fixed</code> by the size of a pointer, whatever the block size, so
+  blocks of 32 bytes overlap; our host check of v0.1.0 shows filling block
+  0 changing 24 of block 1's 32 bytes
+  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/checks/memorypool_v010.cpp"><code>checks/memorypool_v010.cpp</code></a>).
+  v0.1.0 also does not build for arm-none-eabi.
+- The author fixed the spacing in pull request
+  <a href="https://github.com/bertmelis/MemoryPool/pull/4">#4</a>, merged
+  2024-05-14, and made the mutex optional where threads are not available
+  (2024-05-15). There has been no release since.
+- So the kind measures the main branch at <code>5073178</code>, and says so wherever
+  the pin is shown. On the boards its mutex is compiled out, so the pool
+  has no lock there.</p>
+<h2 id="checked-on-the-host">Checked on the host</h2>
+<p>Before any board, on the host (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">README</a>,
+"The host test, and that it can fail"):
+- <strong>The host test</strong>: for every configuration, 64 random sequences of
+  20 000 calls and the board's scenario patterns, with the checks above
+  after every call. The four broken builds of the reference must fail it.
+- <strong>ASan and UBSan</strong> over the same test, for the C and C++ code.
+- <strong>CBMC on the reference</strong>: for 4 blocks and every sequence of 8 calls,
+  the free list is exactly the blocks not held, without repeats; the two
+  broken builds of the list are refuted.
+- <strong>Miri</strong> on the Rust adapters: atomic-pool's test passes; heapless's
+  board path is Arm assembly, which Miri cannot run.</p>
+<p><strong>Where the host differs from the boards.</strong> Some code runs only on the
+boards, and there the per-call checks of the bench image are its only
+test: CMSIS-RTX's LDREX/STREX variant (Cortex-M4, M7 and M33), heapless's
+LL/SC stack, and atomic-pool's single-core path on the Cortex-M0+. The
+README lists every such difference per row.</p>
+<h2 id="what-the-placements-show">What the placements show</h2>
+<p>The figures in this section are those of the first series
+(<a href="report-2026-11-26-pools-first-series.html">report</a>), from the
+records under <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/pools</code></a>.</p>
+<p><strong>The measurement repeats, but for one board.</strong> On five of the six boards
+every mean of the series is the same in both passes, and the baseline
+measures the same in every image of a board. On the Raspberry Pi Pico 2 H,
+116 of 4224 means differ between the passes, all of them a
+configuration's and with the cache on, by at most 6.3 % (heapless,
+<code>init</code>, one call); the shortest call is the same in both passes in 115 of
+the 116. The tables show the first pass.</p>
+<p><strong>A mean includes the first call.</strong> Each scenario's mean is over all its
+calls, the first included. Per image the baseline runs first, then the
+configuration; each with the cache off, then on; each time <code>init</code>, then
+the six scenarios in the order of the table under "What is
+measured" (<code>kinds/pools/bench/main.c</code>, <code>run_all</code>). The first call adds at most
+12.6 % to a mean on the Raspberry Pi Pico 2 H (C_Allocator, <code>pair</code> alloc
+with the cache on: a first call of 1760 cycles in a mean of 60), at most
+2.0 % on the NUCLEO-H723ZG, and less than 1 % on the other four boards.</p>
+<p><strong>Where the code lies moves the numbers more than repetition does.</strong> The
+same configuration, built eight times with its code moved by 0, 4 ... 28
+bytes, gives different means. With the cache off the largest spread over
+the eight placements, <code>init</code> aside, is 61 % on the nRF5340 DK, 37 % on
+the NUCLEO-G474RE, 15 % on the NUCLEO-G0B1RE, 7 % on the Raspberry Pi
+Pico 2 H and 352 % on the NUCLEO-H723ZG (Contiki-NG, <code>pair_full</code> free:
+250–1132); on the SAM D20 Xplained Pro it is 0, every figure the same at
+all eight placements. With the cache on it is at most 5 % on the nRF5340
+DK, 6 % on the Raspberry Pi Pico 2 H, 9 % on the SAM D20 Xplained Pro,
+12 % on the NUCLEO-G0B1RE, 35 % on the NUCLEO-H723ZG and 44 % on the
+NUCLEO-G474RE. The CRC kind's numbers move with the placement in the
+same way (<a href="method-crc.html">CRC method</a>, "What the placements show").</p>
+<p><strong>What this means for the tables.</strong> A difference between two
+configurations is a difference only where their ranges over the eight
+placements do not overlap. Every table therefore shows the range, and
+a single placement says little on the NUCLEO-H723ZG with the cache off.
+What the tables show, row by row, is on the
+<a href="results-pools.html#what-the-tables-show">results page</a>.</p>
+<h2 id="what-is-not-measured">What is not measured</h2>
+<ul>
+<li>Use from interrupts or from several threads (above), and the time a
+  pool keeps interrupts off.</li>
+<li>Other pool shapes than 32 blocks of 32 bytes.</li>
+<li>Pools that live inside an RTOS and cannot be built alone, and memory
+  allocators of several block sizes.</li>
+<li>heapless on the Cortex-M0+: its documentation says its pool needs
+  LDREX/STREX, which the Cortex-M0+ does not have.</li>
+<li>Code run from RAM: every configuration runs from flash.</li>
+</ul></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body></html>

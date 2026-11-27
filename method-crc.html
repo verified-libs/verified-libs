@@ -40,12 +40,18 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 .sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
 .tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
 </style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html" class=on>Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
 <main><h1 id="method-how-crc-libraries-are-measured-and-checked">Method: how CRC libraries are measured and checked</h1>
-<p>The method of one of the two kinds of library so far (<a href="kinds.html">all kinds</a>);
-the other kind's: <a href="method.html">embedded ring buffers</a>.</p>
+<p>The method of one of the three kinds of library so far (<a href="kinds.html">all kinds</a>);
+the other kinds': <a href="method.html">embedded ring buffers</a> and
+<a href="method-pools.html">fixed-block memory pools</a>.</p>
 <p>The numbers are on the <a href="results-crc.html">results page</a>. The details and
 every run's output are in <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md"><code>kinds/crc/README.md</code></a>,
 the first series and the checks of its numbers in its
@@ -141,7 +147,7 @@ tables are in flash on every board, so what the switch covers differs
 <tr>
 <td>NUCLEO-G474RE, 170 MHz</td>
 <td>ART: instruction cache, a data cache of 256 bytes on DCode, prefetch (RM0440)</td>
-<td>4</td>
+<td>4, as RM0440 requires at 170 MHz in boost mode (Table 9); ST's template for the board sets 8</td>
 </tr>
 <tr>
 <td>NUCLEO-G0B1RE, 64 MHz</td>
@@ -154,9 +160,9 @@ tables are in flash on every board, so what the switch covers differs
 <td>no setting</td>
 </tr>
 <tr>
-<td>NUCLEO-H723ZG, 64 MHz</td>
+<td>NUCLEO-H723ZG, 520 MHz</td>
 <td>the Cortex-M7 L1 instruction and data caches, 32-byte lines</td>
-<td>7, the power-on default (RM0468 allows 0 or 1 at 64 MHz)</td>
+<td>3, as RM0468 requires for an AXI clock of 260 MHz (Table 16)</td>
 </tr>
 <tr>
 <td>SAM D20 Xplained Pro, 48 MHz</td>
@@ -211,13 +217,21 @@ reference's; a record is made only if every call of every run agreed
 <li>Code run from RAM: every configuration runs from flash.</li>
 </ul>
 <h2 id="what-the-placements-show">What the placements show</h2>
+<p>The figures in this section are those of the first series
+(<a href="report-2026-11-25-crc-first-series.html">report</a>); for the
+NUCLEO-H723ZG and the nRF5340 DK that is before method version 3, in the
+archived series linked from the <a href="results-crc.html">results page</a>.</p>
 <p><strong>The measurement repeats exactly.</strong> On five of the six boards every
 number of the series is the same in both passes, to the cycle, and the
 baseline measures the same in every image of a board of one CRC. On the Pico 2, 90
 of 7680 means differ between the passes, all with the cache on, by at
 most 1.26 %; the shortest call is the same in both passes, so the
 difference lies in a few slower calls (the <a href="report-2026-11-25-crc-first-series.html">series report</a>,
-"The numbers, checked", check 1).</p>
+"The numbers, checked", check 1). That fits the Pico 2's XIP cache, which
+replaces a line at random ("Cache eviction policy is random", RP2350
+datasheet 4.4.1.2) and is cleared by the boot ROM at every start, so two
+runs of one image can miss in different calls
+(<a href="report-2026-11-27-crc-unexplained.html">what was explained later</a>, item 2).</p>
 <p><strong>A mean includes the first call.</strong> Each scenario's mean is over its 256
 calls, the first included. The scenarios run in a fixed order: the cache
 off, then on; within each, lengths 1 to 1024 bytes, and for each length
@@ -243,25 +257,91 @@ and RM0444 3.2); on the nRF5340 DK every 16 bytes, its cache line (128
 bits, nRF5340 Product Specification v1.6, 5.4.1); on the NUCLEO-H723ZG a
 configuration is slow exactly where its loop crosses a 32-byte boundary,
 the width of the flash word that its read buffer holds (256 bits, RM0468
-4.3.8), in the three configurations looked at. The NUCLEO-H723ZG runs at
-the 7 wait states it has after power-on, which RM0468 does not require at
-64 MHz (Table 16: 0 or 1); its numbers with the cache off carry them.
+4.3.8), in the three configurations looked at (measured at 64 MHz, before
+method version 3). The NUCLEO-H723ZG runs at 520 MHz with 3 wait states,
+as ST's template for the board sets it (method version 3); its numbers
+with the cache off carry them (<a href="#the-nucleo-h723zg-at-520-mhz">below</a>).
 "Fits" is all that is claimed: the period matches the figure in the
 manual; the mechanism was not measured. What is not explained is listed
-in the report.</p>
+in the series reports. Two items have been studied since in the data at
+hand (<a href="report-2026-11-27-crc-unexplained.html">report of 2026-11-27</a>):
+- on the Pico 2 with the cache off, a configuration's numbers are decided
+  by where its loop starts modulo 8 (15 of 20 configurations exactly),
+  which is the period of 8 bytes; which of the two positions is the slow
+  one is still not explained (item 3);
+- the NUCLEO-H723ZG's retries in the first two series came from the
+  images' own running time, the untimed reference included, against the
+  runner's first wait (item 1).</p>
 <p><strong>What this means for the tables.</strong> A difference between two
 configurations is a difference only where their ranges over the eight
 placements do not overlap. Every table therefore shows the range over the
 placements, and with the cache off a single placement says little on the
 NUCLEO-H723ZG, the nRF5340 DK and the two STM32 boards with 8-byte reads.</p>
-<h2 id="for-the-next-version-of-the-method">For the next version of the method</h2>
-<p>Two changes are noted for when both kinds are measured again, not before
-(<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>, 2026-11-25):</p>
-<ul>
-<li>the NUCLEO-H723ZG with the flash wait states a user would set at its
-  clock, not the 7 it has after power-on;</li>
-<li>the median of a scenario's 256 calls beside the mean, so that a few slow
-  calls can be told from a shifted level.</li>
-</ul></main>
-<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+<h2 id="method-version-3">Method version 3</h2>
+<p>Since 2026-11-26 the boards run at the clock of their vendor's start-up
+code or template with the fewest flash wait states the manual allows, the
+option registers are recorded with every series, and the nRF5340's boot
+stub opens its debug port at every boot (<a href="method.html#method-version-3">ring buffers' method page,
+"Method version 3"</a>, with the sources). For
+the CRC kind that means:
+- the NUCLEO-H723ZG runs at 520 MHz with 3 wait states instead of 64 MHz
+  with 7, and its configurations were measured again (below);
+- the nRF5340 DK's configurations were measured again, as its boot stub
+  changed; the measured code is the same;
+- the records of the other four boards stand: method version 3 builds
+  their images byte for byte the same;
+- the two boards' records before method version 3 are archived series,
+  linked from the <a href="results-crc.html">results page</a> under each board;
+- the median of a scenario's 256 calls beside the mean was left out of
+  method version 3 explicitly (<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>,
+  2026-11-26): it would need every benchmark measured again.</p>
+<h3 id="the-nucleo-h723zg-at-520-mhz">The NUCLEO-H723ZG at 520 MHz</h3>
+<p><strong>Cycles with the cache off rise, the time falls.</strong> The flash's wait
+states count cycles of the AXI bus clock (RM0468 4.3.8, "Adjusting read
+timing constraints"; Table 16), and since method version 3 the AXI bus
+runs at half the core clock, 260 MHz (<code>firmware/common/stm32h723/board.h</code>:
+the core divider /1, the bus divider /2).
+- <em>A read from the flash array costs the same in core cycles:</em> before,
+  (7 + 1) flash clocks at 64 MHz = 8 core cycles; now (3 + 1) flash clocks
+  at 260 MHz = 4 × 2 = 8 core cycles.
+- <em>Everything else an access pays on the bus side</em> (the bus matrix, the
+  flash interface's read queue, the response) is counted in bus cycles,
+  which cost one core cycle before and two now. So the cycles with the
+  cache off rise by that overhead per flash access, times the number of
+  accesses.
+- <em>What the numbers show</em> (ETL <code>crc32_t256</code>,
+  <a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t256.json">its record</a> of
+  method version 3 against the archived one, first pass, cache off): per byte 32 → 38
+  cycles at placement 0 and 34 → 42 at placement 4. The step between the
+  two placements doubles, from 2 to 4 cycles per byte: one extra bus
+  access per byte, caused by where the code lies, costs twice as many core
+  cycles. The reference: 59 → 64 cycles per byte. With the cache on
+  nothing changes (8 = 8 and 41 = 41 cycles per byte): the loop then makes
+  no bus access.
+- <em>Time:</em> 1024 bytes with the cache off, placement 0, took 32 796 cycles at 64 MHz
+  (512 µs) and take 38 968 cycles at 520 MHz (74.9 µs): 19 % more cycles,
+  6.8 times less time. Cycles at another clock are not times.</p>
+<p><strong>The board's CRC unit on the H723 is slower in cycles with the cache on
+too.</strong> Its rows are the only ones whose numbers with the cache on changed:
+per byte from 1.5 to 3.0 cycles, a call on 16 bytes from 55 to 85 cycles,
+for all three CRCs (<a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_hw_crc32.json">the H723's records</a>
+against the archived ones). The unit is a peripheral that our code writes
+and reads over an AHB bus, and since method version 3 the AHB clock is half
+the core clock (<code>firmware/common/stm32h723/board.h</code>: HPRE /2), so each of
+those accesses costs twice as many core cycles; that fits the doubling
+exactly, and was not measured further. In time it is faster: 1024 bytes
+took 1567 cycles at 64 MHz (24.5 µs) and take 3109 cycles at 520 MHz
+(6.0 µs).</p>
+<p><strong>What is not explained.</strong> The number of bus accesses behind each rise
+was not counted: how the Cortex-M7 fetches with its instruction cache off,
+and how the flash interface queues and overlaps reads. So the overhead of
+about 2 bus cycles per access is inferred from one pair of placements, not
+measured; the rise per call of 1 byte (+23 cycles for the reference, +28
+for the configuration) cannot be split between
+instruction fetches and table loads; and why the configuration's rise
+exceeds the reference's is not known. A test that counts accesses
+(the same loop from ITCM, or the table in DTCM, at both clocks) was not
+run.</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

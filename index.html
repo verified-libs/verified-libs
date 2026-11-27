@@ -1,17 +1,17 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation (libraries that compute a CRC in software and, on the boards that have one, the board&#x27;s CRC unit beside them), for microcontrollers on six boards, every number with its record and source.">
+<meta name="description" content="An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. Three kinds so far: embedded ring buffer (FIFO) libraries, CRC calculation (libraries that compute a CRC in software and, on the boards that have one, the board&#x27;s CRC unit beside them) and fixed-block memory pools, for microcontrollers on six boards, every number with its record and source.">
 <link rel="canonical" href="https://verified-libs.org/">
 <meta property="og:site_name" content="verified-libs">
 <meta property="og:type" content="website">
-<meta property="og:title" content="verified-libs: libraries tested on real hardware: embedded ring buffers and CRC">
-<meta property="og:description" content="An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. Two kinds so far: embedded ring buffer (FIFO) libraries and CRC calculation (libraries that compute a CRC in software and, on the boards that have one, the board&#x27;s CRC unit beside them), for microcontrollers on six boards, every number with its record and source.">
+<meta property="og:title" content="verified-libs: libraries tested on real hardware: embedded ring buffers, CRC and memory pools">
+<meta property="og:description" content="An open registry of specialist libraries, measured, stress-tested and model-checked on real hardware. Three kinds so far: embedded ring buffer (FIFO) libraries, CRC calculation (libraries that compute a CRC in software and, on the boards that have one, the board&#x27;s CRC unit beside them) and fixed-block memory pools, for microcontrollers on six boards, every number with its record and source.">
 <meta property="og:url" content="https://verified-libs.org/">
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "verified-libs", "url": "https://verified-libs.org/"}</script>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<title>verified-libs: libraries tested on real hardware: embedded ring buffers and CRC</title><style>
+<title>verified-libs: libraries tested on real hardware: embedded ring buffers, CRC and memory pools</title><style>
 :root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
 @media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
@@ -41,7 +41,12 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 .sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
 .tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
 </style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
 <main><h1 id="verified-libs">verified-libs</h1>
@@ -49,22 +54,26 @@ p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
 hardware, stress-tested with a negative control that must be caught, and
 model-checked where the library promises lock-free concurrency. Everything
 can be reproduced from the repository.</p>
-<p>Two kinds of library so far:</p>
+<p>Three kinds of library so far:</p>
 <ul>
 <li><strong>Embedded ring buffers</strong>: interrupt or DMA to main loop on Cortex-M, in
   C, C++ and Rust.</li>
 <li><strong>CRC calculation</strong>: CRC-32, CRC-16 and CRC-8 on Cortex-M, by libraries
   in C, C++ and Rust that compute it in software and, on the boards that
   have one, by the board's CRC unit beside them.</li>
+<li><strong>Fixed-block memory pools</strong>: alloc and free of one block size on
+  Cortex-M, in C, C++ and Rust, measured in one context (what a library
+  documents about interrupts is shown, not tested).</li>
 </ul>
 <p><em>Run by AI, with a human who is accountable.</em></p>
 <h2 id="what-you-find-here">What you find here</h2>
 <ul>
-<li><strong><a href="kinds.html">Results</a></strong>: the results of both kinds, embedded ring
-  buffers and CRC calculation, each with the exact versions,
-  compiler flags and boards.</li>
+<li><strong><a href="kinds.html">Results</a></strong>: the results of each kind, embedded ring
+  buffers, CRC calculation and fixed-block memory pools, each with the
+  exact versions, compiler flags and boards.</li>
 <li><strong>Method</strong>: how each number is produced, and the rules that decide
-  whether a run counts: <a href="method.html">ring buffers</a>, <a href="method-crc.html">CRC</a>.</li>
+  whether a run counts: <a href="method.html">ring buffers</a>, <a href="method-crc.html">CRC</a>,
+  <a href="method-pools.html">memory pools</a>.</li>
 <li><strong><a href="findings.html">Findings</a></strong>: defects found in libraries, published
   after the maintainer has been told.</li>
 <li><strong><a href="reports.html">Reports</a></strong>: the campaign and measurement reports, in
@@ -77,7 +86,9 @@ can be reproduced from the repository.</p>
   an AI agent (Model Context Protocol). It gives the same rows in the same
   order as the comparison pages for <a href="compare.html">ring buffers</a> (with the
   notes and published findings, and which library the project owner wrote)
-  and for <a href="compare-crc.html">CRC</a> (<code>list_crc_configurations</code>, <code>compare_crc</code>).
+  for <a href="compare-crc.html">CRC</a> (<code>list_crc_configurations</code>, <code>compare_crc</code>)
+  and for <a href="compare-pools.html">memory pools</a> (<code>list_pool_configurations</code>,
+  <code>compare_pools</code>).
   It runs on your own machine from a copy of the repository; there is no
   hosted server.</li>
 <li><strong><a href="data/libs.json">data/libs.json</a></strong>: the data behind the ring buffers'
@@ -88,6 +99,10 @@ can be reproduced from the repository.</p>
 <li><strong><a href="data/crc.json">data/crc.json</a></strong>: the data behind the CRC comparison
   page, written from the CRC records by <a href="https://github.com/verified-libs/verified-libs/blob/main/site/crc_data.py"><code>site/crc_data.py</code></a>,
   which says where each field comes from (the file's <code>about</code>).</li>
+<li><strong><a href="data/pools.json">data/pools.json</a></strong>: the data behind the memory pools'
+  comparison page, written from the pools records by
+  <a href="https://github.com/verified-libs/verified-libs/blob/main/site/pools_data.py"><code>site/pools_data.py</code></a>, which says where each field
+  comes from (the file's <code>about</code>).</li>
 </ul>
 <h2 id="principles-in-short">Principles, in short</h2>
 <ul>
@@ -132,5 +147,6 @@ board, the results for that board say so. Today every board in the lab was
 bought by the project.</p>
 <h2 id="contact">Contact</h2>
 <p>contact@verified-libs.org</p></main>
-<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The boards whose images changed with method version 3 were measured again, through the board queue, on the job list lab/plans/2026-11-26-v3-reruns-jobs.md ...">
+<link rel="canonical" href="https://verified-libs.org/report-2026-11-26-method-version-3-reruns.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Method version 3: the reruns of the nRF5340 DK and the NUCLEO-H723ZG (2026-11-26) - verified-libs">
+<meta property="og:description" content="The boards whose images changed with method version 3 were measured again, through the board queue, on the job list lab/plans/2026-11-26-v3-reruns-jobs.md ...">
+<meta property="og:url" content="https://verified-libs.org/report-2026-11-26-method-version-3-reruns.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Method version 3: the reruns of the nRF5340 DK and the NUCLEO-H723ZG (2026-11-26) - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="method-version-3-the-reruns-of-the-nrf5340-dk-and-the-nucleo-h723zg-2026-11-26">Method version 3: the reruns of the nRF5340 DK and the NUCLEO-H723ZG (2026-11-26)</h1>
+<p>The boards whose images changed with method version 3 were measured again,
+through the board queue, on the job list
+<code>lab/plans/2026-11-26-v3-reruns-jobs.md</code>, each job with the reviewer's OK.
+Series commit <code>4032f80</code>, worktree <code>~/vl-wt-v3-series</code>. Records in
+<code>kind-pools</code> <code>4b12135</code>.</p>
+<h2 id="result">Result</h2>
+<ul>
+<li><strong>162 records measured again.</strong> They replace the archived ones at the same
+  paths, with the same names and counts:</li>
+</ul>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>CRC (<code>crc-bench/2</code>)</th>
+<th>Ring buffers (<code>rb-bench/3</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>35</td>
+<td>45</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>38</td>
+<td>44</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>None left out.</li>
+<li>The baseline the same in every run: CRC 24 of 24 numbers per CRC kind;
+    ring buffers 20 of 20.</li>
+<li><strong>All 162 rebuilt at their commit <code>4032f80</code></strong> (<code>crcverify.sh</code>,
+  <code>oneverify.sh</code>): MATCH.</li>
+<li><strong>The export check passes</strong> (<code>lab/tools/public-export.py --check</code> at
+  <code>4b12135</code>).</li>
+<li>The three series "before method version 3" are kept in
+    <code>records/archived.json</code> and in the public history they name: version 2
+    and the second CRC series at <code>be1da88</code>, the first CRC series at
+    <code>fc7e8ad</code>.</li>
+<li>The export takes a series whose records all left the tree as kept there
+    (<code>402cf13</code>).</li>
+<li><strong>Every record carries the board's option registers.</strong> Each board's
+  readings agree with each other all day (below).</li>
+</ul>
+<h2 id="the-jobs-and-the-writes">The jobs and the writes</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Jobs</th>
+<th>Runs</th>
+<th>Flash writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>N0 smoke (CRC 25, 2 runs); N1–N4 CRC 25–28; N5–N9 version 2 bundles 0–4</td>
+<td>2 + 560 + 768</td>
+<td>9 (N0, N2–N9), as counted</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>H-1 thermal; H0 smoke; H1–H4 CRC; H5–H9 version 2</td>
+<td>2 + 608 + 704</td>
+<td>10 (H-1, H0, H2–H9), as counted</td>
+</tr>
+</tbody>
+</table></div>
+<p>From the queue's ledger, <code>~/vl-queue/writes.tsv</code>. No power switching on
+either board. The nRF5340 was never power-cycled.</p>
+<h3 id="stops-and-interruptions">Stops and interruptions</h3>
+<ol>
+<li><strong>Enqueuing N1 failed</strong> (11:08 UTC), before any job ran: my enqueue
+   script split the pattern <code>--refuse "FLASH WRITE"</code>. Fixed in <code>08d3698</code>;
+   the nRF series resumed at N1.</li>
+<li><strong>The H723 was taken by the owner</strong> after H-1 (11:23), for another
+   project.</li>
+<li>Its orchestration was stopped after H-1, before H0.</li>
+<li>Its option registers were read before it left and again on its return.
+     Equal (below).</li>
+<li>H0 to H9 ran on its return (11:53–13:37).</li>
+<li><strong>N9 stopped on the refuse rule <code>errors [1-9]</code></strong> (14:54).</li>
+<li>The line matched was of version 2's <em>part</em> images in the nRF5340's
+     bundle 4: <code>part_nrf_atomics</code>, <code>part_memcpy1</code>, <code>part_nrf_len0</code>. They time
+     single operations and are no FIFOs, so the FIFO check counts errors on
+     them by design.</li>
+<li>Their counts equal version 2's own runs, image for image: <strong>4086, 1920
+     and 4086</strong> (<code>~/lab-runs/v2-run1</code> and <code>v2-far1</code>).</li>
+<li>No record is made from them.</li>
+<li>The job itself was whole: 120 runs, 0 without a file, 1 write, every
+     <code>adapter_*</code> run with errors 0.</li>
+<li>The reviewer let N9 stand (decision a). <code>check_job.py</code> now skips
+     <code>part_*</code> by name and still fails on any <code>adapter_*</code> error, as a control
+     shows. The board's STOPPED was cleared with that reason.</li>
+</ol>
+<h2 id="h-1-the-h723-at-520-mhz-thermal-and-clock">H-1: the H723 at 520 MHz (thermal and clock)</h2>
+<ul>
+<li><strong>Temperature:</strong></li>
+<li>idle 32.1–32.7 °C;</li>
+<li>under load at 520 MHz from 31.1 °C to a plateau of 50.9 °C, maximum
+    51.2 °C (601 samples, not aborted);</li>
+<li>cooled to 35.3 °C.</li>
+</ul>
+<p>Well under the 85 °C limit.
+- <strong>Clock:</strong> the image's CYCCNT time against the host's time over the load:
+  591 s against 589.2 s, ratio <strong>1.0030</strong>. The image prints whole seconds,
+  so this is good to about ±0.0034. 520 MHz confirmed within 1 %.
+- <strong>Writes:</strong> one (the thermal image).</p>
+<h2 id="the-option-registers">The option registers</h2>
+<p>Read zero-write by <code>lab/tools/read-options.py</code>, before every job and once at
+the end. Files: <code>~/vl-wt-crc-runs/v3/options-final/</code>.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Board</th>
+<th>Registers</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nRF5340 DK</td>
+<td>UICR.APPROTECT, UICR.SECUREAPPROTECT</td>
+<td>0x50fa50fa, 0x50fa50fa</td>
+</tr>
+<tr>
+<td>NUCLEO-H723ZG</td>
+<td>FLASH_OPTSR_CUR, FLASH_OPTSR2_CUR</td>
+<td>0x0306aad0, 0x00000000 (CPUFREQ_BOOST 0)</td>
+</tr>
+<tr>
+<td>NUCLEO-G474RE</td>
+<td>FLASH_OPTR</td>
+<td>0xfbeff8aa</td>
+</tr>
+<tr>
+<td>NUCLEO-G0B1RE</td>
+<td>FLASH_OPTR</td>
+<td>0xfffffeaa</td>
+</tr>
+<tr>
+<td>SAM D20 Xplained Pro</td>
+<td>NVM User Row</td>
+<td>0x48e0c7cf, 0xffffff5d</td>
+</tr>
+<tr>
+<td>Pico 2</td>
+<td>OTP rows: CRIT0 copies, page 1, boot keys, lock words (264)</td>
+<td>0 but the lock words of pages 0, 1, 2, 62, 63: 0xf80=0x3f3f3f, 0xf81=0x151515, 0xf83/0xf85/0xffd=0x040404, 0xfff=0x141414</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Each board's final reading equals every reading its jobs took today:</strong>
+  nRF5340 10 of 10, H723 10 of 10, G474 4 of 4, G0B1 4 of 4, SAM D20 6 of 6.</li>
+<li><strong>The H723 left for another project and came back.</strong> Its reading before
+  (11:23) and after (11:53) are equal register by register.</li>
+<li><strong>The Pico 2 also left and came back.</strong></li>
+<li>The port check passed, switched through the queue's <code>power</code> (zero
+    write): CHIP_ID 0x20004927 read with port 3 on; no answer with it off;
+    the same ID when on again.</li>
+<li>Its 264 OTP rows equal the second CRC series' reading of 2026-11-25 row
+    by row, 0 different.</li>
+<li>Its row is that reading.</li>
+</ul>
+<h2 id="against-the-archived-records">Against the archived records</h2>
+<p><code>~/vl-v3-proof/compare_v3.py</code>. Each run is set against the archived record's
+run of the same configuration, placement and pass. The images are matched by
+configuration and placement; on the nRF5340 their bytes differ only in the
+boot stub. "Within" means within 1 % or 0.05 cycles.</p>
+<h3 id="nrf5340-dk-identical">nRF5340 DK: identical</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>Means</th>
+<th>Within</th>
+<th>Ratio new/archived</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CRC (N1–N4), configuration and baseline, cache off and on</td>
+<td>26 880</td>
+<td>all</td>
+<td>1.0000 (min 1.0000, max 1.0000)</td>
+</tr>
+<tr>
+<td>Ring buffers (N5–N9), configuration and baseline, cache off and on</td>
+<td>29 888</td>
+<td>all</td>
+<td>1.0000 (min 1.0000, max 1.0000)</td>
+</tr>
+</tbody>
+</table></div>
+<p>As expected: the new boot stub (<code>BENCHBOOT_NRF5340</code>, the UICR copied to the
+CTRL-AP at reset) lies outside the measured part. The clock (64 MHz) is
+unchanged.</p>
+<h3 id="nucleo-h723zg-ratios-520-mhz-against-64-mhz">NUCLEO-H723ZG: ratios, 520 MHz against 64 MHz</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>Cache off: median (min–max), within</th>
+<th>Cache on: median (min–max), within</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CRC, baseline</td>
+<td>1.1109 (1.0851–1.3239), 0 of 7296</td>
+<td>1.0000 (1.0000–1.0021), 7296 of 7296</td>
+</tr>
+<tr>
+<td>CRC, configuration</td>
+<td>1.2196 (0.9752–2.0435), 220 of 7296</td>
+<td>1.0000 (0.9767–1.9876), 6354 of 7296</td>
+</tr>
+<tr>
+<td>Ring buffers, baseline</td>
+<td>1.2307 (1.2158–2.3760), 0 of 7040</td>
+<td>1.0001 (0.9994–1.0020), 7040 of 7040</td>
+</tr>
+<tr>
+<td>Ring buffers, configuration</td>
+<td>1.1616 (0.8706–1.9114), 90 of 7520</td>
+<td>1.0000 (0.8862–1.0926), 7250 of 7520</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>With the cache on</strong>, all differences outside 1 % but one group are few
+  and small. They are in short scenarios: a share of the means per
+  configuration, from −11 % (<code>pxq_spmc</code>, one block scenario) to +9 %.</li>
+<li><strong>The group that differs is the board's hardware CRC unit</strong>
+  (<code>adapter_hw_crc32</code>, <code>_crc16</code>, <code>_crc8</code>): ×1.76 median (1.30–1.99) on all
+  192 means each, cache on. The unit is a peripheral on the AHB bus, which
+  since method version 3 runs at half the core clock (HPRE /2, 260 MHz), so
+  each of its register accesses costs twice the core cycles. This is the
+  same mechanism as the cache-off rise below.</li>
+<li><strong>With the cache off</strong>, every library and the baseline take more cycles.
+  This is the bus-clock effect below.</li>
+</ul>
+<h3 id="why-cache-off-cycles-rose-although-the-wait-states-fell-from-7-to-3">Why cache-off cycles rose although the wait states fell from 7 to 3</h3>
+<p>The full account, with file:line, RM0468 quotes and the arithmetic, is in
+<code>~/vl-v3-proof/h723-cache-off-cycles.md</code>. In short:</p>
+<p><strong>The clocks:</strong>
+- Version 3 (<code>firmware/common/stm32h723/board.h</code> at <code>4032f80</code>, lines 120–125)
+  runs the core at 520 MHz with HPRE /2: rcc_hclk3 = rcc_aclk = 260 MHz, the
+  flash's AXI clock. LATENCY is 3.
+- Version 2 ran core and AXI at 64 MHz, with the power-on latency of 7.</p>
+<p><strong>What the manual says:</strong> RM0468 §4.3.8 and Table 16 count the latency in
+cycles of the flash's AXI interface clock.</p>
+<p><strong>The arithmetic:</strong>
+- An array read costs (7 + 1) × 1 = 8 core cycles before and (3 + 1) × 2 = 8
+  now: the same.
+- Everything else an access pays on the AXI side is counted in AXI cycles,
+  and an AXI cycle is now 2 core cycles.</p>
+<p><strong>Measured</strong> (H0, etl crc32_t256, cache off, per byte from 256 to 1024
+bytes):
+- 32 → 38 cycles at placement 0, 34 → 42 at placement 4. The placement's
+  extra access costs 2 core cycles before and 4 now: the predicted doubling,
+  seen directly.
+- With the cache on, 8 = 8.</p>
+<p><strong>Time:</strong> 1024 bytes, cache off, is 32 796 cycles at 64 MHz (512 µs) before
+and 38 968 cycles at 520 MHz (74.9 µs) now. Cycles at another clock are not
+times.</p>
+<p><strong>Not explained:</strong>
+- the number of AXI accesses per call (the M7's fetch with the I-cache off,
+  the flash's read queue);
+- why a configuration's per-call rise (+28 at length 1) exceeds the
+  baseline's (+23).</p>
+<p>An access-counting test (the loop from ITCM, or the table in DTCM, at both
+clocks) would settle both. None was run.</p>
+<h2 id="tools-changed-on-the-way">Tools changed on the way</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Commit</th>
+<th>What</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>08d3698</code></td>
+<td><code>v3-reruns-enqueue.sh</code>: the refuse pattern of a job without writes passed as one argument</td>
+</tr>
+<tr>
+<td><code>56e5863</code></td>
+<td><code>image-ledger.py</code>: an archived series counts only for the paths its entry covers. Before, a remade ledger would have dropped the 176 version 2 records of the four boards not measured again, and the export would have stopped them. The tree's ledger predates the archive entries, so nothing was wrong in the tree.</td>
+</tr>
+<tr>
+<td><code>fd9e1a4</code>, <code>018ee6c</code></td>
+<td><code>test-public-export.sh</code>: the ledger cases leave out archived records, and count from the tree's root</td>
+</tr>
+<tr>
+<td><code>402cf13</code></td>
+<td><code>public-export.py</code>: an archived series none of whose records is in the tree is kept in the public history. A series partly gone, or a changed record, still stops the export. Three quick test cases.</td>
+</tr>
+<tr>
+<td>(host)</td>
+<td><code>~/vl-v3-proof/check_job.py</code>: skips <code>part_*</code> (above)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><code>test-public-export.sh</code> (full runs):</strong>
+- <strong>Before these fixes:</strong> 5 ledger cases failed, all traced to <code>ce79a27</code>'s
+  archiving, none to the pools rule.
+- <strong>At <code>a0f0df6</code>:</strong> 31 of 31 cases passed. The run then ended on a syntax
+  error after the last case, because I edited the script (<code>402cf13</code>) while
+  bash was still reading it.
+- <strong>At <code>f00be00</code>:</strong> a clean run is under way (about 70 min).</p>
+<h2 id="the-watched-power-on-of-the-nrf5340-dk-passed">The watched power-on of the nRF5340 DK: passed</h2>
+<p>The owner decided on one watched power-on, after the reruns. It ran after
+pools as well, with the reviewer's OK (15:38 UTC). The question was whether
+the debug port is open after a power-on with only our boot stub having run.
+That is what <code>BENCHBOOT_NRF5340</code> is for: it copies the UICR to the CTRL-AP
+at reset. All of it was zero write.</p>
+<p><strong>How the switch was made.</strong>
+- The queue's rule "never power the nRF5340" stays.
+- It was lifted for this one call by an explicit flag,
+  <code>boardqueue.py power nrf5340dk off|on --override-no-power REASON</code>
+  (<code>4c927bb</code>). The flag runs the switch under the hub's lock and writes the
+  call to <code>~/vl-queue/power-overrides.tsv</code> before and after.
+- Hub 4B0708619185 had no job. All of today's records were pushed.</p>
+<p><strong>What was done and seen</strong> (<code>~/vl-v3-proof/nrf-poweron.sh</code> and <code>.log</code>):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>When</th>
+<th>Seen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Before: attach, both UICR words, the first flash words</td>
+<td>15:38:40</td>
+<td>0x50fa50fa, 0x50fa50fa; flash 0x0: 2007fff0 00000041 000000cd 000000cd 0 0 0 0</td>
+</tr>
+<tr>
+<td>The power cycle (port 1, through the queue with the override)</td>
+<td>off 15:38:40, on 15:38:48</td>
+<td>both exit 0. The J-Link OB re-enumerated: connected since 15:38:50 (sysfs), so the board was without power.</td>
+</tr>
+<tr>
+<td>After, with nothing done first: attach, both UICR words, the first flash words</td>
+<td>15:38:50</td>
+<td>attached; 0x50fa50fa, 0x50fa50fa; the same flash words</td>
+</tr>
+<tr>
+<td>One zero-write pools job (NP): N2's command on bundle 51, without <code>--flash</code></td>
+<td>15:39–15:40</td>
+<td>"bundle 51: on the board, nothing written"; 8 runs, 0 without a file, 0 writes</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>NP against N2:</strong> 384 means, all equal (largest difference 0.000
+  cycles). The image starts and measures as before.</li>
+<li><strong>So:</strong> with method version 3's boot stub, the nRF5340 DK's debug port is
+  open after a power-on.</li>
+</ul>
+<h2 id="open">Open</h2>
+<ul>
+<li><strong>The ledger (<code>records/rebuilt.json</code>):</strong> made again after these records,
+  with the pools kind (<code>125d0ba</code>).</li>
+</ul></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body></html>

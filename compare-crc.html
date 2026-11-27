@@ -40,10 +40,15 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 .sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
 .tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
 </style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html" class=on>Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
-<main><p class="kindsw">Kind: <a href="compare.html">Ring buffers</a> | <strong>CRC</strong></p>
+<main><p class="kindsw">Kind: <a href="compare.html">Ring buffers</a> | <strong>CRC</strong> | <a href="compare-pools.html">Memory pools</a></p>
 <h1>Compare CRC calculation</h1>
 <p>The table holds the libraries and, on the boards that have one, the board's own CRC unit, driven
 by our code: it is not a library, and its name says so in every row. Its bytes are our adapter
@@ -136,7 +141,7 @@ one per row.</p>
 <script type="application/json" id="crcdata">{
  "schema": "crc-data/2",
  "about": {
-  "boards": "per board directory of records/crc (records_dir): id (the board's id in libs.json and in kinds/crc/repeat.sh), the record's board, board_decoded, core and clock_hz; note_cache_off: the sentence the results page puts above the board's cache-off tables (site/crc_tables.py, BEFORE_OFF), or null",
+  "boards": "per board directory of records/crc (records_dir): id (the board's id in libs.json and in kinds/crc/repeat.sh), the record's board, board_decoded, core and clock_hz; method_version (3 for the records of crc-bench/2, with the board's option registers; 2 for crc-bench/1), archived (the series of records/archived.json that held this board's records before method version 3, where the present records replaced them; with its public commit), method_text (the sentence the pages put under the board's numbers; site/series_info.py); note_cache_off: the sentence the results page puts above the board's cache-off tables (site/crc_tables.py, before_off: by the board and the clock its records ran at), or null; note_hw_unit: the sentence about the board's CRC unit that the pages show where its row is shown (site/crc_tables.py, hw_unit_note: by the board and the clock), or null",
   "crcs": "the CRCs in the order of kinds/crc/configs.txt",
   "configurations": "per adapter, in the order of kinds/crc/configs.txt with the board's CRC units last: its language (column 2: C, C++ or Rust) and library (column 3), the name the record carries, its CRC, and class and table place (steps 2 and 11 of kinds/crc/README.md, as site/crc_tables.py reads it); role: 'library', or 'hardware' for the board's CRC unit, driven by our code and not a library (its library is null and its note says so, in its name cell every time); a hardware row is a row of the same table, after the libraries of its CRC, and with weights it is scored like any row (decided 2026-11-26, DECISIONS.md 2026-11-25); a filter on the kind of row leaves it out. table 'RAM (copied at start by the image)': a library's table moved from flash to RAM by our build (step 11), told apart from libraries that build their table in RAM themselves",
   "rows": "per board and configuration: flash_bytes (the table in flash plus the code at -O2 for the board's core) and ram_bytes (steps 4 and 11 of kinds/crc/README.md, as site/crc_tables.py; a table copied to RAM counts in both), the record's path, cycles and per_byte; hardware rows only on the boards that have the unit",
@@ -150,6 +155,7 @@ one per row.</p>
   "records": "records/crc",
   "commits": [
    "04a2197a9bf1",
+   "4032f809fd8d",
    "40f19587e4ed",
    "63010588cf9c"
   ],
@@ -165,7 +171,24 @@ one per row.</p>
    "board_decoded": "nRF5340 DK, application core (Cortex-M33)",
    "core": "application (Cortex-M33)",
    "clock_hz": 64000000,
-   "note_cache_off": null
+   "note_cache_off": null,
+   "note_hw_unit": null,
+   "method_version": 3,
+   "archived": [
+    {
+     "name": "CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+     "commit": "63010588cf9c",
+     "public_commit": "fc7e8ad78c8949684c2e5920d72f957edd431ca8",
+     "url": "https://github.com/verified-libs/verified-libs/tree/fc7e8ad78c8949684c2e5920d72f957edd431ca8/records/crc/nrf5340"
+    },
+    {
+     "name": "CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+     "commit": "40f19587e4ed",
+     "public_commit": "be1da88cda418e07e5b503c2cc8c93b2cd019f5e",
+     "url": "https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/crc/nrf5340"
+    }
+   ],
+   "method_text": "Method version 3, at 64 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series \"CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)\" (public commit fc7e8ad); the archived series \"CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)\" (public commit be1da88)."
   },
   {
    "id": "pico2",
@@ -174,7 +197,11 @@ one per row.</p>
    "board_decoded": "Raspberry Pi Pico 2 H (RP2350A, core 0, Cortex-M33)",
    "core": "RP2350 core 0 (Cortex-M33)",
    "clock_hz": 150000000,
-   "note_cache_off": null
+   "note_cache_off": null,
+   "note_hw_unit": null,
+   "method_version": 2,
+   "archived": [],
+   "method_text": "Method version 2, at 150 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand."
   },
   {
    "id": "nucleo-g474re",
@@ -183,7 +210,11 @@ one per row.</p>
    "board_decoded": "NUCLEO-G474RE (STM32G474RET6, Cortex-M4F)",
    "core": "Cortex-M4F",
    "clock_hz": 170000000,
-   "note_cache_off": null
+   "note_cache_off": null,
+   "note_hw_unit": null,
+   "method_version": 2,
+   "archived": [],
+   "method_text": "Method version 2, at 170 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand."
   },
   {
    "id": "nucleo-h723zg",
@@ -191,8 +222,25 @@ one per row.</p>
    "name": "NUCLEO-H723ZG",
    "board_decoded": "NUCLEO-H723ZG (STM32H723ZGT6, Cortex-M7)",
    "core": "Cortex-M7",
-   "clock_hz": 64000000,
-   "note_cache_off": "The NUCLEO-H723ZG runs at 64 MHz with the 7 flash wait states it has after power-on: the board's 64 MHz build leaves `FLASH_ACR` as after reset (`firmware/common/stm32h723/board.h`). RM0468 (Table 16) allows 0 or 1 wait states at 64 MHz. The numbers with the cache off carry the 7 wait states; fewer were not measured."
+   "clock_hz": 520000000,
+   "note_cache_off": "The NUCLEO-H723ZG runs at 520 MHz with 3 flash wait states (voltage scale 0), as ST's template for the board sets it (`firmware/common/stm32h723/board.h`, method version 3). RM0468 (Table 16) requires 3 wait states for its AXI clock of 260 MHz. The numbers with the cache off carry the 3 wait states.",
+   "note_hw_unit": "The board's CRC unit is reached over a bus that runs at half the core clock since method version 3, so its cycles per byte are 3.0 where the archived series at 64 MHz had 1.5; in time it is faster: 1024 bytes take 3109 cycles at 520 MHz (6.0 µs) against 1567 at 64 MHz (24.5 µs) (method page, \"The NUCLEO-H723ZG at 520 MHz\").",
+   "method_version": 3,
+   "archived": [
+    {
+     "name": "CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+     "commit": "63010588cf9c",
+     "public_commit": "fc7e8ad78c8949684c2e5920d72f957edd431ca8",
+     "url": "https://github.com/verified-libs/verified-libs/tree/fc7e8ad78c8949684c2e5920d72f957edd431ca8/records/crc/stm32h723"
+    },
+    {
+     "name": "CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+     "commit": "40f19587e4ed",
+     "public_commit": "be1da88cda418e07e5b503c2cc8c93b2cd019f5e",
+     "url": "https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/crc/stm32h723"
+    }
+   ],
+   "method_text": "Method version 3, at 520 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series \"CRC first series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)\" (public commit fc7e8ad); the archived series \"CRC second series, nRF5340 DK and NUCLEO-H723ZG (before method version 3)\" (public commit be1da88)."
   },
   {
    "id": "nucleo-g0b1re",
@@ -201,7 +249,11 @@ one per row.</p>
    "board_decoded": "NUCLEO-G0B1RE (STM32G0B1RET6, Cortex-M0+)",
    "core": "Cortex-M0+",
    "clock_hz": 64000000,
-   "note_cache_off": null
+   "note_cache_off": null,
+   "note_hw_unit": null,
+   "method_version": 2,
+   "archived": [],
+   "method_text": "Method version 2, at 64 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand."
   },
   {
    "id": "sam-d20-xpro",
@@ -210,7 +262,11 @@ one per row.</p>
    "board_decoded": "SAM D20 Xplained Pro (ATSAMD20J18A, Cortex-M0+)",
    "core": "Cortex-M0+",
    "clock_hz": 48005120,
-   "note_cache_off": null
+   "note_cache_off": null,
+   "note_hw_unit": null,
+   "method_version": 2,
+   "archived": [],
+   "method_text": "Method version 2, at 48 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand."
   }
  ],
  "crcs": [
@@ -5248,7 +5304,7 @@ one per row.</p>
       ],
       "1024": [
        17424.0,
-       17424.012
+       17424.004
       ]
      }
     },
@@ -15904,8 +15960,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       15.414,
-       16.492
+       15.672,
+       16.754
       ],
       "4": [
        41.031,
@@ -15931,7 +15987,7 @@ one per row.</p>
      "1": {
       "1": [
        14.0,
-       15.043
+       15.051
       ],
       "4": [
        41.0,
@@ -15958,54 +16014,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       36.16,
-       56.125
+       60.133,
+       76.086
       ],
       "4": [
-       110.383,
-       164.098
+       133.508,
+       216.094
       ],
       "16": [
-       335.691,
-       569.0
+       371.164,
+       720.0
       ],
       "64": [
-       1236.398,
-       2201.0
+       1321.484,
+       2736.0
       ],
       "256": [
-       4846.145,
-       8729.0
+       5128.695,
+       10800.0
       ],
       "1024": [
-       19260.902,
-       34841.0
+       20336.773,
+       43056.0
       ]
      },
      "1": {
       "1": [
-       36.0,
-       56.0
+       60.0,
+       76.0
       ],
       "4": [
-       110.59,
-       164.0
+       133.625,
+       216.0
       ],
       "16": [
-       335.582,
-       569.0
+       371.07,
+       720.0
       ],
       "64": [
-       1236.863,
-       2201.0
+       1321.883,
+       2736.0
       ],
       "256": [
-       4860.008,
-       8729.0
+       5140.578,
+       10800.0
       ],
       "1024": [
-       19237.66,
-       34841.0
+       20316.852,
+       43056.0
       ]
      }
     }
@@ -16023,12 +16079,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      18.7692,
-      34.0
+      19.8022,
+      42.0
      ],
      "1": [
-      18.7209,
-      34.0
+      19.7608,
+      42.0
      ]
     }
    }
@@ -16043,8 +16099,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       43.586,
-       44.609
+       43.828,
+       44.969
       ],
       "4": [
        69.031,
@@ -16097,54 +16153,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       144.207,
-       167.242
+       176.031,
+       202.203
       ],
       "4": [
-       205.504,
-       265.086
+       249.641,
+       322.109
       ],
       "16": [
-       431.129,
-       673.0
+       487.539,
+       804.0
       ],
       "64": [
-       1331.617,
-       2305.0
+       1437.672,
+       2820.0
       ],
       "256": [
-       4943.297,
-       8833.0
+       5245.969,
+       10884.0
       ],
       "1024": [
-       19367.844,
-       34945.0
+       20454.773,
+       43140.0
       ]
      },
      "1": {
       "1": [
-       144.0,
-       167.0
+       176.0,
+       202.0
       ],
       "4": [
-       205.562,
-       265.0
+       249.625,
+       322.0
       ],
       "16": [
-       430.883,
-       673.0
+       487.328,
+       804.0
       ],
       "64": [
-       1332.738,
-       2305.0
+       1438.633,
+       2820.0
       ],
       "256": [
-       4951.391,
-       8833.0
+       5252.906,
+       10884.0
       ],
       "1024": [
-       19336.953,
-       34945.0
+       20434.852,
+       43140.0
       ]
      }
     }
@@ -16162,12 +16218,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      18.7692,
-      34.0
+      19.8022,
+      42.0
      ],
      "1": [
-      18.7209,
-      34.0
+      19.7608,
+      42.0
      ]
     }
    }
@@ -16182,8 +16238,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       35.18,
-       36.176
+       35.242,
+       36.273
       ],
       "4": [
        62.035,
@@ -16236,54 +16292,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       97.395,
-       109.305
+       100.367,
+       136.258
       ],
       "4": [
-       112.184,
-       189.094
+       130.211,
+       220.094
       ],
       "16": [
-       208.0,
-       501.0
+       226.0,
+       590.0
       ],
       "64": [
-       592.0,
-       1749.0
+       610.0,
+       2126.0
       ],
       "256": [
-       2128.0,
-       6741.0
+       2146.0,
+       8270.0
       ],
       "1024": [
-       8272.0,
-       26709.0
+       8290.0,
+       32846.0
       ]
      },
      "1": {
       "1": [
-       97.0,
-       109.0
+       100.0,
+       136.0
       ],
       "4": [
-       112.0,
-       189.0
+       130.0,
+       220.0
       ],
       "16": [
-       208.0,
-       501.0
+       226.0,
+       590.0
       ],
       "64": [
-       592.0,
-       1749.0
+       610.0,
+       2126.0
       ],
       "256": [
-       2128.0,
-       6741.0
+       2146.0,
+       8270.0
       ],
       "1024": [
-       8272.0,
-       26709.0
+       8290.0,
+       32846.0
       ]
      }
     }
@@ -16302,11 +16358,11 @@ one per row.</p>
     "off": {
      "0": [
       8.0,
-      26.0
+      32.0
      ],
      "1": [
       8.0,
-      26.0
+      32.0
      ]
     }
    }
@@ -16321,12 +16377,12 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       39.719,
-       40.598
+       39.945,
+       41.02
       ],
       "4": [
-       60.051,
-       61.082
+       60.109,
+       61.176
       ],
       "16": [
        144.023,
@@ -16375,54 +16431,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       96.184,
-       123.074
+       118.156,
+       152.086
       ],
       "4": [
-       153.113,
-       177.055
+       183.977,
+       206.016
       ],
       "16": [
-       423.617,
-       483.703
+       501.18,
+       557.648
       ],
       "64": [
-       1345.102,
-       1620.145
+       1581.516,
+       1852.5
       ],
       "256": [
-       5031.996,
-       6170.289
+       5893.711,
+       7026.562
       ],
       "1024": [
-       19780.969,
-       24371.664
+       23143.688,
+       27725.625
       ]
      },
      "1": {
       "1": [
-       96.0,
-       123.0
+       118.0,
+       152.0
       ],
       "4": [
-       152.754,
-       176.727
+       183.789,
+       206.0
       ],
       "16": [
-       422.988,
-       483.234
+       501.672,
+       557.297
       ],
       "64": [
-       1345.703,
-       1622.113
+       1582.031,
+       1851.984
       ],
       "256": [
-       5038.176,
-       6171.301
+       5899.008,
+       7023.352
       ],
       "1024": [
-       19764.727,
-       24372.676
+       23129.766,
+       27725.859
       ]
      }
     }
@@ -16440,12 +16496,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      19.2044,
-      23.7
+      22.4609,
+      26.9519
      ],
      "1": [
-      19.1752,
-      23.7025
+      22.4359,
+      26.9564
      ]
     }
    }
@@ -16460,8 +16516,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       20.137,
-       21.215
+       20.25,
+       21.359
       ],
       "4": [
        65.023,
@@ -16514,54 +16570,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       59.16,
-       75.133
+       84.141,
+       96.109
       ],
       "4": [
-       205.43,
-       245.086
+       256.141,
+       314.094
       ],
       "16": [
-       684.625,
-       893.0
+       832.0,
+       1106.0
       ],
       "64": [
-       2603.75,
-       3485.0
+       3136.0,
+       4274.0
       ],
       "256": [
-       10282.0,
-       13853.0
+       12352.0,
+       16946.0
       ],
       "1024": [
-       41002.0,
-       55325.0
+       49216.0,
+       67634.0
       ]
      },
      "1": {
       "1": [
-       59.0,
-       75.0
+       84.0,
+       96.0
       ],
       "4": [
-       205.719,
-       245.0
+       256.0,
+       314.0
       ],
       "16": [
-       685.5,
-       893.0
+       832.0,
+       1106.0
       ],
       "64": [
-       2605.5,
-       3485.0
+       3136.0,
+       4274.0
       ],
       "256": [
-       10289.0,
-       13853.0
+       12352.0,
+       16946.0
       ],
       "1024": [
-       41002.0,
-       55325.0
+       49216.0,
+       67634.0
       ]
      }
     }
@@ -16579,12 +16635,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      40.0,
-      54.0
+      48.0,
+      66.0
      ],
      "1": [
-      39.9909,
-      54.0
+      48.0,
+      66.0
      ]
     }
    }
@@ -16599,8 +16655,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       38.352,
-       39.309
+       38.43,
+       39.395
       ],
       "4": [
        83.023,
@@ -16653,54 +16709,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       120.176,
-       143.098
+       146.117,
+       162.195
       ],
       "4": [
-       275.145,
-       317.141
+       326.141,
+       380.094
       ],
       "16": [
-       758.5,
-       965.0
+       902.0,
+       1172.0
       ],
       "64": [
-       2676.75,
-       3557.0
+       3206.0,
+       4340.0
       ],
       "256": [
-       10355.0,
-       13925.0
+       12422.0,
+       17012.0
       ],
       "1024": [
-       41075.0,
-       55397.0
+       49286.0,
+       67700.0
       ]
      },
      "1": {
       "1": [
-       120.0,
-       143.0
+       146.0,
+       162.0
       ],
       "4": [
-       275.0,
-       317.0
+       326.0,
+       380.0
       ],
       "16": [
-       760.25,
-       965.0
+       902.0,
+       1172.0
       ],
       "64": [
-       2680.25,
-       3557.0
+       3206.0,
+       4340.0
       ],
       "256": [
-       10355.0,
-       13925.0
+       12422.0,
+       17012.0
       ],
       "1024": [
-       41082.0,
-       55397.0
+       49286.0,
+       67700.0
       ]
      }
     }
@@ -16718,12 +16774,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      39.9909,
-      54.0
+      48.0,
+      66.0
      ],
      "1": [
-      40.0091,
-      54.0
+      48.0,
+      66.0
      ]
     }
    }
@@ -16738,16 +16794,16 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       57.789,
-       58.781
+       58.07,
+       59.172
       ],
       "4": [
-       62.055,
-       64.816
+       62.586,
+       65.77
       ],
       "16": [
-       96.133,
-       98.449
+       96.676,
+       98.672
       ],
       "64": [
        228.059,
@@ -16792,54 +16848,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       190.371,
-       233.469
+       224.289,
+       270.32
       ],
       "4": [
-       253.391,
-       265.391
+       291.344,
+       327.109
       ],
       "16": [
-       474.004,
-       522.223
+       564.43,
+       618.18
       ],
       "64": [
-       1356.348,
-       1470.098
+       1561.445,
+       1710.328
       ],
       "256": [
-       4884.887,
-       5262.098
+       5546.859,
+       6126.305
       ],
       "1024": [
-       18995.359,
-       20430.098
+       21480.258,
+       23789.859
       ]
      },
      "1": {
       "1": [
-       180.258,
-       200.133
+       204.203,
+       250.164
       ],
       "4": [
-       280.359,
-       354.539
+       326.219,
+       420.508
       ],
       "16": [
-       522.863,
-       600.289
+       612.07,
+       708.344
       ],
       "64": [
-       1439.863,
-       1541.312
+       1670.281,
+       1800.938
       ],
       "256": [
-       4974.352,
-       5333.312
+       5660.156,
+       6218.148
       ],
       "1024": [
-       19084.562,
-       20501.312
+       21593.484,
+       23878.305
       ]
      }
     }
@@ -16857,12 +16913,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      18.373,
-      19.75
+      20.7466,
+      23.0
      ],
      "1": [
-      18.3727,
-      19.75
+      20.7465,
+      23.0
      ]
     }
    }
@@ -16877,20 +16933,20 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       42.789,
-       43.805
+       43.098,
+       44.164
       ],
       "4": [
        68.031,
        69.035
       ],
       "16": [
-       141.215,
-       143.195
+       141.297,
+       143.258
       ],
       "64": [
-       428.691,
-       433.867
+       429.574,
+       434.781
       ],
       "256": [
        1388.105,
@@ -16904,7 +16960,7 @@ one per row.</p>
      "1": {
       "1": [
        41.0,
-       42.043
+       42.051
       ],
       "4": [
        68.0,
@@ -16915,8 +16971,8 @@ one per row.</p>
        143.0
       ],
       "64": [
-       429.102,
-       432.094
+       429.109,
+       432.102
       ],
       "256": [
        1410.117,
@@ -16931,54 +16987,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       131.215,
-       144.199
+       158.148,
+       188.188
       ],
       "4": [
-       186.66,
-       256.086
+       223.742,
+       326.094
       ],
       "16": [
-       439.41,
-       478.828
+       509.531,
+       539.102
       ],
       "64": [
-       1560.953,
-       1747.484
+       1793.789,
+       2059.383
       ],
       "256": [
-       5445.629,
-       5879.301
+       6325.0,
+       6818.289
       ],
       "1024": [
-       21050.195,
-       22978.621
+       24630.961,
+       26805.406
       ]
      },
      "1": {
       "1": [
-       131.0,
-       144.0
+       158.0,
+       188.0
       ],
       "4": [
-       186.18,
-       256.0
+       223.297,
+       326.0
       ],
       "16": [
-       438.441,
-       477.551
+       508.664,
+       539.086
       ],
       "64": [
-       1573.715,
-       1744.223
+       1789.18,
+       2062.242
       ],
       "256": [
-       5542.824,
-       5874.211
+       6475.727,
+       6878.695
       ],
       "1024": [
-       21057.914,
-       22982.34
+       24647.508,
+       26795.859
       ]
      }
     }
@@ -16996,12 +17052,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      20.3184,
-      22.3246
+      23.8359,
+      26.0795
      ],
      "1": [
-      20.2019,
-      22.3345
+      23.6612,
+      26.0992
      ]
     }
    }
@@ -17016,8 +17072,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       81.262,
-       82.305
+       81.391,
+       82.402
       ],
       "4": [
        210.039,
@@ -17070,54 +17126,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       182.367,
-       348.359
+       194.305,
+       412.242
       ],
       "4": [
-       316.188,
-       1036.094
+       322.234,
+       1220.109
       ],
       "16": [
-       808.0,
-       3736.0
+       814.0,
+       4316.0
       ],
       "64": [
-       2776.0,
-       14536.0
+       2782.0,
+       16700.0
       ],
       "256": [
-       10648.0,
-       57736.0
+       10654.0,
+       66236.0
       ],
       "1024": [
-       42136.0,
-       230536.0
+       42142.0,
+       264380.0
       ]
      },
      "1": {
       "1": [
-       182.0,
-       348.0
+       194.0,
+       412.0
       ],
       "4": [
-       316.0,
-       1036.0
+       322.0,
+       1220.0
       ],
       "16": [
-       808.0,
-       3736.0
+       814.0,
+       4316.0
       ],
       "64": [
-       2776.0,
-       14536.0
+       2782.0,
+       16700.0
       ],
       "256": [
-       10648.0,
-       57736.0
+       10654.0,
+       66236.0
       ],
       "1024": [
-       42136.0,
-       230536.0
+       42142.0,
+       264380.0
       ]
      }
     }
@@ -17136,11 +17192,11 @@ one per row.</p>
     "off": {
      "0": [
       41.0,
-      225.0
+      258.0
      ],
      "1": [
       41.0,
-      225.0
+      258.0
      ]
     }
    }
@@ -17155,8 +17211,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       13.715,
-       14.82
+       13.918,
+       15.031
       ],
       "4": [
        37.031,
@@ -17209,54 +17265,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       36.164,
-       56.207
+       62.117,
+       76.125
       ],
       "4": [
-       105.789,
-       173.098
+       132.984,
+       230.109
       ],
       "16": [
-       317.395,
-       574.0
+       369.195,
+       720.0
       ],
       "64": [
-       1152.0,
-       2206.0
+       1304.0,
+       2832.0
       ],
       "256": [
-       4531.41,
-       8734.0
+       5078.352,
+       11280.0
       ],
       "1024": [
-       18008.746,
-       34846.0
+       20141.211,
+       45072.0
       ]
      },
      "1": {
       "1": [
-       36.0,
-       56.0
+       62.0,
+       76.0
       ],
       "4": [
-       105.469,
-       173.0
+       132.688,
+       230.0
       ],
       "16": [
-       315.398,
-       574.0
+       367.484,
+       720.0
       ],
       "64": [
-       1154.078,
-       2206.0
+       1305.781,
+       2832.0
       ],
       "256": [
-       4542.074,
-       8734.0
+       5087.492,
+       11280.0
       ],
       "1024": [
-       18032.25,
-       34846.0
+       20164.5,
+       45072.0
       ]
      }
     }
@@ -17274,12 +17330,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      17.5297,
-      34.0
+      19.5969,
+      44.0
      ],
      "1": [
-      17.5485,
-      34.0
+      19.613,
+      44.0
      ]
     }
    }
@@ -17294,108 +17350,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       45.906,
-       46.945
+       46.129,
+       48.168
       ],
       "4": [
        69.023,
-       70.035
+       71.035
       ],
       "16": [
        153.0,
-       154.0
+       155.0
       ],
       "64": [
        489.0,
-       490.0
+       491.0
       ],
       "256": [
        1833.0,
-       1834.0
+       1835.0
       ],
       "1024": [
        7209.0,
-       7210.0
+       7211.0
       ]
      },
      "1": {
       "1": [
        45.0,
-       46.0
+       47.0
       ],
       "4": [
        69.0,
-       70.0
+       71.0
       ],
       "16": [
        153.0,
-       154.0
+       155.0
       ],
       "64": [
        489.0,
-       490.0
+       491.0
       ],
       "256": [
        1833.0,
-       1834.0
+       1835.0
       ],
       "1024": [
        7209.0,
-       7210.0
+       7211.0
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       162.316,
-       187.371
+       200.25,
+       216.117
       ],
       "4": [
-       213.074,
-       281.094
+       259.25,
+       346.094
       ],
       "16": [
-       423.465,
-       689.0
+       495.453,
+       850.0
       ],
       "64": [
-       1258.891,
-       2321.0
+       1432.648,
+       2866.0
       ],
       "256": [
-       4642.82,
-       8849.0
+       5192.594,
+       10930.0
       ],
       "1024": [
-       18149.742,
-       34961.0
+       20278.891,
+       43186.0
       ]
      },
      "1": {
       "1": [
-       162.0,
-       187.0
+       200.0,
+       216.0
       ],
       "4": [
-       212.578,
-       281.0
+       258.805,
+       346.0
       ],
       "16": [
-       422.672,
-       689.0
+       493.836,
+       850.0
       ],
       "64": [
-       1262.227,
-       2321.0
+       1434.641,
+       2866.0
       ],
       "256": [
-       4645.637,
-       8849.0
+       5201.117,
+       10930.0
       ],
       "1024": [
-       18157.965,
-       34961.0
+       20298.133,
+       43186.0
       ]
      }
     }
@@ -17413,12 +17469,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      17.5842,
-      34.0
+      19.6436,
+      42.0
      ],
      "1": [
-      17.5934,
-      34.0
+      19.6515,
+      42.0
      ]
     }
    }
@@ -17433,8 +17489,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       33.184,
-       34.184
+       33.215,
+       34.285
       ],
       "4": [
        57.023,
@@ -17487,54 +17543,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       92.305,
-       99.344
+       116.258,
+       134.32
       ],
       "4": [
-       126.16,
-       201.094
+       142.242,
+       238.094
       ],
       "16": [
-       210.0,
-       513.0
+       226.0,
+       632.0
       ],
       "64": [
-       546.0,
-       1799.0
+       562.0,
+       2264.0
       ],
       "256": [
-       1890.0,
-       6983.0
+       1906.0,
+       8792.0
       ],
       "1024": [
-       7266.0,
-       27719.0
+       7282.0,
+       34904.0
       ]
      },
      "1": {
       "1": [
-       92.0,
-       99.0
+       116.0,
+       134.0
       ],
       "4": [
-       126.0,
-       201.0
+       142.0,
+       238.0
       ],
       "16": [
-       210.0,
-       513.0
+       226.0,
+       632.0
       ],
       "64": [
-       546.0,
-       1799.0
+       562.0,
+       2264.0
       ],
       "256": [
-       1890.0,
-       6983.0
+       1906.0,
+       8792.0
       ],
       "1024": [
-       7266.0,
-       27719.0
+       7282.0,
+       34904.0
       ]
      }
     }
@@ -17553,11 +17609,11 @@ one per row.</p>
     "off": {
      "0": [
       7.0,
-      27.0
+      34.0
      ],
      "1": [
       7.0,
-      27.0
+      34.0
      ]
     }
    }
@@ -17572,8 +17628,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       29.121,
-       29.234
+       29.25,
+       29.398
       ],
       "4": [
        63.023,
@@ -17626,54 +17682,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       70.414,
-       95.168
+       102.328,
+       126.227
       ],
       "4": [
-       169.008,
-       195.086
+       216.125,
+       236.141
       ],
       "16": [
-       469.0,
-       519.0
+       576.0,
+       666.0
       ],
       "64": [
-       1669.0,
-       1861.0
+       2016.0,
+       2394.0
       ],
       "256": [
-       6469.0,
-       7237.0
+       7776.0,
+       9306.0
       ],
       "1024": [
-       25669.0,
-       28741.0
+       30816.0,
+       36954.0
       ]
      },
      "1": {
       "1": [
-       70.0,
-       95.0
+       102.0,
+       126.0
       ],
       "4": [
-       169.0,
-       195.0
+       216.0,
+       236.0
       ],
       "16": [
-       469.0,
-       519.0
+       576.0,
+       666.0
       ],
       "64": [
-       1669.0,
-       1861.0
+       2016.0,
+       2394.0
       ],
       "256": [
-       6469.0,
-       7237.0
+       7776.0,
+       9306.0
       ],
       "1024": [
-       25669.0,
-       28741.0
+       30816.0,
+       36954.0
       ]
      }
     }
@@ -17691,12 +17747,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      25.0,
-      28.0
+      30.0,
+      36.0
      ],
      "1": [
-      25.0,
-      28.0
+      30.0,
+      36.0
      ]
     }
    }
@@ -17711,8 +17767,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       20.102,
-       20.199
+       20.242,
+       20.32
       ],
       "4": [
        65.023,
@@ -17765,54 +17821,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       58.297,
-       75.254
+       83.129,
+       108.125
       ],
       "4": [
-       203.109,
-       254.094
+       254.141,
+       334.109
       ],
       "16": [
-       683.0,
-       902.0
+       830.0,
+       1150.0
       ],
       "64": [
-       2603.0,
-       3494.0
+       3134.0,
+       4414.0
       ],
       "256": [
-       10283.0,
-       13862.0
+       12350.0,
+       17470.0
       ],
       "1024": [
-       41003.0,
-       55334.0
+       49214.0,
+       69694.0
       ]
      },
      "1": {
       "1": [
-       58.0,
-       75.0
+       83.0,
+       108.0
       ],
       "4": [
-       203.0,
-       254.0
+       254.0,
+       334.0
       ],
       "16": [
-       683.0,
-       902.0
+       830.0,
+       1150.0
       ],
       "64": [
-       2603.0,
-       3494.0
+       3134.0,
+       4414.0
       ],
       "256": [
-       10283.0,
-       13862.0
+       12350.0,
+       17470.0
       ],
       "1024": [
-       41003.0,
-       55334.0
+       49214.0,
+       69694.0
       ]
      }
     }
@@ -17830,12 +17886,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      40.0,
-      54.0
+      48.0,
+      68.0
      ],
      "1": [
-      40.0,
-      54.0
+      48.0,
+      68.0
      ]
     }
    }
@@ -17850,108 +17906,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       27.129,
-       28.211
+       27.215,
+       29.258
       ],
       "4": [
        69.023,
-       70.016
+       71.016
       ],
       "16": [
        225.0,
-       226.0
+       227.0
       ],
       "64": [
        849.0,
-       850.0
+       851.0
       ],
       "256": [
        3345.0,
-       3346.0
+       3347.0
       ],
       "1024": [
        13329.0,
-       13330.0
+       13331.0
       ]
      },
      "1": {
       "1": [
        27.0,
-       28.0
+       29.0
       ],
       "4": [
        69.0,
-       70.0
+       71.0
       ],
       "16": [
        225.0,
-       226.0
+       227.0
       ],
       "64": [
        849.0,
-       850.0
+       851.0
       ],
       "256": [
        3345.0,
-       3346.0
+       3347.0
       ],
       "1024": [
        13329.0,
-       13330.0
+       13331.0
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       76.172,
-       88.289
+       98.117,
+       118.055
       ],
       "4": [
-       173.109,
-       217.094
+       220.016,
+       276.0
       ],
       "16": [
-       485.0,
-       696.0
+       606.0,
+       876.0
       ],
       "64": [
-       1733.0,
-       2616.0
+       2142.0,
+       3276.0
       ],
       "256": [
-       6725.0,
-       10296.0
+       8286.0,
+       12876.0
       ],
       "1024": [
-       26693.0,
-       41016.0
+       32862.0,
+       51276.0
       ]
      },
      "1": {
       "1": [
-       76.0,
-       88.0
+       98.0,
+       118.0
       ],
       "4": [
-       173.0,
-       217.0
+       220.0,
+       276.0
       ],
       "16": [
-       485.0,
-       696.0
+       606.0,
+       876.0
       ],
       "64": [
-       1733.0,
-       2616.0
+       2142.0,
+       3276.0
       ],
       "256": [
-       6725.0,
-       10296.0
+       8286.0,
+       12876.0
       ],
       "1024": [
-       26693.0,
-       41016.0
+       32862.0,
+       51276.0
       ]
      }
     }
@@ -17969,12 +18025,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      26.0,
-      40.0
+      32.0,
+      50.0
      ],
      "1": [
-      26.0,
-      40.0
+      32.0,
+      50.0
      ]
     }
    }
@@ -17989,8 +18045,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       12.391,
-       13.434
+       12.508,
+       13.59
       ],
       "4": [
        31.039,
@@ -18043,54 +18099,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       35.227,
-       55.191
+       59.191,
+       67.23
       ],
       "4": [
-       89.395,
-       161.086
+       113.562,
+       186.047
       ],
       "16": [
-       271.793,
-       569.0
+       320.68,
+       690.0
       ],
       "64": [
-       999.352,
-       2201.0
+       1150.016,
+       2706.0
       ],
       "256": [
-       3904.352,
-       8729.0
+       4465.789,
+       10770.0
       ],
       "1024": [
-       15493.348,
-       34841.0
+       17693.727,
+       43026.0
       ]
      },
      "1": {
       "1": [
-       35.0,
-       55.0
+       59.0,
+       67.0
       ],
       "4": [
-       89.73,
-       161.0
+       113.586,
+       186.0
       ],
       "16": [
-       270.465,
-       569.0
+       320.047,
+       690.0
       ],
       "64": [
-       999.898,
-       2201.0
+       1150.484,
+       2706.0
       ],
       "256": [
-       3891.527,
-       8729.0
+       4455.023,
+       10770.0
       ],
       "1024": [
-       15542.457,
-       34841.0
+       17734.578,
+       43026.0
       ]
      }
     }
@@ -18108,12 +18164,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      15.0415,
-      34.0
+      17.1784,
+      42.0
      ],
      "1": [
-      15.1407,
-      34.0
+      17.2635,
+      42.0
      ]
     }
    }
@@ -18128,108 +18184,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       43.488,
-       45.398
+       43.645,
+       46.57
       ],
       "4": [
        63.039,
-       64.055
+       65.055
       ],
       "16": [
        123.0,
-       124.0
+       125.0
       ],
       "64": [
        363.0,
-       364.0
+       365.0
       ],
       "256": [
        1323.0,
-       1324.0
+       1325.0
       ],
       "1024": [
        5163.0,
-       5164.0
+       5165.0
       ]
      },
      "1": {
       "1": [
        43.0,
-       45.0
+       46.0
       ],
       "4": [
        63.0,
-       64.0
+       65.0
       ],
       "16": [
        123.0,
-       124.0
+       125.0
       ],
       "64": [
        363.0,
-       364.0
+       365.0
       ],
       "256": [
        1323.0,
-       1324.0
+       1325.0
       ],
       "1024": [
        5163.0,
-       5164.0
+       5165.0
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       130.426,
-       176.316
+       170.312,
+       198.258
       ],
       "4": [
-       196.266,
-       270.086
+       230.18,
+       322.125
       ],
       "16": [
-       379.516,
-       678.0
+       437.664,
+       820.0
       ],
       "64": [
-       1105.078,
-       2310.0
+       1270.328,
+       2836.0
       ],
       "256": [
-       4009.352,
-       8838.0
+       4594.016,
+       10900.0
       ],
       "1024": [
-       15630.883,
-       34950.0
+       17821.328,
+       43156.0
       ]
      },
      "1": {
       "1": [
-       130.0,
-       176.0
+       170.0,
+       198.0
       ],
       "4": [
-       196.375,
-       270.0
+       229.586,
+       322.0
       ],
       "16": [
-       378.094,
-       678.0
+       436.258,
+       820.0
       ],
       "64": [
-       1111.855,
-       2310.0
+       1270.773,
+       2836.0
       ],
       "256": [
-       3996.527,
-       8838.0
+       4579.609,
+       10900.0
       ],
       "1024": [
-       15654.098,
-       34950.0
+       17841.227,
+       43156.0
       ]
      }
     }
@@ -18247,12 +18303,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      15.0766,
-      34.0
+      17.2086,
+      42.0
      ],
      "1": [
-      15.1457,
-      34.0
+      17.2677,
+      42.0
      ]
     }
    }
@@ -18267,8 +18323,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       22.375,
-       24.414
+       22.492,
+       24.605
       ],
       "4": [
        42.039,
@@ -18321,54 +18377,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       80.383,
-       99.223
+       106.203,
+       124.164
       ],
       "4": [
-       128.184,
-       209.086
+       161.594,
+       234.047
       ],
       "16": [
-       310.777,
-       617.0
+       369.523,
+       738.0
       ],
       "64": [
-       1039.512,
-       2249.0
+       1199.867,
+       2754.0
       ],
       "256": [
-       3949.352,
-       8777.0
+       4517.492,
+       10818.0
       ],
       "1024": [
-       15534.348,
-       34889.0
+       17741.727,
+       43074.0
       ]
      },
      "1": {
       "1": [
-       80.0,
-       99.0
+       106.0,
+       124.0
       ],
       "4": [
-       128.238,
-       209.0
+       161.633,
+       234.0
       ],
       "16": [
-       309.492,
-       617.0
+       368.422,
+       738.0
       ],
       "64": [
-       1038.855,
-       2249.0
+       1199.305,
+       2754.0
       ],
       "256": [
-       3931.48,
-       8777.0
+       4501.555,
+       10818.0
       ],
       "1024": [
-       15583.457,
-       34889.0
+       17783.773,
+       43074.0
       ]
      }
     }
@@ -18386,12 +18442,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      15.0415,
-      34.0
+      17.1784,
+      42.0
      ],
      "1": [
-      15.1407,
-      34.0
+      17.2635,
+      42.0
      ]
     }
    }
@@ -18406,8 +18462,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       21.082,
-       21.168
+       21.191,
+       21.273
       ],
       "4": [
        66.023,
@@ -18460,54 +18516,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       59.16,
-       82.125
+       84.141,
+       98.141
       ],
       "4": [
-       203.148,
-       257.074
+       256.141,
+       314.094
       ],
       "16": [
-       683.0,
-       893.0
+       832.0,
+       1106.0
       ],
       "64": [
-       2603.0,
-       3485.0
+       3136.0,
+       4274.0
       ],
       "256": [
-       10283.0,
-       13853.0
+       12352.0,
+       16946.0
       ],
       "1024": [
-       41003.0,
-       55325.0
+       49216.0,
+       67634.0
       ]
      },
      "1": {
       "1": [
-       59.0,
-       82.0
+       84.0,
+       98.0
       ],
       "4": [
-       203.0,
-       257.0
+       256.0,
+       314.0
       ],
       "16": [
-       683.0,
-       893.0
+       832.0,
+       1106.0
       ],
       "64": [
-       2603.0,
-       3485.0
+       3136.0,
+       4274.0
       ],
       "256": [
-       10283.0,
-       13853.0
+       12352.0,
+       16946.0
       ],
       "1024": [
-       41003.0,
-       55325.0
+       49216.0,
+       67634.0
       ]
      }
     }
@@ -18525,12 +18581,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      40.0,
-      54.0
+      48.0,
+      66.0
      ],
      "1": [
-      39.9909,
-      54.0
+      48.0,
+      66.0
      ]
     }
    }
@@ -18545,108 +18601,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       33.207,
-       34.234
+       33.281,
+       35.293
       ],
       "4": [
        75.023,
-       76.023
+       77.023
       ],
       "16": [
        231.0,
-       232.0
+       233.0
       ],
       "64": [
        855.0,
-       856.0
+       857.0
       ],
       "256": [
        3351.0,
-       3352.0
+       3353.0
       ],
       "1024": [
        13335.0,
-       13336.0
+       13337.0
       ]
      },
      "1": {
       "1": [
        33.0,
-       34.0
+       35.0
       ],
       "4": [
        75.0,
-       76.0
+       77.0
       ],
       "16": [
        231.0,
-       232.0
+       233.0
       ],
       "64": [
        855.0,
-       856.0
+       857.0
       ],
       "256": [
        3351.0,
-       3352.0
+       3353.0
       ],
       "1024": [
        13335.0,
-       13336.0
+       13337.0
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       120.137,
-       130.137
+       148.094,
+       164.07
       ],
       "4": [
-       249.156,
-       304.078
+       304.141,
+       376.094
       ],
       "16": [
-       729.0,
-       952.0
+       880.0,
+       1168.0
       ],
       "64": [
-       2649.0,
-       3544.0
+       3184.0,
+       4336.0
       ],
       "256": [
-       10329.0,
-       13912.0
+       12400.0,
+       17008.0
       ],
       "1024": [
-       41049.0,
-       55384.0
+       49264.0,
+       67696.0
       ]
      },
      "1": {
       "1": [
-       120.0,
-       130.0
+       148.0,
+       164.0
       ],
       "4": [
-       249.0,
-       304.0
+       304.0,
+       376.0
       ],
       "16": [
-       729.0,
-       952.0
+       880.0,
+       1168.0
       ],
       "64": [
-       2649.0,
-       3544.0
+       3184.0,
+       4336.0
       ],
       "256": [
-       10329.0,
-       13912.0
+       12400.0,
+       17008.0
       ],
       "1024": [
-       41049.0,
-       55384.0
+       49264.0,
+       67696.0
       ]
      }
     }
@@ -18664,12 +18720,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      40.0,
-      54.0
+      48.0,
+      66.0
      ],
      "1": [
-      40.0,
-      54.0
+      48.0,
+      66.0
      ]
     }
    }
@@ -18684,8 +18740,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       14.039,
-       15.102
+       14.137,
+       15.207
       ],
       "4": [
        41.031,
@@ -18738,54 +18794,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       26.156,
-       42.137
+       48.141,
+       68.07
       ],
       "4": [
-       71.18,
-       129.094
+       88.188,
+       168.109
       ],
       "16": [
-       167.0,
-       441.0
+       184.0,
+       562.0
       ],
       "64": [
-       551.0,
-       1734.0
+       568.0,
+       2194.0
       ],
       "256": [
-       2087.0,
-       6918.0
+       2104.0,
+       8722.0
       ],
       "1024": [
-       8231.0,
-       27654.0
+       8248.0,
+       34834.0
       ]
      },
      "1": {
       "1": [
-       26.0,
-       42.0
+       48.0,
+       68.0
       ],
       "4": [
-       71.0,
-       129.0
+       88.0,
+       168.0
       ],
       "16": [
-       167.0,
-       441.0
+       184.0,
+       562.0
       ],
       "64": [
-       551.0,
-       1734.0
+       568.0,
+       2194.0
       ],
       "256": [
-       2087.0,
-       6918.0
+       2104.0,
+       8722.0
       ],
       "1024": [
-       8231.0,
-       27654.0
+       8248.0,
+       34834.0
       ]
      }
     }
@@ -18804,11 +18860,11 @@ one per row.</p>
     "off": {
      "0": [
       8.0,
-      27.0
+      34.0
      ],
      "1": [
       8.0,
-      27.0
+      34.0
      ]
     }
    }
@@ -18823,8 +18879,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       42.199,
-       43.227
+       42.324,
+       43.352
       ],
       "4": [
        69.031,
@@ -18877,54 +18933,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       122.203,
-       158.191
+       148.109,
+       174.227
       ],
       "4": [
-       165.129,
-       229.094
+       204.172,
+       276.0
       ],
       "16": [
-       261.0,
-       536.0
+       300.0,
+       684.0
       ],
       "64": [
-       645.0,
-       1828.0
+       684.0,
+       2316.0
       ],
       "256": [
-       2181.0,
-       7012.0
+       2220.0,
+       8844.0
       ],
       "1024": [
-       8325.0,
-       27748.0
+       8364.0,
+       34956.0
       ]
      },
      "1": {
       "1": [
-       122.0,
-       158.0
+       148.0,
+       174.0
       ],
       "4": [
-       165.0,
-       229.0
+       204.0,
+       276.0
       ],
       "16": [
-       261.0,
-       536.0
+       300.0,
+       684.0
       ],
       "64": [
-       645.0,
-       1828.0
+       684.0,
+       2316.0
       ],
       "256": [
-       2181.0,
-       7012.0
+       2220.0,
+       8844.0
       ],
       "1024": [
-       8325.0,
-       27748.0
+       8364.0,
+       34956.0
       ]
      }
     }
@@ -18943,11 +18999,11 @@ one per row.</p>
     "off": {
      "0": [
       8.0,
-      27.0
+      34.0
      ],
      "1": [
       8.0,
-      27.0
+      34.0
      ]
     }
    }
@@ -18962,12 +19018,12 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       38.289,
-       39.238
+       38.41,
+       39.391
       ],
       "4": [
-       60.051,
-       61.082
+       60.113,
+       61.18
       ],
       "16": [
        144.023,
@@ -19016,54 +19072,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       90.168,
-       114.086
+       112.156,
+       140.109
       ],
       "4": [
-       116.242,
-       132.094
+       144.289,
+       164.023
       ],
       "16": [
-       262.102,
-       288.086
+       320.125,
+       360.0
       ],
       "64": [
-       754.0,
-       917.0
+       920.0,
+       1152.0
       ],
       "256": [
-       2722.0,
-       3461.0
+       3320.0,
+       4320.0
       ],
       "1024": [
-       10594.0,
-       13637.0
+       12920.0,
+       16992.0
       ]
      },
      "1": {
       "1": [
-       90.0,
-       114.0
+       112.0,
+       140.0
       ],
       "4": [
-       116.0,
-       132.0
+       144.0,
+       164.0
       ],
       "16": [
-       262.0,
-       288.0
+       320.0,
+       360.0
       ],
       "64": [
-       754.0,
-       917.0
+       920.0,
+       1152.0
       ],
       "256": [
-       2722.0,
-       3461.0
+       3320.0,
+       4320.0
       ],
       "1024": [
-       10594.0,
-       13637.0
+       12920.0,
+       16992.0
       ]
      }
     }
@@ -19081,12 +19137,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      10.25,
-      13.25
+      12.5,
+      16.5
      ],
      "1": [
-      10.25,
-      13.25
+      12.5,
+      16.5
      ]
     }
    }
@@ -19101,8 +19157,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       20.062,
-       21.086
+       20.168,
+       21.211
       ],
       "4": [
        65.023,
@@ -19155,54 +19211,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       33.18,
-       45.188
+       60.125,
+       68.141
       ],
       "4": [
-       133.102,
-       158.051
+       174.055,
+       210.008
       ],
       "16": [
-       433.0,
-       626.0
+       536.0,
+       786.0
       ],
       "64": [
-       1633.0,
-       2498.0
+       1976.0,
+       3090.0
       ],
       "256": [
-       6433.0,
-       9986.0
+       7736.0,
+       12306.0
       ],
       "1024": [
-       25633.0,
-       39938.0
+       30776.0,
+       49170.0
       ]
      },
      "1": {
       "1": [
-       33.0,
-       45.0
+       60.0,
+       68.0
       ],
       "4": [
-       133.0,
-       158.0
+       174.0,
+       210.0
       ],
       "16": [
-       433.0,
-       626.0
+       536.0,
+       786.0
       ],
       "64": [
-       1633.0,
-       2498.0
+       1976.0,
+       3090.0
       ],
       "256": [
-       6433.0,
-       9986.0
+       7736.0,
+       12306.0
       ],
       "1024": [
-       25633.0,
-       39938.0
+       30776.0,
+       49170.0
       ]
      }
     }
@@ -19220,12 +19276,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      25.0,
-      39.0
+      30.0,
+      48.0
      ],
      "1": [
-      25.0,
-      39.0
+      30.0,
+      48.0
      ]
     }
    }
@@ -19240,8 +19296,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       38.23,
-       39.223
+       38.289,
+       39.297
       ],
       "4": [
        83.023,
@@ -19294,54 +19350,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       93.156,
-       120.133
+       110.18,
+       146.094
       ],
       "4": [
-       199.129,
-       235.059
+       242.125,
+       278.125
       ],
       "16": [
-       511.0,
-       703.0
+       626.0,
+       852.0
       ],
       "64": [
-       1759.0,
-       2575.0
+       2162.0,
+       3156.0
       ],
       "256": [
-       6751.0,
-       10063.0
+       8306.0,
+       12372.0
       ],
       "1024": [
-       26719.0,
-       40015.0
+       32882.0,
+       49236.0
       ]
      },
      "1": {
       "1": [
-       93.0,
-       120.0
+       110.0,
+       146.0
       ],
       "4": [
-       199.0,
-       235.0
+       242.0,
+       278.0
       ],
       "16": [
-       511.0,
-       703.0
+       626.0,
+       852.0
       ],
       "64": [
-       1759.0,
-       2575.0
+       2162.0,
+       3156.0
       ],
       "256": [
-       6751.0,
-       10063.0
+       8306.0,
+       12372.0
       ],
       "1024": [
-       26719.0,
-       40015.0
+       32882.0,
+       49236.0
       ]
      }
     }
@@ -19359,12 +19415,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      26.0,
-      39.0
+      32.0,
+      48.0
      ],
      "1": [
-      26.0,
-      39.0
+      32.0,
+      48.0
      ]
     }
    }
@@ -19379,12 +19435,12 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       56.391,
-       57.383
+       56.527,
+       57.543
       ],
       "4": [
-       59.145,
-       61.18
+       59.188,
+       61.195
       ],
       "16": [
        96.129,
@@ -19433,54 +19489,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       170.371,
-       219.465
+       200.297,
+       244.32
       ],
       "4": [
-       203.594,
-       217.281
+       236.219,
+       270.203
       ],
       "16": [
-       304.598,
-       359.246
+       384.539,
+       438.211
       ],
       "64": [
-       652.285,
-       843.309
+       816.148,
+       1066.367
       ],
       "256": [
-       2044.285,
-       2859.309
+       2544.148,
+       3658.367
       ],
       "1024": [
-       7612.285,
-       10923.309
+       9456.148,
+       14026.367
       ]
      },
      "1": {
       "1": [
-       158.375,
-       192.141
+       196.211,
+       244.141
       ],
       "4": [
-       239.629,
-       303.449
+       258.656,
+       340.633
       ],
       "16": [
-       362.348,
-       429.234
+       390.414,
+       492.273
       ],
       "64": [
-       753.352,
-       920.312
+       900.258,
+       1118.375
       ],
       "256": [
-       2145.352,
-       2936.312
+       2628.258,
+       3710.375
       ],
       "1024": [
-       7713.352,
-       11000.312
+       9540.258,
+       14078.375
       ]
      }
     }
@@ -19498,12 +19554,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      7.25,
-      10.5
+      9.0,
+      13.5
      ],
      "1": [
-      7.25,
-      10.5
+      9.0,
+      13.5
      ]
     }
    }
@@ -19518,20 +19574,20 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       41.383,
-       42.422
+       41.5,
+       42.609
       ],
       "4": [
        68.031,
        69.035
       ],
       "16": [
-       141.215,
-       143.195
+       141.297,
+       143.262
       ],
       "64": [
-       423.473,
-       428.562
+       423.617,
+       428.734
       ],
       "256": [
        1388.105,
@@ -19572,54 +19628,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       124.195,
-       136.18
+       152.172,
+       178.164
       ],
       "4": [
-       147.184,
-       223.094
+       178.18,
+       278.109
       ],
       "16": [
-       261.316,
-       285.324
+       330.078,
+       364.133
       ],
       "64": [
-       900.262,
-       1073.059
+       1060.875,
+       1295.086
       ],
       "256": [
-       2785.426,
-       3368.418
+       3472.43,
+       3882.266
       ],
       "1024": [
-       10464.238,
-       12639.129
+       13192.211,
+       15174.172
       ]
      },
      "1": {
       "1": [
-       124.0,
-       136.0
+       152.0,
+       178.0
       ],
       "4": [
-       147.0,
-       223.0
+       178.0,
+       278.0
       ],
       "16": [
-       261.0,
-       285.0
+       330.0,
+       364.0
       ],
       "64": [
-       924.316,
-       1075.324
+       1058.359,
+       1298.383
       ],
       "256": [
-       2915.488,
-       3357.578
+       3618.555,
+       3970.25
       ],
       "1024": [
-       10498.273,
-       12647.18
+       13234.289,
+       15172.195
       ]
      }
     }
@@ -19637,12 +19693,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      9.9985,
-      12.0712
+      12.656,
+      14.703
      ],
      "1": [
-      9.8734,
-      12.0958
+      12.5205,
+      14.7497
      ]
     }
    }
@@ -19657,8 +19713,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       13.039,
-       14.102
+       13.141,
+       14.207
       ],
       "4": [
        37.031,
@@ -19711,54 +19767,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       26.16,
-       41.238
+       50.125,
+       68.055
       ],
       "4": [
-       66.188,
-       130.094
+       84.188,
+       170.0
       ],
       "16": [
-       150.0,
-       447.0
+       168.0,
+       578.0
       ],
       "64": [
-       486.0,
-       1743.0
+       504.0,
+       2210.0
       ],
       "256": [
-       1830.0,
-       6927.0
+       1848.0,
+       8738.0
       ],
       "1024": [
-       7206.0,
-       27663.0
+       7224.0,
+       34850.0
       ]
      },
      "1": {
       "1": [
-       26.0,
-       41.0
+       50.0,
+       68.0
       ],
       "4": [
-       66.0,
-       130.0
+       84.0,
+       170.0
       ],
       "16": [
-       150.0,
-       447.0
+       168.0,
+       578.0
       ],
       "64": [
-       486.0,
-       1743.0
+       504.0,
+       2210.0
       ],
       "256": [
-       1830.0,
-       6927.0
+       1848.0,
+       8738.0
       ],
       "1024": [
-       7206.0,
-       27663.0
+       7224.0,
+       34850.0
       ]
      }
     }
@@ -19777,11 +19833,11 @@ one per row.</p>
     "off": {
      "0": [
       7.0,
-      27.0
+      34.0
      ],
      "1": [
       7.0,
-      27.0
+      34.0
      ]
     }
    }
@@ -19796,108 +19852,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       45.227,
-       46.238
+       45.316,
+       47.371
       ],
       "4": [
        69.023,
-       70.035
+       71.035
       ],
       "16": [
        153.0,
-       154.0
+       155.0
       ],
       "64": [
        489.0,
-       490.0
+       491.0
       ],
       "256": [
        1833.0,
-       1834.0
+       1835.0
       ],
       "1024": [
        7209.0,
-       7210.0
+       7211.0
       ]
      },
      "1": {
       "1": [
        45.0,
-       46.0
+       47.0
       ],
       "4": [
        69.0,
-       70.0
+       71.0
       ],
       "16": [
        153.0,
-       154.0
+       155.0
       ],
       "64": [
        489.0,
-       490.0
+       491.0
       ],
       "256": [
        1833.0,
-       1834.0
+       1835.0
       ],
       "1024": [
        7209.0,
-       7210.0
+       7211.0
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       141.359,
-       172.305
+       178.242,
+       192.094
       ],
       "4": [
-       173.145,
-       249.109
+       206.203,
+       298.125
       ],
       "16": [
-       257.0,
-       561.0
+       290.0,
+       704.0
       ],
       "64": [
-       593.0,
-       1850.0
+       626.0,
+       2336.0
       ],
       "256": [
-       1937.0,
-       7034.0
+       1970.0,
+       8864.0
       ],
       "1024": [
-       7313.0,
-       27770.0
+       7346.0,
+       34976.0
       ]
      },
      "1": {
       "1": [
-       141.0,
-       172.0
+       178.0,
+       192.0
       ],
       "4": [
-       173.0,
-       249.0
+       206.0,
+       298.0
       ],
       "16": [
-       257.0,
-       561.0
+       290.0,
+       704.0
       ],
       "64": [
-       593.0,
-       1850.0
+       626.0,
+       2336.0
       ],
       "256": [
-       1937.0,
-       7034.0
+       1970.0,
+       8864.0
       ],
       "1024": [
-       7313.0,
-       27770.0
+       7346.0,
+       34976.0
       ]
      }
     }
@@ -19916,11 +19972,11 @@ one per row.</p>
     "off": {
      "0": [
       7.0,
-      27.0
+      34.0
      ],
      "1": [
       7.0,
-      27.0
+      34.0
      ]
     }
    }
@@ -19935,8 +19991,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       20.062,
-       20.156
+       20.211,
+       20.273
       ],
       "4": [
        65.023,
@@ -19989,54 +20045,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       39.281,
-       59.215
+       64.125,
+       92.055
       ],
       "4": [
-       151.094,
-       180.094
+       176.062,
+       224.0
       ],
       "16": [
-       482.0,
-       653.0
+       608.0,
+       824.0
       ],
       "64": [
-       1778.0,
-       2573.0
+       2242.0,
+       3224.0
       ],
       "256": [
-       6962.0,
-       10253.0
+       8770.0,
+       12824.0
       ],
       "1024": [
-       27698.0,
-       40973.0
+       34882.0,
+       51224.0
       ]
      },
      "1": {
       "1": [
-       39.0,
-       59.0
+       64.0,
+       92.0
       ],
       "4": [
-       151.0,
-       180.0
+       176.0,
+       224.0
       ],
       "16": [
-       482.0,
-       653.0
+       608.0,
+       824.0
       ],
       "64": [
-       1778.0,
-       2573.0
+       2242.0,
+       3224.0
       ],
       "256": [
-       6962.0,
-       10253.0
+       8770.0,
+       12824.0
       ],
       "1024": [
-       27698.0,
-       40973.0
+       34882.0,
+       51224.0
       ]
      }
     }
@@ -20054,12 +20110,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      27.0,
-      40.0
+      34.0,
+      50.0
      ],
      "1": [
-      27.0,
-      40.0
+      34.0,
+      50.0
      ]
     }
    }
@@ -20074,8 +20130,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       12.047,
-       13.094
+       12.121,
+       13.191
       ],
       "4": [
        31.039,
@@ -20128,54 +20184,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       23.242,
-       40.223
+       47.23,
+       56.242
       ],
       "4": [
-       52.152,
-       125.094
+       68.25,
+       142.062
       ],
       "16": [
-       112.0,
-       425.0
+       128.0,
+       502.0
       ],
       "64": [
-       352.0,
-       1625.0
+       368.0,
+       1942.0
       ],
       "256": [
-       1312.0,
-       6425.0
+       1328.0,
+       7702.0
       ],
       "1024": [
-       5152.0,
-       25625.0
+       5168.0,
+       30742.0
       ]
      },
      "1": {
       "1": [
-       23.0,
-       40.0
+       47.0,
+       56.0
       ],
       "4": [
-       52.0,
-       125.0
+       68.0,
+       142.0
       ],
       "16": [
-       112.0,
-       425.0
+       128.0,
+       502.0
       ],
       "64": [
-       352.0,
-       1625.0
+       368.0,
+       1942.0
       ],
       "256": [
-       1312.0,
-       6425.0
+       1328.0,
+       7702.0
       ],
       "1024": [
-       5152.0,
-       25625.0
+       5168.0,
+       30742.0
       ]
      }
     }
@@ -20194,11 +20250,11 @@ one per row.</p>
     "off": {
      "0": [
       5.0,
-      25.0
+      30.0
      ],
      "1": [
       5.0,
-      25.0
+      30.0
      ]
     }
    }
@@ -20213,108 +20269,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       43.184,
-       45.176
+       43.285,
+       46.301
       ],
       "4": [
        63.039,
-       64.055
+       65.055
       ],
       "16": [
        123.0,
-       124.0
+       125.0
       ],
       "64": [
        363.0,
-       364.0
+       365.0
       ],
       "256": [
        1323.0,
-       1324.0
+       1325.0
       ],
       "1024": [
        5163.0,
-       5164.0
+       5165.0
       ]
      },
      "1": {
       "1": [
        43.0,
-       45.0
+       46.0
       ],
       "4": [
        63.0,
-       64.0
+       65.0
       ],
       "16": [
        123.0,
-       124.0
+       125.0
       ],
       "64": [
        363.0,
-       364.0
+       365.0
       ],
       "256": [
        1323.0,
-       1324.0
+       1325.0
       ],
       "1024": [
        5163.0,
-       5164.0
+       5165.0
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       123.43,
-       170.312
+       160.32,
+       192.242
       ],
       "4": [
-       156.184,
-       234.102
+       184.195,
+       280.07
       ],
       "16": [
-       216.0,
-       534.0
+       244.0,
+       664.0
       ],
       "64": [
-       456.0,
-       1775.0
+       484.0,
+       2200.0
       ],
       "256": [
-       1416.0,
-       6767.0
+       1444.0,
+       8344.0
       ],
       "1024": [
-       5256.0,
-       26735.0
+       5284.0,
+       32920.0
       ]
      },
      "1": {
       "1": [
-       123.0,
-       170.0
+       160.0,
+       192.0
       ],
       "4": [
-       156.0,
-       234.0
+       184.0,
+       280.0
       ],
       "16": [
-       216.0,
-       534.0
+       244.0,
+       664.0
       ],
       "64": [
-       456.0,
-       1775.0
+       484.0,
+       2200.0
       ],
       "256": [
-       1416.0,
-       6767.0
+       1444.0,
+       8344.0
       ],
       "1024": [
-       5256.0,
-       26735.0
+       5284.0,
+       32920.0
       ]
      }
     }
@@ -20333,11 +20389,11 @@ one per row.</p>
     "off": {
      "0": [
       5.0,
-      26.0
+      32.0
      ],
      "1": [
       5.0,
-      26.0
+      32.0
      ]
     }
    }
@@ -20352,8 +20408,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       22.117,
-       24.16
+       22.188,
+       24.289
       ],
       "4": [
        42.039,
@@ -20406,54 +20462,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       72.391,
-       93.219
+       94.289,
+       112.219
       ],
       "4": [
-       90.219,
-       173.094
+       116.18,
+       190.062
       ],
       "16": [
-       150.0,
-       473.0
+       176.0,
+       550.0
       ],
       "64": [
-       390.0,
-       1673.0
+       416.0,
+       1990.0
       ],
       "256": [
-       1350.0,
-       6473.0
+       1376.0,
+       7750.0
       ],
       "1024": [
-       5190.0,
-       25673.0
+       5216.0,
+       30790.0
       ]
      },
      "1": {
       "1": [
-       72.0,
-       93.0
+       94.0,
+       112.0
       ],
       "4": [
-       90.0,
-       173.0
+       116.0,
+       190.0
       ],
       "16": [
-       150.0,
-       473.0
+       176.0,
+       550.0
       ],
       "64": [
-       390.0,
-       1673.0
+       416.0,
+       1990.0
       ],
       "256": [
-       1350.0,
-       6473.0
+       1376.0,
+       7750.0
       ],
       "1024": [
-       5190.0,
-       25673.0
+       5216.0,
+       30790.0
       ]
      }
     }
@@ -20472,11 +20528,11 @@ one per row.</p>
     "off": {
      "0": [
       5.0,
-      25.0
+      30.0
      ],
      "1": [
       5.0,
-      25.0
+      30.0
      ]
     }
    }
@@ -20491,8 +20547,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       21.062,
-       21.125
+       21.16,
+       21.227
       ],
       "4": [
        66.023,
@@ -20545,54 +20601,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       38.16,
-       53.145
+       62.117,
+       74.141
       ],
       "4": [
-       139.094,
-       180.094
+       176.062,
+       212.008
       ],
       "16": [
-       451.0,
-       648.0
+       568.0,
+       788.0
       ],
       "64": [
-       1699.0,
-       2520.0
+       2104.0,
+       3092.0
       ],
       "256": [
-       6691.0,
-       10008.0
+       8248.0,
+       12308.0
       ],
       "1024": [
-       26659.0,
-       39960.0
+       32824.0,
+       49172.0
       ]
      },
      "1": {
       "1": [
-       38.0,
-       53.0
+       62.0,
+       74.0
       ],
       "4": [
-       139.0,
-       180.0
+       176.0,
+       212.0
       ],
       "16": [
-       451.0,
-       648.0
+       568.0,
+       788.0
       ],
       "64": [
-       1699.0,
-       2520.0
+       2104.0,
+       3092.0
       ],
       "256": [
-       6691.0,
-       10008.0
+       8248.0,
+       12308.0
       ],
       "1024": [
-       26659.0,
-       39960.0
+       32824.0,
+       49172.0
       ]
      }
     }
@@ -20610,12 +20666,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      26.0,
-      39.0
+      32.0,
+      48.0
      ],
      "1": [
-      26.0,
-      39.0
+      32.0,
+      48.0
      ]
     }
    }
@@ -20630,108 +20686,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       33.168,
-       34.191
+       33.234,
+       35.25
       ],
       "4": [
        75.023,
-       76.023
+       77.023
       ],
       "16": [
        231.0,
-       232.0
+       233.0
       ],
       "64": [
        855.0,
-       856.0
+       857.0
       ],
       "256": [
        3351.0,
-       3352.0
+       3353.0
       ],
       "1024": [
        13335.0,
-       13336.0
+       13337.0
       ]
      },
      "1": {
       "1": [
        33.0,
-       34.0
+       35.0
       ],
       "4": [
        75.0,
-       76.0
+       77.0
       ],
       "16": [
        231.0,
-       232.0
+       233.0
       ],
       "64": [
        855.0,
-       856.0
+       857.0
       ],
       "256": [
        3351.0,
-       3352.0
+       3353.0
       ],
       "1024": [
        13335.0,
-       13336.0
+       13337.0
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       88.203,
-       103.113
+       112.156,
+       132.078
       ],
       "4": [
-       190.09,
-       214.062
+       222.055,
+       276.008
       ],
       "16": [
-       502.0,
-       682.0
+       624.0,
+       852.0
       ],
       "64": [
-       1750.0,
-       2554.0
+       2160.0,
+       3156.0
       ],
       "256": [
-       6742.0,
-       10042.0
+       8304.0,
+       12372.0
       ],
       "1024": [
-       26710.0,
-       39994.0
+       32880.0,
+       49236.0
       ]
      },
      "1": {
       "1": [
-       88.0,
-       103.0
+       112.0,
+       132.0
       ],
       "4": [
-       190.0,
-       214.0
+       222.0,
+       276.0
       ],
       "16": [
-       502.0,
-       682.0
+       624.0,
+       852.0
       ],
       "64": [
-       1750.0,
-       2554.0
+       2160.0,
+       3156.0
       ],
       "256": [
-       6742.0,
-       10042.0
+       8304.0,
+       12372.0
       ],
       "1024": [
-       26710.0,
-       39994.0
+       32880.0,
+       49236.0
       ]
      }
     }
@@ -20749,12 +20805,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      26.0,
-      39.0
+      32.0,
+      48.0
      ],
      "1": [
-      26.0,
-      39.0
+      32.0,
+      48.0
      ]
     }
    }
@@ -20769,108 +20825,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       32.258,
-       32.305
+       49.133,
+       49.203
       ],
       "4": [
-       37.137,
-       37.156
+       48.297,
+       48.32
       ],
       "16": [
-       55.098,
-       55.102
+       84.566,
+       84.566
       ],
       "64": [
-       127.023,
-       127.023
+       228.523,
+       228.523
       ],
       "256": [
-       415.023,
-       415.023
+       804.52,
+       804.52
       ],
       "1024": [
-       1567.023,
-       1567.023
+       3108.52,
+       3108.52
       ]
      },
      "1": {
       "1": [
-       31.039,
-       31.047
+       48.805,
+       48.805
       ],
       "4": [
-       49.094,
-       49.105
+       84.355,
+       84.355
       ],
       "16": [
-       71.086,
-       72.078
+       120.492,
+       120.492
       ],
       "64": [
-       142.039,
-       142.047
+       264.504,
+       264.504
       ],
       "256": [
-       430.039,
-       430.047
+       840.492,
+       840.492
       ],
       "1024": [
-       1582.039,
-       1582.047
+       3144.492,
+       3144.492
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       84.602,
-       113.52
+       121.551,
+       141.418
       ],
       "4": [
-       103.66,
-       128.613
+       139.391,
+       163.391
       ],
       "16": [
-       130.426,
-       218.363
+       167.445,
+       251.125
       ],
       "64": [
-       178.215,
-       518.238
+       295.039,
+       635.266
       ],
       "256": [
-       464.215,
-       1766.238
+       871.039,
+       2171.266
       ],
       "1024": [
-       1616.215,
-       6758.238
+       3175.039,
+       8315.266
       ]
      },
      "1": {
       "1": [
-       66.293,
-       124.105
+       101.328,
+       157.023
       ],
       "4": [
-       102.52,
-       200.227
+       139.672,
+       227.258
       ],
       "16": [
-       146.465,
-       289.395
+       187.391,
+       311.352
       ],
       "64": [
-       194.371,
-       589.285
+       313.25,
+       671.219
       ],
       "256": [
-       478.371,
-       1789.285
+       889.25,
+       2183.484
       ],
       "1024": [
-       1630.371,
-       6757.375
+       3193.25,
+       8327.484
       ]
      }
     }
@@ -20878,22 +20934,22 @@ one per row.</p>
    "per_byte": {
     "on": {
      "0": [
-      1.5,
-      1.5
+      3.0,
+      3.0
      ],
      "1": [
-      1.5,
-      1.5
+      3.0,
+      3.0
      ]
     },
     "off": {
      "0": [
-      1.5,
-      6.5
+      3.0,
+      8.0
      ],
      "1": [
-      1.5,
-      6.5
+      3.0,
+      8.0
      ]
     }
    }
@@ -20908,108 +20964,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       32.281,
-       32.418
+       48.902,
+       48.961
       ],
       "4": [
-       37.141,
-       37.172
+       48.598,
+       48.621
       ],
       "16": [
-       55.098,
-       55.102
+       84.562,
+       84.562
       ],
       "64": [
-       127.023,
-       127.023
+       228.512,
+       228.512
       ],
       "256": [
-       415.023,
-       415.023
+       804.52,
+       804.52
       ],
       "1024": [
-       1567.023,
-       1567.023
+       3108.559,
+       3108.559
       ]
      },
      "1": {
       "1": [
-       31.039,
-       31.043
+       48.488,
+       48.488
       ],
       "4": [
-       49.094,
-       49.105
+       84.559,
+       84.559
       ],
       "16": [
-       71.086,
-       72.078
+       120.5,
+       120.5
       ],
       "64": [
-       142.039,
-       142.047
+       264.484,
+       264.484
       ],
       "256": [
-       430.039,
-       430.047
+       840.508,
+       840.508
       ],
       "1024": [
-       1582.039,
-       1582.047
+       3144.473,
+       3144.473
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       84.5,
-       113.41
+       121.605,
+       141.402
       ],
       "4": [
-       103.66,
-       128.613
+       139.32,
+       163.391
       ],
       "16": [
-       130.426,
-       218.363
+       167.445,
+       251.125
       ],
       "64": [
-       178.215,
-       518.238
+       295.039,
+       635.266
       ],
       "256": [
-       464.215,
-       1766.238
+       871.039,
+       2171.266
       ],
       "1024": [
-       1616.215,
-       6758.238
+       3175.039,
+       8315.266
       ]
      },
      "1": {
       "1": [
-       66.293,
-       124.105
+       101.328,
+       157.023
       ],
       "4": [
-       102.52,
-       200.227
+       139.672,
+       227.258
       ],
       "16": [
-       146.465,
-       289.395
+       187.391,
+       311.352
       ],
       "64": [
-       194.371,
-       589.285
+       313.25,
+       671.219
       ],
       "256": [
-       478.371,
-       1789.285
+       889.25,
+       2183.484
       ],
       "1024": [
-       1630.371,
-       6757.375
+       3193.25,
+       8327.484
       ]
      }
     }
@@ -21017,22 +21073,22 @@ one per row.</p>
    "per_byte": {
     "on": {
      "0": [
-      1.5,
-      1.5
+      3.0001,
+      3.0001
      ],
      "1": [
-      1.5,
-      1.5
+      3.0,
+      3.0
      ]
     },
     "off": {
      "0": [
-      1.5,
-      6.5
+      3.0,
+      8.0
      ],
      "1": [
-      1.5,
-      6.5
+      3.0,
+      8.0
      ]
     }
    }
@@ -21047,108 +21103,108 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       32.258,
-       32.305
+       48.789,
+       48.859
       ],
       "4": [
-       37.137,
-       37.156
+       48.582,
+       48.645
       ],
       "16": [
-       55.098,
-       55.102
+       84.562,
+       84.562
       ],
       "64": [
-       127.023,
-       127.023
+       228.527,
+       228.527
       ],
       "256": [
-       415.023,
-       415.023
+       804.523,
+       804.523
       ],
       "1024": [
-       1567.023,
-       1567.023
+       3108.598,
+       3108.598
       ]
      },
      "1": {
       "1": [
-       31.039,
-       31.047
+       48.547,
+       48.555
       ],
       "4": [
-       49.094,
-       49.105
+       84.512,
+       84.52
       ],
       "16": [
-       71.086,
-       72.078
+       120.477,
+       120.477
       ],
       "64": [
-       142.039,
-       142.047
+       264.523,
+       264.523
       ],
       "256": [
-       430.039,
-       430.047
+       840.512,
+       840.512
       ],
       "1024": [
-       1582.039,
-       1582.047
+       3144.477,
+       3144.477
       ]
      }
     },
     "off": {
      "0": {
       "1": [
-       84.602,
-       113.52
+       121.551,
+       141.418
       ],
       "4": [
-       103.66,
-       128.613
+       139.32,
+       163.391
       ],
       "16": [
-       130.426,
-       218.363
+       167.445,
+       251.125
       ],
       "64": [
-       178.215,
-       518.238
+       295.039,
+       635.266
       ],
       "256": [
-       464.215,
-       1766.238
+       871.039,
+       2171.266
       ],
       "1024": [
-       1616.215,
-       6758.238
+       3175.039,
+       8315.266
       ]
      },
      "1": {
       "1": [
-       66.293,
-       124.105
+       101.398,
+       157.094
       ],
       "4": [
-       102.52,
-       200.227
+       139.672,
+       227.258
       ],
       "16": [
-       146.465,
-       289.395
+       187.391,
+       311.352
       ],
       "64": [
-       194.371,
-       589.285
+       313.25,
+       671.219
       ],
       "256": [
-       478.371,
-       1789.285
+       889.25,
+       2183.484
       ],
       "1024": [
-       1630.371,
-       6757.375
+       3193.25,
+       8327.484
       ]
      }
     }
@@ -21156,22 +21212,22 @@ one per row.</p>
    "per_byte": {
     "on": {
      "0": [
-      1.5,
-      1.5
+      3.0001,
+      3.0001
      ],
      "1": [
-      1.5,
-      1.5
+      3.0,
+      3.0
      ]
     },
     "off": {
      "0": [
-      1.5,
-      6.5
+      3.0,
+      8.0
      ],
      "1": [
-      1.5,
-      6.5
+      3.0,
+      8.0
      ]
     }
    }
@@ -32556,8 +32612,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       48.074,
-       48.074
+       48.176,
+       48.176
       ],
       "4": [
        177.039,
@@ -32610,54 +32666,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       71.281,
-       71.281
+       94.32,
+       94.32
       ],
       "4": [
-       271.102,
-       271.102
+       314.109,
+       314.109
       ],
       "16": [
-       979.0,
-       979.0
+       1082.0,
+       1082.0
       ],
       "64": [
-       3811.0,
-       3811.0
+       4154.0,
+       4154.0
       ],
       "256": [
-       15139.0,
-       15139.0
+       16442.0,
+       16442.0
       ],
       "1024": [
-       60451.0,
-       60451.0
+       65594.0,
+       65594.0
       ]
      },
      "1": {
       "1": [
-       71.0,
-       71.0
+       94.0,
+       94.0
       ],
       "4": [
-       271.0,
-       271.0
+       314.0,
+       314.0
       ],
       "16": [
-       979.0,
-       979.0
+       1082.0,
+       1082.0
       ],
       "64": [
-       3811.0,
-       3811.0
+       4154.0,
+       4154.0
       ],
       "256": [
-       15139.0,
-       15139.0
+       16442.0,
+       16442.0
       ],
       "1024": [
-       60451.0,
-       60451.0
+       65594.0,
+       65594.0
       ]
      }
     }
@@ -32675,12 +32731,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      59.0,
-      59.0
+      64.0,
+      64.0
      ],
      "1": [
-      59.0,
-      59.0
+      64.0,
+      64.0
      ]
     }
    }
@@ -32692,8 +32748,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       67.055,
-       67.055
+       67.156,
+       67.156
       ],
       "4": [
        251.328,
@@ -32746,54 +32802,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       331.82,
-       331.82
+       419.102,
+       419.102
       ],
       "4": [
-       1294.766,
-       1294.766
+       1603.844,
+       1603.844
       ],
       "16": [
-       5097.375,
-       5097.375
+       6272.719,
+       6272.719
       ],
       "64": [
-       20310.898,
-       20310.898
+       24947.453,
+       24947.453
       ],
       "256": [
-       80803.516,
-       80803.516
+       99235.625,
+       99235.625
       ],
       "1024": [
-       323464.324,
-       323464.324
+       397169.773,
+       397169.773
       ]
      },
      "1": {
       "1": [
-       329.0,
-       329.0
+       416.156,
+       416.156
       ],
       "4": [
-       1297.633,
-       1297.633
+       1608.109,
+       1608.109
       ],
       "16": [
-       5114.758,
-       5114.758
+       6297.328,
+       6297.328
       ],
       "64": [
-       20282.164,
-       20282.164
+       24919.828,
+       24919.828
       ],
       "256": [
-       81222.148,
-       81222.148
+       99727.969,
+       99727.969
       ],
       "1024": [
-       324002.957,
-       324002.957
+       397831.648,
+       397831.648
       ]
      }
     }
@@ -32811,12 +32867,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      315.9646,
-      315.9646
+      387.9351,
+      387.9351
      ],
      "1": [
-      316.1208,
-      316.1208
+      388.1558,
+      388.1558
      ]
     }
    }
@@ -32828,8 +32884,8 @@ one per row.</p>
     "on": {
      "0": {
       "1": [
-       55.207,
-       55.207
+       55.297,
+       55.297
       ],
       "4": [
        226.004,
@@ -32882,54 +32938,54 @@ one per row.</p>
     "off": {
      "0": {
       "1": [
-       225.199,
-       225.199
+       262.188,
+       262.188
       ],
       "4": [
-       929.094,
-       929.094
+       1032.109,
+       1032.109
       ],
       "16": [
-       3641.0,
-       3641.0
+       3984.0,
+       3984.0
       ],
       "64": [
-       14489.0,
-       14489.0
+       15792.0,
+       15792.0
       ],
       "256": [
-       57881.0,
-       57881.0
+       63024.0,
+       63024.0
       ],
       "1024": [
-       231449.0,
-       231449.0
+       251952.0,
+       251952.0
       ]
      },
      "1": {
       "1": [
-       225.0,
-       225.0
+       262.0,
+       262.0
       ],
       "4": [
-       929.0,
-       929.0
+       1032.0,
+       1032.0
       ],
       "16": [
-       3641.0,
-       3641.0
+       3984.0,
+       3984.0
       ],
       "64": [
-       14489.0,
-       14489.0
+       15792.0,
+       15792.0
       ],
       "256": [
-       57881.0,
-       57881.0
+       63024.0,
+       63024.0
       ],
       "1024": [
-       231449.0,
-       231449.0
+       251952.0,
+       251952.0
       ]
      }
     }
@@ -32947,12 +33003,12 @@ one per row.</p>
     },
     "off": {
      "0": [
-      226.0,
-      226.0
+      246.0,
+      246.0
      ],
      "1": [
-      226.0,
-      226.0
+      246.0,
+      246.0
      ]
     }
    }
@@ -34036,10 +34092,13 @@ one per row.</p>
       (st.row && !chosen ? ". The chosen configuration is not shown: nothing is marked" : "") + ".";
     var bd = D.boards.filter(function (x) { return x.id === st.board; })[0];
     var hasUnit = v.all.some(function (x) { return x.c.role === "hardware"; });
+    var unitShown = rs.some(function (x) { return x.c.role === "hardware"; });
     $("cmp-note").textContent = [st.cache === "off" && bd.note_cache_off ? bd.note_cache_off : "",
+      unitShown && bd.note_hw_unit ? bd.note_hw_unit : "",
       hasUnit ? "" : "No CRC unit of the " + bd.name + " was measured for " + st.crc + ": the table holds libraries only."]
       .filter(function (x) { return x; }).join(" ");
-    $("cmp-src").textContent = bd.name + " (" + bd.core + ", " + Math.round(bd.clock_hz / 1e6) + " MHz). Records: " +
+    $("cmp-src").textContent = bd.name + " (" + bd.core + ", " + Math.round(bd.clock_hz / 1e6) + " MHz). " +
+      (bd.method_text ? bd.method_text + " " : "") + "Records: " +
       D.source.records + ", series at commit " + D.source.commits.join(", ") + ", toolchain " + D.source.toolchain_image.join(", ") +
       ". Each number is the mean of the scenario's 256 calls, the first included, as min–max over the eight placements, first pass; " +
       "per byte from the means at 256 and 1024 bytes, at the chosen start.";
@@ -34087,5 +34146,6 @@ one per row.</p>
   build();
 })();
 </script></main>
-<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

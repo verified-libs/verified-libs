@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The items, from the first and second CRC series reports, and two from the pools series:">
+<link rel="canonical" href="https://verified-libs.org/report-2026-11-27-crc-unexplained.html">
+<meta property="og:site_name" content="verified-libs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="What the CRC reports left unexplained, studied in the data we have - verified-libs">
+<meta property="og:description" content="The items, from the first and second CRC series reports, and two from the pools series:">
+<meta property="og:url" content="https://verified-libs.org/report-2026-11-27-crc-unexplained.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>What the CRC reports left unexplained, studied in the data we have - verified-libs</title><style>
+:root{--bg:#fdfdfc;--fg:#1d1d1b;--mute:#62625e;--line:#e2e1dc;--acc:#1f5f8b;--code:#f3f2ee;--bad:#a3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#e8e7e3;--mute:#a3a29c;--line:#33332f;--acc:#7fb6dd;--code:#22221f;--bad:#f0877f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{border-bottom:1px solid var(--line)}nav,main{max-width:1060px;margin:0 auto;padding:0 16px}
+nav{display:flex;gap:20px;align-items:baseline;padding:14px 16px;flex-wrap:wrap}
+nav .brand{font-weight:650;margin-right:auto;color:var(--fg)}nav a{color:var(--mute);text-decoration:none}
+nav a.on,nav a:hover{color:var(--acc)}main{padding:24px 16px 64px}
+h1{font-size:1.9rem;line-height:1.25}h2{margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+a{color:var(--acc)}code{background:var(--code);padding:1px 4px;border-radius:4px;font-size:.92em}
+pre{background:var(--code);padding:12px;overflow-x:auto;border-radius:6px}pre code{padding:0}
+.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;white-space:nowrap}footer{max-width:1060px;margin:0 auto;padding:24px 16px;color:var(--mute);
+font-size:.85rem;border-top:1px solid var(--line)}
+form.cmp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1rem 0}
+form.cmp fieldset{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;min-width:0}
+form.cmp legend{font-weight:600;padding:0 4px}form.cmp label{display:block;margin:4px 0}
+form.cmp label.w{display:grid;grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 2ch;gap:8px;align-items:center}
+form.cmp select,form.cmp button{font:inherit;color:inherit;background:var(--code);border:1px solid var(--line);
+border-radius:4px;padding:2px 6px}form.cmp input[type=range]{width:100%;accent-color:var(--acc)}
+form.cmp select{max-width:100%;display:block;margin-top:4px}form.cmp fieldset{align-self:start}
+table.cmp{min-width:900px}table.cmp td.r{white-space:nowrap}
+table.cmp td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp td.score{font-weight:650}
+.sortb{font:inherit;font-weight:600;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
+.tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
+tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
+</style></head>
+<body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
+<main><h1 id="what-the-crc-reports-left-unexplained-studied-in-the-data-we-have">What the CRC reports left unexplained, studied in the data we have</h1>
+<p>2026-11-27. No board was used and nothing was written to one. Every number
+below is printed by
+<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/analysis/unexplained-2026-11-27.py"><code>lab/analysis/unexplained-2026-11-27.py</code></a>
+(the subcommand is named with each number) or by
+<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/tools/crc-placement.py"><code>lab/tools/crc-placement.py</code></a>, from:
+- the records under <code>records/crc</code> and <code>records/pools</code>;
+- the run files of the series (the CRC series' run directories of commits
+  6301058 and 40f1958, the first pools series' of commit f12caf7);
+- the images of those commits, as built: the Pico 2's CRC images of 40f1958
+  are byte for byte those of the records of 6301058 (296 of 296
+  <code>image_sha256</code> equal), and the pools series' images are those of its
+  records.</p>
+<p>The items, from the <a href="report-2026-11-25-crc-first-series.html">first</a> and
+<a href="report-2026-11-25-crc-second-series.html">second</a> CRC series reports, and two from
+the <a href="report-2026-11-26-pools-first-series.html">pools series</a>:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. The NUCLEO-H723ZG's retries (CRC, 18 and 14 per series, always at the first image of a configuration)</td>
+<td>explained by the image's own running time</td>
+</tr>
+<tr>
+<td>2. The Pico 2's differences between pass 1 and pass 2 (CRC and pools)</td>
+<td>explained by the XIP cache's random replacement, which the RP2350 datasheet states; confirmed by a zero-write job of six passes</td>
+</tr>
+<tr>
+<td>3. The Pico 2's period of 8 bytes with the cache off (CRC)</td>
+<td>narrowed, not explained; the flash interface's settings read; what would settle it below</td>
+</tr>
+<tr>
+<td>4. The NUCLEO-H723ZG's spread over the placements with the cache off (pools, 352 %)</td>
+<td>explained for the configuration named (Contiki-NG); the others at the same placements fit the same rule, not shown instruction by instruction</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="1-the-nucleo-h723zgs-retries">1. The NUCLEO-H723ZG's retries</h2>
+<p><strong>What was seen.</strong>
+- The runner (<code>kinds/crc/bench/run-crc.py</code>) looks at an image after a wait.
+  If it has not finished, the run is thrown away and repeated with twice
+  the wait. The wait is kept per configuration, and the next configuration
+  starts at the shortest wait that has finished (5 s).
+- On the H723, at 64 MHz with the cache off and on, the first series had 18
+  retries and the second 14. Each came at the first image of a
+  configuration that a run reached.</p>
+<p><strong>What it is.</strong> The image's running time is longer than the wait. It is
+more than the cycles a record holds: before every timed call, the image
+computes the expected CRC with the bitwise reference (<code>ref_crc()</code>,
+<code>kinds/crc/bench/main.c</code>, <code>scenario()</code>), untimed, in the configuration's
+loop and in the baseline's. So the image runs about the baseline's timed
+cycles twice more. The running time estimated that way (<code>retries</code>):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configurations (second series)</th>
+<th>Estimated running time</th>
+<th>Retries each</th>
+<th>Waits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the 4 CRC-16 configurations</td>
+<td>12.45–12.94 s</td>
+<td>2</td>
+<td>5 s, 10 s, then 20 s finished</td>
+</tr>
+<tr>
+<td>the 6 CRC-8 configurations</td>
+<td>9.25–9.74 s</td>
+<td>1</td>
+<td>5 s, then 10 s finished</td>
+</tr>
+<tr>
+<td>the 8 CRC-32 configurations</td>
+<td>3.38–3.87 s</td>
+<td>0</td>
+<td>5 s finished</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>In both series every configuration above 10 s had two retries, every one
+  between 5 and 10 s one, and every one below 5 s none.</li>
+<li>Second series: 4 × 2 + 6 × 1 = 14.</li>
+<li>First series: 6 CRC-16 configurations at 12.73–13.10 s give 2 each; 5
+  CRC-8 configurations at 9.59–9.90 s and crcany's bitwise CRC-32 at 6.21 s
+  give 1 each; 6 × 2 + 6 × 1 = 18.</li>
+<li>CRC-16 and CRC-8 take longer than CRC-32 because their bitwise reference
+  is slower on this board. At 1024 bytes it costs 323 464 and 231 449
+  cycles with the cache off, against 60 451 for CRC-32; with the cache on
+  62 049 and 54 725 against 41 997 (the baseline rows of the second
+  series). The reference is in every image, and its cost is the baseline
+  row of every table.</li>
+<li>A check of the explanation: under method version 3 the H723 runs at
+  520 MHz, and the same images' running time is about an eighth. The CRC
+  jobs of method version 3 on the H723 (<code>~/vl-wt-crc-runs/v3/stm32h723</code>)
+  logged no retry ("not finished": 0).</li>
+</ul>
+<p>Nothing about the boards or the libraries follows from the retries: a
+retried run is a complete run with a longer wait.</p>
+<h2 id="2-the-pico-2s-differences-between-the-passes">2. The Pico 2's differences between the passes</h2>
+<p><strong>What was seen</strong> (<code>passes</code>):
+- <strong>CRC</strong> (<code>records/crc/rp2350</code>): 90 means differ between pass 1 and pass 2.
+  All are of the configuration, none of the baseline, all with the cache
+  on. The minimum of the scenario's calls is the same in both passes in all
+  90; the largest difference is 1.26 % (crcany <code>crc32iso_hdlc_word</code>, 4
+  bytes).
+- <strong>Pools</strong> (<code>records/pools/rp2350</code>): 116 of 4224 means differ. All are of
+  the configuration, all with the cache on. The minimum is the same in 115;
+  the largest difference is 6.30 %, heapless's <code>init</code>, which is one call.
+- On the other five boards no mean differs between the passes, in either
+  kind.</p>
+<p><strong>Not the image that ran before</strong> (<code>order</code>). The first series' runner runs
+odd passes in the bundle's order and even passes in reverse, so an image
+follows another image in each pass. In the pools series the Pico 2's images
+of atomic-pool and ETL ran in two jobs (the smoke and the series job). Taking
+the image that ran just before each run:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>Cache-on means equal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the same image ran before, in both jobs</td>
+<td>311 of 348</td>
+</tr>
+<tr>
+<td>another image ran before</td>
+<td>361 of 420</td>
+</tr>
+</tbody>
+</table></div>
+<p>The image that ran before does not decide it.</p>
+<p><strong>What the datasheet says.</strong> RP2350 datasheet (RP-008373), 4.4.1.2 "Cache
+line states" (page 345 of the PDF): "Cache eviction policy is random, and
+the cache only makes one attempt to select an eviction way." The cache is
+"16 kB, two-way set-associative" (4.4.1). On a miss in a set whose two ways
+are full, which of the two lines is replaced is chosen at random. So a
+later access may miss in one run and hit in another, from the same start.</p>
+<p>The same section says: "Cache line states are stored in the cache tag
+memory (...). This memory contents do not change on reset", and "The
+bootrom clears the tag memory upon entering the flash boot or NSBOOT (USB
+boot) path". Every run is started by a reset through the boot
+ROM and the boot stub. So every run starts from an empty cache, whatever
+ran before, as the table above shows.</p>
+<p><strong>It fits what was seen:</strong>
+- only with the cache on (with it off nothing is cached);
+- only in some means, by a few slower calls: the minimum is the same, and
+  the maximum differs (CRC: in 44 of the 90; pools: in 103 of the 116);
+- never in the baseline: the reference is short code in the image's fixed
+  part, whose lines conflict less.</p>
+<p><strong>A correction.</strong> The first CRC series report says, at check 1: "Which way
+of the two-way XIP cache is replaced on a miss is not stated in the RP2350
+datasheet (...) no replacement policy found". The datasheet states it, in
+the sentence quoted above. That sentence is in the section on pinned lines,
+not in the overview, which is presumably why the search missed it.</p>
+<p><strong>What would confirm it</strong> (a zero-write job, as a proposal):
+- Run one image of a configuration that differed, six times in the same
+  order: <code>run-pools.py rp2350 DIR --bundle 12 --adapter adapter_heapless
+  --passes 6</code>.
+- This is 48 runs and about 5 minutes, with no write: bundle 12 is on the
+  board. The pools concurrency bundle (300) lies in the first 232 KB of
+  flash, bundle 12 from 2 MB on, so the concurrency series does not touch
+  it; the runner compares the flash with the bundle first and refuses to
+  run if it differs.
+- Read the option registers first (<code>read-options.py</code>).
+- Expected if the explanation holds: the cache-off means are equal in all
+  six passes; the cache-on means differ between passes 1, 3 and 5, which
+  ran in the same order after the same images.
+- If instead the cache-on means were equal in all passes of the same order,
+  the explanation would be wrong.</p>
+<p><strong>Confirmed</strong> (that job, 2026-11-26 22:54 to 22:59 UTC: option registers
+read first, 48 runs, no flash write; run files
+<code>~/vl-wt-pools-runs/rp2350/U1</code>; <code>sixpass</code>). Over the 8 placements, 88 means
+per cache state and library, <code>init</code> left out (one call):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>All six passes equal</th>
+<th>Pairs of the same order</th>
+<th>Pairs of reverse order</th>
+<th>Fastest call equal in all six</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>heapless, cache off</td>
+<td>88 of 88</td>
+<td>88</td>
+<td>88</td>
+<td>88 of 88</td>
+</tr>
+<tr>
+<td>heapless, cache on</td>
+<td>55 of 88</td>
+<td>64 to 69</td>
+<td>64 to 71</td>
+<td>88 of 88</td>
+</tr>
+<tr>
+<td>baseline, cache off</td>
+<td>88 of 88</td>
+<td>88</td>
+<td>88</td>
+<td>88 of 88</td>
+</tr>
+<tr>
+<td>baseline, cache on</td>
+<td>88 of 88</td>
+<td>88</td>
+<td>88</td>
+<td>88 of 88</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>With the cache off every mean is the same in all six passes.</li>
+<li>With the cache on, the means differ between passes of the same order
+  as often as between passes of reverse order, so the order of the runs
+  does not decide them.</li>
+<li>The fastest call is the same in every pass. The largest difference
+  between two passes is 12.35 % (placement 20, <code>mixed/alloc</code>, cache on).</li>
+<li>The baseline in the same runs is equal in all six passes, with the
+  cache on too.</li>
+</ul>
+<h2 id="3-the-pico-2s-period-of-8-bytes-with-the-cache-off">3. The Pico 2's period of 8 bytes with the cache off</h2>
+<p><strong>What was seen.</strong> With the cache off, the CRC means at 1024 bytes repeat
+every 8 bytes of placement in 12 of 20 configurations (first series, check
+7).</p>
+<p><strong>What the images show</strong> (<code>crc-placement.py</code> on the images of the records,
+then <code>residue</code>):
+- The placements step by 4 bytes, so a loop's first address takes two
+  values modulo 8 in each configuration (0 and 4, or 2 and 6).
+- In 15 of the 20 configurations the mean is decided by that value alone:
+  one mean for each.
+- In four others (crcany <code>crc32iso_hdlc_byte</code> and <code>crc32iso_hdlc_word</code>,
+  ETL <code>crc32_t256</code>, Rust <code>Table&lt;1&gt;</code>) it is decided but for at most 7
+  cycles in 300 000 to 440 000.
+- zlib moves by up to 1.5 % within one value.
+- The size of the effect:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Loop</th>
+<th>Mean at 1024 bytes, cache off, by the loop's first address modulo 8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AceCRC <code>crc8</code> byte table</td>
+<td>12 bytes, 5 instructions</td>
+<td>0: 297 899; 4: 262 949 (13.3 %)</td>
+</tr>
+<tr>
+<td>ETL <code>crc8_t256</code></td>
+<td>12 bytes, 5 instructions</td>
+<td>0: 297 657; 4: 262 674 (13.3 %)</td>
+</tr>
+<tr>
+<td>crcany <code>crc8smbus_byte</code></td>
+<td>12 bytes, 5 instructions</td>
+<td>2: 326 024; 6: 362 642 (11.2 %)</td>
+</tr>
+<tr>
+<td>the other 17</td>
+<td>14 to 74 bytes</td>
+<td>0.00 to 0.17 %, zlib 1.50 %</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What is known about the flash path:</strong>
+- With the cache disabled, accesses "ignore the cache contents, and always
+  access the QSPI interface" (4.4.5, XIP_CTRL CTRL.EN_SECURE).
+- The QMI does "8/16/32-bit accesses for uncached accesses, and 64-bit
+  accesses for cache line fills" (4.4.2), and chains sequentially addressed
+  accesses into one QSPI transfer while M0_TIMING.COOLDOWN is non-zero
+  (12.14.2.1, "Transfer chaining").
+- The board layer leaves the QMI as the boot ROM sets it; M0_TIMING read
+  0x60007203 on 2026-11-11 (<code>firmware/common/rp2350/board.h</code>), whose
+  COOLDOWN field (bits 31:30) is 1. So chaining is on: a loop's sequential
+  fetches chain, and its backward branch starts a new transfer.</p>
+<p><strong>Not explained.</strong>
+- Which of the two values is the slow one: it is 0 for two of the 12-byte
+  loops and 6 for the third.
+- Why the effect is large only for the shortest loops.
+- Counting the units the loop touches gives it for one of the three
+  12-byte loops only. For crcany the slow value (6) is the one whose loop
+  touches three 8-byte units instead of two. For AceCRC and ETL the loop
+  touches three 32-bit words and two 8-byte units at both values, and the
+  value 0 is still the slow one.</p>
+<p><strong>What would settle it:</strong>
+- First, zero-write: read over the probe, after a run, the QMI's
+  M0_TIMING, M0_RFMT and M0_RCMD (0x400d000c, 0x400d0010, 0x400d0014) and
+  XIP_CTRL CTRL (0x400c8000). That gives the read command, the chaining
+  and the page-break setting the measurement ran with, today, under method
+  version 3. It does not settle the question; it is what a model of the
+  transfers needs.
+  <strong>Read</strong> on 2026-11-26 at 22:59 UTC, after the six-pass job, with the
+  last heapless image running (<code>probe-rs read</code>, no write). The fields
+  are from the datasheet's tables (12.14, QMI registers; 4.4, XIP CTRL):
+  - <strong>M0_TIMING <code>0x60007203</code>:</strong>
+    - COOLDOWN 1 (chaining on), as read on 2026-11-11;
+    - PAGEBREAK 2 (bursts break at 1024-byte boundaries);
+    - SELECT_SETUP 0, SELECT_HOLD 0, MAX_SELECT 0 (no limit);
+    - MIN_DESELECT 7, RXDELAY 2;
+    - CLKDIV 3 (SCK = clk_sys / 3, 50 MHz at the 150 MHz of the runs).
+  - <strong>M0_RFMT <code>0x000492a8</code>:</strong>
+    - prefix 8 bits single width;
+    - address, suffix (8 bits), dummy (16 bits) and data all quad width;
+    - no DTR.
+  - <strong>M0_RCMD <code>0x000000eb</code>:</strong> prefix 0xEB (fast read, quad I/O), suffix
+    0x00 (no continuous-read mode).
+  - <strong>XIP CTRL <code>0x00000083</code>:</strong>
+    - EN_SECURE and EN_NONSECURE 1;
+    - POWER_DOWN 0, SPLIT_WAYS 0, MAINT_NONSEC 0;
+    - NO_UNTRANSLATED_NONSEC 1 (its reset value), the other NO_ bits 0.
+  - <strong>One 8-byte line by these settings:</strong>
+    - 8 SCK for the command, 6 for the address, 2 for the suffix, 4 for
+      the dummy phase and 16 for the data;
+    - 36 SCK, which is 108 system clock cycles, before the chip-select
+      times;
+    - a miss in our records is of that size: heapless's one-call <code>init</code>,
+      cache on, placement 4, took 1904 cycles in one pass and 1784 in the
+      other (<code>records/pools/rp2350</code>), 120 more.
+- Then one measurement that needs images of its own (so not zero-write;
+  for a decision, not a job): one 12-byte loop at the 8 positions of an
+  8-byte unit, with the cache off, once as built and once with
+  M0_TIMING.COOLDOWN set to 0 at the image's start.
+  - If the difference between the values goes away without chaining, it
+    is the chaining across the loop's end.
+  - If it stays, it is the core's fetch of the instructions after the
+    branch.
+- The CRC images on the Pico 2 have been overwritten in part by the pools
+  series' bundle 12, so the CRC images could not be re-run without a write
+  either.</p>
+<h2 id="4-the-nucleo-h723zgs-spread-over-the-placements-with-the-cache-off-pools">4. The NUCLEO-H723ZG's spread over the placements with the cache off (pools)</h2>
+<p><strong>What was seen</strong> (<code>spread</code>, pass 1). Contiki-NG <code>memb</code>, <code>pair_full</code> free,
+cache off, by placement:
+- 298, 271, 278 and 250 cycles at placements 0, 4, 8 and 12;
+- 1132, 1046 and 1086 at placements 16, 20 and 24;
+- 272 at placement 28.</p>
+<p><strong>Where its loop lies</strong> (<code>loop memb_free</code>, the pools series' images):
+- <code>memb_free</code> looks for the block's index in a loop of 16 bytes.
+- At placements 16, 20 and 24 that loop crosses a 32-byte boundary (first
+  byte at 20, 24 and 28 modulo 32).
+- At the other five placements it lies inside one 32-byte block.
+- The slow placements are exactly the crossing ones.
+- 32 bytes is the flash word the H723's read buffer holds (256 bits,
+  RM0468 4.3.8): the same fit the first CRC series found for its loops on
+  this board (check 7).
+- <code>pair_full</code> frees the block allocated last with 31 held, so the search
+  runs many times through the loop each call; hence a factor of about 4.</p>
+<p><strong>The other configurations at the same placements.</strong>
+- MemoryPool (<code>empty</code> alloc 34 against 19), CMSIS-RTX (<code>mixed</code> alloc) and
+  RIOT (<code>empty</code> alloc, at 20 and 24) are slow at the same placements, or
+  some of them.
+- Their alloc paths are straight code, not loops. The function spans two
+  32-byte blocks from placement 12 (MemoryPool) or 16 (RIOT) on, while the
+  slow placements begin one step later.
+- That fits the rule if the instructions an exhausted pool executes are
+  the first 13 to 16 bytes of the function. The path was not traced
+  instruction by instruction, so this is a fit, not shown.</p>
+<p>Nothing here is a property of a library: with the cache on, the
+factor of about 4 is gone (Contiki-NG <code>pair_full</code> free: 162–181 cycles over
+the same placements), and the pages show every figure as the range over
+the eight placements.</p>
+<h2 id="not-studied-tonight">Not studied tonight</h2>
+<p>The other items the CRC reports list as not explained:
+- the order of AceCRC's seven placements on the G474 with the cache on;
+- which loop start modulo 8 is the slow one on the G0B1;
+- crcany's slicing by 4 on the Pico 2, faster at offset 1;
+- the H723's RAM tables with the cache off;
+- the Pico 2's hardware rows' fixed cost with the cache off;
+- the G474's tables of 16 in RAM and in flash.</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body></html>

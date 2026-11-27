@@ -40,10 +40,15 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 .sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
 .tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
 </style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html" class=on>Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html">Reports</a></nav></header>
-<main><p class="kindsw">Kind: <strong>Ring buffers</strong> | <a href="compare-crc.html">CRC</a></p>
+<main><p class="kindsw">Kind: <strong>Ring buffers</strong> | <a href="compare-crc.html">CRC</a> | <a href="compare-pools.html">Memory pools</a></p>
 <h1>Compare embedded ring buffers by what matters to you</h1>
 <p>Pick a board, filter on hard requirements, and set weights for the speeds you care about.
 There is no ranking of ours: without weights the table is alphabetical, and any ranking is the
@@ -159,7 +164,9 @@ score uses the value at 0.</p>
 <h2>What changed from version 1, per board</h2>
 <p>The libraries, their versions and the compiler versions are those of version 1; what changed
 is what else is in the image and where the library's code lies. Counted when version 2 replaced
-version 1 (2026-11-23), over every mean on the page (push, pop and 64-byte block of every configuration and producer/consumer mode):</p>
+version 1 (2026-11-23), over every mean on the page (push, pop and 64-byte block of every configuration and producer/consumer mode),
+with the NUCLEO-H723ZG at 64 MHz as both versions then ran it. Its numbers on this page now are of method version 3, at 520 MHz
+(<a href="method.html#method-version-3">method</a>); the nRF5340 DK's method version 3 numbers equal its earlier ones.</p>
 <table>
 <thead><tr><th>Board</th><th>Means</th><th>Same to 0.1 cycle</th><th>Within each other's range</th><th>Largest moves outside the ranges</th></tr></thead>
 <tbody>
@@ -175,7 +182,7 @@ alignment and, with a cache, what shared its cache lines came from them. TinyUSB
 nRF5340 and pxq's &#9888; block number on the Pico 2 were the two numbers that had already moved
 when another library's code changed
 (<a href="https://github.com/verified-libs/verified-libs/blob/main/reports/2026-11-22-lwrb-v3.4.0-rerun.md">2026-11-22 report</a>). The NUCLEO-H723ZG
-(Cortex-M7 with caches, at its reset clock with reset-default flash wait states) is the board
+(Cortex-M7 with caches; at 64 MHz in this count) is the board
 where placement decides most: there the numbers of version 1 and version 2 are two placements of
 the same code (and, for a library that is called, the distance above), and neither is the
 library's speed to the cycle. Without a cache and with code
@@ -300,7 +307,7 @@ in the repository gives this table as tools: the same rows in the same order, an
    },
    "bench2": {
     "records": "records/bench-v2/nrf5340",
-    "commit": "d06180e914ab",
+    "commit": "4032f809fd8d",
     "passes": 2,
     "placements": [
      0,
@@ -317,7 +324,18 @@ in the repository gives this table as tools: the same rows in the same order, an
     "far_bytes": 6144,
     "compiler": "arm-none-eabi-gcc 14.2.1",
     "rustc": "rustc 1.99.1",
-    "time": "2026-11-23T18:25:46Z"
+    "clock_mhz": 64,
+    "method_version": 3,
+    "time": "2026-11-26T13:56:29Z",
+    "archived": [
+     {
+      "name": "version 2, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+      "commit": "d06180e914ab",
+      "public_commit": "be1da88cda418e07e5b503c2cc8c93b2cd019f5e",
+      "url": "https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/bench-v2/nrf5340"
+     }
+    ],
+    "method_text": "Method version 3, at 64 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series \"version 2, nRF5340 DK and NUCLEO-H723ZG (before method version 3)\" (public commit be1da88)."
    }
   },
   {
@@ -410,7 +428,11 @@ in the repository gives this table as tools: the same rows in the same order, an
     "far_bytes": 6144,
     "compiler": "arm-none-eabi-gcc 14.2.1",
     "rustc": "rustc 1.99.1",
-    "time": "2026-11-23T18:25:28Z"
+    "clock_mhz": 64,
+    "method_version": 2,
+    "time": "2026-11-23T18:25:28Z",
+    "archived": [],
+    "method_text": "Method version 2, at 64 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand."
    }
   },
   {
@@ -503,7 +525,11 @@ in the repository gives this table as tools: the same rows in the same order, an
     "far_bytes": 6144,
     "compiler": "arm-none-eabi-gcc 14.2.1",
     "rustc": "rustc 1.99.1",
-    "time": "2026-11-23T18:25:28Z"
+    "clock_mhz": 170,
+    "method_version": 2,
+    "time": "2026-11-23T18:25:28Z",
+    "archived": [],
+    "method_text": "Method version 2, at 170 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand."
    }
   },
   {
@@ -579,7 +605,7 @@ in the repository gives this table as tools: the same rows in the same order, an
    },
    "bench2": {
     "records": "records/bench-v2/stm32h723",
-    "commit": "d06180e914ab",
+    "commit": "4032f809fd8d",
     "passes": 2,
     "placements": [
      0,
@@ -596,7 +622,18 @@ in the repository gives this table as tools: the same rows in the same order, an
     "far_bytes": 6144,
     "compiler": "arm-none-eabi-gcc 14.2.1",
     "rustc": "rustc 1.99.1",
-    "time": "2026-11-23T18:25:35Z"
+    "clock_mhz": 520,
+    "method_version": 3,
+    "time": "2026-11-26T12:53:09Z",
+    "archived": [
+     {
+      "name": "version 2, nRF5340 DK and NUCLEO-H723ZG (before method version 3)",
+      "commit": "d06180e914ab",
+      "public_commit": "be1da88cda418e07e5b503c2cc8c93b2cd019f5e",
+      "url": "https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/bench-v2/stm32h723"
+     }
+    ],
+    "method_text": "Method version 3, at 520 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series \"version 2, nRF5340 DK and NUCLEO-H723ZG (before method version 3)\" (public commit be1da88)."
    }
   },
   {
@@ -689,7 +726,11 @@ in the repository gives this table as tools: the same rows in the same order, an
     "far_bytes": 6144,
     "compiler": "arm-none-eabi-gcc 14.2.1",
     "rustc": "rustc 1.99.1",
-    "time": "2026-11-23T18:25:20Z"
+    "clock_mhz": 48,
+    "method_version": 2,
+    "time": "2026-11-23T18:25:20Z",
+    "archived": [],
+    "method_text": "Method version 2, at 48 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand."
    }
   },
   {
@@ -782,7 +823,11 @@ in the repository gives this table as tools: the same rows in the same order, an
     "far_bytes": 6144,
     "compiler": "arm-none-eabi-gcc 14.2.1",
     "rustc": "rustc 1.99.1",
-    "time": "2026-11-23T19:40:25Z"
+    "clock_mhz": 150,
+    "method_version": 2,
+    "time": "2026-11-23T19:40:25Z",
+    "archived": [],
+    "method_text": "Method version 2, at 150 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand."
    }
   }
  ],
@@ -1104,23 +1149,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 33.055,
-     "pop": 27.042,
+     "push": 33.072,
+     "pop": 27.056,
      "block": 9.28,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       33.055,
-       34.057
+       33.072,
+       34.073
       ],
       "pop": [
-       27.037,
-       27.046
+       27.05,
+       28.051
       ],
       "block": [
        9.27,
-       9.3
+       9.29
       ]
      }
     },
@@ -1458,19 +1503,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 30.035,
-     "pop": 27.026,
+     "push": 30.061,
+     "pop": 27.049,
      "block": 26.81,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       30.035,
-       30.035
+       30.061,
+       30.061
       ],
       "pop": [
-       27.026,
-       27.026
+       27.048,
+       27.049
       ],
       "block": [
        26.81,
@@ -1812,19 +1857,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 53.029,
-     "pop": 51.021,
+     "push": 53.056,
+     "pop": 51.044,
      "block": 50.31,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       53.029,
-       53.029
+       53.056,
+       53.056
       ],
       "pop": [
-       51.021,
-       51.021
+       51.043,
+       51.044
       ],
       "block": [
        50.31,
@@ -2238,19 +2283,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 155.188,
-     "pop": 123.171,
+     "push": 155.241,
+     "pop": 123.187,
      "block": 5.9,
      "dma_w": 316.894,
      "dma_r": 254.049,
      "range": {
       "push": [
-       155.188,
-       155.188
+       155.241,
+       155.242
       ],
       "pop": [
-       123.171,
-       123.172
+       123.187,
+       123.187
       ],
       "block": [
        5.9,
@@ -2616,23 +2661,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 33.054,
-     "pop": 27.031,
+     "push": 33.09,
+     "pop": 27.041,
      "block": 28.8,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       33.052,
-       33.064
+       33.084,
+       33.103
       ],
       "pop": [
-       27.024,
-       29.023
+       27.041,
+       29.031
       ],
       "block": [
        28.8,
-       29.31
+       29.3
       ]
      }
     },
@@ -2983,19 +3028,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 53.098,
-     "pop": 67.05,
+     "push": 53.114,
+     "pop": 67.072,
      "block": 57.82,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       53.071,
-       53.098
+       53.093,
+       53.123
       ],
       "pop": [
-       67.034,
-       68.039
+       67.039,
+       68.062
       ],
       "block": [
        57.82,
@@ -3460,53 +3505,53 @@ in the repository gives this table as tools: the same rows in the same order, an
      },
      "nucleo-h723zg": {
       "MPSC": {
-       "push": 50.029,
-       "pop": 51.021,
+       "push": 50.055,
+       "pop": 51.029,
        "block": null,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         50.029,
-         50.029
+         50.055,
+         50.055
         ],
         "pop": [
-         51.021,
-         51.021
+         51.028,
+         51.029
         ]
        }
       },
       "SPMC": {
-       "push": 50.029,
-       "pop": 51.021,
+       "push": 50.055,
+       "pop": 51.029,
        "block": null,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         50.029,
-         50.029
+         50.055,
+         50.055
         ],
         "pop": [
-         51.021,
-         51.021
+         51.028,
+         51.029
         ]
        }
       },
       "MPMC": {
-       "push": 50.029,
-       "pop": 51.021,
+       "push": 50.055,
+       "pop": 51.029,
        "block": null,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         50.029,
-         50.029
+         50.055,
+         50.055
         ],
         "pop": [
-         51.021,
-         51.021
+         51.028,
+         51.029
         ]
        }
       }
@@ -3850,23 +3895,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 69.142,
-     "pop": 67.061,
+     "push": 69.184,
+     "pop": 67.077,
      "block": 3.13,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       69.142,
-       70.154
+       69.173,
+       70.189
       ],
       "pop": [
-       67.049,
-       67.076
+       67.063,
+       68.098
       ],
       "block": [
        3.13,
-       3.23
+       3.24
       ]
      }
     },
@@ -4276,19 +4321,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 54.107,
-     "pop": 52.043,
+     "push": 54.133,
+     "pop": 52.052,
      "block": 3.11,
      "dma_w": 139.03,
      "dma_r": 144.03,
      "range": {
       "push": [
-       54.104,
-       56.114
+       54.131,
+       56.135
       ],
       "pop": [
-       52.043,
-       52.058
+       52.052,
+       52.083
       ],
       "block": [
        3.0,
@@ -4296,7 +4341,7 @@ in the repository gives this table as tools: the same rows in the same order, an
       ],
       "dma_w": [
        139.03,
-       158.264
+       158.265
       ],
       "dma_r": [
        144.03,
@@ -4655,19 +4700,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 119.688,
-     "pop": 111.086,
+     "push": 119.738,
+     "pop": 111.141,
      "block": 4.38,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       119.688,
-       119.688
+       119.738,
+       119.738
       ],
       "pop": [
-       111.086,
-       111.086
+       111.141,
+       111.141
       ],
       "block": [
        4.38,
@@ -4967,19 +5012,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 28.047,
-     "pop": 26.024,
+     "push": 28.059,
+     "pop": 26.034,
      "block": 24.82,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       28.047,
-       28.047
+       28.059,
+       28.059
       ],
       "pop": [
-       26.024,
-       26.024
+       26.034,
+       26.035
       ],
       "block": [
        24.82,
@@ -5321,19 +5366,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 37.03,
-     "pop": 33.039,
+     "push": 37.052,
+     "pop": 33.051,
      "block": 31.82,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       37.024,
-       37.051
+       37.048,
+       37.068
       ],
       "pop": [
-       32.021,
-       33.039
+       32.049,
+       33.051
       ],
       "block": [
        31.81,
@@ -5633,19 +5678,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 22.035,
-     "pop": 21.019,
+     "push": 22.046,
+     "pop": 21.029,
      "block": 19.31,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       22.035,
-       22.035
+       22.046,
+       22.046
       ],
       "pop": [
-       21.019,
-       21.019
+       21.029,
+       21.03
       ],
       "block": [
        19.31,
@@ -5987,19 +6032,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 33.026,
-     "pop": 32.025,
+     "push": 33.046,
+     "pop": 32.028,
      "block": 26.05,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       33.026,
-       33.026
+       33.046,
+       33.046
       ],
       "pop": [
-       32.025,
-       32.025
+       32.028,
+       32.029
       ],
       "block": [
        26.05,
@@ -6341,19 +6386,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 39.025,
-     "pop": 40.026,
+     "push": 39.049,
+     "pop": 40.028,
      "block": 28.36,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       39.025,
-       39.025
+       39.049,
+       39.049
       ],
       "pop": [
-       40.026,
-       40.026
+       40.028,
+       40.029
       ],
       "block": [
        28.36,
@@ -6695,23 +6740,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 75.047,
-     "pop": 72.029,
-     "block": 61.86,
+     "push": 74.068,
+     "pop": 71.037,
+     "block": 60.36,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       73.047,
-       75.058
+       73.063,
+       74.068
       ],
       "pop": [
-       70.031,
-       72.03
+       70.036,
+       71.037
       ],
       "block": [
        60.36,
-       62.36
+       61.36
       ]
      }
     },
@@ -7050,19 +7095,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 224.212,
-     "pop": 172.126,
+     "push": 224.291,
+     "pop": 172.153,
      "block": 4.56,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       196.921,
-       225.219
+       196.984,
+       225.312
       ],
       "pop": [
-       155.631,
-       173.127
+       155.677,
+       173.177
       ],
       "block": [
        4.48,
@@ -7791,19 +7836,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      },
      "nucleo-h723zg": {
       "MPSC": {
-       "push": 55.046,
-       "pop": 52.039,
+       "push": 55.048,
+       "pop": 52.059,
        "block": 49.9,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         55.046,
-         55.046
+         55.048,
+         55.048
         ],
         "pop": [
-         52.039,
-         52.039
+         52.059,
+         52.06
         ],
         "block": [
          49.9,
@@ -7812,19 +7857,19 @@ in the repository gives this table as tools: the same rows in the same order, an
        }
       },
       "SPMC": {
-       "push": 55.046,
-       "pop": 52.039,
+       "push": 55.048,
+       "pop": 52.059,
        "block": 49.9,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         55.046,
-         55.046
+         55.048,
+         55.048
         ],
         "pop": [
-         52.039,
-         52.039
+         52.059,
+         52.06
         ],
         "block": [
          49.9,
@@ -7833,19 +7878,19 @@ in the repository gives this table as tools: the same rows in the same order, an
        }
       },
       "MPMC": {
-       "push": 55.046,
-       "pop": 52.039,
+       "push": 55.048,
+       "pop": 52.059,
        "block": 49.9,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         55.046,
-         55.046
+         55.048,
+         55.048
         ],
         "pop": [
-         52.039,
-         52.039
+         52.059,
+         52.06
         ],
         "block": [
          49.9,
@@ -8277,19 +8322,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 34.031,
-     "pop": 29.008,
+     "push": 34.044,
+     "pop": 29.027,
      "block": 27.9,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       34.031,
-       34.031
+       34.044,
+       34.044
       ],
       "pop": [
-       29.008,
-       29.008
+       29.027,
+       29.028
       ],
       "block": [
        27.9,
@@ -8631,19 +8676,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 30.026,
-     "pop": 30.025,
+     "push": 30.046,
+     "pop": 30.029,
      "block": 6.52,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       30.026,
-       30.026
+       30.046,
+       30.046
       ],
       "pop": [
-       30.025,
-       30.025
+       30.029,
+       30.029
       ],
       "block": [
        6.52,
@@ -9057,23 +9102,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 47.039,
-     "pop": 44.031,
-     "block": 3.96,
+     "push": 47.061,
+     "pop": 43.04,
+     "block": 3.95,
      "dma_w": 195.514,
      "dma_r": 181.534,
      "range": {
       "push": [
-       47.031,
-       48.042
+       47.05,
+       47.061
       ],
       "pop": [
-       43.034,
-       45.031
+       43.04,
+       44.046
       ],
       "block": [
        3.87,
-       3.96
+       3.95
       ],
       "dma_w": [
        195.514,
@@ -9081,7 +9126,7 @@ in the repository gives this table as tools: the same rows in the same order, an
       ],
       "dma_r": [
        181.534,
-       186.034
+       185.534
       ]
      }
     },
@@ -9435,22 +9480,22 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 60.562,
-     "pop": 58.046,
-     "block": 4.83,
+     "push": 60.589,
+     "pop": 58.054,
+     "block": 4.81,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       60.562,
-       60.562
+       60.589,
+       60.589
       ],
       "pop": [
-       58.046,
-       58.046
+       58.053,
+       58.054
       ],
       "block": [
-       4.83,
+       4.81,
        4.83
       ]
      }
@@ -9747,23 +9792,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 43.092,
-     "pop": 48.054,
+     "push": 43.103,
+     "pop": 48.048,
      "block": 36.81,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       43.092,
-       47.106
+       43.103,
+       47.103
       ],
       "pop": [
-       45.04,
-       48.054
+       45.041,
+       48.048
       ],
       "block": [
        36.78,
-       37.27
+       36.82
       ]
      }
     },
@@ -10101,23 +10146,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 78.111,
-     "pop": 71.046,
-     "block": 59.97,
+     "push": 78.132,
+     "pop": 71.043,
+     "block": 59.95,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       78.092,
-       78.111
+       78.105,
+       78.132
       ],
       "pop": [
-       71.046,
-       71.065
+       71.04,
+       71.079
       ],
       "block": [
-       59.91,
-       59.97
+       59.95,
+       59.96
       ]
      }
     },
@@ -10455,19 +10500,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 48.109,
-     "pop": 49.028,
+     "push": 48.14,
+     "pop": 49.034,
      "block": 44.44,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       48.105,
-       49.102
+       48.124,
+       49.132
       ],
       "pop": [
-       48.028,
-       49.028
+       48.033,
+       49.034
       ],
       "block": [
        43.94,
@@ -10876,19 +10921,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 32.026,
-     "pop": 29.029,
+     "push": 32.046,
+     "pop": 29.031,
      "block": 5.11,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       32.026,
-       32.026
+       32.046,
+       32.046
       ],
       "pop": [
-       29.029,
-       29.029
+       29.031,
+       29.032
       ],
       "block": [
        5.11,
@@ -11617,61 +11662,61 @@ in the repository gives this table as tools: the same rows in the same order, an
      },
      "nucleo-h723zg": {
       "MPSC": {
-       "push": 33.031,
-       "pop": 16.019,
-       "block": 3.04,
+       "push": 33.047,
+       "pop": 16.023,
+       "block": 2.86,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         33.031,
-         33.031
+         33.046,
+         33.047
         ],
         "pop": [
-         16.019,
-         16.019
+         16.017,
+         16.023
         ],
         "block": [
          2.84,
-         3.04
+         3.03
         ]
        }
       },
       "SPMC": {
-       "push": 17.023,
-       "pop": 31.021,
+       "push": 17.043,
+       "pop": 31.034,
        "block": 3.04,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         17.023,
-         17.034
+         17.043,
+         17.043
         ],
         "pop": [
-         31.021,
-         31.021
+         31.034,
+         31.035
         ],
         "block": [
          2.84,
-         3.04
+         3.05
         ]
        }
       },
       "MPMC": {
-       "push": 33.015,
-       "pop": 31.01,
+       "push": 33.018,
+       "pop": 31.034,
        "block": 3.02,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         33.015,
-         33.03
+         33.018,
+         33.046
         ],
         "pop": [
-         31.01,
-         31.014
+         31.015,
+         31.035
         ],
         "block": [
          3.0,
@@ -12199,23 +12244,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 17.035,
-     "pop": 16.026,
+     "push": 17.044,
+     "pop": 16.028,
      "block": 2.71,
      "dma_w": 56.01,
      "dma_r": 60.5,
      "range": {
       "push": [
-       17.035,
-       17.035
+       17.044,
+       17.044
       ],
       "pop": [
-       16.026,
-       16.026
+       16.028,
+       16.029
       ],
       "block": [
        2.71,
-       2.73
+       2.72
       ],
       "dma_w": [
        56.005,
@@ -12607,23 +12652,23 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 18.037,
-     "pop": 18.024,
+     "push": 18.048,
+     "pop": 18.028,
      "block": 2.73,
      "dma_w": 60.505,
      "dma_r": 62.0,
      "range": {
       "push": [
-       18.026,
-       18.037
+       18.048,
+       18.048
       ],
       "pop": [
-       18.024,
-       18.024
+       18.028,
+       18.029
       ],
       "block": [
        2.73,
-       2.87
+       2.86
       ],
       "dma_w": [
        60.505,
@@ -12985,19 +13030,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 47.05,
-     "pop": 42.024,
+     "push": 47.077,
+     "pop": 42.029,
      "block": 42.32,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       47.04,
-       48.046
+       47.064,
+       47.084
       ],
       "pop": [
-       42.021,
-       43.035
+       42.029,
+       43.045
       ],
       "block": [
        42.31,
@@ -13339,19 +13384,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 31.141,
-     "pop": 39.033,
+     "push": 31.153,
+     "pop": 39.058,
      "block": 28.96,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       31.141,
-       31.141
+       31.153,
+       31.153
       ],
       "pop": [
-       39.033,
-       39.033
+       39.058,
+       39.059
       ],
       "block": [
        28.96,
@@ -14080,19 +14125,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      },
      "nucleo-h723zg": {
       "MPSC": {
-       "push": 48.548,
-       "pop": 42.04,
+       "push": 48.582,
+       "pop": 42.055,
        "block": 11.19,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         48.547,
-         49.557
+         48.578,
+         49.579
         ],
         "pop": [
-         42.036,
-         43.033
+         42.049,
+         43.046
         ],
         "block": [
          11.18,
@@ -14101,19 +14146,19 @@ in the repository gives this table as tools: the same rows in the same order, an
        }
       },
       "SPMC": {
-       "push": 48.548,
-       "pop": 42.04,
+       "push": 48.582,
+       "pop": 42.055,
        "block": 11.19,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         48.547,
-         49.557
+         48.578,
+         49.579
         ],
         "pop": [
-         42.036,
-         43.033
+         42.049,
+         43.046
         ],
         "block": [
          11.18,
@@ -14122,19 +14167,19 @@ in the repository gives this table as tools: the same rows in the same order, an
        }
       },
       "MPMC": {
-       "push": 48.548,
-       "pop": 42.04,
+       "push": 48.582,
+       "pop": 42.055,
        "block": 11.19,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         48.547,
-         49.557
+         48.578,
+         49.579
         ],
         "pop": [
-         42.036,
-         43.033
+         42.049,
+         43.046
         ],
         "block": [
          11.18,
@@ -14554,19 +14599,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 48.548,
-     "pop": 42.04,
+     "push": 48.582,
+     "pop": 42.055,
      "block": 11.19,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       48.547,
-       49.557
+       48.578,
+       49.579
       ],
       "pop": [
-       42.036,
-       43.033
+       42.049,
+       43.046
       ],
       "block": [
        11.18,
@@ -14908,19 +14953,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 30.036,
-     "pop": 31.019,
+     "push": 30.046,
+     "pop": 31.027,
      "block": 28.81,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       30.036,
-       30.036
+       30.046,
+       30.046
       ],
       "pop": [
-       31.019,
-       31.019
+       31.027,
+       31.028
       ],
       "block": [
        28.81,
@@ -15262,19 +15307,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 54.131,
-     "pop": 47.172,
+     "push": 54.156,
+     "pop": 47.189,
      "block": 3.14,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       54.131,
-       54.152
+       54.156,
+       54.178
       ],
       "pop": [
-       47.154,
-       47.18
+       47.178,
+       47.199
       ],
       "block": [
        3.14,
@@ -15616,22 +15661,22 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 39.246,
-     "pop": 33.291,
-     "block": 2.92,
+     "push": 39.146,
+     "pop": 33.184,
+     "block": 2.93,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       39.129,
-       40.128
+       39.145,
+       40.148
       ],
       "pop": [
-       33.159,
-       34.163
+       33.179,
+       34.196
       ],
       "block": [
-       2.92,
+       2.93,
        3.03
       ]
      }
@@ -16042,19 +16087,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 63.02,
-     "pop": 65.155,
+     "push": 63.062,
+     "pop": 65.163,
      "block": 3.11,
      "dma_w": 147.503,
      "dma_r": 151.763,
      "range": {
       "push": [
-       62.776,
-       64.01
+       62.822,
+       64.056
       ],
       "pop": [
-       65.145,
-       67.129
+       65.163,
+       67.166
       ],
       "block": [
        3.1,
@@ -16807,19 +16852,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      },
      "nucleo-h723zg": {
       "MPSC": {
-       "push": 48.024,
-       "pop": 44.023,
+       "push": 48.044,
+       "pop": 44.029,
        "block": 43.8,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         48.024,
-         48.024
+         48.044,
+         48.044
         ],
         "pop": [
-         44.023,
-         44.023
+         44.029,
+         44.03
         ],
         "block": [
          43.8,
@@ -16828,19 +16873,19 @@ in the repository gives this table as tools: the same rows in the same order, an
        }
       },
       "SPMC": {
-       "push": 48.024,
-       "pop": 44.023,
+       "push": 48.044,
+       "pop": 44.029,
        "block": 43.8,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         48.024,
-         48.024
+         48.044,
+         48.044
         ],
         "pop": [
-         44.023,
-         44.023
+         44.029,
+         44.03
         ],
         "block": [
          43.8,
@@ -16849,19 +16894,19 @@ in the repository gives this table as tools: the same rows in the same order, an
        }
       },
       "MPMC": {
-       "push": 48.024,
-       "pop": 44.023,
+       "push": 48.044,
+       "pop": 44.029,
        "block": 43.8,
        "dma_w": null,
        "dma_r": null,
        "range": {
         "push": [
-         48.024,
-         48.024
+         48.044,
+         48.044
         ],
         "pop": [
-         44.023,
-         44.023
+         44.029,
+         44.03
         ],
         "block": [
          43.8,
@@ -17287,19 +17332,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 48.024,
-     "pop": 44.023,
+     "push": 48.044,
+     "pop": 44.029,
      "block": 43.8,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       48.024,
-       48.024
+       48.044,
+       48.044
       ],
       "pop": [
-       44.023,
-       44.023
+       44.029,
+       44.03
       ],
       "block": [
        43.8,
@@ -17647,19 +17692,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 19.037,
-     "pop": 18.017,
+     "push": 19.047,
+     "pop": 18.029,
      "block": 16.44,
      "dma_w": null,
      "dma_r": null,
      "range": {
       "push": [
-       19.037,
-       19.037
+       19.047,
+       19.047
       ],
       "pop": [
-       18.017,
-       18.017
+       18.028,
+       18.029
       ],
       "block": [
        16.44,
@@ -18073,22 +18118,22 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 42.197,
-     "pop": 40.206,
+     "push": 42.25,
+     "pop": 40.222,
      "block": 2.86,
      "dma_w": 68.94,
      "dma_r": 69.672,
      "range": {
       "push": [
-       42.197,
-       42.197
+       42.25,
+       42.25
       ],
       "pop": [
-       40.206,
-       40.206
+       40.219,
+       40.222
       ],
       "block": [
-       2.85,
+       2.86,
        2.86
       ],
       "dma_w": [
@@ -18523,19 +18568,19 @@ in the repository gives this table as tools: the same rows in the same order, an
      }
     },
     "nucleo-h723zg": {
-     "push": 60.717,
-     "pop": 58.23,
+     "push": 60.79,
+     "pop": 58.236,
      "block": 3.05,
      "dma_w": 88.369,
      "dma_r": 91.623,
      "range": {
       "push": [
-       60.717,
-       60.717
+       60.79,
+       60.79
       ],
       "pop": [
-       58.23,
-       58.23
+       58.235,
+       58.236
       ],
       "block": [
        3.05,
@@ -18878,7 +18923,9 @@ in the repository gives this table as tools: the same rows in the same order, an
       (mpMode() ? ". Speeds" + (w ? " and scores" : "") + " are those of each library's " + mpMode() + " mode, timed without contention " +
         "(one caller at a time), and compared among these libraries only; the ISR stress columns are still the SPSC test" : "");
     var b = D.boards.filter(function (x) { return x.id === st.board; })[0];
-    $("cmp-src").textContent = b.name + " (" + b.core + ", " + b.clock_mhz + " MHz). Speed: " +
+    // version 2's numbers: the clock of its records and their method version (site/series_info.py); version 1's: its record's clock
+    $("cmp-src").textContent = b.name + " (" + b.core + ", " + (two() ? b.bench2.clock_mhz : b.clock_mhz) + " MHz). " +
+      (two() && b.bench2.method_text ? b.bench2.method_text + " " : "") + "Speed: " +
       (two() ? "benchmark version 2, each configuration in an image of its own (" + b.bench2.records + ", commit " + b.bench2.commit +
         ", " + b.bench2.passes + " passes), " + b.bench2.compiler + " " + b.bench2.opt + " (Rust: " + b.bench2.rustc +
         ", same opt-level), code in flash" + (b.bench2.far_bytes ? ", library code that is not inlined at least " + b.bench2.far_bytes +
@@ -18946,5 +18993,6 @@ in the repository gives this table as tools: the same rows in the same order, an
   build();
 })();
 </script></main>
-<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

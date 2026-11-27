@@ -40,7 +40,12 @@ table.cmp th{white-space:normal;vertical-align:bottom;min-width:5rem}table.cmp t
 .sortb:hover,.sortb:focus-visible{color:var(--acc)}.sub{color:var(--mute);font-size:.82rem;font-weight:400}
 .tag{color:var(--mute);font-size:.82rem}.tag a{color:inherit}.warn{color:var(--bad)}.mute{color:var(--mute)}.bad{color:var(--bad);font-weight:600}
 tr.sep td{background:var(--code);color:var(--mute);font-size:.85rem;font-weight:600}
+main details{border:1px solid var(--line);border-radius:6px;margin:10px 0;padding:0 14px}
+main details details{border-style:dashed}main summary{cursor:pointer;padding:9px 0;line-height:1.45}
+main details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+p.foldall{margin:.4rem 0;font-size:.85rem}p.foldall button{font:inherit;color:var(--acc);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
+.onectx{border:1px solid var(--acc);border-left-width:4px;background:var(--code);border-radius:6px;padding:8px 12px;margin:12px 0}
 </style></head>
 <body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
 <main><h1 id="board-runs-in-parallel-the-proof-2026-11-2526">Board runs in parallel: the proof (2026-11-25/26)</h1>
@@ -211,6 +216,78 @@ nRF5340 DK 28.</p>
   WRITE" line the queue counts.</li>
 <li>Runs longer than about 12 minutes at once. The longest job was the Pico
   2's.</li>
-</ul></main>
-<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0.</footer>
+</ul>
+<h2 id="addition-version-2s-runner-through-the-queue-2026-11-26-1020-to-1028-utc">Addition: version 2's runner through the queue (2026-11-26, 10:20 to 10:28 UTC)</h2>
+<p>The trial the decision of 2026-11-26 asks for before ring-buffer runs go on
+several boards at once (<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>, "CRC runs on
+several boards at once"), with the reviewer's OK for each job.
+- <strong>Setup.</strong> All jobs on the NUCLEO-G474RE, from a clean worktree at
+  <code>a3174e7</code> (main), with <code>firmware/nrf5340-rb-bench/run-one.py</code> on bundle 0
+  (built there with <code>onebuild.sh table</code>). Two configurations, lwrb and
+  jnk0le, one pass, 16 runs each job.
+- <strong>Why a write first.</strong> No board held a ring-buffer bundle: since the CRC
+  series every board holds CRC bundles, and a board holds one bundle at a
+  time. So the trial began with one write.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Job</th>
+<th>What ran</th>
+<th>Flash writes</th>
+<th>Time (UTC)</th>
+<th>Means against the records (pass 1, same images)</th>
+<th>Against each other</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>bundle 0 written (it replaces CRC bundle 54), then 16 runs</td>
+<td>1 (bundle 0, 127 units, 10:20:37)</td>
+<td>10:20:18–10:21:35</td>
+<td>704 of 704 identical</td>
+<td>–</td>
+</tr>
+<tr>
+<td>2</td>
+<td>the same 16 runs, no write</td>
+<td>0</td>
+<td>10:21:35–10:22:34</td>
+<td>704 of 704 identical</td>
+<td>job 1: 704 of 704 identical</td>
+</tr>
+<tr>
+<td>3</td>
+<td>job 2 again, while the NUCLEO-G0B1RE and the SAM D20 ran zero-write CRC jobs through their own workers</td>
+<td>0</td>
+<td>10:22:34–10:23:34</td>
+<td>704 of 704 identical</td>
+<td>jobs 1 and 2: 704 of 704 identical</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Identical.</strong> The largest difference in every comparison was 0.
+  "Within" (1 % or 0.05 cycles) is met trivially.</li>
+<li><strong>The runner through the queue.</strong> The queue counted the runner's FLASH
+  WRITE line (one line in <code>writes.tsv</code>), held job 1 to its budget of 1 and
+  jobs 2 and 3 to 0 (<code>--refuse "FLASH WRITE"</code>). Every job printed its
+  expected "done: 16 runs, 0 without a file, N flash writes".</li>
+<li><strong>The CRC jobs beside job 3</strong>, from the worktree at <code>40f1958</code>:</li>
+<li><em>SAM D20</em>: the parallel proof's part-A command (bundle 115). 14 runs;
+    672 of 672 means identical to part A; 2 retries, as in part A.</li>
+<li><em>NUCLEO-G0B1RE</em>: it holds bundle 55 since part C1, so the command was
+    C1's without <code>--flash</code>. 16 runs; 768 of 768 means identical to C1.</li>
+<li><strong>Not run:</strong> the nRF5340 DK, and no power switching.</li>
+</ul>
+<p><strong>What the boards hold now:</strong> NUCLEO-G474RE ring-buffer bundle 0 (no longer
+CRC bundle 54); the others as after the proof (NUCLEO-G0B1RE 55,
+NUCLEO-H723ZG 28, Pico 2 6 and 7, SAM D20 115, nRF5340 DK 28). Flash
+writes in the queue's ledger: 4.</p>
+<p><strong>What this supports (a reading):</strong> version 2's runner runs through the
+queue as the CRC runner does, with the same numbers alone and beside two
+other boards. The run files, logs and the comparison scripts are on the lab
+host (<code>~/vl-wt-crc-runs/v2-queue-trial/</code>, <code>~/vl-v2trial/</code>).</p></main>
+<footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
+<script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

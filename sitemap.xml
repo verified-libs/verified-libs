@@ -2,11 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>https://verified-libs.org/</loc></url>
 <url><loc>https://verified-libs.org/compare-crc.html</loc></url>
+<url><loc>https://verified-libs.org/compare-pools.html</loc></url>
 <url><loc>https://verified-libs.org/compare.html</loc></url>
 <url><loc>https://verified-libs.org/finding-diffstorm-cb-overwrite-padding.html</loc></url>
 <url><loc>https://verified-libs.org/findings.html</loc></url>
 <url><loc>https://verified-libs.org/kinds.html</loc></url>
 <url><loc>https://verified-libs.org/method-crc.html</loc></url>
+<url><loc>https://verified-libs.org/method-pools.html</loc></url>
 <url><loc>https://verified-libs.org/method.html</loc></url>
 <url><loc>https://verified-libs.org/repeats.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-06-first-harness.html</loc></url>
@@ -33,12 +35,17 @@
 <url><loc>https://verified-libs.org/report-2026-11-23-bench-v2-first-run.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-23-bench-v2-placement-period.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-24-next-kind.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-24-pool-prechecks.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-24-what-carries-over.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-25-crc-first-series.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-25-crc-second-series.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-26-method-version-3-reruns.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-26-parallel-runs-proof.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-26-pools-first-series.html</loc></url>
+<url><loc>https://verified-libs.org/report-2026-11-27-crc-unexplained.html</loc></url>
 <url><loc>https://verified-libs.org/reports.html</loc></url>
 <url><loc>https://verified-libs.org/reproduce.html</loc></url>
 <url><loc>https://verified-libs.org/results-crc.html</loc></url>
+<url><loc>https://verified-libs.org/results-pools.html</loc></url>
 <url><loc>https://verified-libs.org/results.html</loc></url>
 </urlset>
