@@ -24,7 +24,12 @@ set -euo pipefail
 
 mode=${1:-}
 case $mode in --dry-run|--go) ;; *) sed -n '2,24p' "$0"; exit 2 ;; esac
+# the export test's cache of rebuild results (lab/tools/image-ledger.py --test-cache) never reaches a publication
+[ -z "${VL_LEDGER_CACHE:-}" ] || { echo "VL_LEDGER_CACHE is set: refused (the cache is for the export test only)" >&2; exit 2; }
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
+if git -C "$REPO" show HEAD:records/rebuilt.json 2>/dev/null | jq -e '.cache_used' > /dev/null 2>&1; then
+    echo "records/rebuilt.json at HEAD was made with the test's cache (cache_used): refused; make it again without it" >&2; exit 2
+fi
 PUBLIC=${PUBLIC:-git@github-verified-libs-public:verified-libs/verified-libs.git}
 DOMAIN=${DOMAIN:-verified-libs.org}
 GIT_NAME=${GIT_NAME:-verified-libs}

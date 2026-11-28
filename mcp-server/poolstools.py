@@ -31,7 +31,9 @@ ISR_CONTEXT = ("Use from interrupts was tested in a series of its own, the concu
                "in a way it does not document: only what was observed, never call it failing), and 'control' (our "
                "control, which must be caught). It is part of no score; use_from_interrupts 'passed' keeps the rows that "
                "passed within their documentation (and ours). documented_use_from_interrupts is each library's own words. "
-               "The cycles are of one context.")
+               "use_from_interrupts_other_builds, where a row has it, is another build of the same library that the series "
+               "ran as a configuration of its own (C_Allocator with its lock option ALLOC_LOCK_CMSIS_RTOS2): not the build "
+               "the row's cycles come from, and not part of the filter. The cycles are of one context.")
 NOTES = [
     ONE_CONTEXT,
     "Every number is the range (min, max) over eight placements of the code, first pass. Two rows differ only where "
@@ -250,6 +252,10 @@ def tool_compare_pools(args, check_args, choice, flag):
         o["documented_use_from_interrupts"] = _documented(c)
         if pq.has_isr(P):
             o["use_from_interrupts_observed"] = _observed(r.get("isr"))
+            if r.get("isr_variants"):   # another build of the same library, a configuration of its own in that series
+                o["use_from_interrupts_other_builds"] = [
+                    {"name": v["name"], "not_the_build_timed_here": True, "documented_use_from_interrupts": _documented(v),
+                     "observed": _observed(v)} for v in r["isr_variants"]]
         o["record"] = pq.REPO + r["record"]
         rows.append(o)
     if base:

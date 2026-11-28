@@ -32,6 +32,7 @@
   var BASE_TEXT = "Reference free list (baseline), not a library";
   var NOT_PUBLISHED = "The first board series of this kind is not published yet: there are no records, so there is nothing to compare.";
   var ISR = !!D.isr_source;   // records of the concurrency series
+  var VARIANT_TEXT = "a build of its own, not the one timed here: ";
   var ISR_FILTER = "use from interrupts: tested within its documentation, and passed";
   var st;
 
@@ -249,7 +250,12 @@
       var ct = el("td");
       claimCell(ct, c);
       tr.appendChild(ct);
-      if (ISR) tr.appendChild(el("td", r.isr ? r.isr.text : "–"));
+      if (ISR) {
+        var it = el("td", r.isr ? r.isr.text : "–");
+        // another build of the same library in the concurrency series (C_Allocator with its lock option)
+        (r.isr_variants || []).forEach(function (v) { it.appendChild(el("div", v.name + ", " + VARIANT_TEXT + v.text, "sub")); });
+        tr.appendChild(it);
+      }
       tb.appendChild(tr);
     });
     if (base) {

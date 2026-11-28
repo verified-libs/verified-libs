@@ -2,7 +2,7 @@
 """Rebuild the published records of other commits from this tree and write
 down which images the tree still builds: records/rebuilt.json.
 
-Usage: lab/tools/image-ledger.py [--all] [--out FILE]
+Usage: lab/tools/image-ledger.py [--all] [--out FILE] [--plan] [--test-cache]
 
 A record under records/ may be shown although its commit has other test
 sources than the tree, if the tree builds the image it was measured from
@@ -52,6 +52,11 @@ for it is not rebuilt either.
         the tree is not meant to build (a check of the whole tree; about
         20 seconds per record, half a minute per board for version 2)
 --out   write there instead of records/rebuilt.json
+--test-cache  for lab/tools/test-public-export.sh only: take rebuild results
+        from the cache VL_LEDGER_CACHE=DIR and keep new ones there (class
+        Cache: the key covers everything a rebuild reads). Without the flag a
+        set VL_LEDGER_CACHE is refused; a ledger made with it says so
+        ("cache_used") and lab/tools/publish.sh refuses it.
 --plan  only say what would be rebuilt, each record with the checksum
         its ledger entry would hold; nothing is built or written (seconds:
         the quick export test runs it)
@@ -66,6 +71,7 @@ With nothing to rebuild, no file is written. Commit the file with the
 records: the export reads it from HEAD.
 Exit: 0 written (or nothing to do), 1 a record could not be checked.
 """
+import hashlib
 import importlib.util
 import json
 import os
@@ -74,6 +80,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -100,10 +108,129 @@ def git(*args):
     return subprocess.run(["git", "-C", ROOT, *args], capture_output=True, check=True, text=True).stdout
 
 
+# at most this many verify scripts at once (each builds in containers of its own; the memory cap of a test holds two)
+LEDGER_JOBS = 2
+
+
+def parse_images(prefix, field):
+    """the parser of a kind's verify script (crcverify.sh, poolverify.sh, isrverify.sh) or of version 2's
+    oneverify.sh: their lines "<board>/<file>: MATCH|DIFFERS  ...", the indented lines that say why, and
+    "<board>/<file>: <why not checked>"; record names are PREFIX<board>/<file>.json"""
+    def parse(lines, mine):
+        got, last = {}, None
+        for line in lines:
+            m = re.match(r"^(\S+): (MATCH|DIFFERS)  (.*)$", line)
+            name = prefix + m.group(1) + ".json" if m else None
+            if name in mine:
+                last = name
+                got[last] = {field: mine[last], "result": "match" if m.group(2) == "MATCH" else "differs"}
+                if "ELF file differs" in m.group(3):
+                    got[last]["note"] = m.group(3).rsplit("; ", 1)[-1]
+            elif line.startswith("  ") and last in mine and not line.startswith("  kept:"):
+                got[last]["note"] = "; ".join(filter(None, [got[last].get("note"), line.strip()]))
+            else:
+                m = re.match(r"^(\S+): (.*)$", line)
+                if m and prefix + m.group(1) + ".json" in mine:
+                    last = prefix + m.group(1) + ".json"
+                    got[last] = {field: mine[last], "result": "not checked", "note": m.group(2)}
+        return got
+    return parse
+
+
+def parse_fw(lines, mine):
+    """the parser of verify-build.sh (the ring buffers' records of version 1)"""
+    got, last = {}, None
+    for line in lines:
+        m = LINE.match(line)
+        if m:
+            last = m.group(1) + ".json"
+            got[last] = {"fw_sha256": mine[last], "result": "match" if m.group(2) == "MATCH" else "differs",
+                         "rebuilt_sha256": m.group(3), "toolchain_image": m.group(4).rsplit(", ", 1)[-1]}
+            if m.group(5).strip():
+                got[last]["note"] = m.group(5).strip()
+            continue
+        m = re.match(r"^  library (\S+): image differs$", line)
+        if m and last:
+            got[last].setdefault("libs_differ", []).append(m.group(1))
+            continue
+        m = re.match(r"^(\S+): (.*)$", line)
+        if m and m.group(1) + ".json" in mine:
+            last = m.group(1) + ".json"
+            got[last] = {"fw_sha256": mine[last], "result": "not checked", "note": m.group(2)}
+    return got
+
+
+class Cache:
+    """A cache of rebuild results for the export test's clones (--test-cache, VL_LEDGER_CACHE=DIR), never for
+    the project's ledger: a record's result ("match" or "differs" only; never "not checked") is kept under a
+    key of everything its rebuild reads:
+      - the group (a kind of public-export.py's KINDS, bench-v2, the ring buffers) and its verify script;
+      - the record file's bytes;
+      - the files at HEAD under the group's test sources, all of them (every side, the files public-export.py
+        leaves out of the checksum too), and under firmware/ (the board layer, the boot stub, version 2's
+        programs the kinds import), toolchain/, and the lab files of TEST_SOURCES;
+      - every pin of the lock files (lab/tools/lib-mirror.py pins());
+      - the toolchain images on the host (podman: each verified-libs/toolchain tag and its image ID);
+      - this file's own bytes.
+    An entry holds its key; one that does not (a file put under another key) is not used, and is counted."""
+
+    def __init__(self, d):
+        self.dir = os.path.abspath(d)
+        os.makedirs(self.dir, exist_ok=True)
+        self.refused, self._trees = 0, {}
+        r = subprocess.run(["podman", "images", "--no-trunc", "--format", "{{.Repository}}:{{.Tag}} {{.ID}}"],
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.exit("--test-cache: podman could not list the toolchain images: no cache")
+        images = sorted(l for l in r.stdout.splitlines() if "verified-libs/toolchain" in l)
+        self.base = hashlib.sha256(json.dumps(
+            [open(os.path.abspath(__file__), "rb").read().hex(), [list(p) for p in lm.pins()], images]).encode()).hexdigest()
+
+    def tree(self, group):
+        if group not in self._trees:
+            paths = (pe.KINDS[group]["sources"] if group in pe.KINDS else pe.TEST_SOURCES) + ["firmware", "toolchain"] + pe.TEST_SOURCES[1:]
+            self._trees[group] = hashlib.sha256(git("ls-tree", "-r", "HEAD", "--", *sorted(set(paths))).encode()).hexdigest()
+        return self._trees[group]
+
+    def key(self, group, script, rec_bytes):
+        return hashlib.sha256(json.dumps([self.base, group, os.path.relpath(script, ROOT), self.tree(group),
+                                          hashlib.sha256(rec_bytes).hexdigest()]).encode()).hexdigest()
+
+    def get(self, key):
+        f = os.path.join(self.dir, key[:2], key + ".json")
+        if not os.path.exists(f):
+            return None
+        try:
+            e = json.load(open(f))
+        except (OSError, ValueError):
+            e = None
+        if not isinstance(e, dict) or e.get("key") != key or e.get("entry", {}).get("result") not in ("match", "differs"):
+            self.refused += 1
+            return None
+        return e["entry"]
+
+    def put(self, key, entry):
+        if entry.get("result") not in ("match", "differs"):
+            return
+        d = os.path.join(self.dir, key[:2])
+        os.makedirs(d, exist_ok=True)
+        tmp = os.path.join(d, f".{key}.{os.getpid()}")
+        with open(tmp, "w") as fh:
+            json.dump({"key": key, "entry": entry}, fh)
+        os.replace(tmp, os.path.join(d, key + ".json"))
+
+
 def main():
     args = sys.argv[1:]
-    every, plan = "--all" in args, "--plan" in args
-    args = [a for a in args if a not in ("--all", "--plan")]
+    every, plan, test_cache = "--all" in args, "--plan" in args, "--test-cache" in args
+    args = [a for a in args if a not in ("--all", "--plan", "--test-cache")]
+    # the cache is for the export test's clones only: never without the test's own flag, never the flag alone
+    if os.environ.get("VL_LEDGER_CACHE") and not test_cache:
+        sys.exit("VL_LEDGER_CACHE is set: refused (the cache is for lab/tools/test-public-export.sh's clones only, "
+                 "with --test-cache; the project's ledger is made without it)")
+    if test_cache and not os.environ.get("VL_LEDGER_CACHE"):
+        sys.exit("--test-cache without VL_LEDGER_CACHE=DIR")
+    cache = Cache(os.environ["VL_LEDGER_CACHE"]) if test_cache else None
     out = os.path.join(ROOT, pe.LEDGER)
     if args[:1] == ["--out"] and len(args) == 2:
         out = os.path.abspath(args[1])
@@ -198,6 +325,7 @@ def main():
                 print(f"({out} exists; the export takes it only if it was made from these sources)")
             return 0
         env = dict(os.environ, VL_TREE="1", VL_REPO=ROOT, TMPDIR=work)
+        env.pop("VL_LEDGER_CACHE", None)   # the verify scripts never see the cache
         if os.environ.get("VL_LIB_MIRROR"):
             mirror = os.path.abspath(os.path.expanduser(os.environ["VL_LIB_MIRROR"]))
             bad = lm.check(mirror, lm.pins())
@@ -209,90 +337,69 @@ def main():
         if "VL_LIBS_FROM" not in env and os.path.isdir(libs):
             env["VL_LIBS_FROM"] = libs
         print(f"rebuilding {len(todo) + len(todo2) + len(todo3)} records from the sources of {head[:12]}", flush=True)
-        records, last = {}, None
+        records = {}
+        # the jobs: (group, its records name -> checksum, the script, its environment, the parser of its output)
+        jobs = []
         for kind, (script, libs_var, libs_default) in KIND_VERIFY.items():
-            mine = {n: d for n, d in todo3.items() if n.startswith(kind + "/")}
-            if not mine:
+            mine_k = {n: d for n, d in todo3.items() if n.startswith(kind + "/")}
+            if not mine_k:
                 continue
             env3 = dict(env)
             env3.pop("VL_LIBS_FROM", None)
             libs3 = os.environ.get(libs_var, os.path.expanduser(libs_default))
             if os.path.isdir(libs3):
                 env3["VL_LIBS_FROM"] = libs3
-            p = subprocess.Popen(["bash", os.path.join(ROOT, script), *[os.path.join(work, n) for n in sorted(mine)]],
-                                 stdout=subprocess.PIPE, text=True, env=env3)
-            last = None
-            for line in p.stdout:
-                line = line.rstrip("\n")
-                print(line, flush=True)
-                m = re.match(r"^(\S+): (MATCH|DIFFERS)  (.*)$", line)
-                name = f"{kind}/" + m.group(1) + ".json" if m else None
-                if name in mine:
-                    last = name
-                    records[last] = {"images_sha256": mine[last], "result": "match" if m.group(2) == "MATCH" else "differs"}
-                    if "ELF file differs" in m.group(3):
-                        records[last]["note"] = m.group(3).rsplit("; ", 1)[-1]
-                elif line.startswith("  ") and last in mine and not line.startswith("  kept:"):
-                    records[last]["note"] = "; ".join(filter(None, [records[last].get("note"), line.strip()]))
-                else:
-                    m = re.match(r"^(\S+): (.*)$", line)
-                    if m and f"{kind}/" + m.group(1) + ".json" in mine:
-                        last = f"{kind}/" + m.group(1) + ".json"
-                        records[last] = {"images_sha256": mine[last], "result": "not checked", "note": m.group(2)}
-            p.wait()
-            for n in mine:
-                records.setdefault(n, {"images_sha256": mine[n], "result": "not checked",
-                                       "note": f"no result from {os.path.basename(script)}"})
-            last = None
+            # a verify script names a record by its last two parts (<board>/<file>): the records of a kind under
+            # a deeper directory (records/pools-isr/b301/<board>/<file>.json, bundle 301) go in a job of their
+            # own, so that no two records of one job have the same name (the controls of bundles 300 and 301)
+            subs = {}
+            for n, d in mine_k.items():
+                subs.setdefault("/".join(n.split("/")[:-2]) + "/", {})[n] = d
+            for prefix, mine in sorted(subs.items()):
+                jobs.append((kind, mine, os.path.join(ROOT, script), env3, parse_images(prefix, "images_sha256")))
         if todo2:
-            p = subprocess.Popen(["bash", os.path.join(ROOT, "firmware/nrf5340-rb-bench/oneverify.sh"),
-                                  *[os.path.join(work, n) for n in sorted(todo2)]], stdout=subprocess.PIPE, text=True, env=env)
-            for line in p.stdout:
-                line = line.rstrip("\n")
-                print(line, flush=True)
-                m = re.match(r"^(\S+): (MATCH|DIFFERS)  (.*)$", line)
-                name = "bench-v2/" + m.group(1) + ".json" if m else None
-                if name in todo2:
-                    last = name
-                    records[last] = {"images_sha256": todo2[last], "result": "match" if m.group(2) == "MATCH" else "differs"}
-                    if "ELF file differs" in m.group(3):
-                        records[last]["note"] = m.group(3).rsplit("; ", 1)[-1]
-                elif line.startswith("  ") and last in todo2 and not line.startswith("  kept:"):
-                    records[last]["note"] = "; ".join(filter(None, [records[last].get("note"), line.strip()]))
-                else:
-                    m = re.match(r"^(\S+): (.*)$", line)
-                    if m and "bench-v2/" + m.group(1) + ".json" in todo2:
-                        last = "bench-v2/" + m.group(1) + ".json"
-                        records[last] = {"images_sha256": todo2[last], "result": "not checked", "note": m.group(2)}
-            p.wait()
-            for n in todo2:
-                records.setdefault(n, {"images_sha256": todo2[n], "result": "not checked", "note": "no result from oneverify.sh"})
-            last = None
-        p = subprocess.Popen(["bash", os.path.join(HERE, "verify-build.sh"), *[os.path.join(work, n) for n in sorted(todo)]],
-                             stdout=subprocess.PIPE, text=True, env=env) if todo else None
-        for line in (p.stdout if p else ()):
-            line = line.rstrip("\n")
-            print(line, flush=True)
-            m = LINE.match(line)
-            if m:
-                last = m.group(1) + ".json"
-                records[last] = {"fw_sha256": todo[last], "result": "match" if m.group(2) == "MATCH" else "differs",
-                                 "rebuilt_sha256": m.group(3), "toolchain_image": m.group(4).rsplit(", ", 1)[-1]}
-                if m.group(5).strip():
-                    records[last]["note"] = m.group(5).strip()
-                continue
-            m = re.match(r"^  library (\S+): image differs$", line)
-            if m and last:
-                records[last].setdefault("libs_differ", []).append(m.group(1))
-                continue
-            m = re.match(r"^(\S+): (.*)$", line)
-            if m and m.group(1) + ".json" in todo:
-                last = m.group(1) + ".json"
-                records[last] = {"fw_sha256": todo[last], "result": "not checked", "note": m.group(2)}
-        if p:
-            p.wait()
-        for n in todo:
-            records.setdefault(n, {"fw_sha256": todo[n], "result": "not checked", "note": "no result from verify-build.sh"})
+            jobs.append(("bench-v2", todo2, os.path.join(ROOT, "firmware/nrf5340-rb-bench/oneverify.sh"), env,
+                         parse_images("bench-v2/", "images_sha256")))
+        if todo:
+            jobs.append(("ring buffers", todo, os.path.join(HERE, "verify-build.sh"), env, parse_fw))
+        stats = {}
+        if cache:
+            for i, (group, mine, script, env_j, parse) in enumerate(jobs):
+                miss = {}
+                for n, d in mine.items():
+                    e = cache.get(cache.key(group, script, open(os.path.join(work, n), "rb").read()))
+                    if e is not None:
+                        records[n] = e
+                    else:
+                        miss[n] = d
+                h0, m0 = stats.get(group, (0, 0))   # a kind may have several jobs (a deeper directory)
+                stats[group] = (h0 + len(mine) - len(miss), m0 + len(miss))
+                jobs[i] = (group, miss, script, env_j, parse)
+            print("cache (" + cache.dir + "): " + "; ".join(f"{g} {h} from the cache, {m} to rebuild" for g, (h, m) in stats.items())
+                  + (f"; {cache.refused} entries refused (not of their key)" if cache.refused else ""), flush=True)
+            jobs = [j for j in jobs if j[1]]
+
+        def run(job):
+            group, mine, script, env_j, _ = job
+            t0 = time.time()
+            p = subprocess.run(["bash", script, *[os.path.join(work, n) for n in sorted(mine)]],
+                               stdout=subprocess.PIPE, text=True, env=env_j)
+            return p.stdout.splitlines(), time.time() - t0
+        # at most LEDGER_JOBS verify scripts at once, each in its own trees; their output is read in a fixed order
+        with ThreadPoolExecutor(max_workers=LEDGER_JOBS) as pool:
+            done = [pool.submit(run, j) for j in jobs]
+            for (group, mine, script, env_j, parse), fut in zip(jobs, done):
+                out_lines, secs = fut.result()
+                print("\n".join(out_lines), flush=True)
+                print(f"({group}: {len(mine)} records, {os.path.basename(script)}, {secs:.0f} s)", flush=True)
+                got = parse(out_lines, mine)
+                for n in mine:
+                    got.setdefault(n, {**({"fw_sha256": mine[n]} if parse is parse_fw else {"images_sha256": mine[n]}),
+                                       "result": "not checked", "note": f"no result from {os.path.basename(script)}"})
+                records.update(got)
+                if cache:
+                    for n in mine:
+                        cache.put(cache.key(group, script, open(os.path.join(work, n), "rb").read()), got[n])
         for r in records.values():
             if r["result"] == "not checked" and FETCH_FAULT.search(r.get("note", "")) \
                     and not r["note"].startswith("could not fetch the libraries"):
@@ -303,6 +410,9 @@ def main():
                "commit": head, "sources": pe.source_ids("HEAD")[0],
                **{f"sources_{k}": pe.source_ids("HEAD", k)[0] for k in pe.KINDS},
                "records": {n: records[n] for n in sorted(records)}}
+        if cache:
+            led["cache_used"] = {"dir": cache.dir, "hits_and_rebuilt": stats,
+                                 "note": "made with --test-cache for a test; never to be committed to the project"}
         os.makedirs(os.path.dirname(out), exist_ok=True)
         with open(out, "w") as fh:
             json.dump(led, fh, indent=1)

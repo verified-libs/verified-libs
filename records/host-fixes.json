@@ -81,6 +81,24 @@
    "what": "The concurrency series gets a check of a record, as the CRC and pools kinds have: it rebuilds a record's bundle in the toolchain image from the sources of a commit (or of this tree, VL_TREE=1, which the ledger image-ledger.py uses) and compares the record's image (address and flash bytes), the boot stub, the bundle, the toolchain and the libraries' pins. The series' commit did not have the file.",
    "numbers": "It reads records and builds images; it writes no record, runs nothing on a board and changes nothing that was read from a board, worked out or stored. A record it cannot hold stops the export.",
    "control": "2026-11-27: all 82 records rebuilt from their commit f344730 (kinds/pools-isr/bench/isrverify.sh, the six boards): 82 MATCH; two NUCLEO-G0B1RE records with a changed image checksum and a changed bundle checksum: DIFFERS for each, the unchanged record beside them MATCH."
+  },
+  {
+   "file": "kinds/pools-isr/decode.py",
+   "from": "3fc93ca7710b97b442a431fba175ac9d2c1b5fcf",
+   "to": "1aef42a543b94b767bdbc524291b265599bfabe3",
+   "date": "2026-11-28",
+   "what": "One configuration more in CLASS, the class of each configuration: adapter_c_allocator_lock (C_Allocator built with its interrupt-masking lock option ALLOC_LOCK_CMSIS_RTOS2, bundle 301; lab/plans/2026-11-28-pools-isr-cal-lock.md) is 'within'.",
+   "numbers": "Nothing that is read from a board, worked out or stored changes for any configuration of bundle 300: their classes, the decoding of the result block and the verdicts are as before. The new entry is read only for the new configuration.",
+   "control": "2026-11-28: test_decode.py and test_runner.py stm32g474 (no board) pass unchanged; bundle 300 rebuilt for the NUCLEO-G474RE at 28e6a8f: its manifest's bundle_sha256 and all 14 images (address and flash bytes) the same as in its 14 records."
+  },
+  {
+   "file": "kinds/pools-isr/bench/isrverify.sh",
+   "from": "55bc6bd1cfa926c1f91bc24b0b26ce6dc303012c",
+   "to": "dcb9b5459887cccdcbd3d46d44471891984e9657",
+   "date": "2026-11-28",
+   "what": "The check of a record builds the bundle the record names (its 'bundle': 300 into build/v1 as before, 301 into build/b301, BUNDLE of onebuild.sh) and groups the records by it; a record of another bundle number is refused as not of the series.",
+   "numbers": "Nothing of a record is changed: the check reads records and rebuilds images. For a record of bundle 300 it builds and compares exactly as before.",
+   "control": "2026-11-28, VL_TREE=1 at 28e6a8f, NUCLEO-G474RE: adapter_c_allocator and adapter_ref of bundle 300 (records made at f344730): MATCH; a stand-in record of bundle 301 made from that build's manifest (adapter_c_allocator_lock): MATCH, bundle 301."
   }
  ]
 }

@@ -1,0 +1,306 @@
+{
+ "schema": "pools-isr/1",
+ "kind": "pools-isr",
+ "board": "stm32g0b1",
+ "board_id": 2,
+ "board_decoded": "NUCLEO-G0B1RE (STM32G0B1RET6, Cortex-M0+)",
+ "adapter": "adapter_c_allocator_lock",
+ "class": "within",
+ "bench_commit": "c7d0f33ce3c7",
+ "toolchain_image": "verified-libs/toolchain:2026-11-13",
+ "toolchain": {
+  "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+  "ubuntu_snapshot": "20261105T000000Z",
+  "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+  "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+  "cbmc": "6.6.0 (cbmc-6.6.0)",
+  "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+  "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+  "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+  "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+ },
+ "libs_pinned": [
+  "etl 7d604f2e4f7fa79ff49bf675c089656943f9171b",
+  "riot 9c9a6abec901838b1637ef9308427b50ef59ce5c",
+  "threadx 93387b0a60382a29579bbad5045c68328e3751df",
+  "cmsis-rtx b566de42a5bf77d8b080f521cefc38ec7c45a3cc",
+  "cmsis6 af1b110e46a1720349f6f125e386e126767699bd",
+  "cortex-dfp cd38dbb875f7195e70460eee51faa7ab180c24a1",
+  "contiki-ng 4ccd1a3b9e767f168d12ec3df187fe6b7dc736b5",
+  "c-allocator 497b46500e314467d2bc2a3f6623e68d71eab9db",
+  "eccles 02146345a899e29fe53555098848a4584491818c",
+  "memorypool c98ff35f19473b737c4b75817096481327023c02",
+  "atomic-pool ab88f3ccfebd382685bf97239df6828769c5b743",
+  "heapless 19188229ac2b76fc91ad79f57dee01fa362a1e15",
+  "zephyr 41d10b59730406bbab4ca9f1fbbe9e96aafb4966",
+  "lwip 77dcd25a72509eb83f72b033d219b1d40cd8eb95",
+  "memorypool-head 5073178622c3af7b682060a93c4b38ce386f2d59",
+  "as-slice-01 e21f5bd9e629f2bf5641b97f64e582ed745e3ab6",
+  "as-slice-02 c3687342bc9f3c9c202676a5d2e17288ff979c90",
+  "rs-portable-atomic e4595528211f1d53b7f4d93e528ef84b491fc871",
+  "rs-stable-deref-trait 66f9d8a15b7209c45f58edee6c1b6bb497b7bd31",
+  "rs-hash32 d44eb33a01be4582669d9a1fa3f7c58455a21de9",
+  "rs-byteorder ec068eefa042d494475db125c4b034bd8e9e34dd",
+  "rs-generic-array-012 42843cdb6c24ef3684494617e78745a62a64a29c",
+  "rs-generic-array-013 525f5e7dc3e3e9cab6ee92c2655611c5590675d3",
+  "rs-generic-array-014 a1b3c3cfdf64ad99fd2004c0d8ce81b0e56e5ebe",
+  "rs-typenum b237efbb1da9646435274f63d7290cb7651b031f",
+  "rs-version-check d77ef9f27cc336719b2d839d09ee6635dd22f758"
+ ],
+ "clock_hz": 64000000,
+ "image_base": "0x08011000",
+ "image_bytes": 5288,
+ "image_sha256": "56b4ef7118691d536760720f61f62dfa0633eb00089af05683c7149887886420",
+ "fw_sha256": "5e7e458b314d5b271559151b911901ccbb254bd0dc496b0281fbc3521f67c464",
+ "bundle": 301,
+ "bundle_sha256": "ff20053613ae473002d772302cfe6f78f752569be9170db90d755058612aadaf",
+ "boot_image_sha256": "9e9d857dc838b056740c6f23b194962ef66d5717ad3775cbed7b5e3d9b4735bf",
+ "time": "2026-11-27T23:20:22Z",
+ "host": "lib-lab1",
+ "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+ "attempt": 1,
+ "wait_s": 10.0,
+ "seconds": 71.6,
+ "run_number": "0xd02afcb5",
+ "verdict": "pass",
+ "result": {
+  "magic": 1447840049,
+  "version": 1,
+  "done": 1,
+  "clock_hz": 64000000,
+  "board_id": 2,
+  "image_base": 134287360,
+  "nonce": 3492478133,
+  "faults_total": 0,
+  "c": [
+   {
+    "trials": 51504,
+    "inside": 41988,
+    "before": 5612,
+    "after": 3904,
+    "faults": {},
+    "first_fault": 0,
+    "first_case": 0,
+    "first_d": 0,
+    "lat_min": 51,
+    "lat_max": 101,
+    "lat_max_case": 256,
+    "lat_max_d": 113,
+    "lat_n": 41988,
+    "irq_wait_cycles": 50
+   },
+   {
+    "trials": 44660,
+    "inside": 36852,
+    "before": 3904,
+    "after": 3904,
+    "faults": {},
+    "first_fault": 0,
+    "first_case": 0,
+    "first_d": 0,
+    "lat_min": 49,
+    "lat_max": 89,
+    "lat_max_case": 256,
+    "lat_max_d": 98,
+    "lat_n": 36852,
+    "irq_wait_cycles": 40
+   }
+  ],
+  "cal_lat_min": [
+   51,
+   49
+  ],
+  "cal_lat_n": [
+   69,
+   65
+  ],
+  "cov_outside": 0,
+  "adapter": "adapter_c_allocator_lock",
+  "class": "within",
+  "coverage_bits": 72
+ },
+ "option_registers": [
+  {
+   "schema": "board-options/1",
+   "board": "stm32g0b1",
+   "chip": "STM32G0B1RE",
+   "time": "2026-11-27T23:17:02Z",
+   "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+   "regions": [
+    {
+     "name": "FLASH_OPTR",
+     "address": "0x40022020",
+     "source": "RM0444 \u00a73.7.8, offset 0x020",
+     "words": [
+      "0xfffffeaa"
+     ]
+    }
+   ]
+  }
+ ],
+ "coverage": {
+  "instructions": 142,
+  "reached": 50,
+  "per_function": {
+   "ALLOC_Alloc": {
+    "reached": 17,
+    "instructions": 60,
+    "unreached": [
+     "0x8011ff0",
+     "0x8011ff2",
+     "0x8011ff4",
+     "0x8011ff6",
+     "0x8011ff8",
+     "0x8011ffa",
+     "0x8011ffc",
+     "0x8011ffe",
+     "0x8012000",
+     "0x8012002",
+     "0x8012004",
+     "0x8012006",
+     "0x8012008",
+     "0x801200a",
+     "0x801200c",
+     "0x801200e",
+     "0x8012010",
+     "0x8012012",
+     "0x801201a",
+     "0x801201c",
+     "0x801201e",
+     "0x8012020",
+     "0x8012022",
+     "0x8012026",
+     "0x8012028",
+     "0x801202a",
+     "0x801202c",
+     "0x8012030",
+     "0x8012032",
+     "0x8012034",
+     "0x8012036",
+     "0x8012038",
+     "0x801203a",
+     "0x801203c",
+     "0x801203e",
+     "0x8012040",
+     "0x8012042",
+     "0x8012044",
+     "0x8012046",
+     "0x8012048",
+     "0x801204a",
+     "0x801204c",
+     "0x801204e"
+    ]
+   },
+   "ALLOC_Free": {
+    "reached": 10,
+    "instructions": 27,
+    "unreached": [
+     "0x8012078",
+     "0x801207a",
+     "0x801207c",
+     "0x801207e",
+     "0x8012080",
+     "0x8012082",
+     "0x8012084",
+     "0x8012086",
+     "0x8012088",
+     "0x801208a",
+     "0x801208c",
+     "0x801208e",
+     "0x8012094",
+     "0x8012096",
+     "0x8012098",
+     "0x801209c",
+     "0x801209e"
+    ]
+   },
+   "ALLOC_Init": {
+    "reached": 0,
+    "instructions": 5,
+    "unreached": [
+     "0x8011fc8",
+     "0x8011fca",
+     "0x8011fce",
+     "0x8011fd0",
+     "0x8011fd2"
+    ]
+   },
+   "FaultHandler": {
+    "reached": 5,
+    "instructions": 6,
+    "unreached": [
+     "0x8011fc2"
+    ]
+   },
+   "LK_Create": {
+    "reached": 0,
+    "instructions": 2,
+    "unreached": [
+     "0x8011f3c",
+     "0x8011f3e"
+    ]
+   },
+   "LK_Lock": {
+    "reached": 5,
+    "instructions": 10,
+    "unreached": [
+     "0x8011f50",
+     "0x8011f52",
+     "0x8011f54",
+     "0x8011f56",
+     "0x8011f5a"
+    ]
+   },
+   "LK_Unlock": {
+    "reached": 1,
+    "instructions": 3,
+    "unreached": [
+     "0x8011f60",
+     "0x8011f66"
+    ]
+   },
+   "cal_alloc": {
+    "reached": 5,
+    "instructions": 5,
+    "unreached": []
+   },
+   "cal_free": {
+    "reached": 7,
+    "instructions": 7,
+    "unreached": []
+   },
+   "cal_init": {
+    "reached": 0,
+    "instructions": 9,
+    "unreached": [
+     "0x8011fa0",
+     "0x8011fa2",
+     "0x8011fa4",
+     "0x8011fa6",
+     "0x8011fa8",
+     "0x8011faa",
+     "0x8011fac",
+     "0x8011fae",
+     "0x8011fb2"
+    ]
+   },
+   "cal_region": {
+    "reached": 0,
+    "instructions": 8,
+    "unreached": [
+     "0x8011f68",
+     "0x8011f6a",
+     "0x8011f6c",
+     "0x8011f6e",
+     "0x8011f70",
+     "0x8011f72",
+     "0x8011f74",
+     "0x8011f76"
+    ]
+   }
+  }
+ }
+}

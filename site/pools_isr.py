@@ -35,7 +35,17 @@ SERIES = "the concurrency series"
 M0 = ("stm32g0b1", "samd20")
 MASKS = {"adapter_ref_primask": None, "adapter_threadx": None, "adapter_lwip": None,
          "adapter_cmsis_rtx": M0, "adapter_atomic_pool": M0, "adapter_broken_isr_alloc": None,
-         "adapter_broken_isr_free": None}
+         "adapter_broken_isr_free": None, "adapter_c_allocator_lock": None}
+# Builds of a library other than the one its one-context numbers come from, each a configuration of its own in the
+# series, in a bundle of its own (lab/plans/2026-11-28-pools-isr-cal-lock.md): the one-context row's adapter ->
+# [(adapter, name)]. Their records are in records/pools-isr/<bundle directory>/<board>/ (VARIANT_DIRS); of those
+# directories only the variants are read (the bundle's controls proved its run; their records are bundle 300's
+# names and are not shown twice).
+VARIANTS = {"adapter_c_allocator": [("adapter_c_allocator_lock", "C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C)")]}
+VARIANT_DIRS = ("b301",)
+VARIANT_NOTE = ("C_Allocator has two rows: the build the one-context numbers come from (no lock, the library's "
+                "default on a bare-metal toolchain) and a build of its own with its lock option ALLOC_LOCK_CMSIS_RTOS2, "
+                "which is not timed in one context.")
 CONTROLS = ("adapter_ref", "adapter_broken_isr_alloc", "adapter_broken_isr_free")
 CONTROL_TEXT = {"adapter_ref": "reference free list, no lock (our control)",
                 "adapter_broken_isr_alloc": "broken: interrupts on too early in alloc (our control)",
@@ -89,7 +99,25 @@ def load(rdir=None):
                 sys.exit(f"refused: {os.path.relpath(f, ROOT)} is a synthetic record (site/pools_isr_synthetic.py)")
             syn = True
         out[(os.path.basename(os.path.dirname(f)), r["adapter"])] = (f, r)
+    variants = {a for v in VARIANTS.values() for a, _ in v}
+    for vd in VARIANT_DIRS:
+        for f in sorted(glob.glob(os.path.join(rdir, vd, "*", "*.json"))):
+            r = json.load(open(f))
+            if r.get("schema") != SCHEMA or r.get("adapter") not in variants:
+                continue
+            if is_synthetic(r):
+                if os.path.realpath(rdir).startswith(os.path.realpath(RECORDS)):
+                    sys.exit(f"refused: {os.path.relpath(f, ROOT)} is a synthetic record (site/pools_isr_synthetic.py)")
+                syn = True
+            out[(os.path.basename(os.path.dirname(f)), r["adapter"])] = (f, r)
     return out, syn
+
+
+def sub_path(f):
+    """A record's path below its records directory: <board>/<file>, or <bundle directory>/<board>/<file>."""
+    up = os.path.basename(os.path.dirname(os.path.dirname(f)))
+    tail = os.path.join(os.path.basename(os.path.dirname(f)), os.path.basename(f))
+    return os.path.join(up, tail) if up in VARIANT_DIRS else tail
 
 
 def masks(board_dir, adapter):

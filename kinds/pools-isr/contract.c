@@ -66,6 +66,19 @@ static const target TARGETS[] = {
     { &adapter_cmsis_rtx, WITHIN, "CMSIS-RTX osRtxMemoryPool, LDREX/STREX (C)" },
 #endif
 };
+#elif CAL_LOCK
+/* C_Allocator with its interrupt-masking lock option ALLOC_LOCK_CMSIS_RTOS2, no kernel linked
+ * (lab/plans/2026-11-28-pools-isr-cal-lock.md): the library's LockGuard.cpp built against
+ * ../pools/shims/host/cal_lock/cmsis_compiler.h, whose __get_PRIMASK, __disable_irq and __set_PRIMASK are this
+ * check's interrupts-off flag. The control: the same build with __disable_irq doing nothing (CAL_LOCK_BROKEN). */
+extern const pool_adapter adapter_c_allocator;
+static const target TARGETS[] = {
+#if CAL_LOCK_BROKEN
+    { &adapter_c_allocator, CONTROL, "broken: C_Allocator, its lock's __disable_irq does nothing" },
+#else
+    { &adapter_c_allocator, WITHIN, "C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C)" },
+#endif
+};
 #else
 extern const pool_adapter adapter_ref, adapter_ref_primask, adapter_broken_isr_alloc, adapter_broken_isr_free;
 extern const pool_adapter adapter_etl, adapter_riot, adapter_threadx, adapter_cmsis_rtx, adapter_contiki,

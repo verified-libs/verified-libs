@@ -102,6 +102,16 @@ def default_state(P):
             "isr": "", "sort": "", "dir": 1, "row": "", "w": {m: 0 for m in WEIGHT_IDS}}
 
 
+# another build of the same library in the concurrency series (the data's isr_variants), as the page writes it
+VARIANT_TEXT = "a build of its own, not the one timed here: "
+
+
+def isr_cell(r):
+    """The concurrency series' cell of a row, as compare-pools.js writes it: the row's result, then each variant's."""
+    return ([r["isr"]["text"] if r.get("isr") else "–"]
+            + [v["name"] + ", " + VARIANT_TEXT + v["text"] for v in r.get("isr_variants") or []])
+
+
 def has_isr(P):
     """True where the data holds records of the concurrency series (the page then shows its column and filter)."""
     return bool(P.get("isr_source"))
@@ -361,7 +371,7 @@ def page_view(P, st):
         rows.append([first] + ([sc] if wd else [])
                     + [["–" if c["library"] is None else c["library"]], ["–" if c["pin"] is None else c["pin"]], [c["lang"]],
                        ["–" if c["lock"] is None else c["lock"]], [_nb(r["flash_bytes"])], [_nb(r["ram_bytes"])]]
-                    + numbers(r, x is ch) + [claim_cell(c)] + ([[r["isr"]["text"] if r.get("isr") else "–"]] if isr else []))
+                    + numbers(r, x is ch) + [claim_cell(c)] + ([isr_cell(r)] if isr else []))
     if base:
         seps.append([len(rows), BASE_TEXT])
         rows.append([[s] for s in (BASE_NAME,) + (("–",) if wd else ()) + ("–", "–", "C", "none", "–", "–")]

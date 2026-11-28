@@ -26,6 +26,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import pools_data      # noqa: E402
 import pools_tables as t   # noqa: E402
+import pools_isr       # noqa: E402
 
 
 def cells(line):
@@ -184,7 +185,10 @@ def main():
             names = {c["adapter"]: c["name"] for c in data["configurations"]}
             for b in data["boards"]:
                 rows = sec.get(b["name"], {}).get("Use from interrupts", [])
-                want = [(names[r["adapter"]], r["isr"]["text"]) for r in data["rows"] if r["board"] == b["id"]]
+                want = []
+                for r in data["rows"]:
+                    if r["board"] == b["id"]:   # the row, then another build of its library (site/pools_isr.py VARIANTS)
+                        want += [(names[r["adapter"]], r["isr"]["text"])] + [(v["name"], v["text"]) for v in r.get("isr_variants", [])]
                 base = next(x for x in data["baseline_isr"] if x["board"] == b["id"])
                 want.append((t.BASE_LABEL, base["text"]))
                 want += [(x["name"], x["text"]) for x in data["isr_controls"] if x["board"] == b["id"]]
@@ -196,6 +200,10 @@ def main():
                     # synthetic records lie outside the tree: the cell is the text, not linked
                     if not got[0].startswith(("[" + name + "]", name)) or got[2] != text.replace("|", "\\|"):
                         fails.append(f"{b['id']} {name}: 'Use from interrupts' says {got[2][:80]!r}, the data {text[:80]!r}")
+            nvar = sum(len(r.get("isr_variants", [])) for r in data["rows"])
+            if nvar != len(data["boards"]) or pools_isr.VARIANT_NOTE not in blk:
+                fails.append(f"C_Allocator's lock build: {nvar} rows in the data for {len(data['boards'])} boards, "
+                             f"the note {'missing' if pools_isr.VARIANT_NOTE not in blk else 'there'}")
             if "SYNTHETIC: every result of the concurrency series" not in blk or "SYNTHETIC_ISR" not in data:
                 fails.append("synthetic results of the concurrency series not marked SYNTHETIC")
             if "Use from interrupts was tested" not in blk or t.ONE_CONTEXT_HTML in blk:

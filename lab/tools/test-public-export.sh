@@ -9,7 +9,7 @@
 #   bash lab/tools/test-public-export.sh --quick   without the CRC ledger cases
 # The CRC ledger cases (DECISIONS 2026-11-24, the same-image rule for the CRC
 # kind) build the NUCLEO-G0B1RE's CRC images in the clone in the toolchain
-# image (podman), at nice 10 on two CPUs: once for two made-up records
+# image (podman), at nice 10 on four CPUs (0-3): once for two made-up records
 # (lab/tools/test-crc-records.py: a build's checksums, no measurement) and
 # once per ledger image-ledger.py makes. The cases run with the tree's real
 # CRC records beside the made-up ones (the two made-up records replace two
@@ -187,11 +187,34 @@ else
     sed 's/^/     /' <<<"$out" | grep -v '^     would rebuild' | tail -n 12; fails=$((fails + 1))
 fi
 git reset -q --hard "$base"
+# The cache of rebuild results is for this test's clones only (image-ledger.py --test-cache): without the flag a
+# set VL_LEDGER_CACHE is refused; publish.sh refuses it too, and so do publish.sh and the export a committed ledger
+# made with it (cache_used). publish.sh runs with --dry-run only and to a public repository that does not exist.
+out=$(VL_LEDGER_CACHE=$T/c python3 lab/tools/image-ledger.py --plan 2>&1); rc=$?
+out2=$(VL_LEDGER_CACHE=$T/c PUBLIC=$T/none bash lab/tools/publish.sh --dry-run 2>&1); rc2=$?
+jq '. + {cache_used: {note: "test"}}' records/rebuilt.json > "$T/led.json" && cp "$T/led.json" records/rebuilt.json
+git commit -q -am "test: a ledger made with the cache"
+out3=$(PUBLIC=$T/none bash lab/tools/publish.sh --dry-run 2>&1); rc3=$?
+out4=$(python3 lab/tools/public-export.py "$T/out-cached" 2>&1); rc4=$?
+if [ "$rc" = 1 ] && grep -q "VL_LEDGER_CACHE is set: refused" <<<"$out" && [ "$rc2" = 2 ] && grep -q "VL_LEDGER_CACHE is set: refused" <<<"$out2" \
+   && [ "$rc3" = 2 ] && grep -q "made with the test's cache" <<<"$out3" && [ "$rc4" = 1 ] && grep -q "made with the export test's cache" <<<"$out4" \
+   && [ ! -e "$T/out-cached" ]; then
+    echo "ok   the ledger's cache refused outside the test: image-ledger.py without --test-cache, publish.sh (the variable, a cached ledger), the export (a cached ledger)"
+else
+    echo "FAIL the ledger's cache outside the test: image-ledger.py rc $rc, publish.sh rc $rc2 / $rc3, export rc $rc4"
+    printf '%s\n' "$out" "$out2" "$out3" "$out4" | tail -n 8 | sed 's/^/     /'; fails=$((fails + 1))
+fi
+git reset -q --hard "$base"
 # The same-image rule for CRC records (DECISIONS 2026-11-24): two made-up
 # records of a real build of this commit, on a base of their own.
 if [ "${1:-}" != --quick ]; then
     B=stm32g0b1
-    run2() { nice -n 10 taskset -c 0,1 "$@"; }
+    run2() { nice -n 10 taskset -c 0-3 "$@"; }
+    # the ledgers of the clone take rebuild results from a cache (image-ledger.py --test-cache, class Cache: the
+    # key covers everything a rebuild reads): each make rebuilds what the case changed. VL_TEST_LEDGER_CACHE=DIR
+    # keeps it across runs (a warm run); by default it is the clone's and goes with it. The fetch case runs
+    # without it, and the last cases check it (warm, off, a planted entry).
+    LCACHE=${VL_TEST_LEDGER_CACHE:-$T/ledger-cache}
     MIRROR=${VL_LIB_MIRROR:-$HOME/vl-scratch/lib-mirror}
     python3 -I lab/tools/lib-mirror.py fill "$MIRROR" > "$T/mirror.log" 2>&1 ||
         { echo "FAIL could not fetch the libraries into the mirror $MIRROR (no case run):"; grep -v ': in the mirror$' "$T/mirror.log" | sed 's/^/     /'; exit 1; }
@@ -255,11 +278,14 @@ if [ "${1:-}" != --quick ]; then
                 sed 's/^/     /' <<<"$out"; fails=$((fails + 1))
             fi
         }
-        ledger_() {   # records/rebuilt.json made from the tree, committed
-            run2 python3 lab/tools/image-ledger.py > "$T/ledger.log" 2>&1 || {
+        ledger_() {   # records/rebuilt.json made from the tree, committed; what came from the cache, and the time
+            local t0=$SECONDS
+            VL_LEDGER_CACHE=$LCACHE run2 python3 lab/tools/image-ledger.py --test-cache > "$T/ledger.log" 2>&1 || {
                 # the lines that say why, not the log's last lines (a later MATCH)
                 why=$(grep -E ': (DIFFERS|build failed|could not|not a record|commit .* cannot|toolchain image .* not present)|^could not fetch|lacks' "$T/ledger.log" | head -n 5)
                 echo "     image-ledger.py: ${why:-$(tail -n 3 "$T/ledger.log")}" | cut -c1-400; }
+            echo "     ledger made in $((SECONDS - t0)) s; $(grep -h '^cache (' "$T/ledger.log" | sed 's/^cache ([^)]*): //')"
+            grep -h '^([a-z0-9 -]*: [0-9]* records, ' "$T/ledger.log" | sed 's/^/       /'
             git add records/rebuilt.json && git commit -q -m "test: ledger"
         }
         change() { printf '\n/* test change */\n' >> "$1"; git commit -q -am "test: $1"; }
@@ -318,7 +344,9 @@ for n in sys.stdin.read().split():
         # changed; without a ledger the pools records stop, with one made again from this tree they stand (the
         # made-up pools record, which has no images, is taken out first)
         # pcase NAME WANT_POOLS_STOPPED WANT_ISR_STOPPED TEXT [ISR_TEXT]: the pools concurrency records are built
-        # from the pools kind's sources too, so the same change touches them
+        # from the pools kind's sources too, so the same change touches them. ISR_TEXT "each: WHY": the export
+        # lists the pools concurrency records commit by commit (bundle 300's of one, bundle 301's of another),
+        # so "<n>: WHY" must be there for the number of records of each commit ($isr_each)
         pcase() {
             local name=$1 want=$2 want_i=$3 text=$4 text_i=${5:-} out rc got=no got_i=no want_rc=0
             out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
@@ -326,12 +354,18 @@ for n in sys.stdin.read().split():
             grep -q "under records/pools-isr/ name commit" <<<"$out" && got_i=yes
             { [ "$want" = yes ] || [ "$want_i" = yes ]; } && want_rc=1
             if [ "$got" = "$want" ] && [ "$got_i" = "$want_i" ] && [ "$rc" = "$want_rc" ] && grep -q "$text" <<<"$out" &&
-               { [ -z "$text_i" ] || grep -q "$text_i" <<<"$out"; }; then
+               { [ -z "$text_i" ] || isr_text "$text_i" "$out"; }; then
                 echo "ok   $name: pools records stopped: $got, pools concurrency records stopped: $got_i"
             else
                 echo "FAIL $name: pools records stopped: $got (want $want), pools concurrency records stopped: $got_i (want $want_i), rc $rc"
                 sed 's/^/     /' <<<"$out"; fails=$((fails + 1))
             fi
+        }
+        isr_text() {   # TEXT OUT: TEXT in OUT, or with "each: WHY" a line " <n>: WHY" for each commit's n
+            case $1 in
+              "each: "*) local c; for c in $isr_each; do grep -q " $c: ${1#each: }" <<<"$2" || return 1; done ;;
+              *) grep -q "$1" <<<"$2" ;;
+            esac
         }
         git reset -q --hard "$base2"
         if git cat-file -e HEAD:records/pools/stm32g474/adapter_test.json 2>/dev/null; then
@@ -339,8 +373,9 @@ for n in sys.stdin.read().split():
         fi
         n_pools=$(git ls-files records/pools | grep -c '\.json$')
         n_isr=$(git ls-files records/pools-isr | grep -c '\.json$')
+        isr_each=$(git ls-files records/pools-isr | grep '\.json$' | xargs jq -r .bench_commit | sort | uniq -c | awk '{print $1}')
         printf '\n# test change\n' >> kinds/pools/configs.txt; git commit -q -am "test: kinds/pools/configs.txt"
-        pcase "pools: configs.txt changed, no ledger" yes yes "$n_pools: no rebuild from the sources of HEAD" "$n_isr: no rebuild from the sources of HEAD"
+        pcase "pools: configs.txt changed, no ledger" yes yes "$n_pools: no rebuild from the sources of HEAD" "each: no rebuild from the sources of HEAD"
         ledger_
         pcase "pools: configs.txt changed, the ledger made again" no no "0 pools records ($n_pools more of other commits" \
             "0 pools concurrency records ($n_isr more of other commits"
@@ -368,10 +403,58 @@ for n in sys.stdin.read().split():
         sed -i 's/^#define RESULT_MAGIC 0x564C4931u/#define RESULT_MAGIC 0x564C4932u/' kinds/pools-isr/main.c
         git commit -q -am "test: kinds/pools-isr/main.c, other flash bytes"
         pcase "pools concurrency: an image source changed, ledger of before" no yes "0 pools records ($n_pools more of other commits" \
-            "$n_isr: no rebuild from the sources of HEAD"
+            "each: no rebuild from the sources of HEAD"
         ledger_
         pcase "pools concurrency: an image source changed, the ledger made again" no yes "0 pools records ($n_pools more of other commits" \
-            "$n_isr: HEAD builds another image"
+            "each: HEAD builds another image"
+        # the cache itself: made again from the same tree, warm (every result from the cache) and without the
+        # cache, the ledger is the one committed, byte for byte but for the note that a cache was used and the
+        # commit it names: ledger_ committed the ledger, so it names the commit before HEAD, a new one names
+        # HEAD; the two commits differ in records/rebuilt.json only (the sources_* checksums are compared)
+        [ "$(git diff --name-only HEAD~1 HEAD)" = records/rebuilt.json ] && [ "$(jq -r .commit records/rebuilt.json)" = "$(git rev-parse HEAD~1)" ] \
+            || { echo "FAIL the cache: HEAD is not the commit of the ledger alone"; fails=$((fails + 1)); }
+        same_led() { [ "$(jq -r .commit "$1")" = "$(git rev-parse HEAD)" ] &&
+                     diff <(jq -S 'del(.cache_used, .commit)' "$1") <(jq -S 'del(.cache_used, .commit)' records/rebuilt.json) > /dev/null; }
+        VL_LEDGER_CACHE=$LCACHE run2 python3 lab/tools/image-ledger.py --test-cache --out "$T/warm.json" > "$T/warm.log" 2>&1
+        line=$(grep -h '^cache (' "$T/warm.log" | sed 's/^cache ([^)]*): //')
+        if same_led "$T/warm.json" && ! grep -qv ' 0 to rebuild$' <<<"$(tr ';' '\n' <<<"$line" | sed 's/^ //')"; then
+            echo "ok   the cache, warm: every result from it ($line), the ledger the committed one"
+        else
+            echo "FAIL the cache, warm: $line; the same ledger: $(same_led "$T/warm.json" && echo yes || echo no)"; fails=$((fails + 1))
+        fi
+        t0=$SECONDS
+        run2 python3 lab/tools/image-ledger.py --out "$T/off.json" > "$T/off.log" 2>&1
+        if same_led "$T/off.json" && ! grep -q '^cache (' "$T/off.log" && ! jq -e .cache_used "$T/off.json" > /dev/null; then
+            echo "ok   the cache, off: the ledger made without it ($((SECONDS - t0)) s) is the committed one"
+        else
+            echo "FAIL the cache, off: the ledger made without it is not the committed one"; diff <(jq -S 'del(.cache_used, .commit)' "$T/off.json") \
+                <(jq -S 'del(.cache_used, .commit)' records/rebuilt.json) | head -n 8 | sed 's/^/     /'; fails=$((fails + 1))
+        fi
+        # a planted entry: under the key of a pools concurrency record at HEAD, the entry of that record at the
+        # tree before the change of main.c (another key) with the verdict of before ("match"); it must not be used (the record
+        # DIFFERS at HEAD), and the ledger must be the one without the cache
+        r=$(git ls-files records/pools-isr | grep '\.json$' | head -n 1)
+        keyof() {   # the cache key of record $r at the tree of HEAD
+            python3 -I - "$LCACHE" "$r" <<'EOF'
+import importlib.util, os, sys
+spec = importlib.util.spec_from_file_location("image_ledger", os.path.join("lab", "tools", "image-ledger.py"))
+il = importlib.util.module_from_spec(spec); spec.loader.exec_module(il)
+c = il.Cache(sys.argv[1])
+print(c.key("pools-isr", os.path.join(il.ROOT, il.KIND_VERIFY["pools-isr"][0]), open(sys.argv[2], "rb").read()))
+EOF
+        }
+        k_now=$(keyof); here=$(git rev-parse HEAD); git checkout -q "$base3"; k_before=$(keyof); git checkout -q "$here"
+        n=${r#records/}; mkdir -p "$LCACHE/${k_now:0:2}"
+        jq --arg k "$k_before" --arg n "$n" '{key: $k, entry: (.records[$n] + {result: "match"} | del(.note))}' records/rebuilt.json \
+            > "$LCACHE/${k_now:0:2}/$k_now.json"
+        VL_LEDGER_CACHE=$LCACHE run2 python3 lab/tools/image-ledger.py --test-cache --out "$T/poison.json" > "$T/poison.log" 2>&1
+        line=$(grep -h '^cache (' "$T/poison.log" | sed 's/^cache ([^)]*): //')
+        if [ "$k_now" != "$k_before" ] && same_led "$T/poison.json" && [ "$(jq -r --arg n "$n" '.records[$n].result' "$T/poison.json")" = differs ] \
+           && grep -q '1 entries refused' <<<"$line" && grep -q "pools-isr $((n_isr - 1)) from the cache, 1 to rebuild" <<<"$line"; then
+            echo "ok   the cache, a planted entry under another tree's key ($n, \"match\"): refused, the record rebuilt: differs ($line)"
+        else
+            echo "FAIL the cache, a planted entry: $line; $n: $(jq -r --arg n "$n" '.records[$n].result' "$T/poison.json")"; fails=$((fails + 1))
+        fi
     fi
 fi
 [ "$fails" = 0 ] && echo "every case as expected" || echo "$fails cases not as expected"

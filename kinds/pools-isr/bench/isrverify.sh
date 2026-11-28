@@ -14,7 +14,8 @@
 # SAME_SOURCES_POOLS_ISR lists it (public-export.py: a commit with the same
 # test sources of the pools concurrency kind as the exported one). Its
 # kinds/pools-isr/onebuild.sh builds every image of the board and the
-# bundle, in the toolchain image the records name, with the libraries at
+# bundle the record names (BUNDLE: 300 into build/v1, 301 into build/b301;
+# a commit before bundle 301 builds bundle 300 only), in the toolchain image the records name, with the libraries at
 # the pins of kinds/pools/libs.lock (fetched into the fresh directory, or
 # copied from VL_LIBS_FROM and checked out again; a library with changed
 # files is refused). Per record, its one image is compared:
@@ -38,7 +39,7 @@ set -uo pipefail
 export LC_ALL=C
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=${VL_REPO:-$(cd "$HERE/../../.." && pwd)}
-[ $# -ge 1 ] || { sed -n '2,36p' "$0"; exit 2; }
+[ $# -ge 1 ] || { sed -n '2,37p' "$0"; exit 2; }
 command -v jq >/dev/null && command -v podman >/dev/null && command -v git >/dev/null || { echo "needs jq, git and podman" >&2; exit 2; }
 TMPROOT=${TMPDIR:-/tmp}
 worst=0
@@ -51,16 +52,18 @@ for rec in "$@"; do
     base=$(basename "$(dirname "$rec")")/$(basename "$rec" .json)
     case "$(jq -r '.schema // empty' "$rec" 2>/dev/null)" in pools-isr/1) true ;; *) false ;; esac || { echo "$base: not a record of the pools concurrency series (pools-isr/1)"; note 2; continue; }
     commit=$(jq -r '.bench_commit // empty' "$rec"); img=$(jq -r '.toolchain_image // empty' "$rec")
-    board=$(jq -r '.board // empty' "$rec")
+    board=$(jq -r '.board // empty' "$rec"); bundle=$(jq -r '.bundle // empty' "$rec")
     case "$commit" in ""|unknown|*+dirty) echo "$base: commit '$commit' cannot be rebuilt (unknown, or uncommitted changes)"; note 2; continue ;; esac
     case "$BOARDS" in *" $board "*) ;; *) echo "$base: no board of the series ('$board')"; note 2; continue ;; esac
     [ -n "$img" ] || { echo "$base: no toolchain image"; note 2; continue; }
-    group["$commit $board $img"]+="$rec"$'\n'
+    case "$bundle" in 300|301) ;; *) echo "$base: no bundle of the series ('$bundle')"; note 2; continue ;; esac
+    group["$commit $board $img $bundle"]+="$rec"$'\n'
 done
 
 for key in $(printf '%s\n' "${!group[@]}" | sort | tr ' ' '|'); do
-    IFS='|' read -r commit board img <<<"$key"
-    recs=${group["$commit $board $img"]}
+    IFS='|' read -r commit board img bundle <<<"$key"
+    recs=${group["$commit $board $img $bundle"]}
+    case "$bundle" in 300) out=v1 ;; *) out=b$bundle ;; esac
     fail() { while read -r r; do [ -z "$r" ] || echo "$(basename "$(dirname "$r")")/$(basename "$r" .json): $1"; done <<<"$recs"; note 2; }
     podman image exists "$img" || { fail "toolchain image $img not present (see toolchain/README.md)"; continue; }
     tree=$(mktemp -d "$TMPROOT/vl-isrverify.XXXXXX")
@@ -97,12 +100,12 @@ for key in $(printf '%s\n' "${!group[@]}" | sort | tr ' ' '|'); do
         fail "the libraries could not be fetched: $(tail -n 2 "$tree/libs.txt" | tr '\n' ' ')"; rm -rf "${tree:?}"; continue
     fi
     [ -z "$dirty" ] || { fail "libraries with changed files:$dirty"; rm -rf "${tree:?}"; continue; }
-    if ! (cd "$kind" && LIBS=$libs bash onebuild.sh "$board") > "$tree/build.log" 2>&1; then
+    if ! (cd "$kind" && LIBS=$libs BUNDLE=$bundle bash onebuild.sh "$board") > "$tree/build.log" 2>&1; then
         fail "build failed ($src): $(tail -n 2 "$tree/build.log" | tr '\n' ' ')"; VL_KEEP=1; echo "  kept: $tree"; continue
     fi
     while read -r rec; do
         [ -n "$rec" ] || continue
-        python3 -I - "$rec" "$kind/build/v1/$board" "$src, $img" <<'EOF'
+        python3 -I - "$rec" "$kind/build/$out/$board" "$src, $img" <<'EOF'
 import glob, json, os, sys
 rec, built, src = json.load(open(sys.argv[1])), sys.argv[2], sys.argv[3]
 base = os.path.basename(os.path.dirname(sys.argv[1])) + "/" + os.path.basename(sys.argv[1])[:-5]

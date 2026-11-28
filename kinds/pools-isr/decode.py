@@ -38,7 +38,10 @@ CLASS = {"adapter_ref": "control", "adapter_broken_isr_alloc": "control", "adapt
          "adapter_ref_primask": "ours", "adapter_threadx": "within", "adapter_cmsis_rtx": "within",
          "adapter_lwip": "within", "adapter_heapless": "within", "adapter_atomic_pool": "within",
          "adapter_etl": "outside", "adapter_riot": "outside", "adapter_contiki": "outside",
-         "adapter_c_allocator": "outside", "adapter_memorypool": "outside"}
+         "adapter_c_allocator": "outside", "adapter_memorypool": "outside",
+         # bundle 301 (lab/plans/2026-11-28-pools-isr-cal-lock.md): C_Allocator built with its interrupt-masking
+         # lock option ALLOC_LOCK_CMSIS_RTOS2, no kernel linked
+         "adapter_c_allocator_lock": "within"}
 
 
 def layout():

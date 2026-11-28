@@ -1,0 +1,233 @@
+{
+ "schema": "pools-isr/1",
+ "kind": "pools-isr",
+ "board": "samd20",
+ "board_id": 5,
+ "board_decoded": "SAM D20 Xplained Pro (ATSAMD20J18A, Cortex-M0+)",
+ "adapter": "adapter_broken_isr_free",
+ "class": "control",
+ "bench_commit": "c7d0f33ce3c7",
+ "toolchain_image": "verified-libs/toolchain:2026-11-13",
+ "toolchain": {
+  "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+  "ubuntu_snapshot": "20261105T000000Z",
+  "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+  "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+  "cbmc": "6.6.0 (cbmc-6.6.0)",
+  "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+  "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+  "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+  "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+ },
+ "libs_pinned": [
+  "etl 7d604f2e4f7fa79ff49bf675c089656943f9171b",
+  "riot 9c9a6abec901838b1637ef9308427b50ef59ce5c",
+  "threadx 93387b0a60382a29579bbad5045c68328e3751df",
+  "cmsis-rtx b566de42a5bf77d8b080f521cefc38ec7c45a3cc",
+  "cmsis6 af1b110e46a1720349f6f125e386e126767699bd",
+  "cortex-dfp cd38dbb875f7195e70460eee51faa7ab180c24a1",
+  "contiki-ng 4ccd1a3b9e767f168d12ec3df187fe6b7dc736b5",
+  "c-allocator 497b46500e314467d2bc2a3f6623e68d71eab9db",
+  "eccles 02146345a899e29fe53555098848a4584491818c",
+  "memorypool c98ff35f19473b737c4b75817096481327023c02",
+  "atomic-pool ab88f3ccfebd382685bf97239df6828769c5b743",
+  "heapless 19188229ac2b76fc91ad79f57dee01fa362a1e15",
+  "zephyr 41d10b59730406bbab4ca9f1fbbe9e96aafb4966",
+  "lwip 77dcd25a72509eb83f72b033d219b1d40cd8eb95",
+  "memorypool-head 5073178622c3af7b682060a93c4b38ce386f2d59",
+  "as-slice-01 e21f5bd9e629f2bf5641b97f64e582ed745e3ab6",
+  "as-slice-02 c3687342bc9f3c9c202676a5d2e17288ff979c90",
+  "rs-portable-atomic e4595528211f1d53b7f4d93e528ef84b491fc871",
+  "rs-stable-deref-trait 66f9d8a15b7209c45f58edee6c1b6bb497b7bd31",
+  "rs-hash32 d44eb33a01be4582669d9a1fa3f7c58455a21de9",
+  "rs-byteorder ec068eefa042d494475db125c4b034bd8e9e34dd",
+  "rs-generic-array-012 42843cdb6c24ef3684494617e78745a62a64a29c",
+  "rs-generic-array-013 525f5e7dc3e3e9cab6ee92c2655611c5590675d3",
+  "rs-generic-array-014 a1b3c3cfdf64ad99fd2004c0d8ce81b0e56e5ebe",
+  "rs-typenum b237efbb1da9646435274f63d7290cb7651b031f",
+  "rs-version-check d77ef9f27cc336719b2d839d09ee6635dd22f758"
+ ],
+ "clock_hz": 48005120,
+ "image_base": "0x00009000",
+ "image_bytes": 5008,
+ "image_sha256": "85b123c5cabc7405d71269d372dc88aa3dd63abc2dc76eeba586c318580038b8",
+ "fw_sha256": "739edb6ef9dfaa0bdeaea4cca59c43ec79614be067934fccf839a6c1c270520f",
+ "bundle": 301,
+ "bundle_sha256": "57e4f0461002e01e821817045bb88031d0b196144f0f026811c0096a49d8cc3c",
+ "boot_image_sha256": "aa22730439b5fee03fabc4e918c36044c4dc0da33d144b6909aa1847d710ce9b",
+ "time": "2026-11-27T23:19:05Z",
+ "host": "lib-lab1",
+ "probe_rs": "openocd 0.12.0 (probe-rs stand-in, common/samd20/bin/probe-rs)",
+ "attempt": 1,
+ "wait_s": 10.0,
+ "seconds": 30.8,
+ "run_number": "0x95560a8a",
+ "verdict": "caught",
+ "result": {
+  "magic": 1447840049,
+  "version": 1,
+  "done": 1,
+  "clock_hz": 48005120,
+  "board_id": 5,
+  "image_base": 36864,
+  "nonce": 2505443978,
+  "faults_total": 1620,
+  "c": [
+   {
+    "trials": 24044,
+    "inside": 15748,
+    "before": 4392,
+    "after": 3904,
+    "faults": {
+     "afterwards a block given twice": 560,
+     "afterwards fewer than 32 blocks: blocks lost": 280
+    },
+    "first_fault": 12,
+    "first_case": 66048,
+    "first_d": 52,
+    "lat_min": 45,
+    "lat_max": 63,
+    "lat_max_case": 256,
+    "lat_max_d": 53,
+    "lat_n": 15748,
+    "first": {
+     "fault": "afterwards a block given twice",
+     "held": 1,
+     "main": "free",
+     "interrupt": 0,
+     "rotation": 0,
+     "d": 52
+    },
+    "irq_wait_cycles": 18
+   },
+   {
+    "trials": 21940,
+    "inside": 14132,
+    "before": 3904,
+    "after": 3904,
+    "faults": {
+     "afterwards a block given twice": 520,
+     "afterwards fewer than 32 blocks: blocks lost": 260
+    },
+    "first_fault": 12,
+    "first_case": 66048,
+    "first_d": 47,
+    "lat_min": 43,
+    "lat_max": 57,
+    "lat_max_case": 256,
+    "lat_max_d": 49,
+    "lat_n": 14132,
+    "first": {
+     "fault": "afterwards a block given twice",
+     "held": 1,
+     "main": "free",
+     "interrupt": 0,
+     "rotation": 0,
+     "d": 47
+    },
+    "irq_wait_cycles": 14
+   }
+  ],
+  "cal_lat_min": [
+   45,
+   43
+  ],
+  "cal_lat_n": [
+   57,
+   53
+  ],
+  "cov_outside": 0,
+  "adapter": "adapter_broken_isr_free",
+  "class": "control",
+  "coverage_bits": 30
+ },
+ "option_registers": [
+  {
+   "schema": "board-options/1",
+   "board": "samd20",
+   "chip": "ATSAMD20J18A",
+   "time": "2026-11-27T23:17:13Z",
+   "probe_rs": "openocd 0.12.0 (probe-rs stand-in, common/samd20/bin/probe-rs)",
+   "regions": [
+    {
+     "name": "NVM User Row",
+     "address": "0x00804000",
+     "source": "DS60001504K \u00a79.4: the NVM User Row, read at 0x804000",
+     "words": [
+      "0x48e0c7cf",
+      "0xffffff5d"
+     ]
+    }
+   ]
+  }
+ ],
+ "coverage": {
+  "instructions": 44,
+  "reached": 8,
+  "per_function": {
+   "b_alloc": {
+    "reached": 3,
+    "instructions": 10,
+    "unreached": [
+     "0x9fba",
+     "0x9fbc",
+     "0x9fbe",
+     "0x9fc0",
+     "0x9fc2",
+     "0x9fc4",
+     "0x9fc6"
+    ]
+   },
+   "b_free": {
+    "reached": 5,
+    "instructions": 10,
+    "unreached": [
+     "0x9fd6",
+     "0x9fd8",
+     "0x9fda",
+     "0x9fdc",
+     "0x9fe6"
+    ]
+   },
+   "b_init": {
+    "reached": 0,
+    "instructions": 16,
+    "unreached": [
+     "0x9f90",
+     "0x9f92",
+     "0x9f94",
+     "0x9f96",
+     "0x9f98",
+     "0x9f9a",
+     "0x9f9c",
+     "0x9f9e",
+     "0x9fa0",
+     "0x9fa2",
+     "0x9fa4",
+     "0x9fa6",
+     "0x9fa8",
+     "0x9faa",
+     "0x9fac",
+     "0x9fae"
+    ]
+   },
+   "b_region": {
+    "reached": 0,
+    "instructions": 8,
+    "unreached": [
+     "0x9fec",
+     "0x9fee",
+     "0x9ff0",
+     "0x9ff2",
+     "0x9ff4",
+     "0x9ff6",
+     "0x9ff8",
+     "0x9ffa"
+    ]
+   }
+  }
+ }
+}

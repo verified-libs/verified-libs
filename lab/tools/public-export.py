@@ -551,6 +551,10 @@ def main():
     out = None if check_only else os.path.abspath(sys.argv[1])
     if out and os.path.exists(out):
         sys.exit(f"{out} exists")
+    if out:   # the export test's cache of rebuild results (image-ledger.py --test-cache) is never exported
+        r = subprocess.run(["git", "-C", ROOT, "show", f"HEAD:{LEDGER}"], capture_output=True, text=True)
+        if r.returncode == 0 and "cache_used" in json.loads(r.stdout):
+            sys.exit(f"{LEDGER} at HEAD was made with the export test's cache (cache_used): no export; make it again without it")
     words = [w.lower() for w in lines_of("site/embargo.txt")]
     skip = [p.rstrip("/") for p in lines_of("site/embargo-paths.txt")]
     # session names: whole words, case-insensitive (site/session-names.txt, one per line)

@@ -78,6 +78,10 @@ ISR_ABOUT = {
            "irq_wait_cycles {off, on}, where the configuration takes interrupts off as built: the longest time an "
            "interrupt waited; coverage [instructions reached, instructions]; record. Used in no score; the comparison "
            "page offers a filter on it. null where the series has no record of the row",
+    "isr_variants": "per row, where the series has one: another build of the same library, a configuration of its "
+                    "own in the concurrency series and not the build the row's numbers come from (C_Allocator with its "
+                    "lock option ALLOC_LOCK_CMSIS_RTOS2): adapter, name, documented_interrupts (kinds/pools/claims.tsv), "
+                    "and its result in the form of 'isr'",
     "baseline_isr": "per board: the reference free list without a lock, which the concurrency series runs as a "
                     "control (it must be caught), in the form of 'isr'",
     "isr_controls": "per board: our two broken interrupts-off builds of the reference, the series' other controls",
@@ -128,6 +132,12 @@ def build(rdir=None, claims_path=None, isr_dir=None):
             if isr:
                 k = (b["records_dir"], c["adapter"])
                 rows[-1]["isr"] = pools_isr.summary(k[0], *isr[k], rdir=isr_dir) if k in isr else None
+                var = [dict({"adapter": va, "name": vname,
+                             "documented_interrupts": {x: y for x, y in cl[va].items() if x != "who"} if va in cl else None},
+                            **pools_isr.summary(k[0], *isr[(k[0], va)], rdir=isr_dir))
+                       for va, vname in pools_isr.VARIANTS.get(c["adapter"], []) if (k[0], va) in isr]
+                if var:
+                    rows[-1]["isr_variants"] = var
             if c["role"] == "library":
                 base.update({(c["adapter"], p): x["baseline"] for p, x in pp.items()})
         if base:
@@ -147,7 +157,8 @@ def build(rdir=None, claims_path=None, isr_dir=None):
                 "baseline_documented": ({k: v for k, v in cl["adapter_ref"].items() if k != "who"}
                                         if recs and "adapter_ref" in cl else None)})
     if isr:   # only with records of the concurrency series: without them the file is as before
-        out["about"] = dict(ABOUT, **ISR_ABOUT)
+        out["about"] = dict(ABOUT, **{k: v for k, v in ISR_ABOUT.items()
+                                      if k != "isr_variants" or any(r.get("isr_variants") for r in rows)})
         out["isr_source"] = {"records": "records/pools-isr", "commits": sorted({r["bench_commit"] for _, r in isr.values()}),
                              "board_notes": {b["id"]: pools_isr.BOARD_NOTE[b["records_dir"]] for b in boards
                                              if b["records_dir"] in pools_isr.BOARD_NOTE

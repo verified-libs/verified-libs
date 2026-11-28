@@ -4,8 +4,10 @@
 # libraries and adapters are compiled as the kind's host test compiles them
 # (../pools/Makefile, the same include paths and defines); nothing of ../pools is
 # written: everything goes to build/ here.
-#   make check    the three programs: every configuration, and CMSIS-RTX's
-#                 LDREX/STREX variant and its control
+#   make check    the five programs: every configuration, CMSIS-RTX's
+#                 LDREX/STREX variant and its control, and C_Allocator with its
+#                 lock option ALLOC_LOCK_CMSIS_RTOS2 and its control
+#                 (lab/plans/2026-11-28-pools-isr-cal-lock.md)
 #   make test-board-side   the no-board tests of the image, runner and record writer
 LIBS ?= /libs
 K := ../pools
@@ -26,6 +28,8 @@ INC_RIOT := -I$(K)/shims/riot -I$(RIOT)/sys/include
 INC_TX   := -I$(TX)/common/inc -I$(K)/ports/host
 INC_CTK  := -I$(K)/shims/contiki -I$(CTK)
 INC_CAL  := -I$(CAL) -DALLOC_LOCK_NONE
+# C_Allocator's lock option on the host: CMSIS-Core's three functions are the check's flag (cal_lock/cmsis_compiler.h)
+INC_CAL_LOCK := -I$(K)/shims/host/cal_lock -I$(CAL) -DALLOC_LOCK_CMSIS_RTOS2
 INC_LWIP := -I$(K)/shims/lwip -I$(LWIP)/include
 INC_RTX  := -I$(K)/shims -I$(RTX)/Include -I$(RTX)/Source -I$(RTX)/Config -I$(CMSIS)/CMSIS/RTOS2/Include -DOS_EVR_MEMORY=0
 # CMSIS-RTX on the host: as the kind's host test, but with this directory's device header (ARMCM_isr.h: PRIMASK
@@ -42,9 +46,10 @@ OBJS := $(addprefix $(B)/,contract.o adapter_ref.o adapter_ref_primask.o broken_
         rtx_mempool_pool.o adapter_contiki.o lib_memb.o adapter_c_allocator.o lib_fb_allocator.o lib_LockGuard.o \
         adapter_lwip.o sys_arch.o lib_memp.o adapter_memorypool.o adapter_rust.o) $(TX_OBJS)
 
-check: $(B)/contract $(B)/contract_rtx_excl $(B)/contract_rtx_excl_broken
+check: $(B)/contract $(B)/contract_rtx_excl $(B)/contract_rtx_excl_broken $(B)/contract_cal_lock $(B)/contract_cal_lock_broken
 	./$(B)/contract; a=$$?; ./$(B)/contract_rtx_excl; b=$$?; ./$(B)/contract_rtx_excl_broken; c=$$?; \
-	echo "exit codes $$a $$b $$c"; [ $$a -eq 0 ] && [ $$b -eq 0 ] && [ $$c -eq 0 ]
+	./$(B)/contract_cal_lock; d=$$?; ./$(B)/contract_cal_lock_broken; e=$$?; \
+	echo "exit codes $$a $$b $$c $$d $$e"; [ $$a -eq 0 ] && [ $$b -eq 0 ] && [ $$c -eq 0 ] && [ $$d -eq 0 ] && [ $$e -eq 0 ]
 .PHONY: check
 
 # the no-board tests of the board side (after bash onebuild.sh): the result block's layout and verdicts, and
@@ -65,6 +70,10 @@ $(B)/contract_rtx.o: contract.c verdict.h excl_host.h $(K)/pool.h | $(B)
 	$(CC) -DRTX_EXCL=1 -c $< -o $@
 $(B)/contract_rtx_broken.o: contract.c verdict.h excl_host.h $(K)/pool.h | $(B)
 	$(CC) -DRTX_EXCL=1 -DRTX_EXCL_BROKEN=1 -c $< -o $@
+$(B)/contract_cal.o: contract.c verdict.h excl_host.h $(K)/pool.h | $(B)
+	$(CC) -DCAL_LOCK=1 -c $< -o $@
+$(B)/contract_cal_broken.o: contract.c verdict.h excl_host.h $(K)/pool.h | $(B)
+	$(CC) -DCAL_LOCK=1 -DCAL_LOCK_BROKEN=1 -c $< -o $@
 $(B)/adapter_ref.o: $(K)/adapter_ref.c $(K)/pool.h | $(B)
 	$(CC) -c $< -o $@
 $(B)/adapter_ref_primask.o: $(K)/adapter_ref.c $(K)/pool.h | $(B)
@@ -109,6 +118,10 @@ $(B)/lib_fb_allocator.o: | $(B)
 	$(LIBCC) $(INC_CAL) -c $(CAL)/fb_allocator.c -o $@
 $(B)/lib_LockGuard.o: | $(B)
 	g++ -std=c++17 -O2 -g -w -I$(K) $(INC_CAL) -c $(CAL)/LockGuard.cpp -o $@
+$(B)/lib_LockGuard_cal.o: $(K)/shims/host/cal_lock/cmsis_compiler.h | $(B)
+	g++ -std=c++17 -O2 -g -w -I$(K) $(INC_CAL_LOCK) -c $(CAL)/LockGuard.cpp -o $@
+$(B)/lib_LockGuard_cal_broken.o: $(K)/shims/host/cal_lock/cmsis_compiler.h | $(B)
+	g++ -std=c++17 -O2 -g -w -I$(K) $(INC_CAL_LOCK) -DCAL_LOCK_BROKEN=1 -c $(CAL)/LockGuard.cpp -o $@
 $(B)/adapter_lwip.o: $(K)/adapter_lwip.c | $(B)
 	$(CC) $(INC_LWIP) -c $< -o $@
 $(B)/sys_arch.o: $(K)/shims/lwip/sys_arch.c | $(B)
@@ -127,6 +140,10 @@ $(B)/contract_rtx_excl: $(B)/contract_rtx.o $(B)/adapter_cmsis_rtx.o $(B)/rtx_me
 	gcc -o $@ $^
 $(B)/contract_rtx_excl_broken: $(B)/contract_rtx_broken.o $(B)/adapter_cmsis_rtx.o $(B)/rtx_mempool_excl_broken.o
 	gcc -o $@ $^
+$(B)/contract_cal_lock: $(B)/contract_cal.o $(B)/adapter_c_allocator.o $(B)/lib_fb_allocator.o $(B)/lib_LockGuard_cal.o
+	g++ -o $@ $^
+$(B)/contract_cal_lock_broken: $(B)/contract_cal_broken.o $(B)/adapter_c_allocator.o $(B)/lib_fb_allocator.o $(B)/lib_LockGuard_cal_broken.o
+	g++ -o $@ $^
 
 clean:
 	rm -rf $(B)

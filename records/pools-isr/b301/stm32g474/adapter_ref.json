@@ -1,0 +1,221 @@
+{
+ "schema": "pools-isr/1",
+ "kind": "pools-isr",
+ "board": "stm32g474",
+ "board_id": 3,
+ "board_decoded": "NUCLEO-G474RE (STM32G474RET6, Cortex-M4F)",
+ "adapter": "adapter_ref",
+ "class": "control",
+ "bench_commit": "c7d0f33ce3c7",
+ "toolchain_image": "verified-libs/toolchain:2026-11-13",
+ "toolchain": {
+  "base_image": "docker.io/library/ubuntu:26.04@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+  "ubuntu_snapshot": "20261105T000000Z",
+  "clang": "Ubuntu clang version 21.1.8 (6ubuntu1)",
+  "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "arm_none_eabi_gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
+  "cbmc": "6.6.0 (cbmc-6.6.0)",
+  "genmc": "GenMC (https://plv.mpi-sws.org/genmc): (fab5bba7d9efaf76990227c2f59d62c11c7ea2a3)",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "rustc_nightly": "rustc 1.101.0-nightly (2d20b42b8 2026-11-04)",
+  "miri": "miri 0.1.0 (2d20b42b88 2026-11-04)",
+  "rust_targets": "thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabi ",
+  "added_2026_11_13": "rust-std thumbv7em-none-eabi, thumbv8m.main-none-eabi"
+ },
+ "libs_pinned": [
+  "etl 7d604f2e4f7fa79ff49bf675c089656943f9171b",
+  "riot 9c9a6abec901838b1637ef9308427b50ef59ce5c",
+  "threadx 93387b0a60382a29579bbad5045c68328e3751df",
+  "cmsis-rtx b566de42a5bf77d8b080f521cefc38ec7c45a3cc",
+  "cmsis6 af1b110e46a1720349f6f125e386e126767699bd",
+  "cortex-dfp cd38dbb875f7195e70460eee51faa7ab180c24a1",
+  "contiki-ng 4ccd1a3b9e767f168d12ec3df187fe6b7dc736b5",
+  "c-allocator 497b46500e314467d2bc2a3f6623e68d71eab9db",
+  "eccles 02146345a899e29fe53555098848a4584491818c",
+  "memorypool c98ff35f19473b737c4b75817096481327023c02",
+  "atomic-pool ab88f3ccfebd382685bf97239df6828769c5b743",
+  "heapless 19188229ac2b76fc91ad79f57dee01fa362a1e15",
+  "zephyr 41d10b59730406bbab4ca9f1fbbe9e96aafb4966",
+  "lwip 77dcd25a72509eb83f72b033d219b1d40cd8eb95",
+  "memorypool-head 5073178622c3af7b682060a93c4b38ce386f2d59",
+  "as-slice-01 e21f5bd9e629f2bf5641b97f64e582ed745e3ab6",
+  "as-slice-02 c3687342bc9f3c9c202676a5d2e17288ff979c90",
+  "rs-portable-atomic e4595528211f1d53b7f4d93e528ef84b491fc871",
+  "rs-stable-deref-trait 66f9d8a15b7209c45f58edee6c1b6bb497b7bd31",
+  "rs-hash32 d44eb33a01be4582669d9a1fa3f7c58455a21de9",
+  "rs-byteorder ec068eefa042d494475db125c4b034bd8e9e34dd",
+  "rs-generic-array-012 42843cdb6c24ef3684494617e78745a62a64a29c",
+  "rs-generic-array-013 525f5e7dc3e3e9cab6ee92c2655611c5590675d3",
+  "rs-generic-array-014 a1b3c3cfdf64ad99fd2004c0d8ce81b0e56e5ebe",
+  "rs-typenum b237efbb1da9646435274f63d7290cb7651b031f",
+  "rs-version-check d77ef9f27cc336719b2d839d09ee6635dd22f758"
+ ],
+ "clock_hz": 170000000,
+ "image_base": "0x08001000",
+ "image_bytes": 4212,
+ "image_sha256": "8896ab250e03d4cb5d278a4cb0d623e5cd0161fe97a17de5a228c1387accde25",
+ "fw_sha256": "8ae3c584b4b2395bc42e540c7ea4642511f529669765a0165dedc739f1b30381",
+ "bundle": 301,
+ "bundle_sha256": "30a4d0edd904d1e4ffeac52e0b1173bd565bb5a9fcffd398cd9d4ca5fd3fe60f",
+ "boot_image_sha256": "f315864b4fd55fc698a9b0d8a6298673d3320dd1459de27bffce4d66ce823c70",
+ "time": "2026-11-27T23:17:25Z",
+ "host": "lib-lab1",
+ "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+ "attempt": 1,
+ "wait_s": 10.0,
+ "seconds": 20.8,
+ "run_number": "0x52dceb55",
+ "verdict": "caught",
+ "result": {
+  "magic": 1447840049,
+  "version": 1,
+  "done": 1,
+  "clock_hz": 170000000,
+  "board_id": 3,
+  "image_base": 134221824,
+  "nonce": 1390209877,
+  "faults_total": 900,
+  "c": [
+   {
+    "trials": 27332,
+    "inside": 19280,
+    "before": 4148,
+    "after": 3904,
+    "faults": {
+     "no order of the calls gives these answers: a block handed out while it is held (a block twice)": 160,
+     "no order of the calls gives these answers: an alloc gave a block while all 32 were held": 32,
+     "afterwards a block given twice": 120,
+     "afterwards fewer than 32 blocks: blocks lost": 140
+    },
+    "first_fault": 6,
+    "first_case": 256,
+    "first_d": 74,
+    "lat_min": 52,
+    "lat_max": 60,
+    "lat_max_case": 256,
+    "lat_max_d": 20,
+    "lat_n": 19280,
+    "first": {
+     "fault": "no order of the calls gives these answers: a block handed out while it is held (a block twice)",
+     "held": 0,
+     "main": "alloc",
+     "interrupt": 0,
+     "rotation": 0,
+     "d": 74
+    },
+    "irq_wait_cycles": 8
+   },
+   {
+    "trials": 19312,
+    "inside": 12724,
+    "before": 2684,
+    "after": 3904,
+    "faults": {
+     "no order of the calls gives these answers: a block handed out while it is held (a block twice)": 160,
+     "no order of the calls gives these answers: an alloc gave a block while all 32 were held": 32,
+     "afterwards a block given twice": 120,
+     "afterwards fewer than 32 blocks: blocks lost": 136
+    },
+    "first_fault": 6,
+    "first_case": 256,
+    "first_d": 44,
+    "lat_min": 58,
+    "lat_max": 70,
+    "lat_max_case": 66048,
+    "lat_max_d": 45,
+    "lat_n": 12724,
+    "first": {
+     "fault": "no order of the calls gives these answers: a block handed out while it is held (a block twice)",
+     "held": 0,
+     "main": "alloc",
+     "interrupt": 0,
+     "rotation": 0,
+     "d": 44
+    },
+    "irq_wait_cycles": 12
+   }
+  ],
+  "cal_lat_min": [
+   52,
+   58
+  ],
+  "cal_lat_n": [
+   86,
+   57
+  ],
+  "cov_outside": 0,
+  "adapter": "adapter_ref",
+  "class": "control",
+  "coverage_bits": 32
+ },
+ "option_registers": [
+  {
+   "schema": "board-options/1",
+   "board": "stm32g474",
+   "chip": "STM32G474RE",
+   "time": "2026-11-27T23:17:02Z",
+   "probe_rs": "probe-rs 0.32.0 (git commit: 48f5e4d)",
+   "regions": [
+    {
+     "name": "FLASH_OPTR",
+     "address": "0x40022020",
+     "source": "RM0440 \u00a73.7.8, offset 0x20",
+     "words": [
+      "0xfbeff8aa"
+     ]
+    }
+   ]
+  }
+ ],
+ "coverage": {
+  "instructions": 34,
+  "reached": 12,
+  "per_function": {
+   "ref_alloc": {
+    "reached": 6,
+    "instructions": 6,
+    "unreached": []
+   },
+   "ref_free": {
+    "reached": 6,
+    "instructions": 8,
+    "unreached": [
+     "0x8001d94",
+     "0x8001d9a"
+    ]
+   },
+   "ref_init": {
+    "reached": 0,
+    "instructions": 15,
+    "unreached": [
+     "0x8001d50",
+     "0x8001d52",
+     "0x8001d54",
+     "0x8001d56",
+     "0x8001d5a",
+     "0x8001d5e",
+     "0x8001d60",
+     "0x8001d62",
+     "0x8001d64",
+     "0x8001d68",
+     "0x8001d6a",
+     "0x8001d6c",
+     "0x8001d6e",
+     "0x8001d70",
+     "0x8001d72"
+    ]
+   },
+   "ref_region": {
+    "reached": 0,
+    "instructions": 5,
+    "unreached": [
+     "0x8001da0",
+     "0x8001da2",
+     "0x8001da4",
+     "0x8001da8",
+     "0x8001daa"
+    ]
+   }
+  }
+ }
+}

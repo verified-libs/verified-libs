@@ -7,8 +7,10 @@ SYNTHETIC. As site/pools_synthetic.py for the first series.
 
 Usage: python3 -I site/pools_isr_synthetic.py OUT_DIR
   OUT_DIR/<board directory>/<adapter>.json for the boards and configurations
-  of records/pools, our three controls and the reference. Refused under
-  records/ or site/.
+  of records/pools, our three controls and the reference; and
+  OUT_DIR/b301/<board directory>/adapter_c_allocator_lock.json, C_Allocator
+  with its lock option in a bundle of its own (site/pools_isr.py VARIANTS).
+  Refused under records/ or site/.
 
 What the made-up results look like, by the plan's classes: the controls are
 caught; ours and the libraries within their documentation pass; the
@@ -27,7 +29,8 @@ CLASS = {"adapter_ref": "control", "adapter_broken_isr_alloc": "control", "adapt
          "adapter_ref_primask": "ours", "adapter_threadx": "within", "adapter_cmsis_rtx": "within",
          "adapter_lwip": "within", "adapter_heapless": "within", "adapter_atomic_pool": "within",
          "adapter_etl": "outside", "adapter_riot": "outside", "adapter_contiki": "outside",
-         "adapter_c_allocator": "outside", "adapter_memorypool": "outside"}   # kinds/pools-isr/decode.py CLASS
+         "adapter_c_allocator": "outside", "adapter_memorypool": "outside",
+         "adapter_c_allocator_lock": "within"}   # kinds/pools-isr/decode.py CLASS
 TWICE = "no order of the calls gives these answers: a block handed out while it is held (a block twice)"
 LOST = "afterwards fewer than 32 blocks: blocks lost"
 CRASH = "the program crashed: a call followed the pool's corrupted state outside memory"
@@ -46,6 +49,8 @@ def main():
         first = json.load(open(sorted(glob.glob(os.path.join(d, "*.json")))[0]))
         ads = sorted({json.load(open(f))["adapter"] for f in glob.glob(os.path.join(d, "*.json"))})
         ads += ["adapter_ref", "adapter_broken_isr_alloc", "adapter_broken_isr_free"]
+        if "adapter_c_allocator" in ads:
+            ads.append("adapter_c_allocator_lock")
         for k, a in enumerate(ads):
             cls = CLASS[a]
             seed = (sum(map(ord, bdir + a)) * 7919) % 1000
@@ -54,7 +59,7 @@ def main():
             if cls == "control" or (cls == "outside" and a != "adapter_riot"):
                 faults = [{TWICE: 40 + seed % 50, LOST: 10 + seed % 20}, {TWICE: 35 + seed % 40}]
             masks = a in ("adapter_ref_primask", "adapter_threadx", "adapter_lwip", "adapter_broken_isr_alloc",
-                          "adapter_broken_isr_free") or (a in ("adapter_cmsis_rtx", "adapter_atomic_pool") and bdir in ("stm32g0b1", "samd20"))
+                          "adapter_broken_isr_free", "adapter_c_allocator_lock") or (a in ("adapter_cmsis_rtx", "adapter_atomic_pool") and bdir in ("stm32g0b1", "samd20"))
             wait = [40 + seed % 60, 20 + seed % 30] if masks else [seed % 3, seed % 2]
             c = [{"trials": trials[i], "inside": trials[i] * 3 // 5, "faults": faults[i], "irq_wait_cycles": wait[i]}
                  for i in range(2)]
@@ -73,7 +78,9 @@ def main():
                    "bench_commit": "5yn7e71c0000", "toolchain_image": "synthetic:0", "clock_hz": first["clock_hz"],
                    "verdict": verdict, "result": dict({"c": c, "done": 0 if stopped else 1}, **({"stopped": stopped} if stopped else {})),
                    "coverage": {"instructions": 100 + seed % 200, "reached": 90 + seed % 150}}
-            p = os.path.join(out, bdir, a + ".json")
+            if a == "adapter_c_allocator_lock":
+                rec["bundle"] = 301
+            p = os.path.join(out, *(["b301"] if a == "adapter_c_allocator_lock" else []), bdir, a + ".json")
             os.makedirs(os.path.dirname(p), exist_ok=True)
             with open(p, "w") as fh:
                 json.dump(rec, fh, indent=1)

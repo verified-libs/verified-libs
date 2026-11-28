@@ -1,9 +1,10 @@
 {
  "about": "Rebuilds of the records of other commits from this tree's test sources (lab/tools/image-ledger.py, DECISIONS 2026-11-22). match: the tree builds, byte for byte, the image the record was measured from.",
- "commit": "125d0ba324602558cc2959eead4a4463237f749f",
+ "commit": "a87558164d10f65839c267e1c270c3d517bf5f10",
  "sources": "3c9689654e611f4bdf94a9eff12fe37a8fae2ce1ea2374f3576033bf2a292a7b",
  "sources_crc": "4bf602b52538d2519cb4d33fb65d4df4448da2640e2ef86b6c404d0c020c4573",
  "sources_pools": "07a4b7a610c0857b006545fda8e4b90dbc8e720f029850a49b295dd45ec5116c",
+ "sources_pools-isr": "e73657c44c934854444a9c7e9383bb71f8fcfec6e7bd4cb6f3c4b1758b7cacbe",
  "records": {
   "bench-v2/rp2350/adapter_anders.json": {
    "images_sha256": "81a966886eaadfb375288b6089028d513f4832de36791aeb79aa72762dbe54f7",
@@ -1302,6 +1303,334 @@
   },
   "crc/stm32g474/adapter_zlib_crc32_ram.json": {
    "images_sha256": "d1bdd42979254c1d007a55ce25ca6a9e6c83e1019527f8639ffaca6fcb2c6d14",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_atomic_pool.json": {
+   "images_sha256": "bef16346d902b31a7915c20db0e4eb26d87a52be3478a0082e544011729cea9c",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_broken_isr_alloc.json": {
+   "images_sha256": "46b4814fc2a4c595f200d7a971d6da3bfa8fbfd16bbaab703f227bcd956cb3ea",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_broken_isr_free.json": {
+   "images_sha256": "009f9c3b69e9c3c0b64f4f6bbe28687f99902e76514ae07631073ab6ab56d360",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_c_allocator.json": {
+   "images_sha256": "16ca2410c7a055d73d668a05993d2c54a9ffb5fedf535eec663601a685805593",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_cmsis_rtx.json": {
+   "images_sha256": "910ba41ba6492847bf2703f14b0955200e4f6090d91139dfac8137a36405be7e",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_contiki.json": {
+   "images_sha256": "848930eca58004e652ee66041218a5beddf00908761c513040cad7ff59af3ad7",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_etl.json": {
+   "images_sha256": "40ed7e6822f4b53b942b34aa2523f4b1c161864a43d68537721c1ea21ce0e620",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_heapless.json": {
+   "images_sha256": "c5e99fc5b9ba425fd9b2ca3c21074ab16d647a7f0e768adbdddb0e6d3d221bd0",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_lwip.json": {
+   "images_sha256": "595aa8156cb495fe56f59c33806d2bce9cd12e8de8b5379a562c1260e75979da",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_memorypool.json": {
+   "images_sha256": "c387f5e2de8ec670e61b4b49c83a446eecf7992d4577a49dcd83fe391a51a5af",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_ref.json": {
+   "images_sha256": "e0c8c50e79a517f31b692d3c36557cfa44020aeaffc543c07dd9d49af5637f4d",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_ref_primask.json": {
+   "images_sha256": "b4c7b114bf051ae0e08589b97fb0b0883838c64f1f8852a34ea8f8e91c3fe6d2",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_riot.json": {
+   "images_sha256": "e292a6644a033a94841e5a436c000b13b3688fbc818bb9aa844178b23b6d10af",
+   "result": "match"
+  },
+  "pools-isr/nrf5340/adapter_threadx.json": {
+   "images_sha256": "ee968afbd5f084309243a41542a7da8fc40c0b5149c116269be55016f18964bc",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_atomic_pool.json": {
+   "images_sha256": "1219610adbc4d92c9a5e6f65fc1b4bb389704dd5c5d4d66be10b0ee76f82a413",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_broken_isr_alloc.json": {
+   "images_sha256": "acad2cc898f350d16f435148ca7c0f396789e5219c1d8ff4a8c4d8d3ddd446c3",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_broken_isr_free.json": {
+   "images_sha256": "7da93e8f7b2c9421ed284b1e40268445fc2bf02084853d5b4949eb5c03feed70",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_c_allocator.json": {
+   "images_sha256": "08b54a70c8fc3ea9cf70f0a77370ff8439ee3ca80aa6eeacc8fae709992e814c",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_cmsis_rtx.json": {
+   "images_sha256": "25134f78a590113874cfaffdd045b3f5192e97d3eb424b12395a528dd73d679a",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_contiki.json": {
+   "images_sha256": "6ec84de2b55039c1e0f97eac0f5e9c6c80242eebc6cabee965aa627e1a380a4d",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_etl.json": {
+   "images_sha256": "548ab697d3654c4a064c58bd584c4d42227ab13461889b9cc9951e420874e29e",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_heapless.json": {
+   "images_sha256": "0de28be64884b0a76bcc0243c041845dfb5f9c6b26ce75e9f7d1ad9fc2a837ce",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_lwip.json": {
+   "images_sha256": "b1682710f3c30593f7192fb29610746abff17966f54e5b0399561e1ca5a0bea5",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_memorypool.json": {
+   "images_sha256": "347df1dff89b33f9f88907ed6edb8dfa976baf2eb0eee0a7f08ea6f166ee7302",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_ref.json": {
+   "images_sha256": "322888fb3370e265b608583b4df0455e29cf1f09bf595d98fd95477740dd94ec",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_ref_primask.json": {
+   "images_sha256": "0636efa06cd260e632907bf2865c180757d26eb574b6ecb9c5ee25b312925fd8",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_riot.json": {
+   "images_sha256": "1bf3e9298278a7baae5f72a9179fb77115ecb8a5b9cdd7f17d26c69d71d5cf00",
+   "result": "match"
+  },
+  "pools-isr/rp2350/adapter_threadx.json": {
+   "images_sha256": "d4dd879ddbd79db2fba49f107458b2cb6e6105183c3a5cafc42f8f13fdf3398d",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_atomic_pool.json": {
+   "images_sha256": "b20b0294e8953d7882799049af3db4bf6bfe44c42089fe4a78a47aab984e990d",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_broken_isr_alloc.json": {
+   "images_sha256": "9b9505f2e6e50ceaea50f5e6e1339e36a21dac7ac95d4799e0022f54a1cbec47",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_broken_isr_free.json": {
+   "images_sha256": "3ded5e5f377391d1f5f94672f6d050c6fb99ffd456bddc67d692670e0e841e2e",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_c_allocator.json": {
+   "images_sha256": "427ef0f6a18206a4022a0a94f2b43f334e45fe3ab6b3bffd5634f3c6b26d034a",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_cmsis_rtx.json": {
+   "images_sha256": "10bea4938546857ec7fc3c2e65bb8575280f3af662eb0d86c348422dea9a049d",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_contiki.json": {
+   "images_sha256": "d5795a8c9fee6db6bb071559af409fa8a0f149f1e174d2ac7ce6699ca616049b",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_etl.json": {
+   "images_sha256": "52a1ae4734538f518091991a479855d0760df18056332e73b7305c70b8ce8f53",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_lwip.json": {
+   "images_sha256": "a68a1d12c7bb1d9f8a06c4220fc649e85116e78179abee7935bfc553a71ce062",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_memorypool.json": {
+   "images_sha256": "0fcc8d19eb20a8d2a46e82473576175725cc0b9c9c7c44175de3527308fdee45",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_ref.json": {
+   "images_sha256": "9f3220ed0f47e20eb05d1b24512b780c354776328e27ffac287cfea5b2cf8f6d",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_ref_primask.json": {
+   "images_sha256": "583d19dfa38717886686c078914c03a469caefb73a062bb3a05d1cca168aca73",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_riot.json": {
+   "images_sha256": "772adfb0f6bfb764a03096473dcd33dc363a77f2b9a69d19e566bd5926c4a4ee",
+   "result": "match"
+  },
+  "pools-isr/samd20/adapter_threadx.json": {
+   "images_sha256": "8268ec0e82dcd5e6e61c68f0869ff2a4863167c85b8c3ff1f8d36aa6a2dd0dae",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_atomic_pool.json": {
+   "images_sha256": "615556604df5c8b5fb058e38c6adcd0b1449a5fda775526b1a26dbe5a32d43ae",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_broken_isr_alloc.json": {
+   "images_sha256": "e8da2e5084a37d92050e2e6e5ec3cc565129fce1b8c815d906114cc9afc0cdeb",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_broken_isr_free.json": {
+   "images_sha256": "9ec246460381e38cda065cfe3e070cf92f1a57f6ef37b10302cea5cc28d87f12",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_c_allocator.json": {
+   "images_sha256": "2183828b8245be6d0a965332f76b8b6ce767e298ff26dd832dc3d0d8410bf824",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_cmsis_rtx.json": {
+   "images_sha256": "333955ddc7662195d989a64e51399b66cd7f51ef89278d61b34a0eedfa8e2c4a",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_contiki.json": {
+   "images_sha256": "d7b4fc17183e0e9ad5ce3842e11b36d7ca8b0e6f0117f1335f5f360600395179",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_etl.json": {
+   "images_sha256": "f02d29cb392f69558206084ef23cc64ee25a1f030e5e73b21518d2b076b458bc",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_lwip.json": {
+   "images_sha256": "525461d24dbf497df22fc430bbede36881d45d9735f2bc5a3436759c37b3c243",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_memorypool.json": {
+   "images_sha256": "88816427a2ce96edea3d17b36d05f35d2375a32823c136f0c113ca192651f093",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_ref.json": {
+   "images_sha256": "7443e5f18c274c21fec7a04aab21b18f4a4eadc014f5ae1cd7e4b6aa762d13e4",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_ref_primask.json": {
+   "images_sha256": "440eceba3c551748938a10f7385c2f7f8feef56d5b296ee11ad539e2a2137774",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_riot.json": {
+   "images_sha256": "f259de79bf87ffa2d5d1280e8c709155dbef41a18af13fc7039ca547fc31a620",
+   "result": "match"
+  },
+  "pools-isr/stm32g0b1/adapter_threadx.json": {
+   "images_sha256": "4f5de928b69a2e2ed26aa05062cf511808a3baa4408ac573fb7068b2f799895e",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_atomic_pool.json": {
+   "images_sha256": "17e9c40e5389377400e3f91c1d3d626988dc27a221ada7e9c9cf46288b7936e4",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_broken_isr_alloc.json": {
+   "images_sha256": "6cf9c1a6d7740a49c40a24e52cb3b49a03fcd996a456562140843750e0da55f2",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_broken_isr_free.json": {
+   "images_sha256": "f7a8c02221f662cd045568db3df59138ab56e7e89393876398d24a76dd45165d",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_c_allocator.json": {
+   "images_sha256": "b22d05a7f724cd84389ab2817fdbad8d1d66b5b0148477eb730507870941629c",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_cmsis_rtx.json": {
+   "images_sha256": "a761e32c283f08511b661acd86bee10171e38918474dcc3ba0bd22080339fa46",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_contiki.json": {
+   "images_sha256": "67db16836660771440ccce3dacae7d4284c6ab9cfa8a480f4ba6ea565e752d2b",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_etl.json": {
+   "images_sha256": "fd7443c92b467dba3e55fe59fc28fd8a6413e7f523c268a1d90229c582ac120e",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_heapless.json": {
+   "images_sha256": "e5ad674aaf135b3a3d7f9c88a9add5a2135bf0a41e42fed3d4e5e4542c885405",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_lwip.json": {
+   "images_sha256": "5f653476e3c42eec258f9e9c2f4722979e18ca40461f4cf2dcfed8d2982c2113",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_memorypool.json": {
+   "images_sha256": "a2a5466f44ffa9547cf61a96089544590615b04d37ef75f51fbb4826e6467cd9",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_ref.json": {
+   "images_sha256": "9157fd26334332ecc70ae0aa4a42ade928f7b7c5b3443697d4f0cf1e6b181da0",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_ref_primask.json": {
+   "images_sha256": "49b912843185a818db7b8c9a19314575c13fbf66dfd694680f161af12d2d4eb5",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_riot.json": {
+   "images_sha256": "f9fe6d88eae436f57c4d3f5241d51d9c15b2bd0875bfbf0bc3e08b03bfcfeb41",
+   "result": "match"
+  },
+  "pools-isr/stm32g474/adapter_threadx.json": {
+   "images_sha256": "e12eaa6f3065b2096c6c80855a4f9bc05fada37928f6cac6fcedf332dc819955",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_atomic_pool.json": {
+   "images_sha256": "514e5ef65bf2cad176252090e70d3a85703590213c3dc09504fc9709b47e536a",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_broken_isr_alloc.json": {
+   "images_sha256": "aae81c2742f0a9d615343a148d4f3e9027216c3ff8528884e575eef9094160bd",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_broken_isr_free.json": {
+   "images_sha256": "1b477c0cb3d6a578ad5902500c453b93f08ab941a74b3a040cd1a5ead6c78852",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_c_allocator.json": {
+   "images_sha256": "bcb9de1b724a23ea5d08854335d71201612a10db884984195e97a97f76017781",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_cmsis_rtx.json": {
+   "images_sha256": "cf545055b63936d7821007ad37f34b68136237a40c2974fc71e313aca6a4894d",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_contiki.json": {
+   "images_sha256": "6e025c105027c79a42e75510f0379efe0d453dfa915284cc9bb5b880895b595f",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_etl.json": {
+   "images_sha256": "52aeb11815e035d6baffd1ac5dcf11adc0c4a3b8d3441b5923f5e94f504c6d06",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_heapless.json": {
+   "images_sha256": "cc098f4aee5414e31295df95cc54a015b51e3e8f44862e20ce5c4f323c861450",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_lwip.json": {
+   "images_sha256": "9e78929b43628ae8deb4c6aa005bb10a4c0ff54e897772da1a731cc1d867aa7d",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_memorypool.json": {
+   "images_sha256": "570b07f41e489e6c530f00d32c746ad2c45d0e8ff6398a3e56aac5b682dcaa08",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_ref.json": {
+   "images_sha256": "ce24d85685a54243d02d0ab76e10d161da8e288d0a503fdb58807a4aab6f0817",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_ref_primask.json": {
+   "images_sha256": "0d2d4f02c8c99d7628f2c33d227a9998897298f416cde7772108164866904533",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_riot.json": {
+   "images_sha256": "904b181267a265d6f7d6ab5d70e3f02ac0add498138e60659e58dd4c3a4c512d",
+   "result": "match"
+  },
+  "pools-isr/stm32h723/adapter_threadx.json": {
+   "images_sha256": "e0f22e5cba0dbdc075b67c36cf1d1b12eda2f6e6f5a42e7089cefc28fcd79234",
    "result": "match"
   }
  }

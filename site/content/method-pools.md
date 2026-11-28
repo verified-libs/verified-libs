@@ -65,6 +65,17 @@ each board's fold-out "Use from interrupts" on the
     the same and only what was observed is reported; it is never called
     failing;
   - *ours:* our reference with interrupts off.
+- **C_Allocator twice.** Its one-context numbers are of the build with no
+  lock (`ALLOC_LOCK_NONE`, the library's default on a bare-metal
+  toolchain), which is *outside its documentation* here. The series also
+  ran a build of its own with the library's lock option
+  `ALLOC_LOCK_CMSIS_RTOS2`, *within its documentation*. That build:
+  - is built against CMSIS 6 headers, with no kernel linked, and with
+    `-D__PROGRAM_START=_start`, as CMSIS sets it for picolibc;
+  - only saves PRIMASK and masks interrupts in the lock;
+  - ran in a bundle of its own (bundle 301), with the three controls again.
+
+  It is not timed in one context.
 - **Controls.** On every board, three builds of ours must be caught:
   - our reference without a lock;
   - two builds with interrupts on again too early, in `alloc` and in `free`.

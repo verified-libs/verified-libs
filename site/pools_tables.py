@@ -243,13 +243,15 @@ def span_of(rgs, key, cache="on"):
 def isr_fold(board, bdir, data, isr, isr_rel, cl):
     """The nested fold-out of a board with what the concurrency series observed (site/pools_isr.py)."""
     import pools_isr
+    variants = {a for v in pools_isr.VARIANTS.values() for a, _ in v}
     lines = ["**Use from interrupts.** What the concurrency series observed with an interrupt at every cycle of "
              "the main context's alloc or free, cache off and on, in the classes of its method: within the "
              "library's documentation (passed, or a finding), ours, outside the library's documentation (only what "
              "was observed), and our controls, which must be caught. The longest wait of an interrupt is shown "
              "where the configuration takes interrupts off as built. Not part of any score.\n"
              + ("" if any(b == bdir for b, _ in isr) else "\n*The series has not run on this board yet.*\n")
-             + (f"\n{pools_isr.BOARD_NOTE[bdir]}\n" if bdir in pools_isr.BOARD_NOTE and any(b == bdir for b, _ in isr) else ""),
+             + (f"\n{pools_isr.BOARD_NOTE[bdir]}\n" if bdir in pools_isr.BOARD_NOTE and any(b == bdir for b, _ in isr) else "")
+             + (f"\n{pools_isr.VARIANT_NOTE}\n" if any(a in variants for _, a in isr) else ""),
              f"| Configuration | {CLAIM_HEAD_ISR} | Observed in the concurrency series | Trials | "
              "Instructions reached by an interrupt |",
              "|---|---|---|---:|---:|"]
@@ -262,11 +264,14 @@ def isr_fold(board, bdir, data, isr, isr_rel, cl):
         sm = pools_isr.summary(bdir, f, r)
         cov = sm["coverage"]
         # linked to its record; synthetic records (a preview) lie outside the tree: no link
-        link = f"[{pools_isr.cell(sm)}]({isr_rel}/{bdir}/{os.path.basename(f)})" if isr_rel else pools_isr.cell(sm)
+        link = f"[{pools_isr.cell(sm)}]({isr_rel}/{pools_isr.sub_path(f)})" if isr_rel else pools_isr.cell(sm)
         return (f"| {name} | {claim_cell(cl.get(adapter)) if adapter not in pools_isr.CONTROLS[1:] else '–'} | {link} | "
                 f"{sm['trials']} | {'–' if not cov else f'{cov[0]} of {cov[1]}'} |")
     for name, r, _s, _rg in data:
         lines.append(row(name, r["adapter"]))
+        for va, vname in pools_isr.VARIANTS.get(r["adapter"], []):   # a build of its own, shown where it has records
+            if any(a == va for _, a in isr):
+                lines.append(row(vname + "; a build of its own, not timed above", va))
     lines.append(row(BASE_LABEL + "; the control without a lock", "adapter_ref"))
     for a in pools_isr.CONTROLS[1:]:
         lines.append(row(pools_isr.CONTROL_TEXT[a], a))
