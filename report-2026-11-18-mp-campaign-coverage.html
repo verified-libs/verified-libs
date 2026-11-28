@@ -55,7 +55,7 @@ prescaler 3 and 4 half the runs use aimed interrupts and every run records
 where its interrupts landed (method:
 <a href="report-2026-11-17-mp-coverage-prototype.html">2026-11-17-mp-coverage-prototype.md</a>).
 The first campaign of this kind, and the last long one before version 1
-(DECISIONS 2026-11-18).</p>
+(<a href="method.html#log-2026-11-19-v1">change log</a>).</p>
 <h2 id="result">Result</h2>
 <p><strong>No errors in any library in its documented mode, in any run on any
 board.</strong> A run is valid when the control (an SPSC buffer used by two
@@ -247,29 +247,30 @@ times in the weakest run. Range over the libraries:</p>
 <h2 id="reading">Reading</h2>
 <ul>
 <li>The aimed runs are the ones that test: they caught the control in every
-  run on every board. With them the lowest median per boundary is 52
-  (heapless on the H723); on the other boards it is 433 or more. With
-  random interrupts no library on any board had all its
-  boundaries interrupted 10 times in every run.</li>
+    run on every board. With them the lowest median per boundary is 52
+    (heapless on the H723); on the other boards it is 433 or more. With
+    random interrupts no library on any board had all its
+    boundaries interrupted 10 times in every run.</li>
 <li>Random runs at the slow rates add little. On the Pico 2 they are never
-  valid, so half of its prescaler 3/4 time (58 runs of about 3 minutes)
-  gave nothing.</li>
+    valid, so half of its prescaler 3/4 time (58 runs of about 3 minutes)
+    gave nothing.</li>
 <li>The aim window is one value (160 cycles) for every library and board. The
-  H723 gains least from aiming (not examined why), and the long lock-free
-  operations (heapless,
-  reserve/commit) keep boundaries below 10 on most boards. A window per
-  library would close that; it is a method change and waits until after
-  version 1.</li>
+    H723 gains least from aiming (not examined why), and the long lock-free
+    operations (heapless,
+    reserve/commit) keep boundaries below 10 on most boards. A window per
+    library would close that; it is a method change and waits until after
+    version 1.</li>
 <li>Boundaries in blocks that were never interrupted (heapless: about 90
-  boundaries on the Cortex-M4/M33/M7 boards, 41 on the Cortex-M0+ ones) are paths the test does not take, likely
-  retries after a real collision. An interrupt test on one core does not
-  reach them; model checking does.</li>
+    boundaries on the Cortex-M4/M33/M7 boards, 41 on the Cortex-M0+ ones) are paths the test does not take, likely
+    retries after a real collision. An interrupt test on one core does not
+    reach them; model checking does.</li>
 </ul>
 <h2 id="for-the-publication-re-run">For the publication re-run</h2>
 <p>No change is made here. A proposal for the owner, since it changes what a
 campaign covers: at prescaler 3 and 4 run aimed interrupts only (random
 runs there are often invalid and never on the Pico 2), and keep random
-interrupts at prescaler 1 and 2, where the control is caught reliably.</p></main>
+interrupts at prescaler 1 and 2, where the control is caught reliably.</p>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

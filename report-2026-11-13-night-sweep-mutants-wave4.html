@@ -55,18 +55,18 @@ its own copy of the repository at commit <code>25c64d2</code>), 18:45 to about 0
 below). New since the campaign of 2026-11-11/12:</p>
 <ul>
 <li>the <strong>interrupt sweep</strong> (modes <code>sweep</code>, <code>sweep-block</code>, <code>sweep-dma</code>): one
-  interrupt per call, at every delay from the start of the call, from five
-  fill levels and 256 start positions; 6 of the 17 rotation entries;</li>
+    interrupt per call, at every delay from the start of the call, from five
+    fill levels and 256 start positions; 6 of the 17 rotation entries;</li>
 <li>the <strong>count check</strong>: after every sweep the buffer is drained and the number
-  of bytes compared with what went in and out (bytes lost and bytes too many
-  are reported);</li>
+    of bytes compared with what went in and out (bytes lost and bytes too many
+    are reported);</li>
 <li>four <strong>mutants</strong> (<code>mutants.c</code>): ring buffers with one deliberate defect
-  each, to show which test modes can find which kind of defect. They do not
-  decide whether a run is valid; the negative control does, as before;</li>
+    each, to show which test modes can find which kind of defect. They do not
+    decide whether a run is valid; the negative control does, as before;</li>
 <li><strong>wave 4</strong>: NuttX circbuf, Arduino RingBufferN as shipped (ArduinoCore-API
-  issue 195 says it is not interrupt-safe; reported, not counted) and
-  Arduino SafeRingBufferN. 28 libraries and variants, plus the control and
-  the mutants.</li>
+    issue 195 says it is not interrupt-safe; reported, not counted) and
+    Arduino SafeRingBufferN. 28 libraries and variants, plus the control and
+    the mutants.</li>
 </ul>
 <p><strong>No errors in any real library in any valid run, on any board</strong>: 422 valid
 runs of 427. The errors are where they are expected: the two variants their
@@ -630,34 +630,34 @@ direction, all boards together.</p>
 </table></div>
 <ul>
 <li><strong>The sweep finds every mutant in every run</strong> in the directions where the
-  defect can show (55 of 55 and 70 of 70), where the random modes sometimes
-  miss: "drain re-reads head" is caught in 39 of 89 random single-byte runs,
-  "full test misses the wrap" in 67 of 84 random block runs in the
-  main→interrupt direction.</li>
+    defect can show (55 of 55 and 70 of 70), where the random modes sometimes
+    miss: "drain re-reads head" is caught in 39 of 89 random single-byte runs,
+    "full test misses the wrap" in 67 of 84 random block runs in the
+    main→interrupt direction.</li>
 <li>Two mutants cannot fail in the main→interrupt direction on one core (the
-  defective call then runs in the interrupt and is not interrupted itself);
-  on two cores (Pico 2, SMP) they are caught in both directions ("drain
-  re-reads head" in 16 of 19 random single-byte SMP runs one way, in every run
-  otherwise).</li>
+    defective call then runs in the interrupt and is not interrupted itself);
+    on two cores (Pico 2, SMP) they are caught in both directions ("drain
+    re-reads head" in 16 of 19 random single-byte SMP runs one way, in every run
+    otherwise).</li>
 </ul>
 <h2 id="runs-that-did-not-count">Runs that did not count</h2>
 <ul>
 <li><strong>nRF5340 DK, 4 runs: <code>sweep-block</code> with the cache off was too slow, not
-  hung.</strong> At 256 start positions it needs about 1.7 hours on this board;
-  <code>run.sh</code> gave up after about 1.5 hours, the campaign power-cycled the board
-  and tried once more, twice (about 6 hours of the night). Checked afterwards:
-  the same build and seeds finish with 16 start positions (0 errors, control
-  caught). <code>run.sh</code> now tells a slow run from a hung one (two reads of the
-  result block; exit 4, no power cycle, no retry). The same configuration
-  took 95 minutes on the G0B1 and 94 on the H723, close to the limit.</li>
+    hung.</strong> At 256 start positions it needs about 1.7 hours on this board;
+    <code>run.sh</code> gave up after about 1.5 hours, the campaign power-cycled the board
+    and tried once more, twice (about 6 hours of the night). Checked afterwards:
+    the same build and seeds finish with 16 start positions (0 errors, control
+    caught). <code>run.sh</code> now tells a slow run from a hung one (two reads of the
+    result block; exit 4, no power cycle, no retry). The same configuration
+    took 95 minutes on the G0B1 and 94 on the H723, close to the limit.</li>
 <li><strong>SAM D20, first campaign of the night stopped by hand</strong>: run 0 (single
-  bytes, prescaler 0, 300 000 bytes) passed the same time limit with the
-  larger library list. Restarted at 20:39 UTC with a 2-hour limit; the table
-  shows that campaign. That run took 83 minutes.</li>
+    bytes, prescaler 0, 300 000 bytes) passed the same time limit with the
+    larger library list. Restarted at 20:39 UTC with a 2-hour limit; the table
+    shows that campaign. That run took 83 minutes.</li>
 <li><strong>SAM D20, 1 run invalid</strong> (<code>dma</code>, prescaler 0): the negative control was
-  caught in one direction only (9 950 errors interrupt→main, 0 main→interrupt
-  with 298 interrupts in the measured part: the main loop was starved). 0
-  errors in the real libraries; the run is not counted.</li>
+    caught in one direction only (9 950 errors interrupt→main, 0 main→interrupt
+    with 298 interrupts in the measured part: the main loop was starved). 0
+    errors in the real libraries; the run is not counted.</li>
 </ul>
 <h2 id="time-per-run">Time per run</h2>
 <p><code>sweep-block</code> at 256 start positions is by far the longest entry of the
@@ -673,22 +673,22 @@ the SMP modes on the Pico 2. All 61 runs valid, no errors in real libraries in t
 Records name their source commit.</p>
 <ul>
 <li><strong>Rest of wave 4</strong> (first board runs): RT-Thread rt_ringbuffer with
-  interrupts off per call, Mbed CE CircularBuffer and moodycamel
-  ReaderWriterQueue: 0 errors on one core on every board. RT-Thread as
-  shipped, without a lock (no claim; reported, not counted): 76 errors.
-  With the other side on core 1, the two interrupt-lock designs fail as
-  expected (RT-Thread with interrupt lock, Mbed CE); moodycamel, which is
-  documented for two threads, has 0 errors.</li>
+    interrupts off per call, Mbed CE CircularBuffer and moodycamel
+    ReaderWriterQueue: 0 errors on one core on every board. RT-Thread as
+    shipped, without a lock (no claim; reported, not counted): 76 errors.
+    With the other side on core 1, the two interrupt-lock designs fail as
+    expected (RT-Thread with interrupt lock, Mbed CE); moodycamel, which is
+    documented for two threads, has 0 errors.</li>
 <li><strong>SMP sweep, first board run: it found nothing it should have found.</strong>
-  Single-byte <code>sweep-smp</code> reported 0 errors for wizard97 as shipped, Arduino
-  RingBufferN as shipped and three of the four mutants. Cause: core 1 has to
-  notice the start flag first, so its call always came after the first
-  instructions of core 0's call, and it moved in steps of its polling loop.
-  Fixed (a fixed lead on core 0, delay steps of about one cycle on core 1):
-  every mutant, every single-core design and both unsafe variants are now
-  caught in both directions in <code>sweep-smp</code> and <code>sweep-smp-block</code>; the
-  multicore-documented libraries stay at 0 errors. This is what the mutants
-  are for: the run was "valid" by the negative control alone.</li>
+    Single-byte <code>sweep-smp</code> reported 0 errors for wizard97 as shipped, Arduino
+    RingBufferN as shipped and three of the four mutants. Cause: core 1 has to
+    notice the start flag first, so its call always came after the first
+    instructions of core 0's call, and it moved in steps of its polling loop.
+    Fixed (a fixed lead on core 0, delay steps of about one cycle on core 1):
+    every mutant, every single-core design and both unsafe variants are now
+    caught in both directions in <code>sweep-smp</code> and <code>sweep-smp-block</code>; the
+    multicore-documented libraries stay at 0 errors. This is what the mutants
+    are for: the run was "valid" by the negative control alone.</li>
 </ul>
 <h2 id="how-many-start-positions-16-to-256-nucleo-g474re-sweep-block">How many start positions: 16 to 256 (NUCLEO-G474RE, <code>sweep-block</code>)</h2>
 <p>Question: the sweep runs with 256 start positions take up to 1.7 h on the
@@ -740,17 +740,17 @@ flash, <code>-O2</code> (15 runs, all valid, 0 errors in the real libraries; rec
 </table></div>
 <ul>
 <li>The mutants and the two unsafe variants do not distinguish the settings:
-  their error counts grow linearly with the number of start positions, and
-  the weakest ("full test misses the wrap") still has 85 to 101 errors per
-  direction at 16. "Pop without lock" and "drain re-reads head" are caught
-  isr→main only at every setting, as in the campaign.</li>
+    their error counts grow linearly with the number of start positions, and
+    the weakest ("full test misses the wrap") still has 85 to 101 errors per
+    direction at 16. "Pop without lock" and "drain re-reads head" are caught
+    isr→main only at every setting, as in the campaign.</li>
 <li>The rarest real finding does: RT-Thread without a lock, isr→main, is
-  missed in all three runs at 32 and in two of three at 64, and found in
-  every run from 128 up. main→isr was found in all 15 runs (2 to 4 errors at
-  16, 42 to 82 at 256). From 64 to 128 the isr→main count grows far more
-  than twofold; why has not been examined.</li>
+    missed in all three runs at 32 and in two of three at 64, and found in
+    every run from 128 up. main→isr was found in all 15 runs (2 to 4 errors at
+    16, 42 to 82 at 256). From 64 to 128 the isr→main count grows far more
+    than twofold; why has not been examined.</li>
 <li>The times at 16 and 32 are bounded below by <code>run.sh</code>'s fixed first wait of
-  120 s.</li>
+    120 s.</li>
 </ul>
 <p>Decision (owner, 2026-11-13): 256 start positions stay, the same on every
 board; the default time limit of <code>run.sh</code> goes from 300 to 600 polls (at

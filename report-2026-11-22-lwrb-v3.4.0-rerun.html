@@ -52,7 +52,7 @@ p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
 <p>lwrb released v3.4.0 (<code>b8534fd15925</code>), which adds functions for one byte,
 <code>lwrb_write_byte</code> and <code>lwrb_read_byte</code>. The pin moved from v3.3.0
 (<code>413b7093dcad</code>), and lwrb's single bytes are now measured through the new
-functions (DECISIONS 2026-11-22). The pin and the adapter are test
+functions (<a href="method.html#log-2026-11-22-lwrb">change log</a>). The pin and the adapter are test
 sources, and a record must name sources the reader has, so everything the
 site shows was measured again at one commit, <code>a7a206190337</code>, the same way
 as in the <a href="report-2026-11-20-publication-rerun.html">publication re-run</a>:
@@ -64,28 +64,28 @@ one (tag <code>v1-method-freeze-2</code>); no test and no campaign script change
 <h2 id="result">Result</h2>
 <ul>
 <li><strong>lwrb v3.4.0: no errors</strong> in its 108 runs of the ISR stress test (13
-  of them with the two sides on the Pico 2's two cores), and the model
-  check passes for the byte functions and for the block calls.</li>
+    of them with the two sides on the Pico 2's two cores), and the model
+    check passes for the byte functions and for the block calls.</li>
 <li><strong>lwrb's single bytes are 3 to 4 times faster</strong> through the new
-  functions (table below). Its blocks cost what they did within 4 %, and
-  its zero-copy calls within 6 %, most of them a little more than before.
-  Its code grew by 108 to 132 bytes. (Until a correction on 2026-11-22 this
-  line said "within 4 %" for both; two zero-copy numbers on the H723 are
-  4.3 and 5.4 % higher.)</li>
+    functions (table below). Its blocks cost what they did within 4 %, and
+    its zero-copy calls within 6 %, most of them a little more than before.
+    Its code grew by 108 to 132 bytes. (Until a correction on 2026-11-22 this
+    line said "within 4 %" for both; two zero-copy numbers on the H723 are
+    4.3 and 5.4 % higher.)</li>
 <li><strong>ISR stress test: no errors in any real library in any run</strong> (108 runs
-  on six boards, all valid).</li>
+    on six boards, all valid).</li>
 <li><strong>Two-interrupt test: no errors in any library in its documented mode in
-  any valid run</strong> (324 runs on six boards, 322 valid). lwrb is a
-  single-producer, single-consumer library and is not in this test.</li>
+    any valid run</strong> (324 runs on six boards, 322 valid). lwrb is a
+    single-producer, single-consumer library and is not in this test.</li>
 <li>No step failed: no benchmark image needed a second try, no stress run
-  was repeated, no board was power-cycled.</li>
+    was repeated, no board was power-cycled.</li>
 <li><strong>The other libraries' speed numbers moved too</strong>, although their code
-  did not change, because all the C and C++ libraries share one benchmark
-  image and its layout changed. Most moves are small; 29 of 666 means left
-  the placement range shown before, and one number moved by 57 % (see
-  "What moved in the other libraries").</li>
+    did not change, because all the C and C++ libraries share one benchmark
+    image and its layout changed. Most moves are small; 29 of 666 means left
+    the placement range shown before, and one number moved by 57 % (see
+    "What moved in the other libraries").</li>
 <li>The two invalid runs of the two-interrupt test are the same two entries
-  of the rotation as on 2026-11-19/20.</li>
+    of the rotation as on 2026-11-19/20.</li>
 </ul>
 <h2 id="lwrb-v330-and-v340">lwrb v3.3.0 and v3.4.0</h2>
 <p>Mean cycles per call for one byte, push / pop; cycles per byte for a
@@ -188,13 +188,13 @@ range they had (on the G474 261 to 288 for the write side).</p>
 <p>Host-side checks with v3.4.0, before any board ran:</p>
 <ul>
 <li>GenMC (<a href="https://github.com/verified-libs/verified-libs/blob/main/verify/genmc/README.md">verify/genmc</a>): the byte functions
-  pass (7,118 executions), as do the block calls with a length of 1
-  (7,118), blocks (730) and zero-copy (8,988). The controls fail as they
-  must: without atomics, and with release or acquire weakened to relaxed.
-  <code>run.sh</code> gave all 136 checks as expected. <code>lwrb_init</code> clears its
-  structure with <code>memset</code> from v3.4.0, which GenMC cannot model over
-  atomic objects; the model leaves that one write out (the README says
-  why that is sound here).</li>
+    pass (7,118 executions), as do the block calls with a length of 1
+    (7,118), blocks (730) and zero-copy (8,988). The controls fail as they
+    must: without atomics, and with release or acquire weakened to relaxed.
+    <code>run.sh</code> gave all 136 checks as expected. <code>lwrb_init</code> clears its
+    structure with <code>memset</code> from v3.4.0, which GenMC cannot model over
+    atomic objects; the model leaves that one write out (the README says
+    why that is sound here).</li>
 <li>The one-core contract check (<code>verify/contract</code>): pass.</li>
 </ul>
 <h2 id="benchmarks">Benchmarks</h2>
@@ -452,10 +452,10 @@ calls were stressed on the G474, the H723 and the Pico 2.</p>
 <p><strong>Errors only where they are expected</strong>, as in every campaign before:</p>
 <ul>
 <li>on every board, the three variants their own projects do not call
-  interrupt-safe: wizard97 as shipped, Arduino RingBufferN as shipped and
-  RT-Thread rt_ringbuffer without a lock;</li>
+    interrupt-safe: wizard97 as shipped, Arduino RingBufferN as shipped and
+    RT-Thread rt_ringbuffer without a lock;</li>
 <li>on the Pico 2 with the two sides on two cores, the nine single-core
-  designs (their interrupt lock does nothing against the other core).</li>
+    designs (their interrupt lock does nothing against the other core).</li>
 </ul>
 <p><strong>Mutants</strong> (four buffers with one deliberate defect each): the sweep
 caught every mutant in every sweep run in the directions where its defect
@@ -829,33 +829,33 @@ times in its weakest run.</p>
 <p>Three things were measured here that the project did not know before:</p>
 <ul>
 <li>The same image gives the same numbers (787 of 791 identical, the rest
-  within 0.03 %), and the two-interrupt test with the same images gave
-  the same run counts, the same valid runs and no errors.</li>
+    within 0.03 %), and the two-interrupt test with the same images gave
+    the same run counts, the same valid runs and no errors.</li>
 <li>A change in one library's code moves the numbers of the libraries that
-  share its image, on the nRF5340 by more than their placement range.</li>
+    share its image, on the nRF5340 by more than their placement range.</li>
 <li>Most of what ran had not changed. Of the 24 or 25 benchmark images per
-  board, 16 or 17 were the same (the Rust, multi-producer and Nordic
-  sets). In the stress tests each library runs from its own image: every
-  image of the two-interrupt test, and every image of the ISR test except
-  lwrb's, is byte for byte the one of 2026-11-19/20. Running them again
-  changed nothing on the page beyond the campaigns' new seeds.</li>
+    board, 16 or 17 were the same (the Rust, multi-producer and Nordic
+    sets). In the stress tests each library runs from its own image: every
+    image of the two-interrupt test, and every image of the ISR test except
+    lwrb's, is byte for byte the one of 2026-11-19/20. Running them again
+    changed nothing on the page beyond the campaigns' new seeds.</li>
 </ul>
 <p>So measuring everything again for one library's new version buys little
 for the images that did not change, and it is what the record rule
 requires today. A proposal for a rule that keeps the records of
-unchanged images is in the plan
-(<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-22-same-image-rule.md">lab/plans/2026-11-22-same-image-rule.md</a>); it is a
+unchanged images is in the plan (not published; the rule as adopted:
+<a href="method.html#log-2026-11-22-same-image">change log</a>); it is a
 proposal, and nothing in the tools has changed.</p>
 <h2 id="corrections-found-while-evaluating">Corrections found while evaluating</h2>
 <ul>
 <li>RESULTS.md said that 15 of the Pico 2's 42 ISR runs of 2026-11-19/20
-  had the two sides on two cores. It is 13 (the table in the report of
-  2026-11-20 was right). Corrected.</li>
+    had the two sides on two cores. It is 13 (the table in the report of
+    2026-11-20 was right). Corrected.</li>
 <li><code>firmware/nrf5340-rb-bench/README.md</code> still names lwrb v3.3.0 and
-  <code>lwrb_write</code> / <code>lwrb_read</code> in its list of what is measured. The file is
-  part of the test sources the records name, so it is corrected with the
-  next change there; <code>libs.lock</code> and the adapter are what is built, and
-  every record lists the pinned commits (<code>libs_pinned</code>).</li>
+    <code>lwrb_write</code> / <code>lwrb_read</code> in its list of what is measured. The file is
+    part of the test sources the records name, so it is corrected with the
+    next change there; <code>libs.lock</code> and the adapter are what is built, and
+    every record lists the pinned commits (<code>libs_pinned</code>).</li>
 </ul>
 <h2 id="flash-writes">Flash writes</h2>
 <p>Counted from the benchmark logs and from the bundle checksums in the
@@ -919,10 +919,11 @@ three times.</p>
 <li><code>records/stress/</code>: one run per board and mode (58 records), as before.</li>
 <li><code>records/campaign/</code>: the per-mode summary of each board's ISR campaign.</li>
 <li>The records of 2026-11-19/20 are replaced; the numbers of lwrb v3.3.0
-  are in the table above and in the report of 2026-11-20.</li>
+    are in the table above and in the report of 2026-11-20.</li>
 <li>The campaign directories with every run stay on the lab host
-  (<code>~/lab-runs/overnight-20261122T*</code> and <code>mp-campaign-20261122T*</code>).</li>
-</ul></main>
+    (<code>~/lab-runs/overnight-20261122T*</code> and <code>mp-campaign-20261122T*</code>).</li>
+</ul>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

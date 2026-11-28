@@ -156,18 +156,20 @@ and its checksum).</p>
 <p><strong>The nRF5340 DK and a power-on.</strong> The application core's debug port
 opens only when UICR.APPROTECT is Unprotected and firmware writes
 CTRL-AP.APPROTECT.DISABLE after each reset (nRF5340 Product Specification
-v1.6, §8.2 "Access port protection").
-- <em>Since method version 3</em> our boot stub (<code>firmware/common/benchboot.c</code>)
-  copies UICR.APPROTECT and UICR.SECUREAPPROTECT into CTRL-AP at every
-  boot, so that a board with a bundle of this tree on it stays reachable
-  after a power-on. That was shown on our board on 2026-11-26: after a
-  power cycle with only our boot stub run, the debug port was open and a
-  run without a flash write measured as before
-  (<a href="report-2026-11-26-method-version-3-reruns.html#the-watched-power-on-of-the-nrf5340-dk-passed">report</a>).
-- <em>Bundles from before method version 3</em> (the archived series): their
-  stub does not write CTRL-AP and starts no image after a power-on, so
-  with one of them on the board the debug port is locked after any
-  power-on, and a write or a run fails.</p>
+v1.6, §8.2 "Access port protection").</p>
+<ul>
+<li><em>Since method version 3</em> our boot stub (<code>firmware/common/benchboot.c</code>)
+    copies UICR.APPROTECT and UICR.SECUREAPPROTECT into CTRL-AP at every
+    boot, so that a board with a bundle of this tree on it stays reachable
+    after a power-on. That was shown on our board on 2026-11-26: after a
+    power cycle with only our boot stub run, the debug port was open and a
+    run without a flash write measured as before
+    (<a href="report-2026-11-26-method-version-3-reruns.html#the-watched-power-on-of-the-nrf5340-dk-passed">report</a>).</li>
+<li><em>Bundles from before method version 3</em> (the archived series): their
+    stub does not write CTRL-AP and starts no image after a power-on, so
+    with one of them on the board the debug port is locked after any
+    power-on, and a write or a run fails.</li>
+</ul>
 <p>We recovered a locked board on 2026-11-25 with one command of probe-rs
 0.32.0, which erases the application core (CTRL-AP ERASEALL; the network
 core is not touched):</p>
@@ -264,25 +266,27 @@ commit. Time: in our check of the 120 records (2026-11-25, on 6 CPUs)
 repository, with nothing at hand, it took 28 s per board of 20 records
 (2026-11-25, all 120 records <code>MATCH</code>).</p>
 <p><strong>Which commit each record needs.</strong> The records are of two series and of
-method version 3 (the <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md">records' README</a>):
-- The records of commit <code>4032f80</code> (method version 3: the nRF5340 DK and
-  the NUCLEO-H723ZG) have the test sources of the published tree: the
-  command above builds them from the tree.
-- The records of <code>6301058</code> (the first series), <code>04a2197</code> (the second
-  series on the NUCLEO-G474RE, SAM D20 and the NUCLEO-G0B1RE's tables in
-  RAM) and <code>40f1958</code> (the second series on the Pico 2 and the
-  NUCLEO-G0B1RE's CRC unit) are of earlier commits, and
-  <code>records/rebuilt.json</code> lists them. Check them with <code>VL_TREE=1</code> in front
-  of the command:</p>
+method version 3 (the <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md">records' README</a>):</p>
+<ul>
+<li>The records of commit <code>4032f80</code> (method version 3: the nRF5340 DK and
+    the NUCLEO-H723ZG) have the test sources of the published tree: the
+    command above builds them from the tree.</li>
+<li>The records of <code>6301058</code> (the first series), <code>04a2197</code> (the second
+    series on the NUCLEO-G474RE, SAM D20 and the NUCLEO-G0B1RE's tables in
+    RAM) and <code>40f1958</code> (the second series on the Pico 2 and the
+    NUCLEO-G0B1RE's CRC unit) are of earlier commits, and
+    <code>records/rebuilt.json</code> lists them. Check them with <code>VL_TREE=1</code> in front
+    of the command:</li>
+</ul>
 <pre><code class="language-sh">VL_TREE=1 bash kinds/crc/bench/crcverify.sh records/crc/samd20/*.json
 </code></pre>
 <ul>
 <li>The second series' configurations build like the first's; a table in
-  RAM is moved by the build itself (<code>kinds/crc/bench/onecrc.py</code>), and the
-  board's CRC unit is built only for the boards that have one
-  (<code>kinds/crc/boards.txt</code>).</li>
+    RAM is moved by the build itself (<code>kinds/crc/bench/onecrc.py</code>), and the
+    board's CRC unit is built only for the boards that have one
+    (<code>kinds/crc/boards.txt</code>).</li>
 <li>Time, in our check with the libraries at hand: all 168 records of
-  <code>rebuilt.json</code> in 222 s (2026-11-25).</li>
+    <code>rebuilt.json</code> in 222 s (2026-11-25).</li>
 </ul>
 <p><strong>Run it on your own board.</strong></p>
 <pre><code class="language-sh">kinds/crc/repeat.sh --check          # the tools, the image and the board
@@ -330,15 +334,17 @@ kinds/pools/repeat.sh --level full     # every configuration of the board, two p
 kinds/pools/repeat.sh --board pico2    # choose the board when more than one is connected
 kinds/pools/repeat.sh --bundle 101     # quick, with the configurations of that bundle, not of the first
 </code></pre>
-<p>It works as the CRC kind's script:
-- it builds the images of this tree;
-- it reads the board's option registers without writing anything, because
-  every pools record carries them (method version 3);
-- it writes a bundle to the board and runs its images in two passes, as our
-  series did;
-- it makes records of your runs and compares them with ours image by image
-  (<code>kinds/pools/bench/poolscompare.py</code>);
-- it packs everything into one archive (below, "Send us your result").</p>
+<p>It works as the CRC kind's script:</p>
+<ul>
+<li>it builds the images of this tree;</li>
+<li>it reads the board's option registers without writing anything, because
+    every pools record carries them (method version 3);</li>
+<li>it writes a bundle to the board and runs its images in two passes, as our
+    series did;</li>
+<li>it makes records of your runs and compares them with ours image by image
+    (<code>kinds/pools/bench/poolscompare.py</code>);</li>
+<li>it packs everything into one archive (below, "Send us your result").</li>
+</ul>
 <p>On the Raspberry Pi Pico 2 the XIP cache replaces at random (RP2350
 datasheet 4.4.1.2), so with the cache on the number of calls that miss
 changes from run to run and our own two passes differ too; there the
@@ -374,11 +380,11 @@ Mail it to contact@verified-libs.org with:</p>
 <ul>
 <li>the JSON record, unchanged (it carries the commit, flags and firmware hash);</li>
 <li>the output of <code>compare-records.py</code> (and, for a stress run, of
-  <code>reference.py compare</code>) against our record;</li>
+    <code>reference.py compare</code>) against our record;</li>
 <li>the board's name and the revision printed on it, and the debug probe and
-  its firmware version;</li>
+    its firmware version;</li>
 <li>how the board was powered, and anything you changed (solder bridges,
-  external clock, another probe).</li>
+    external clock, another probe).</li>
 </ul>
 <p>A record from a board model we do not have is welcome too, if you add the
 board layer (<code>firmware/common/&lt;board&gt;</code>) it was built with. We publish what

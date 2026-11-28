@@ -108,16 +108,16 @@ cross builds and is marked as an estimate where it is one.</p>
 <p>Neither alone (the comparison is in the <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md#is-the-result-one-per-library-or-one-per-algorithm">README</a>):</p>
 <ul>
 <li>On the Armv7-M and Armv8-M cores (M4, M7, M33), the C and C++ code of
-  the same class often compiles to the same instructions per byte: CRC-32
-  with a table of 256 from ETL, crcany and libcrc; CRC-8 with a table of
-  256 from ETL, crcany and AceCRC; CRC-16 from crcany and libcrc.</li>
+    the same class often compiles to the same instructions per byte: CRC-32
+    with a table of 256 from ETL, crcany and libcrc; CRC-8 with a table of
+    256 from ETL, crcany and AceCRC; CRC-16 from crcany and libcrc.</li>
 <li>It does not for the Rust crate (a down-counter, and an unrolled loop at
-  -O2), for CRC++, for the tables of 16 of CRC-8, and for most pairs on the
-  Cortex-M0+.</li>
+    -O2), for CRC++, for the tables of 16 of CRC-8, and for most pairs on the
+    Cortex-M0+.</li>
 <li>Where the instructions are the same, the data may not be: libcrc's table
-  is in RAM, crcany's CRC-32 table is 4 KB against ETL's 1 KB. On a board
-  whose cache holds only part of a table (below), that alone can change the
-  cycles.</li>
+    is in RAM, crcany's CRC-32 table is 4 KB against ETL's 1 KB. On a board
+    whose cache holds only part of a table (below), that alone can change the
+    cycles.</li>
 </ul>
 <p>How sure: the instruction comparison is a fact of these builds (and of the
 loop chosen as the work loop; <code>loops.py</code> says how it chooses). That equal
@@ -228,18 +228,18 @@ D20 (2), 7 in all; leaving zlib out saves one 20 KB slot per placement.</p>
 <h2 id="the-table-in-flash-and-copied-to-ram">The table in flash, and copied to RAM</h2>
 <ul>
 <li><strong>In flash</strong> is how ETL, crcany, AceCRC, Zephyr, zlib and the crc crate
-  ship their tables (<code>const</code>); libcrc and CRC++ build theirs in RAM at run
-  time, so they are measured with the table in RAM as shipped.</li>
+    ship their tables (<code>const</code>); libcrc and CRC++ build theirs in RAM at run
+    time, so they are measured with the table in RAM as shipped.</li>
 <li><strong>Copied to RAM</strong> for a flash-table configuration would be a second image
-  of the same configuration: the table's section placed in <code>.data</code> by the
-  linker script (a script of the kind's own, by the table's symbol name
-  from <code>sizes.tsv</code>), so the library's code is unchanged and only the
-  table's address moves. For the 15 configurations with a table in flash
-  that is 120 more images in 7 more segments: 20 more flash writes on the
-  six boards (nRF5340 2, G0B1 4, G474 4, H723 2, SAM D20 7, Pico 2 1;
-  counted the same way as above, an estimate).
-  Proposal: not in the first series; decide after it, per board, where
-  "cache on" does not cover table reads (below).</li>
+    of the same configuration: the table's section placed in <code>.data</code> by the
+    linker script (a script of the kind's own, by the table's symbol name
+    from <code>sizes.tsv</code>), so the library's code is unchanged and only the
+    table's address moves. For the 15 configurations with a table in flash
+    that is 120 more images in 7 more segments: 20 more flash writes on the
+    six boards (nRF5340 2, G0B1 4, G474 4, H723 2, SAM D20 7, Pico 2 1;
+    counted the same way as above, an estimate).
+    Proposal: not in the first series; decide after it, per board, where
+    "cache on" does not cover table reads (below).</li>
 </ul>
 <h2 id="what-cache-on-covers-for-a-table-read-from-flash">What "cache on" covers for a table read from flash</h2>
 <div class="tw"><table>
@@ -296,31 +296,31 @@ which the other Cortex-M4/M7/M33 boards do not have.</p>
 <h2 id="placement">Placement</h2>
 <ul>
 <li><strong>Code</strong>: the method of version 2 applies (eight placements, the far
-  call), with one difference in the image: the placement bytes lie before
-  the adapter, not behind it, so the adapter and the library move together
-  (<code>kinds/crc/README.md</code>, step 7). In version 2 the adapter stays; here
-  that would leave the loop of a library of headers (ETL, CRC++), which is
-  compiled into the adapter, at one address in all eight placements.
-  Whether eight are needed at 1024 bytes: at that length the
-  call is dominated by the loop, so placement may matter less than for a
-  ring-buffer push; but the loop is short (5 to 18 instructions per iteration, up to 32 where the Rust crate unrolls it) and its
-  alignment against the flash line and the cache line is exactly what
-  placement varies. Not known before measuring.</li>
+    call), with one difference in the image: the placement bytes lie before
+    the adapter, not behind it, so the adapter and the library move together
+    (<code>kinds/crc/README.md</code>, step 7). In version 2 the adapter stays; here
+    that would leave the loop of a library of headers (ETL, CRC++), which is
+    compiled into the adapter, at one address in all eight placements.
+    Whether eight are needed at 1024 bytes: at that length the
+    call is dominated by the loop, so placement may matter less than for a
+    ring-buffer push; but the loop is short (5 to 18 instructions per iteration, up to 32 where the Rust crate unrolls it) and its
+    alignment against the flash line and the cache line is exactly what
+    placement varies. Not known before measuring.</li>
 <li><strong>The table</strong>: a new axis. With the table in flash it moves with the
-  code in every placement, so the eight placements also move the table by
-  0 to 28 bytes; its alignment against a 32-byte cache line changes with
-  it. A table in RAM does not move.</li>
+    code in every placement, so the eight placements also move the table by
+    0 to 28 bytes; its alignment against a 32-byte cache line changes with
+    it. A table in RAM does not move.</li>
 <li><strong>How a small first run settles both</strong>: one board (the NUCLEO-G474RE,
-  where flash wait states and a small D-cache make placement and table
-  alignment matter most), four configurations (ETL <code>crc32_t256</code>, ETL
-  <code>crc32_t16</code>, crcany <code>crc32iso_hdlc_word</code>, zlib <code>crc32</code>), all eight
-  placements, plus the same four with the table aligned to 32 bytes
-  (<code>aligned</code> on a copy of the table is not possible without changing the
-  library, so by the linker script of the kind: <code>ALIGN(32)</code> before the
-  table's input section). That is 64 images in about 4 segments: 2 flash
-  writes on that board. The spread over the eight placements and between
-  the two table alignments tells whether eight placements and a table axis
-  are needed for the full series.</li>
+    where flash wait states and a small D-cache make placement and table
+    alignment matter most), four configurations (ETL <code>crc32_t256</code>, ETL
+    <code>crc32_t16</code>, crcany <code>crc32iso_hdlc_word</code>, zlib <code>crc32</code>), all eight
+    placements, plus the same four with the table aligned to 32 bytes
+    (<code>aligned</code> on a copy of the table is not possible without changing the
+    library, so by the linker script of the kind: <code>ALIGN(32)</code> before the
+    table's input section). That is 64 images in about 4 segments: 2 flash
+    writes on that board. The spread over the eight placements and between
+    the two table alignments tells whether eight placements and a table axis
+    are needed for the full series.</li>
 </ul>
 <h2 id="the-export-check-for-a-second-kind-a-proposal-only">The export check for a second kind (a proposal only)</h2>
 <p>Today <code>lab/tools/public-export.py</code> holds all of <code>firmware/</code> (and three lab
@@ -329,17 +329,17 @@ night's work: <code>kinds/crc/</code> is outside <code>firmware/</code> and has 
 CRC has records, the proposal:</p>
 <ul>
 <li>CRC records in a directory of their own (for example <code>records/crc/</code>),
-  with their own ledger entries (<code>records/rebuilt.json</code> keyed by the
-  record's file, as today).</li>
+    with their own ledger entries (<code>records/rebuilt.json</code> keyed by the
+    record's file, as today).</li>
 <li>Their test sources: <code>kinds/crc</code>, <code>firmware/common</code> (the board support
-  the image links) and the three lab files (<code>lab/boards.conf</code>,
-  <code>lab/tools/source-commit.sh</code>, <code>lab/tools/boardpower.sh</code>).</li>
+    the image links) and the three lab files (<code>lab/boards.conf</code>,
+    <code>lab/tools/source-commit.sh</code>, <code>lab/tools/boardpower.sh</code>).</li>
 <li>The ring-buffer rule unchanged: its test sources stay <code>firmware</code> and the
-  three lab files.</li>
+    three lab files.</li>
 <li>A test of the change must show three cases: a file changed in
-  <code>kinds/crc</code> leaves the ring-buffer records exportable; a file changed
-  under <code>firmware/</code> (outside <code>firmware/common</code>) still stops them; a change
-  under <code>firmware/common</code> counts for both kinds.</li>
+    <code>kinds/crc</code> leaves the ring-buffer records exportable; a file changed
+    under <code>firmware/</code> (outside <code>firmware/common</code>) still stops them; a change
+    under <code>firmware/common</code> counts for both kinds.</li>
 </ul>
 <h2 id="what-the-runner-and-the-record-tools-need">What the runner and the record tools need</h2>
 <p>Built since (README, <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md#step-7-the-runner-built-and-not-run">step 7</a>),
@@ -351,26 +351,26 @@ table: 160 images, 9 segments, 26 flash writes, the slot sizes as
 estimated. Still to do:</p>
 <ul>
 <li>the smoke test on a board before any launch (made once, on the
-  NUCLEO-G474RE on 2026-11-24, README step 7; the reference was changed
-  after it, so every bundle is another file than the one written then);</li>
+    NUCLEO-G474RE on 2026-11-24, README step 7; the reference was changed
+    after it, so every bundle is another file than the one written then);</li>
 <li>a record writer (as <code>onerecords.py</code>) with a schema of its own (for
-  example <code>crc-bench/1</code>), and the export of CRC records (above): made on
-  2026-11-24, <code>crc-bench/1</code>, the export rule as proposed with the four
-  programs of version 2 the kind imports added to its test sources
-  (README, step 8);</li>
+    example <code>crc-bench/1</code>), and the export of CRC records (above): made on
+    2026-11-24, <code>crc-bench/1</code>, the export rule as proposed with the four
+    programs of version 2 the kind imports added to its test sources
+    (README, step 8);</li>
 <li><code>repeat.sh</code> and <code>verify-build.sh</code> are frozen; the kind would need its
-  own copies, reading <code>EXPORTED_FROM</code>/<code>SAME_SOURCES</code> with the kind's test
-  sources: the check of a record made (<code>bench/crcverify.sh</code>, reading
-  <code>SAME_SOURCES_CRC</code>); the copy of <code>repeat.sh</code> waits for the first
-  records.</li>
+    own copies, reading <code>EXPORTED_FROM</code>/<code>SAME_SOURCES</code> with the kind's test
+    sources: the check of a record made (<code>bench/crcverify.sh</code>, reading
+    <code>SAME_SOURCES_CRC</code>); the copy of <code>repeat.sh</code> waits for the first
+    records.</li>
 </ul>
 <h2 id="decisions-for-the-owner">Decisions for the owner</h2>
 <ol>
 <li>Whether a first series goes to the boards, and which: the 20
-   configurations (26 flash writes, estimated), or first the small run on
-   the NUCLEO-G474RE (2 writes) to settle placement and table alignment.</li>
+    configurations (26 flash writes, estimated), or first the small run on
+    the NUCLEO-G474RE (2 writes) to settle placement and table alignment.</li>
 <li>Whether the export check is changed as proposed above (a change of
-   method for the export; made and tested in the daytime).</li>
+    method for the export; made and tested in the daytime).</li>
 <li>Whether <code>kind-crc</code> goes into <code>main</code>.</li>
 </ol>
 <h2 id="the-first-series-run-2026-11-24-1428-to-2026-11-25-0013-utc">The first series, run (2026-11-24 14:28 to 2026-11-25 00:13 UTC)</h2>
@@ -378,7 +378,7 @@ estimated. Still to do:</p>
 eight placements, two passes (<code>series.sh</code>, outside the repository; every
 exit other than 0 would have stopped it before the next board). Read by
 <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/tools/crc-series-read.py"><code>lab/tools/crc-series-read.py</code></a>
-(step 1 of <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-24-crc-from-series-to-publication.md">the plan from the series to publication</a>),
+(step 1 of the plan from the series to publication),
 which reads only the run files and logs.</p>
 <div class="tw"><table>
 <thead>
@@ -506,11 +506,11 @@ more than 1 %; the largest is crcany <code>crc32iso_hdlc_word</code> at placemen
 (host only, from the run files):</p>
 <ul>
 <li>every placement has some (8 to 16 each), and every length (1 byte: 6,
-  4: 22, 16: 23, 64: 15, 256: 19, 1024: 5); offset 0: 68, offset 1: 22;</li>
+    4: 22, 16: 23, 64: 15, 256: 19, 1024: 5); offset 0: 68, offset 1: 22;</li>
 <li>pass 2 is lower in 46 and higher in 44;</li>
 <li>the minimum of the 256 calls is the same in both passes in all 90; the
-  maximum differs in 44 of them. The difference lies in a few slower
-  calls, not in a shifted level.</li>
+    maximum differs in 44 of them. The difference lies in a few slower
+    calls, not in a shifted level.</li>
 </ul>
 <p>On the other five boards all 7680 means are identical between the passes,
 to the cycle.</p>
@@ -582,7 +582,7 @@ records: no record that cannot be rebuilt from the tree, 120 CRC records.</p>
 <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/tools/crc-loops.py"><code>crc-loops.py</code></a> and
 <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/tools/crc-placement.py"><code>crc-placement.py</code></a> (the built images of
 commit 6301058). The flash facts are quoted in
-<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-24-crc-flash-read-sources.md"><code>lab/plans/2026-11-24-crc-flash-read-sources.md</code></a>.
+<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/flash-read-sources.md"><code>kinds/crc/flash-read-sources.md</code></a>.
 "Per byte" is (mean at 1024 bytes − mean at 256 bytes) / 768 at offset 0;
 "rest" is what that line leaves at length 0; a range is min–max over the
 eight placements, first pass.</p>
@@ -815,17 +815,17 @@ repeats, and the spread over the placements:</p>
 <p>Not explained:</p>
 <ul>
 <li>the order of the seven placements of AceCRC's CRC-8 on the G474 with the
-  cache on whose table is not 32-byte aligned (9420 to 10272 cycles at
-  1024 bytes); the aligned one (placement 0, 8362) is the only one whose
-  256-byte table spans 8 lines of 32 bytes, the D-cache's 8 lines (RM0440
-  3.2), the others span 9;</li>
+    cache on whose table is not 32-byte aligned (9420 to 10272 cycles at
+    1024 bytes); the aligned one (placement 0, 8362) is the only one whose
+    256-byte table spans 8 lines of 32 bytes, the D-cache's 8 lines (RM0440
+    3.2), the others span 9;</li>
 <li>on the G0B1, which loop start modulo 8 is the slow one differs between
-  configurations (crcany bitwise slow at 0, crcany CRC-16 at 6, libcrc at
-  4);</li>
+    configurations (crcany bitwise slow at 0, crcany CRC-16 at 6, libcrc at
+    4);</li>
 <li>the Pico 2's pass difference (check 1);</li>
 <li>the Pico 2's period of 8 bytes with the cache off (check 7's table);</li>
 <li>on the Pico 2 with the cache on, crcany's slicing by 4 faster at offset 1
-  than at offset 0 at 4 and 16 bytes (check 4).</li>
+    than at offset 0 at 4 and 16 bytes (check 4).</li>
 </ul>
 <p><em>Closing line: the spread over the placements is the largest effect in
 the series after the class itself; on four boards it repeats with the
@@ -837,15 +837,15 @@ empty directory, by the instructions of
 <a href="reproduce.html">Reproduce</a> alone:</p>
 <ul>
 <li><strong><code>kinds/crc/bench/crcverify.sh</code> on all 120 records</strong>, without a local
-  copy of the libraries: 120 <code>MATCH</code>, 0 <code>DIFFERS</code>, 28 s per board (the
-  libraries are fetched for each board; 16 s with them at hand).</li>
+    copy of the libraries: 120 <code>MATCH</code>, 0 <code>DIFFERS</code>, 28 s per board (the
+    libraries are fetched for each board; 16 s with them at hand).</li>
 <li><strong><code>kinds/crc/repeat.sh --level quick</code> on the Raspberry Pi Pico 2</strong>, with
-  no flash write: the tree built bundle 6 with the checksum of every run in
-  our records, and a read-only compare of the board's flash with it
-  matched before the run. probe-rs was called through a wrapper that
-  refused a write. Three configurations (AceCRC <code>crc8_byte</code>, crcany
-  <code>crc16_byte</code>, crcany <code>crc32iso_hdlc_bit</code>), eight placements, two passes,
-  48 runs.</li>
+    no flash write: the tree built bundle 6 with the checksum of every run in
+    our records, and a read-only compare of the board's flash with it
+    matched before the run. probe-rs was called through a wrapper that
+    refused a write. Three configurations (AceCRC <code>crc8_byte</code>, crcany
+    <code>crc16_byte</code>, crcany <code>crc32iso_hdlc_bit</code>), eight placements, two passes,
+    48 runs.<ul>
 <li>First run (export of <code>e250f78</code>): 48 runs, 0 flash writes, but no
     record: in a tree without git history the build recorded the commit
     as <code>unknown</code>, which the record writer refuses, so <code>repeat.sh</code> said
@@ -875,7 +875,10 @@ empty directory, by the instructions of
     The three configurations are not among those whose means differed
     between our passes on the Pico 2 (check 1), so this run does not
     speak to that difference.</li>
-</ul></main>
+</ul>
+</li>
+</ul>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

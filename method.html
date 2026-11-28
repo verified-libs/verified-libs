@@ -107,8 +107,7 @@ long campaigns run unattended. A <code>counter-check</code> firmware confirms on
 board that the cycle counter counts core cycles through the same timing
 routine the benchmark uses.</p>
 <h2 id="method-version-3">Method version 3</h2>
-<p>Since 2026-11-26 (<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>; the plan with its
-sources: <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-26-method-version-3.md"><code>lab/plans/2026-11-26-method-version-3.md</code></a>).
+<p>Since 2026-11-26 (<a href="#log-2026-11-26-v3">change log</a>).
 It applies to both kinds' benchmarks and to every series after it. Each
 board's records say which version they are of, on the results and
 comparison pages.</p>
@@ -116,25 +115,27 @@ comparison pages.</p>
 code or board template uses, never at one that needs an option byte, with
 the fewest flash wait states the reference manual allows at that clock.
 Where the vendor's code and the manual differ, the manual's minimum is
-taken and the difference is said.
-- <em>NUCLEO-H723ZG</em>, the only board whose clock changes: from 64 MHz with
-  the 7 wait states it has after power-on to <strong>520 MHz</strong> (voltage scale 0,
-  AXI bus at 260 MHz, 3 wait states), as ST's template for the board sets
-  it (<code>STM32CubeH7</code> <code>Projects/NUCLEO-H723ZG/Templates</code>; RM0468 Table 16:
-  3 wait states for an AXI clock of 210–275 MHz at VOS0). 550 MHz needs an
-  option byte (CPU_FREQ_BOOST) and is not used.
-- <em>NUCLEO-G474RE</em>: ST's template for the board runs 170 MHz in boost mode
-  with 8 wait states (<code>FLASH_LATENCY_8</code>, <code>STM32CubeG4</code>
-  <code>Projects/NUCLEO-G474RE/Templates/Src/main.c</code>); RM0440 (Table 9) requires
-  4 at 170 MHz in boost mode. We measure at 4, as before. It is the only
-  board where the template and the manual differ.
-- <em>The others are unchanged:</em> NUCLEO-G0B1RE 64 MHz with 2 wait states (ST's
-  template and RM0444 Table 13 agree); nRF5340 DK 64 MHz, the reset value
-  of its clock divider, which Nordic's start-up code keeps;
-  Raspberry Pi Pico 2 150 MHz, with the flash clock divider of 3 that the
-  boot ROM leaves and an SDK image also runs at; SAM D20 Xplained Pro
-  48 MHz with 1 wait state, allowed for its part (ATSAMD20J18A-AUT, 85 °C
-  grade, by Microchip's bill of materials for the board).</p>
+taken and the difference is said.</p>
+<ul>
+<li><em>NUCLEO-H723ZG</em>, the only board whose clock changes: from 64 MHz with
+    the 7 wait states it has after power-on to <strong>520 MHz</strong> (voltage scale 0,
+    AXI bus at 260 MHz, 3 wait states), as ST's template for the board sets
+    it (<code>STM32CubeH7</code> <code>Projects/NUCLEO-H723ZG/Templates</code>; RM0468 Table 16:
+    3 wait states for an AXI clock of 210–275 MHz at VOS0). 550 MHz needs an
+    option byte (CPU_FREQ_BOOST) and is not used.</li>
+<li><em>NUCLEO-G474RE</em>: ST's template for the board runs 170 MHz in boost mode
+    with 8 wait states (<code>FLASH_LATENCY_8</code>, <code>STM32CubeG4</code>
+    <code>Projects/NUCLEO-G474RE/Templates/Src/main.c</code>); RM0440 (Table 9) requires
+    4 at 170 MHz in boost mode. We measure at 4, as before. It is the only
+    board where the template and the manual differ.</li>
+<li><em>The others are unchanged:</em> NUCLEO-G0B1RE 64 MHz with 2 wait states (ST's
+    template and RM0444 Table 13 agree); nRF5340 DK 64 MHz, the reset value
+    of its clock divider, which Nordic's start-up code keeps;
+    Raspberry Pi Pico 2 150 MHz, with the flash clock divider of 3 that the
+    boot ROM leaves and an SDK image also runs at; SAM D20 Xplained Pro
+    48 MHz with 1 wait state, allowed for its part (ATSAMD20J18A-AUT, 85 °C
+    grade, by Microchip's bill of materials for the board).</li>
+</ul>
 <p><strong>The option registers are recorded.</strong> Before each series, and each job of
 it, the board's option registers are read through the debug probe without
 writing anything: FLASH_OPTR on the two STM32G boards, FLASH_OPTSR_CUR and
@@ -150,21 +151,25 @@ at start, so that the board stays reachable after a power-on
 (<code>firmware/common/benchboot.c</code>). It changes only the stub's bytes: the
 measured part of every image is unchanged.</p>
 <p><strong>What was measured again.</strong> A record is shown only if the tree builds its
-images byte for byte (the same-image rule, DECISIONS 2026-11-22). So:
-- the NUCLEO-H723ZG (new clock) and the nRF5340 DK (new boot stub) were
-  measured again, ring buffers and CRC; their records before method
-  version 3 are kept as archived series, checked against their own
-  commit and linked from the results pages;
-- on the other four boards method version 3 builds the same images byte
-  for byte, so their records stand.</p>
-<p><strong>What is not in method version 3:</strong>
-- <em>The median of a scenario's calls beside the mean</em> was left out
-  explicitly (DECISIONS 2026-11-26): it would need every benchmark measured
-  again.
-- <em>The ISR stress test</em> is unchanged. Its records are of version 1 of the
-  benchmark firmware and were made at the clocks of their time: on the
-  NUCLEO-H723ZG at 64 MHz, the reset clock. A new stress series would run
-  under method version 3.</p>
+images byte for byte (the same-image rule, <a href="#log-2026-11-22-same-image">change log</a>). So:</p>
+<ul>
+<li>the NUCLEO-H723ZG (new clock) and the nRF5340 DK (new boot stub) were
+    measured again, ring buffers and CRC; their records before method
+    version 3 are kept as archived series, checked against their own
+    commit and linked from the results pages;</li>
+<li>on the other four boards method version 3 builds the same images byte
+    for byte, so their records stand.</li>
+</ul>
+<p><strong>What is not in method version 3:</strong></p>
+<ul>
+<li><em>The median of a scenario's calls beside the mean</em> was left out
+    explicitly (2026-11-26): it would need every benchmark measured
+    again.</li>
+<li><em>The ISR stress test</em> is unchanged. Its records are of version 1 of the
+    benchmark firmware and were made at the clocks of their time: on the
+    NUCLEO-H723ZG at 64 MHz, the reset clock. A new stress series would run
+    under method version 3.</li>
+</ul>
 <p><strong>Cycles at another clock are not times.</strong> At 520 MHz the H723's numbers
 with the cache off are higher in cycles than at 64 MHz, while the time is
 far shorter: the flash's wait states count bus cycles, and the bus runs at
@@ -200,10 +205,8 @@ boards many numbers depend on where the code lies modulo 8 bytes; the
 range shows it
 (<a href="report-2026-11-23-bench-v2-placement-period.html">report</a>).
 The same code and data that is in every image, the baseline, must measure
-the same in every run of a board, and is recorded with each run. Design and
-decisions:
-<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-22-bench-image-per-library.md">plan</a>,
-<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md">DECISIONS.md</a>. In version 1, used until this replaced
+the same in every run of a board, and is recorded with each run. What changed:
+<a href="#log-2026-11-22-v2-bench">change log</a>. In version 1, used until this replaced
 it, all libraries were linked into one firmware; its records are kept as an
 archived series (<a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md">records</a>).</p>
 <h2 id="isr-stress-test">ISR stress test</h2>
@@ -294,43 +297,148 @@ library, and leaving out one that users can pick would make it less
 useful. This is how we handle it, and where it is not even:</p>
 <ul>
 <li><strong>Marked.</strong> ⚠ next to every pxq row in the comparison and in the
-  tables of the results, and <code>"own": true</code> in the data files. Not every
-  older report carries the mark.</li>
+    tables of the results, and <code>"own": true</code> in the data files. Not every
+    older report carries the mark.</li>
 <li><strong>The same tests, in every mode it documents.</strong> pxq runs every test
-  the others run, in each of its modes (SPSC, MPSC, SPMC, MPMC, producer
-  reservations). That is why it has four rows in the multi-producer
-  test: more rows, not better treatment. Its weaknesses are measured
-  the same way: its modes with several producers or consumers mask
-  interrupts, which does nothing against a second core, so on the two
-  cores of the Pico 2 they give errors (they do not promise to work
-  there, and the results say so); and on the Cortex-M7 its indices share
-  a cache line with its data, so a DMA can only use it in non-cacheable
-  memory.</li>
+    the others run, in each of its modes (SPSC, MPSC, SPMC, MPMC, producer
+    reservations). That is why it has four rows in the multi-producer
+    test: more rows, not better treatment. Its weaknesses are measured
+    the same way: its modes with several producers or consumers mask
+    interrupts, which does nothing against a second core, so on the two
+    cores of the Pico 2 they give errors (they do not promise to work
+    there, and the results say so); and on the Cortex-M7 its indices share
+    a cache line with its data, so a DMA can only use it in non-cacheable
+    memory.</li>
 <li><strong>No test is changed to suit it.</strong> Every change to the method is
-  recorded with its reason in <code>DECISIONS.md</code> and in the reports, which
-  are published with the results; anyone can check whether one favours
-  pxq.</li>
+    recorded in the <a href="#change-log">change log</a>, with how it affects the
+    numbers, and in the reports, which are published with the results; anyone can check whether one favours
+    pxq.</li>
 <li><strong>pxq has changed during the project, and the others have not had
-  that chance yet.</strong> It went from 1.3.2 to 1.4.0 and 1.5.0 while these
-  tests ran, partly because of what they showed. Every result names the
-  version it was measured with. Every other maintainer gets the same
-  offer: a new version is tested the same way (diffstorm/cb was, after
-  its fix), and each library's adapter, the small piece of code written
-  here to drive it, can be reviewed and improved by its maintainer.</li>
+    that chance yet.</strong> It went from 1.3.2 to 1.4.0 and 1.5.0 while these
+    tests ran, partly because of what they showed. Every result names the
+    version it was measured with. Every other maintainer gets the same
+    offer: a new version is tested the same way (diffstorm/cb was, after
+    its fix), and each library's adapter, the small piece of code written
+    here to drive it, can be reviewed and improved by its maintainer.</li>
 <li><strong>The owner hears first about pxq; the others hear when we find
-  something.</strong> What the lab finds about another library goes to its
-  maintainer when found, not at publication; defects first in private,
-  with 90 days before publication.</li>
+    something.</strong> What the lab finds about another library goes to its
+    maintainer when found, not at publication; defects first in private,
+    with 90 days before publication.</li>
 <li><strong>Outside repetition.</strong> No result has been repeated outside the
-  project yet, pxq's included; <a href="repeats.html">Repeats</a> shows how to do
-  it with one of the boards. In the long run the trust in every result
-  here rests on people outside repeating it and getting the same.
-  Because the owner has both a library and this comparison, pxq needs
-  more outside repetitions than the others before its results count as
-  equally certain.</li>
+    project yet, pxq's included; <a href="repeats.html">Repeats</a> shows how to do
+    it with one of the boards. In the long run the trust in every result
+    here rests on people outside repeating it and getting the same.
+    Because the owner has both a library and this comparison, pxq needs
+    more outside repetitions than the others before its results count as
+    equally certain.</li>
 <li><strong>No ranking by us.</strong> The comparison is sorted by name until the
-  reader sets weights; a ranking comes only from the reader's weights.</li>
-</ul></main>
+    reader sets weights; a ranking comes only from the reader's weights.</li>
+</ul>
+<h2 id="change-log_1">Change log</h2>
+<details id="change-log">
+<summary><strong>Change log</strong>: what changed in the method, newest first, and how it affects the numbers or how to read them; the changes that concern every kind are here, the CRC kind's and the pools' on their method pages</summary>
+<ul>
+<li><span id="log-2026-11-28-scope"></span><strong>2026-11-28, What this repository publishes.</strong>
+    From 2026-11-28 the repository publishes what is needed to trace and
+    repeat a number. The project's decision log and plans are kept in the
+    working repository; earlier commits of this repository still hold them.
+    Five report pages that no number on the site rests on were removed: "New
+    boards: first runs (2026-11-11)", "NUCLEO-H723ZG at 520 MHz: die
+    temperature under full load (2026-11-16/17)", "The next kind of library:
+    comparison and recommendation", "Pools: the two checks before kind A" and
+    "What carries over from ring buffers to a second kind of library". Links
+    to documents that are no longer published point to this log.</li>
+<li><span id="log-2026-11-27-host-file"></span><strong>2026-11-27, A recorded fix may add a host file.</strong><ul>
+<li>A recorded fix of a host-side script (one that runs, records or checks,
+    and builds no image) may add such a script that a series' commit did
+    not have. It is named with its exact contents, its reason and its
+    control in <code>records/host-fixes.json</code>.</li>
+<li>An image file is never added that way: any change to what is built
+    still needs a rebuild that matches byte for byte.</li>
+<li>First use: the concurrency series' check of a record
+    (<a href="method-pools.html#log-2026-11-27-isr">pools method</a>).</li>
+</ul>
+</li>
+<li><span id="log-2026-11-26-v3"></span><strong>2026-11-26, Method version 3</strong> (<a href="#method-version-3">above</a>).<ul>
+<li>The boards run at their vendor's start-up clock, with the fewest flash
+    wait states the manual allows; the NUCLEO-H723ZG now runs at 520 MHz,
+    VOS0, 3 wait states.</li>
+<li>The option registers are read without a write and kept in every record.</li>
+<li>The nRF5340's boot stub opens its debug port at every boot.</li>
+<li>The nRF5340 and H723 were measured again. Their earlier records are the
+    archived series "before method version 3", not comparable with the new
+    ones on the H723 (clock, wait states).</li>
+<li>On the other boards version 3 builds the same images byte for byte, so
+    their numbers stand.</li>
+</ul>
+</li>
+<li><span id="log-2026-11-25-parallel"></span><strong>2026-11-25, Boards run at the same time.</strong><ul>
+<li>Each board has its own queue, and several boards run at once.</li>
+<li>This started after a proof
+    (<a href="report-2026-11-26-parallel-runs-proof.html">report</a>): boards
+    running at the same time gave the same numbers as each alone, and a run
+    beside a neighbour's flash write did too (the STM32 boards and the SAM
+    D20).</li>
+<li>The Pico 2 still writes alone, as that proof did not test it.</li>
+</ul>
+</li>
+<li><span id="log-2026-11-23-host-fixes"></span><strong>2026-11-23, Fixes of the runner.</strong>
+    A fix of how runs are read or recorded (not of what is built or decoded)
+    does not start a new series. Each fix is listed in
+    <code>records/host-fixes.json</code> with its control.</li>
+<li><span id="log-2026-11-23-far-call"></span><strong>2026-11-23, A far call for every library.</strong>
+    Every library lies at least 4 KB from the code that calls it. On the
+    Cortex-M7 a far call costs 6 to 10 cycles more than a near one, so
+    version 2 is not comparable with version 1 there
+    (<a href="report-2026-11-23-bench-v2-first-run.html">report</a>).</li>
+<li><span id="log-2026-11-23-v2"></span><strong>2026-11-23, Version 2 published; version 1 archived.</strong>
+    Version 2's method is frozen at <code>v2-method-freeze</code>. The pages and the
+    comparison show version 2; version 1's records, tag and the report of the
+    differences stay linked per board.</li>
+<li><span id="log-2026-11-22-same-image"></span><strong>2026-11-22, A record stands as long as its image does.</strong>
+    A record may be shown if the published tree builds the image it was
+    measured from, byte for byte, and runs and judges it the same way.
+    <code>records/rebuilt.json</code> lists the rebuilds (<code>VL_TREE=1</code> checks them). This
+    applies to the CRC kind since 2026-11-24, to the pools since 2026-11-26,
+    and to the concurrency series since 2026-11-27.</li>
+<li><span id="log-2026-11-22-v2-bench"></span><strong>2026-11-22, Benchmark version 2.</strong>
+    One image per configuration, at eight placements. The bytes in flash
+    decide whether an image is the same. Numbers are per placement and shown
+    as ranges.</li>
+<li><span id="log-2026-11-22-lwrb"></span><strong>2026-11-22, lwrb v3.4.0.</strong>
+    lwrb is pinned at v3.4.0; single bytes go through
+    <code>lwrb_write_byte</code>/<code>lwrb_read_byte</code>; every test ran again at one commit
+    (<a href="report-2026-11-22-lwrb-v3.4.0-rerun.html">report</a>).</li>
+<li><span id="log-2026-11-19-v1"></span><strong>2026-11-19, Version 1 published.</strong>
+    The method of version 1 was frozen (2026-11-18) and published.</li>
+<li><span id="log-2026-11-17-control"></span><strong>2026-11-17, The control is not made easier to catch.</strong>
+    The stress test's reach is measured and shown (coverage), not tuned.</li>
+<li><span id="log-2026-11-15-new-series"></span><strong>2026-11-15, A changed method starts a new series.</strong>
+    Numbers of different method versions are not mixed in one table.</li>
+<li><span id="log-2026-11-14-memcpy"></span><strong>2026-11-14, The C library's memcpy for every library.</strong>
+    Copies inside a library's calls use the same <code>memcpy</code>, so a difference is
+    the library's own.</li>
+<li><span id="log-2026-11-13-no-rank"></span><strong>2026-11-13, No ranking.</strong>
+    The comparison sorts and filters; it does not rank.</li>
+</ul>
+</details></main><script>(function () {
+  function show() {
+    var id = decodeURIComponent(location.hash.slice(1)), e = id && document.getElementById(id), t = e;
+    for (; e; e = e.parentElement) if (e.tagName === "DETAILS") e.open = true;
+    if (t) t.scrollIntoView();
+  }
+  window.addEventListener("hashchange", show); show();
+  var all = document.querySelectorAll("main details"), h = document.querySelector("main h1");
+  if (all.length < 2 || !h) return;
+  var p = document.createElement("p"); p.className = "foldall";
+  [["open all", true], ["close all", false]].forEach(function (x, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { all.forEach(function (d) { d.open = x[1]; }); });
+    if (i) p.appendChild(document.createTextNode(" · ")); p.appendChild(b);
+  });
+  h.parentNode.insertBefore(p, h.nextSibling);
+})();</script>
+
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

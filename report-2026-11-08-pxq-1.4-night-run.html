@@ -56,8 +56,7 @@ not a comparison and not a recommendation.</strong> ⚠ pxq RingBuffer_PackedSta
 is the project owner's library (principle 6), so its numbers count only
 after an independent repetition.
 <em>(Note of 2026-11-17: that last rule was a misunderstanding. Outside
-repetition is a long-term goal for every library, not a condition for pxq;
-see DECISIONS.md, 2026-11-17.)</em></p>
+repetition is a long-term goal for every library, not a condition for pxq.)</em></p>
 <p>The JSON records stay on lib-lab1:</p>
 <div class="tw"><table>
 <thead>
@@ -94,7 +93,7 @@ see DECISIONS.md, 2026-11-17.)</em></p>
 until 1.4.1 is released.</p>
 <h2 id="result">Result</h2>
 <ul>
-<li><strong>Correctness: 0 errors in every real library, in every valid run.</strong></li>
+<li><strong>Correctness: 0 errors in every real library, in every valid run.</strong><ul>
 <li>pxq 1.4.0 passed: stress single, block and dma (code in flash and SRAM),
     stress at -Os, and the 3 h campaign (22 of 22 runs valid).</li>
 <li>pxq 1.4.1 passed: stress single, block, dma and block at -Os.</li>
@@ -102,17 +101,23 @@ until 1.4.1 is released.</p>
     in 1 million values per run, with two interrupt priorities as two
     producers or two consumers.</li>
 <li>The negative control was caught in every run.</li>
-<li><strong>Speed: 1.4.0 traded block copies for a faster single pop. 1.4.1 has both.</strong></li>
+</ul>
+</li>
+<li><strong>Speed: 1.4.0 traded block copies for a faster single pop. 1.4.1 has both.</strong><ul>
 <li>1.4.0: single-byte pop 31 → 20 cycles, but 64-byte blocks became 2.2×
     slower from flash and 3× slower from SRAM.</li>
 <li>1.4.1: keeps the single-byte pop and is the fastest of the three
     versions at 16 and 64 bytes.</li>
 <li>At 4 bytes 1.4.1 sits between the two, about 13 cycles slower than 1.4.0.</li>
+</ul>
+</li>
 <li><strong>Flash:</strong> 1.4.0 is the smallest version. 1.4.1 links newlib's <code>memcpy</code>
-  again, as 1.3.2 did:</li>
+    again, as 1.3.2 did:<ul>
 <li>236 B of the difference is that <code>memcpy</code>. Any program that already
     uses <code>memcpy</code> pays it anyway.</li>
 <li>The other +94 B is the copy logic in <code>push_n</code>/<code>pop_n</code>.</li>
+</ul>
+</li>
 </ul>
 <h2 id="pxq-three-versions-side-by-side">pxq: three versions side by side</h2>
 <p>The same harness, toolchain image and board were used for all three. Values
@@ -285,10 +290,12 @@ aligned it would avoid unaligned accesses, but that is not measured.</p>
 </tbody>
 </table></div>
 <p>RAM is the same for all three versions: 148 B for one buffer of 128.</p>
-<p>Symbol sizes in a one-buffer image at -Os, 1.4.0 → 1.4.1:
-- <code>push_n</code> 84 → 130 B
-- <code>pop_n</code> 82 → 130 B
-- <code>memcpy</code> 0 → 236 B (newlib's, shared by the whole program)</p>
+<p>Symbol sizes in a one-buffer image at -Os, 1.4.0 → 1.4.1:</p>
+<ul>
+<li><code>push_n</code> 84 → 130 B</li>
+<li><code>pop_n</code> 82 → 130 B</li>
+<li><code>memcpy</code> 0 → 236 B (newlib's, shared by the whole program)</li>
+</ul>
 <p>Each further capacity (another template instantiation) adds the copy logic
 again, about 95 B. The number pxq repeats is the per-instantiation part,
 which the earlier reminder about a non-template core already covers.</p>
@@ -344,12 +351,14 @@ run, and the same steps for 1.4.1:</p>
 </tbody>
 </table></div>
 <p>All other libraries in these runs also had 0 errors.</p>
-<p><strong>Campaign</strong> (<code>overnight.sh</code> for 3 h, 09:41–12:53 UTC, pxq 1.4.0):
-- 22 runs, all 22 valid: none unfinished, no retries, no power cycles.
-- The modes were single, block and dma, at prescalers 0, 1, 2 and 4, with
-  the cache on and off and code in flash and SRAM.
-- The rotation change after the 2026-11-07 campaign worked. That campaign
-  had 5 invalid and 3 unfinished runs out of 32; this one had none.</p>
+<p><strong>Campaign</strong> (<code>overnight.sh</code> for 3 h, 09:41–12:53 UTC, pxq 1.4.0):</p>
+<ul>
+<li>22 runs, all 22 valid: none unfinished, no retries, no power cycles.</li>
+<li>The modes were single, block and dma, at prescalers 0, 1, 2 and 4, with
+    the cache on and off and code in flash and SRAM.</li>
+<li>The rotation change after the 2026-11-07 campaign worked. That campaign
+    had 5 invalid and 3 unfinished runs out of 32; this one had none.</li>
+</ul>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -457,18 +466,18 @@ because it needs a model of its single-core contract (planned).</p>
 <h2 id="limits">Limits</h2>
 <ul>
 <li>One board and one core. The byte-loop <code>memcpy</code> case is measured with
-  newlib's stub on this M33 (addendum), not with ST's toolchain itself.</li>
+    newlib's stub on this M33 (addendum), not with ST's toolchain itself.</li>
 <li>0 errors over these runs makes hidden ordering bugs unlikely for these
-  configurations. It does not prove their absence.</li>
+    configurations. It does not prove their absence.</li>
 <li>pxq is the owner's library. Its numbers need an independent repetition
-  before they count (principle 6).</li>
+    before they count (principle 6).</li>
 </ul>
 <h2 id="follow-ups">Follow-ups</h2>
 <ul>
 <li>Repeat on the Cortex-M0+ (NUCLEO-G0B1RE, on order), with both toolchains.</li>
 <li>Update <code>libs.lock</code> when pxq 1.4.1 is released, and rerun the bench.</li>
 <li>Drop prescalers 3 and 4 from the MP campaign rotation: there the control
-  is never caught, so those runs are invalid by design.</li>
+    is never caught, so those runs are invalid by design.</li>
 </ul>
 <h2 id="addendum-evening-2026-11-08">Addendum (evening 2026-11-08)</h2>
 <h3 id="pxq-with-a-byte-loop-memcpy">pxq with a byte-loop <code>memcpy</code></h3>
@@ -575,7 +584,8 @@ starved, no retries, no power cycles). Flag sets: -Os 14, -O3 14, -O2 + LTO
 14, -O2 with clang 13 runs. 0 errors in every real library, 20.8–25.6
 million bytes per library under 86–142 million interrupts, TinyUSB tu_fifo
 included (25.6 million bytes, 0 errors). wizard97 as shipped (not ISR-safe by
-its own docs): 458 812 errors, as before.</p></main>
+its own docs): 458 812 errors, as before.</p>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

@@ -109,21 +109,21 @@ multi-producer sets, <code>-O2</code>, code in flash, five boards (the Pico 2 wa
 nothing else.)</p>
 <ul>
 <li><strong>Rust's memcpy is the slower one here</strong>, by more than a factor of two for
-  a 64-byte copy on the M33, M4 and M7, and by 20 to 30 % on the M0+ boards.
-  The two libraries that copy blocks with it, bbqueue and embassy-sync Pipe,
-  need up to 1.8 times the cycles per byte for a 64-byte block on the M4 and
-  M33, about 1.4 times on the M7, and almost the same on the M0+.</li>
+    a 64-byte copy on the M33, M4 and M7, and by 20 to 30 % on the M0+ boards.
+    The two libraries that copy blocks with it, bbqueue and embassy-sync Pipe,
+    need up to 1.8 times the cycles per byte for a 64-byte block on the M4 and
+    M33, about 1.4 times on the M7, and almost the same on the M0+.</li>
 <li><strong>embassy-sync Pipe calls memcpy for a single byte too</strong>, so its one-byte
-  write and read slow down by 80 to 90 cycles on the M33 and M4, 20 on the
-  M7 and about 15 on the M0+.</li>
+    write and read slow down by 80 to 90 cycles on the M33 and M4, 20 on the
+    M7 and about 15 on the M0+.</li>
 <li><strong>heapless is not affected</strong>: its queues move one element at a time
-  without memcpy (all means equal, except on the H723, where the one-byte
-  means of heapless spsc::Queue moved from 40 / 35 to 34 / 29 cycles: the
-  other memory functions shift the code, a placement effect).</li>
+    without memcpy (all means equal, except on the H723, where the one-byte
+    means of heapless spsc::Queue moved from 40 / 35 to 34 / 29 cycles: the
+    other memory functions shift the code, a placement effect).</li>
 <li>The C++ configuration in the same firmwares that calls memcpy, DNedic
-  lockfree spsc::RingBuf, slows down in the same way (G474: 98 → 146 cycles
-  for one byte, 3.9 → 10.2 per byte for a block), which shows that the
-  difference is the memory function and not the libraries.</li>
+    lockfree spsc::RingBuf, slows down in the same way (G474: 98 → 146 cycles
+    for one byte, 3.9 → 10.2 per byte for a block), which shows that the
+    difference is the memory function and not the libraries.</li>
 </ul>
 <p>What it means for the comparison page: its numbers for bbqueue and
 embassy-sync Pipe are with the C library's memcpy, the favourable case for

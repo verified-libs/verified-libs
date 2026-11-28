@@ -57,71 +57,71 @@ can be reproduced from the repository.</p>
 <p>Three kinds of library so far:</p>
 <ul>
 <li><strong>Embedded ring buffers</strong>: interrupt or DMA to main loop on Cortex-M, in
-  C, C++ and Rust.</li>
+    C, C++ and Rust.</li>
 <li><strong>CRC calculation</strong>: CRC-32, CRC-16 and CRC-8 on Cortex-M, by libraries
-  in C, C++ and Rust that compute it in software and, on the boards that
-  have one, by the board's CRC unit beside them.</li>
+    in C, C++ and Rust that compute it in software and, on the boards that
+    have one, by the board's CRC unit beside them.</li>
 <li><strong>Fixed-block memory pools</strong>: alloc and free of one block size on
-  Cortex-M, in C, C++ and Rust, measured in one context, and their use
-  from interrupts tested in a series of its own (an interrupt at every
-  cycle of a call; a library used in a way it does not document is never
-  called failing).</li>
+    Cortex-M, in C, C++ and Rust, measured in one context, and their use
+    from interrupts tested in a series of its own (an interrupt at every
+    cycle of a call; a library used in a way it does not document is never
+    called failing).</li>
 </ul>
 <p><em>Run by AI, with a human who is accountable.</em></p>
 <h2 id="what-you-find-here">What you find here</h2>
 <ul>
 <li><strong><a href="kinds.html">Results</a></strong>: the results of each kind, embedded ring
-  buffers, CRC calculation and fixed-block memory pools, each with the
-  exact versions, compiler flags and boards.</li>
+    buffers, CRC calculation and fixed-block memory pools, each with the
+    exact versions, compiler flags and boards.</li>
 <li><strong>Method</strong>: how each number is produced, and the rules that decide
-  whether a run counts: <a href="method.html">ring buffers</a>, <a href="method-crc.html">CRC</a>,
-  <a href="method-pools.html">memory pools</a>.</li>
+    whether a run counts: <a href="method.html">ring buffers</a>, <a href="method-crc.html">CRC</a>,
+    <a href="method-pools.html">memory pools</a>.</li>
 <li><strong><a href="findings.html">Findings</a></strong>: defects found in libraries, published
-  after the maintainer has been told.</li>
+    after the maintainer has been told.</li>
 <li><strong><a href="reports.html">Reports</a></strong>: the campaign and measurement reports, in
-  date order.</li>
+    date order.</li>
 </ul>
 <h2 id="for-ai-agents-and-scripts">For AI agents and scripts</h2>
 <p>The comparisons can be read without a browser:</p>
 <ul>
 <li><strong><a href="https://github.com/verified-libs/verified-libs/blob/main/mcp-server/README.md">MCP server</a></strong>: the comparisons as tools for
-  an AI agent (Model Context Protocol). It gives the same rows in the same
-  order as the comparison pages for <a href="compare.html">ring buffers</a> (with the
-  notes and published findings, and which library the project owner wrote)
-  for <a href="compare-crc.html">CRC</a> (<code>list_crc_configurations</code>, <code>compare_crc</code>)
-  and for <a href="compare-pools.html">memory pools</a> (<code>list_pool_configurations</code>,
-  <code>compare_pools</code>).
-  It runs on your own machine from a copy of the repository; there is no
-  hosted server.</li>
+    an AI agent (Model Context Protocol). It gives the same rows in the same
+    order as the comparison pages for <a href="compare.html">ring buffers</a> (with the
+    notes and published findings, and which library the project owner wrote)
+    for <a href="compare-crc.html">CRC</a> (<code>list_crc_configurations</code>, <code>compare_crc</code>)
+    and for <a href="compare-pools.html">memory pools</a> (<code>list_pool_configurations</code>,
+    <code>compare_pools</code>).
+    It runs on your own machine from a copy of the repository; there is no
+    hosted server.</li>
 <li><strong><a href="data/libs.json">data/libs.json</a></strong>: the data behind the ring buffers'
-  comparison page as one JSON file: every number of the page, and the
-  records and campaigns it comes from. <a href="https://github.com/verified-libs/verified-libs/blob/main/site/gen_libdata.py"><code>site/gen_libdata.py</code></a>
-  says where each field comes from. The layout follows the page and can
-  change with it.</li>
+    comparison page as one JSON file: every number of the page, and the
+    records and campaigns it comes from. <a href="https://github.com/verified-libs/verified-libs/blob/main/site/gen_libdata.py"><code>site/gen_libdata.py</code></a>
+    says where each field comes from. The layout follows the page and can
+    change with it.</li>
 <li><strong><a href="data/crc.json">data/crc.json</a></strong>: the data behind the CRC comparison
-  page, written from the CRC records by <a href="https://github.com/verified-libs/verified-libs/blob/main/site/crc_data.py"><code>site/crc_data.py</code></a>,
-  which says where each field comes from (the file's <code>about</code>).</li>
+    page, written from the CRC records by <a href="https://github.com/verified-libs/verified-libs/blob/main/site/crc_data.py"><code>site/crc_data.py</code></a>,
+    which says where each field comes from (the file's <code>about</code>).</li>
 <li><strong><a href="data/pools.json">data/pools.json</a></strong>: the data behind the memory pools'
-  comparison page, written from the pools records by
-  <a href="https://github.com/verified-libs/verified-libs/blob/main/site/pools_data.py"><code>site/pools_data.py</code></a>, which says where each field
-  comes from (the file's <code>about</code>).</li>
+    comparison page, written from the pools records by
+    <a href="https://github.com/verified-libs/verified-libs/blob/main/site/pools_data.py"><code>site/pools_data.py</code></a>, which says where each field
+    comes from (the file's <code>about</code>).</li>
 </ul>
 <h2 id="principles-in-short">Principles, in short</h2>
 <ul>
 <li>Every result says what it was measured on: board, core, clock, compiler,
-  flags, library commit. Results expire when any of these change.</li>
+    flags, library commit. Results expire when any of these change.</li>
 <li>A test run counts only if a deliberately broken buffer (the negative
-  control) is caught in it, and no library was starved of CPU time.</li>
+    control) is caught in it, and no library was starved of CPU time.</li>
 <li>Uncertainty is shown, not hidden: one run on one board is not the same as
-  fifty runs on six.</li>
+    fifty runs on six.</li>
 <li>No paid placement. The test suite ships with the results.</li>
 <li>Defects are reported to the maintainer first; details are published after
-  90 days or when the maintainer agrees.</li>
+    90 days or when the maintainer agrees.</li>
 <li><strong>The project owner wrote one of the libraries.</strong> pxq
-  RingBuffer_PackedState is by Erik N (pxq.dk), who runs this project. It
-  is marked ⚠ in the comparison and the results and goes through every
-  test the others do, in more modes.
-  <a href="method.html#conflict-of-interest">How we handle that</a>.</li>
+    RingBuffer_PackedState is by Erik N (pxq.dk), who runs this project. It
+    is marked ⚠ in the comparison and the results and goes through every
+    test the others do, in more modes.
+    <a href="method.html#conflict-of-interest">How we handle that</a>.</li>
 </ul>
 <h2 id="suggest-a-library">Suggest a library</h2>
 <p>Do you think a library belongs on the test list, your own or one you use?

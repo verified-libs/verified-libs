@@ -59,25 +59,25 @@ and try aiming the interrupts at it.</p>
 <h2 id="what-was-measured">What was measured</h2>
 <ul>
 <li><strong>Coverage.</strong> Every interrupt records the address it interrupted (the PC
-  the core stacked), per library and interrupt (main.c <code>vl_cov</code>, a hash
-  table of 4096 entries; none overflowed). <code>cov_report.py</code> maps each address
-  to the library's instructions with the image's line info (code inlined
-  from a library header counts as the library's), and counts per
-  <em>instruction boundary</em>: how often an interrupt landed exactly there.
-  Boundaries where interrupts are masked (after <code>cpsid i</code> / a saved PRIMASK,
-  followed along every path, nested saves included, plus the one boundary
-  right after the unmasking instruction, which the core never takes: seen
-  as 0 there and everything one instruction later) are not counted: no
-  interrupt can land there in any test. A basic block with at least one
-  interrupt in it was executed; boundaries in blocks without any are listed
-  apart (possibly never executed in this test, e.g. a retry path).</li>
+    the core stacked), per library and interrupt (main.c <code>vl_cov</code>, a hash
+    table of 4096 entries; none overflowed). <code>cov_report.py</code> maps each address
+    to the library's instructions with the image's line info (code inlined
+    from a library header counts as the library's), and counts per
+    <em>instruction boundary</em>: how often an interrupt landed exactly there.
+    Boundaries where interrupts are masked (after <code>cpsid i</code> / a saved PRIMASK,
+    followed along every path, nested saves included, plus the one boundary
+    right after the unmasking instruction, which the core never takes: seen
+    as 0 there and everything one instruction later) are not counted: no
+    interrupt can land there in any test. A basic block with at least one
+    interrupt in it was executed; boundaries in blocks without any are listed
+    apart (possibly never executed in this test, e.g. a retry path).</li>
 <li><strong>Aimed interrupts.</strong> Besides the timers, the main loop arms SysTick
-  before each of its push/pop with a random delay of 1-160 cycles, and
-  SysTick (highest priority) then pends interrupt A or B; interrupt A arms it
-  the same way for B before its own push/pop (B preempting A inside an
-  operation is the producer/producer resp. consumer/consumer race).</li>
+    before each of its push/pop with a random delay of 1-160 cycles, and
+    SysTick (highest priority) then pends interrupt A or B; interrupt A arms it
+    the same way for B before its own push/pop (B preempting A inside an
+    operation is the producer/producer resp. consumer/consumer race).</li>
 <li>Prescaler 3 (the rate where the control is often missed), 300 000 values
-  per library, the same seeds for random and aimed; one run each.</li>
+    per library, the same seeds for random and aimed; one run each.</li>
 </ul>
 <h2 id="results">Results</h2>
 <p>Share of interrupts that landed in the library's code, boundaries
@@ -205,35 +205,35 @@ error-free in all four runs.</p>
 <h2 id="reading">Reading</h2>
 <ul>
 <li>With random timer interrupts only 2-10 % of the interrupts land in the
-  code under test; the rest land in the test's own loop. Aimed, the share
-  is 2-4 times higher and the median count per boundary 2-20 times higher
-  (more where the operation is short compared to the timer period), in
-  the same run time.</li>
+    code under test; the rest land in the test's own loop. Aimed, the share
+    is 2-4 times higher and the median count per boundary 2-20 times higher
+    (more where the operation is short compared to the timer period), in
+    the same run time.</li>
 <li>The libraries that mask interrupts (pxq, RIOT tsrb, wizard97 +
-  PRIMASK) have few boundaries where an interrupt can land at all; that is
-  their design, and the table counts only those. The lock-free ones
-  (DNedic, heapless) have many more, and there aiming matters most:
-  heapless had 56 of 94 boundaries hit 10 times or more at random, 90 of
-  119 aimed, and fewer blocks never interrupted (102 -&gt; 75-77 boundaries;
-  the rest are likely retry paths that need a real collision).</li>
+    PRIMASK) have few boundaries where an interrupt can land at all; that is
+    their design, and the table counts only those. The lock-free ones
+    (DNedic, heapless) have many more, and there aiming matters most:
+    heapless had 56 of 94 boundaries hit 10 times or more at random, 90 of
+    119 aimed, and fewer blocks never interrupted (102 -&gt; 75-77 boundaries;
+    the rest are likely retry paths that need a real collision).</li>
 <li>The number per library is a measure the page could show: "every
-  interruptible boundary of push/pop interrupted at least N times", per
-  board, independent of the control.</li>
+    interruptible boundary of push/pop interrupted at least N times", per
+    board, independent of the control.</li>
 </ul>
 <h2 id="limits-of-the-prototype">Limits of the prototype</h2>
 <ul>
 <li>One board, one rate, one run per setting; the window (160 cycles) is
-  fixed, not fitted to each library's operation length.</li>
+    fixed, not fitted to each library's operation length.</li>
 <li>Recording costs a few dozen cycles per interrupt, so the timing differs
-  slightly from the campaign image.</li>
+    slightly from the campaign image.</li>
 <li>Aimed runs shift the balance (interrupt B pushes or pops about two
-  thirds of the values).</li>
+    thirds of the values).</li>
 <li>The prototype builds for the STM32 boards (TIM2/TIM3 IRQ numbers) and
-  ran on the G474 only. The nRF5340 and RP2350 need their timers' IRQ
-  numbers; on the M0+ boards (G0B1, SAM D20) SysTick also serves as the
-  cycle counter, so aiming there must be checked or done another way.</li>
+    ran on the G474 only. The nRF5340 and RP2350 need their timers' IRQ
+    numbers; on the M0+ boards (G0B1, SAM D20) SysTick also serves as the
+    cycle counter, so aiming there must be checked or done another way.</li>
 <li>The table is read over the debug port (one image of all libraries per
-  start, <code>PER_LIB=0</code>); for the campaigns it would go into the UART dump.</li>
+    start, <code>PER_LIB=0</code>); for the campaigns it would go into the UART dump.</li>
 </ul>
 <p>Records, tables and images: <code>~/lab-runs/cov-proto-20261117/</code> on lib-lab1
 (<code>*.cov.txt</code>, <code>*.elf</code>, <code>*.cov.json</code>, <code>report1.txt</code>).</p>
@@ -243,26 +243,26 @@ prescaler 3/4 runs, coverage in every report) once the measurement ran on
 every board and with one library per reset. Changes:</p>
 <ul>
 <li>Timer IRQ numbers for the nRF5340 (TIMER0/1), RP2350 (PWM wrap 0/1) and
-  SAM D20 (TC0/TC2). On the M0+ boards (G0B1, SAM D20) board_init leaves
-  SysTick running as the cycle counter of time_call(), which this test
-  does not use; the first try there never aimed (the "already armed"
-  check: 0 aims), so aim_init now stops it.</li>
+    SAM D20 (TC0/TC2). On the M0+ boards (G0B1, SAM D20) board_init leaves
+    SysTick running as the cycle counter of time_call(), which this test
+    does not use; the first try there never aimed (the "already armed"
+    check: 0 aims), so aim_init now stops it.</li>
 <li>One library per reset (<code>PER_LIB=1</code>, the campaign way): the aim settings
-  are run parameters in the "go" line (<code>cov_aim</code>, <code>cov_window</code>,
-  <code>cov_seed</code>); after "dump" the host sends "dump2" for the table
-  (common/vls_uart.h <code>VLS_DUMP2</code>, common/uart_host.py <code>VLS_DUMP2=1</code>).
-  run.sh keeps one table per library with that library's image
-  (<code>&lt;record&gt;.cov.&lt;n&gt;.txt</code>, <code>elf/&lt;sha256&gt;.elf</code>, <code>&lt;record&gt;.cov.list</code>).
-  Images without COVERAGE stay byte-identical (checked on all six boards).</li>
+    are run parameters in the "go" line (<code>cov_aim</code>, <code>cov_window</code>,
+    <code>cov_seed</code>); after "dump" the host sends "dump2" for the table
+    (common/vls_uart.h <code>VLS_DUMP2</code>, common/uart_host.py <code>VLS_DUMP2=1</code>).
+    run.sh keeps one table per library with that library's image
+    (<code>&lt;record&gt;.cov.&lt;n&gt;.txt</code>, <code>elf/&lt;sha256&gt;.elf</code>, <code>&lt;record&gt;.cov.list</code>).
+    Images without COVERAGE stay byte-identical (checked on all six boards).</li>
 <li>cov_report.py reads the per-library tables; RP2350 addresses (8 hex
-  digits, which objdump prints unindented) were not parsed before.</li>
+    digits, which objdump prints unindented) were not parsed before.</li>
 <li>campaign.sh: <code>COVERAGE=1</code> by default, recording in the prescaler 3/4 runs
-  only (<code>cov_off</code> per run: at prescaler 1 the recording, some dozens of
-  cycles per interrupt, starved the SAM D20's main loop in a smoke test;
-  at prescaler 3 it adds about 3 % interrupts per value there), aimed runs
-  as above (which ones
-  alternates per pass of the rotation), cov_report.py over all records at
-  the end; summarize.py lists aimed runs apart and adds a coverage table.</li>
+    only (<code>cov_off</code> per run: at prescaler 1 the recording, some dozens of
+    cycles per interrupt, starved the SAM D20's main loop in a smoke test;
+    at prescaler 3 it adds about 3 % interrupts per value there), aimed runs
+    as above (which ones
+    alternates per pass of the rotation), cov_report.py over all records at
+    the end; summarize.py lists aimed runs apart and adds a coverage table.</li>
 </ul>
 <p>Check on five more boards, one library per reset from the shared bundle
 (<code>IMAGES=combined</code>), prescaler 3, 50 000 values per library, the same

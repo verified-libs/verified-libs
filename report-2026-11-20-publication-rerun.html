@@ -60,18 +60,18 @@ Start 2026-11-19 17:33 UTC; the last board finished 2026-11-20 06:44 UTC.</p>
 <h2 id="result">Result</h2>
 <ul>
 <li><strong>ISR stress test: no errors in any real library in any run</strong> (108 runs
-  on six boards, all valid).</li>
+    on six boards, all valid).</li>
 <li><strong>Two-interrupt test: no errors in any library in its documented mode in
-  any valid run</strong> (324 runs on six boards, 322 valid).</li>
+    any valid run</strong> (324 runs on six boards, 322 valid).</li>
 <li>The control was caught in every run of the ISR test and in 322 of the
-  324 runs of the two-interrupt test. The two where it was not caught are
-  left out: both on the nRF5340, MPSC mode, random interrupts at
-  prescaler 2.</li>
+    324 runs of the two-interrupt test. The two where it was not caught are
+    left out: both on the nRF5340, MPSC mode, random interrupts at
+    prescaler 2.</li>
 <li>No step failed: no benchmark image needed a second try, no stress run
-  was repeated, no board was power-cycled.</li>
+    was repeated, no board was power-cycled.</li>
 <li>The speed numbers are the earlier ones within their placement ranges.</li>
 <li>Not reached in the five hours: the zero-copy (DMA API) entries of the
-  ISR rotation on the nRF5340, the G0B1 and the SAM D20 (see below).</li>
+    ISR rotation on the nRF5340, the G0B1 and the SAM D20 (see below).</li>
 </ul>
 <h2 id="benchmarks">Benchmarks</h2>
 <p>24 images per board (three sets at placement shifts 0, 4, ..., 28), 25 on
@@ -83,9 +83,9 @@ made at other commits), seven rows of the speed table changed. Five moved
 by one cycle per call or by at most 0.5 cycles per byte. The other two:</p>
 <ul>
 <li>embassy-sync Pipe on the G474: 229 / 217 cycles for push / pop, before
-  190 / 174. Both pairs lie in its placement range (190-235 / 174-217).</li>
+    190 / 174. Both pairs lie in its placement range (190-235 / 174-217).</li>
 <li>bbqueue on the H723: push 150 cycles, before 144. Its range was 144-150
-  before; in this build it is 150 at all eight placements.</li>
+    before; in this build it is 150 at all eight placements.</li>
 </ul>
 <p>In both cases the code landed at other addresses in this build, and the
 speed of that library on that board depends on them. This is what the
@@ -220,10 +220,10 @@ through the buffers under 6.4 × 10⁹ interrupts.</p>
 <p><strong>Errors only where they are expected</strong>, as in every campaign before:</p>
 <ul>
 <li>on every board, the three variants their own projects do not call
-  interrupt-safe: wizard97 as shipped, Arduino RingBufferN as shipped and
-  RT-Thread rt_ringbuffer without a lock;</li>
+    interrupt-safe: wizard97 as shipped, Arduino RingBufferN as shipped and
+    RT-Thread rt_ringbuffer without a lock;</li>
 <li>on the Pico 2 with the two sides on two cores, the nine single-core
-  designs (their interrupt lock does nothing against the other core).</li>
+    designs (their interrupt lock does nothing against the other core).</li>
 </ul>
 <p><strong>Mutants</strong> (four buffers with one deliberate defect each): the sweep
 caught every mutant in every sweep run in the directions where its defect
@@ -276,7 +276,7 @@ was run; nothing from earlier commits is mixed in.</p>
 <h2 id="two-interrupt-test-mpsc-spmc">Two-interrupt test (MPSC / SPMC)</h2>
 <p><code>firmware/rb-mp-stress/campaign.sh</code>, five hours per board, each library
 from its own image, 1,000,000 values per library and run at prescaler 1
-and 2, fewer at 3 and 4. New in this campaign (DECISIONS 2026-11-19):
+and 2, fewer at 3 and 4. New in this campaign:
 every run at prescaler 3 and 4 uses aimed interrupts, and random
 interrupts are used at prescaler 1 and 2 only. In the campaign of
 2026-11-17/18 half the slow-rate runs were random, and 100 of 850 runs
@@ -608,19 +608,19 @@ per-library aim window that would raise both is not part of version 1.</p>
 Changed on the host side only:</p>
 <ul>
 <li><code>site/collect_records.py</code> takes, from a campaign directory, the first
-  run that passed of each mode (for the two-interrupt test: of each mode
-  with random and with aimed interrupts), not every record. <code>records/stress/</code>
-  then holds 58 records (11 MB; the sweep records carry every sweep
-  position); the campaign reports here and <code>records/campaign/</code> cover all
-  runs.</li>
+    run that passed of each mode (for the two-interrupt test: of each mode
+    with random and with aimed interrupts), not every record. <code>records/stress/</code>
+    then holds 58 records (11 MB; the sweep records carry every sweep
+    position); the campaign reports here and <code>records/campaign/</code> cover all
+    runs.</li>
 <li><code>site/gen_libdata.py</code> and the comparison page: starved runs, as above.</li>
 <li><code>lab/tools/public-export.py</code>, <code>verify-build.sh</code> and <code>repeat.sh</code>: a record
-  names the commit it was made at, and the records can only be committed
-  after it. The export now lists the commits whose test sources (firmware,
-  board table, the two scripts the tests call) are byte for byte those of
-  the exported tree (<code>SAME_SOURCES</code>), the two tools accept a record from
-  any of them, and the export refuses a tree with a record from any other
-  commit.</li>
+    names the commit it was made at, and the records can only be committed
+    after it. The export now lists the commits whose test sources (firmware,
+    board table, the two scripts the tests call) are byte for byte those of
+    the exported tree (<code>SAME_SOURCES</code>), the two tools accept a record from
+    any of them, and the export refuses a tree with a record from any other
+    commit.</li>
 </ul>
 <h2 id="flash-writes">Flash writes</h2>
 <p>Counted from the benchmark logs and from the bundle checksums in the
@@ -687,8 +687,9 @@ driver wrote the G474 about five times.</p>
 <li><code>records/stress/</code>: one run per board and mode, see above.</li>
 <li><code>records/campaign/</code>: the per-mode summary of each board's ISR campaign.</li>
 <li>The campaign directories with every run stay on the lab host
-  (<code>~/lab-runs/overnight-20261119T*</code> and <code>mp-campaign-2026112*</code>).</li>
-</ul></main>
+    (<code>~/lab-runs/overnight-20261119T*</code> and <code>mp-campaign-2026112*</code>).</li>
+</ul>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

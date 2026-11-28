@@ -80,17 +80,19 @@ so.</p>
 <p>Every configuration was checked against a reference before it was timed,
 and every timed call's result was compared with the reference's on the
 board (<a href="method-crc.html">method</a>). Two series, two passes each, and the
-two boards that method version 3 changed measured again:
-- the first, commit <code>6301058</code>, 2026-11-24 to 2026-11-25
-  (<a href="report-2026-11-25-crc-first-series.html">report</a>);
-- the second (tables in RAM and the boards' CRC units), commits <code>04a2197</code>
-  and <code>40f1958</code>, 2026-11-25
-  (<a href="report-2026-11-25-crc-second-series.html">report</a>);
-- method version 3: every configuration of the nRF5340 DK and the
-  NUCLEO-H723ZG, both series' configurations, commit <code>4032f80</code>,
-  2026-11-26 (<a href="method-crc.html#method-version-3">method</a>). Their records of
-  the two series before it are archived series, linked under each board
-  below.</p>
+two boards that method version 3 changed measured again:</p>
+<ul>
+<li>the first, commit <code>6301058</code>, 2026-11-24 to 2026-11-25
+    (<a href="report-2026-11-25-crc-first-series.html">report</a>);</li>
+<li>the second (tables in RAM and the boards' CRC units), commits <code>04a2197</code>
+    and <code>40f1958</code>, 2026-11-25
+    (<a href="report-2026-11-25-crc-second-series.html">report</a>);</li>
+<li>method version 3: every configuration of the nRF5340 DK and the
+    NUCLEO-H723ZG, both series' configurations, commit <code>4032f80</code>,
+    2026-11-26 (<a href="method-crc.html#method-version-3">method</a>). Their records of
+    the two series before it are archived series, linked under each board
+    below.</li>
+</ul>
 <p>What the series reports left unexplained, studied later in the same data:
 <a href="report-2026-11-27-crc-unexplained.html">report of 2026-11-27</a>.</p>
 <p>Compiler: arm-none-eabi-gcc 14.2.1, <code>-O2 -DNDEBUG</code>, newlib-nano; the Rust
@@ -107,30 +109,30 @@ One row per configuration, in the order of
 ranking. Each configuration's name links to its record.</p>
 <ul>
 <li><strong>Class</strong> and <strong>Table</strong>: the algorithm and where its table lies
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 2 of the kind's README</a>).</li>
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 2 of the kind's README</a>).</li>
 <li><strong>Flash bytes</strong>: the table in flash and the code at <code>-O2</code> for the
-  board's core; <strong>RAM bytes</strong>: the table in RAM
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 4 of the kind's README</a>). A table
-  "RAM (copied at start by the image)" counts in both: its bytes stay in
-  flash as the values the start-up code copies
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 11</a>). libcrc and CRC++ build their
-  tables in RAM themselves, at run time.</li>
+    board's core; <strong>RAM bytes</strong>: the table in RAM
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 4 of the kind's README</a>). A table
+    "RAM (copied at start by the image)" counts in both: its bytes stay in
+    flash as the values the start-up code copies
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/README.md">step 11</a>). libcrc and CRC++ build their
+    tables in RAM themselves, at run time.</li>
 <li><strong>The board's CRC unit</strong>, the last row where the board has one,
-  labelled "the board's CRC unit, driven by our code; not a library": the
-  STM32 CRC unit or the RP2350's DMA sniffer, driven by our code
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>adapter_hw.c</code></a>). Its class is "hardware
-  unit" and it has no table. Its bytes are those of our adapter code, read
-  from the board images. On the Pico 2 the unit is a DMA transfer that the
-  CPU waits for; for CRC-32 on the STM32 unit the final XOR is in our code.</li>
+    labelled "the board's CRC unit, driven by our code; not a library": the
+    STM32 CRC unit or the RP2350's DMA sniffer, driven by our code
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>adapter_hw.c</code></a>). Its class is "hardware
+    unit" and it has no table. Its bytes are those of our adapter code, read
+    from the board images. On the Pico 2 the unit is a DMA transfer that the
+    CPU waits for; for CRC-32 on the STM32 unit the final XOR is in our code.</li>
 <li><strong>16 B</strong>: cycles of one call on a message of 16 bytes at an 8-byte
-  boundary, the mean of 256 calls.</li>
+    boundary, the mean of 256 calls.</li>
 <li><strong>per byte</strong>: (mean at 1024 bytes − mean at 256 bytes) / 768, at an
-  8-byte boundary.</li>
+    8-byte boundary.</li>
 <li>Every number is the <strong>range over the eight placements</strong> (the
-  configuration's code moved by 0, 4 ... 28 bytes), first pass; one number
-  where all eight agree. A difference between two rows is a difference
-  only where their ranges do not overlap (the <a href="method-crc.html">method</a>,
-  "What the placements show").</li>
+    configuration's code moved by 0, 4 ... 28 bytes), first pass; one number
+    where all eight agree. A difference between two rows is a difference
+    only where their ranges do not overlap (the <a href="method-crc.html">method</a>,
+    "What the placements show").</li>
 </ul>
 <p>The other lengths (1, 4 and 64 bytes), the message one byte after an
 8-byte boundary, the second pass, the minimum, maximum and first call of
@@ -4850,26 +4852,26 @@ is switched on (<a href="method-crc.html">method</a>, "A mean includes the first
 <p>Each sentence names the rows it rests on; the rows are those of the tables above (open a board).</p>
 <ul>
 <li><strong>The same class from two libraries.</strong> With the cache on, ETL
-  <code>crc32_t256</code> and crcany <code>crc32iso_hdlc_byte</code>, both a CRC-32 table of 256
-  in flash, have the same per-byte figure on five boards (nRF5340 DK 10.0,
-  Raspberry Pi Pico 2 H 10.0, NUCLEO-G474RE 14.7, NUCLEO-H723ZG 8.0,
-  NUCLEO-G0B1RE 15.0); on the SAM D20 Xplained Pro they are 15.3–15.6 and
-  14.3–14.6. Their 16-byte figures differ (NUCLEO-G474RE: 257–258 and
-  280–281), which is the part of a call that does not grow with the
-  message.</li>
+    <code>crc32_t256</code> and crcany <code>crc32iso_hdlc_byte</code>, both a CRC-32 table of 256
+    in flash, have the same per-byte figure on five boards (nRF5340 DK 10.0,
+    Raspberry Pi Pico 2 H 10.0, NUCLEO-G474RE 14.7, NUCLEO-H723ZG 8.0,
+    NUCLEO-G0B1RE 15.0); on the SAM D20 Xplained Pro they are 15.3–15.6 and
+    14.3–14.6. Their 16-byte figures differ (NUCLEO-G474RE: 257–258 and
+    280–281), which is the part of a call that does not grow with the
+    message.</li>
 <li><strong>The same instructions, the table in flash or in RAM.</strong> ETL
-  <code>crc32_t256</code> and libcrc <code>crc_32</code> run the same loop instructions on the
-  Cortex-M4, M7 and M33 cores (the <a href="report-2026-11-25-crc-first-series.html">report</a>,
-  check 3); libcrc builds its table in RAM. With the cache on, the
-  NUCLEO-G474RE gives 14.7 and 10.0 cycles per byte for the two rows, the
-  NUCLEO-H723ZG 8.0 and 8.0.</li>
+    <code>crc32_t256</code> and libcrc <code>crc_32</code> run the same loop instructions on the
+    Cortex-M4, M7 and M33 cores (the <a href="report-2026-11-25-crc-first-series.html">report</a>,
+    check 3); libcrc builds its table in RAM. With the cache on, the
+    NUCLEO-G474RE gives 14.7 and 10.0 cycles per byte for the two rows, the
+    NUCLEO-H723ZG 8.0 and 8.0.</li>
 <li><strong>The placements, with the cache off.</strong> On the SAM D20 Xplained Pro
-  every row of the cache-off tables is one number: the eight placements
-  agree. On the NUCLEO-H723ZG, crcany <code>crc32iso_hdlc_bit</code> (CRC-32,
-  bitwise) costs 41.0–258.0 cycles per byte with the cache off and
-  41.0–42.0 with it on, at 520 MHz (method version 3): at its best
-  placements the same with the cache off as on. The first series, at
-  64 MHz, gave 41.0–225.0 with the cache off (the report, check 7).</li>
+    every row of the cache-off tables is one number: the eight placements
+    agree. On the NUCLEO-H723ZG, crcany <code>crc32iso_hdlc_bit</code> (CRC-32,
+    bitwise) costs 41.0–258.0 cycles per byte with the cache off and
+    41.0–42.0 with it on, at 520 MHz (method version 3): at its best
+    placements the same with the cache off as on. The first series, at
+    64 MHz, gave 41.0–225.0 with the cache off (the report, check 7).</li>
 </ul>
 </details></main><script>(function () {
   function show() {

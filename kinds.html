@@ -55,8 +55,8 @@ The kinds are in the order they were added.</p>
 <h2 id="embedded-ring-buffers">Embedded ring buffers</h2>
 <ul>
 <li><strong>What is measured:</strong> cycles per push and pop and per block, code size, an
-  interrupt stress test in which a deliberately broken buffer must be
-  caught, and model checks where a library promises lock-free concurrency.</li>
+    interrupt stress test in which a deliberately broken buffer must be
+    caught, and model checks where a library promises lock-free concurrency.</li>
 <li><strong>Libraries:</strong> 29 (counted by repository), in 38 configurations.</li>
 <li><strong>Boards:</strong> 6.</li>
 <li><strong>Results:</strong> <a href="results.html">results page</a></li>
@@ -68,10 +68,10 @@ The kinds are in the order they were added.</p>
 <h2 id="crc-calculation">CRC calculation</h2>
 <ul>
 <li><strong>What is measured:</strong> cycles of one call that computes a CRC, for messages
-  of 1 to 1024 bytes, with the cache off and on, and the bytes of flash and
-  RAM it takes; by libraries that compute the CRC in software and, on the
-  boards that have one, by the board's CRC unit as a row beside them. Every
-  call's result is checked against a reference.</li>
+    of 1 to 1024 bytes, with the cache off and on, and the bytes of flash and
+    RAM it takes; by libraries that compute the CRC in software and, on the
+    boards that have one, by the board's CRC unit as a row beside them. Every
+    call's result is checked against a reference.</li>
 <li><strong>Libraries:</strong> 8, in 35 configurations, for 3 CRCs.</li>
 <li><strong>The board's CRC unit:</strong> on 4 boards, driven by our code (not a library), a row beside the libraries.</li>
 <li><strong>Boards:</strong> 6.</li>
@@ -84,11 +84,11 @@ The kinds are in the order they were added.</p>
 <h2 id="fixed-block-memory-pools">Fixed-block memory pools</h2>
 <ul>
 <li><strong>What is measured:</strong> cycles of alloc and free of one block size (32
-  blocks of 32 bytes) in six scenarios and of creating the pool, with the
-  cache off and on, and the bytes of flash and RAM it takes; every call is
-  checked on the board. Measured in one context. Use from interrupts is
-  tested in a series of its own, the concurrency series: an interrupt at
-  every cycle of a call, with controls that must be caught.</li>
+    blocks of 32 bytes) in six scenarios and of creating the pool, with the
+    cache off and on, and the bytes of flash and RAM it takes; every call is
+    checked on the board. Measured in one context. Use from interrupts is
+    tested in a series of its own, the concurrency series: an interrupt at
+    every cycle of a call, with controls that must be caught.</li>
 <li><strong>Libraries:</strong> 10, in 10 configurations, and a row of ours (not a library).</li>
 <li><strong>Boards:</strong> 6.</li>
 <li><strong>Results:</strong> <a href="results-pools.html">results page</a></li>

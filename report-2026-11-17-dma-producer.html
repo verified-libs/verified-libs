@@ -131,13 +131,13 @@ One library per reset over the serial port; firmware commit d31886dc8357.</p>
 </table></div>
 <ul>
 <li>Every library: 0 sequence errors, 0 lost or extra bytes; the control is
-  caught in both runs.</li>
+    caught in both runs.</li>
 <li>The window was exercised: in every library the consumer read 43000 to
-  50000 times while a transfer was in flight (36500 transfers per run).</li>
+    50000 times while a transfer was in flight (36500 transfers per run).</li>
 <li>The buffer ran full in every library (acquire gave no area) - thousands
-  of times at the fastest DMA rate, tens to hundreds at prescaler 2. A first
-  run with shorter consumer pauses hardly filled it (0-5 times); the pauses
-  were lengthened before these runs.</li>
+    of times at the fastest DMA rate, tens to hundreds at prescaler 2. A first
+    run with shorter consumer pauses hardly filled it (0-5 times); the pauses
+    were lengthened before these runs.</li>
 <li>⚠ pxq is the project owner's library (principle 6).</li>
 </ul>
 <h2 id="h723-cortex-m7-with-d-cache">H723 (Cortex-M7 with D-cache)</h2>
@@ -313,7 +313,7 @@ the snapshots). One flash write on the H723 (the snapshot bundle).</p>
 <li>The other boards' DMA layers.</li>
 <li>Longer campaigns, code in SRAM, other compilers.</li>
 <li>The test does not end on a library's documented limit cases (e.g. a
-  zero-length acquire); it covers the DMA as writer, not every API path.</li>
+    zero-length acquire); it covers the DMA as writer, not every API path.</li>
 </ul>
 <p>Records: <code>~/lab-runs/dma-g474-20261117/</code> (lib-lab1).</p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>

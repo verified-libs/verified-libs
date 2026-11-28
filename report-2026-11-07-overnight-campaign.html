@@ -59,14 +59,14 @@ the JSON records stay on lib-lab1 in <code>~/lab-runs/overnight-20261106T215245Z
 <ul>
 <li><strong>32 runs: 24 valid, 5 invalid (control not caught), 3 did not finish.</strong></li>
 <li><strong>0 errors in every real library across all 24 valid runs.</strong> Per library
-  about 10.2 million bytes moved under 49–93 million interrupts, with new
-  random seeds in every run, single bytes and blocks, interrupt periods
-  from 160 to 10 688 cycles, cache on and off, code in flash and SRAM.</li>
+    about 10.2 million bytes moved under 49–93 million interrupts, with new
+    random seeds in every run, single bytes and blocks, interrupt periods
+    from 160 to 10 688 cycles, cache on and off, code in flash and SRAM.</li>
 <li><strong>wizard97 as shipped:</strong> 219 737 errors, as its own header warns; with
-  the PRIMASK macros its README asks for: 0.</li>
+    the PRIMASK macros its README asks for: 0.</li>
 <li><strong>Coverage:</strong> every library found the buffer full and empty in both
-  directions in most runs; the "full in main → ISR" gap from the first
-  stress runs is closed (16–23 of 24 valid runs per library).</li>
+    directions in most runs; the "full in main → ISR" gap from the first
+    stress runs is closed (16–23 of 24 valid runs per library).</li>
 </ul>
 <h2 id="the-8-runs-that-do-not-count">The 8 runs that do not count</h2>
 <p><strong>5 invalid runs:</strong> all block mode at the slowest interrupt rate (prescaler 4,
@@ -85,11 +85,11 @@ more than 100 % interrupt load.</p>
 <h2 id="changes-made-after-this-campaign">Changes made after this campaign</h2>
 <ul>
 <li>Rotation: no prescaler 4 in block mode (replaced by prescaler 1, every
-  320–1 336 cycles) and no cache-off with prescaler 0 (replaced by
-  prescaler 2).</li>
+    320–1 336 cycles) and no cache-off with prescaler 0 (replaced by
+    prescaler 2).</li>
 <li>Firmware: a starvation cap (60 interrupts per byte) ends a starved
-  library/direction instead of hanging the run; it is reported as
-  "starved", never as a pass.</li>
+    library/direction instead of hanging the run; it is reported as
+    "starved", never as a pass.</li>
 </ul>
 <h2 id="limits">Limits</h2>
 <p>One core (interrupt vs main loop), one compiler (arm-none-eabi-gcc 14.2.1,

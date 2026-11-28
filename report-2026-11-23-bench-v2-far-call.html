@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="The series the pages of version 2 are to show. Every library lies at least 6144 bytes behind its adapter (FAR, DECISIONS 2026-11-23), so that a call from the ...">
+<meta name="description" content="The series the pages of version 2 are to show. Every library lies at least 6144 bytes behind its adapter (FAR, change log), so that a call from the adapter ...">
 <link rel="canonical" href="https://verified-libs.org/report-2026-11-23-bench-v2-far-call.html">
 <meta property="og:site_name" content="verified-libs">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Benchmark version 2: the series with the far call (2026-11-23) - verified-libs">
-<meta property="og:description" content="The series the pages of version 2 are to show. Every library lies at least 6144 bytes behind its adapter (FAR, DECISIONS 2026-11-23), so that a call from the ...">
+<meta property="og:description" content="The series the pages of version 2 are to show. Every library lies at least 6144 bytes behind its adapter (FAR, change log), so that a call from the adapter ...">
 <meta property="og:url" content="https://verified-libs.org/report-2026-11-23-bench-v2-far-call.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -50,7 +50,7 @@ p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
 <body><header><nav><a class="brand" href="index.html">verified-libs</a><a href="kinds.html">Results</a><a href="compare.html">Compare</a><a href="method.html">Method</a><a href="reproduce.html">Reproduce</a><a href="repeats.html">Repeats</a><a href="findings.html">Findings</a><a href="reports.html" class=on>Reports</a></nav></header>
 <main><h1 id="benchmark-version-2-the-series-with-the-far-call-2026-11-23">Benchmark version 2: the series with the far call (2026-11-23)</h1>
 <p>The series the pages of version 2 are to show. Every library lies at least
-6144 bytes behind its adapter (<code>FAR</code>, DECISIONS 2026-11-23), so that a
+6144 bytes behind its adapter (<code>FAR</code>, <a href="method.html#log-2026-11-23-far-call">change log</a>), so that a
 call from the adapter into the library is a far one on every board, as it
 is in an application where the linker places the library. The first run
 of version 2, earlier the same day, had the library right behind its
@@ -60,17 +60,17 @@ replaced by the ones of this series and stay in the history (commit
 <h2 id="result">Result</h2>
 <ul>
 <li><strong>265 records</strong> on six boards (45 on the nRF5340 DK, 44 on each of the
-  others), eight placements and two passes each: 4240 runs, every one
-  with its run file, no configuration left out.</li>
+    others), eight placements and two passes each: 4240 runs, every one
+    with its run file, no configuration left out.</li>
 <li><strong>Every image rebuilt</strong> from the records' commit (<code>d06180e</code>) and
-  compared: 265 of 265 the same bytes (<code>oneverify.sh</code>).</li>
+    compared: 265 of 265 the same bytes (<code>oneverify.sh</code>).</li>
 <li><strong>Baseline</strong> (the same code at the same place in every image of a
-  board): 20 of 20 numbers the same in every run on five boards. On the
-  NUCLEO-H723ZG 19 of 20; the single push with the cache on is 10.014 or
-  10.024.</li>
+    board): 20 of 20 numbers the same in every run on five boards. On the
+    NUCLEO-H723ZG 19 of 20; the single push with the cache on is 10.014 or
+    10.024.</li>
 <li>The NUCLEO-G0B1RE and the SAM D20 now have a record for the
-  configuration the first run could not print there (DNedic lockfree
-  mpmc::Queue; it has no numbers on a Cortex-M0+ and the record says so).</li>
+    configuration the first run could not print there (DNedic lockfree
+    mpmc::Queue; it has no numbers on a Cortex-M0+ and the record says so).</li>
 </ul>
 <h2 id="what-the-distance-costs">What the distance costs</h2>
 <p>Far minus near, cycles per call, single push and single pop, the median
@@ -164,23 +164,23 @@ could reach.</p>
 </table></div>
 <ul>
 <li><strong>Only the Cortex-M7 pays for the distance.</strong> On the NUCLEO-H723ZG a
-  configuration that calls into its library costs 3 to 15 cycles more per
-  operation with the cache on (median 6), and up to 66 more with it off.
-  This is the step the experiment of the first report found between 2048
-  and 4096 bytes, now measured for every configuration.</li>
+    configuration that calls into its library costs 3 to 15 cycles more per
+    operation with the cache on (median 6), and up to 66 more with it off.
+    This is the step the experiment of the first report found between 2048
+    and 4096 bytes, now measured for every configuration.</li>
 <li><strong>A configuration that is inlined pays nothing, on any board.</strong> This
-  includes configurations with code behind the gap that the single push
-  and pop do not call (micoring's default mode; all modes of pxq, whose
-  single-byte operations are inlined and whose block operations lie behind
-  the gap). pxq is the owner's own library; the page has to say that its
-  single-byte numbers contain no call while most others do.</li>
+    includes configurations with code behind the gap that the single push
+    and pop do not call (micoring's default mode; all modes of pxq, whose
+    single-byte operations are inlined and whose block operations lie behind
+    the gap). pxq is the owner's own library; the page has to say that its
+    single-byte numbers contain no call while most others do.</li>
 <li>On the four Cortex-M0+, M4 and M33 boards the series are the same
-  within 2 cycles, except one configuration on the nRF5340 DK (+6).</li>
+    within 2 cycles, except one configuration on the nRF5340 DK (+6).</li>
 <li>Pico 2: the same with the cache on (largest difference 0.7). With the
-  cache off one configuration moved, embassy-sync Pipe: push 67 cycles
-  lower, pop 68 higher. With that cache off every instruction is fetched
-  from the external flash, and the number follows where the code lies in
-  it; nothing else moved.</li>
+    cache off one configuration moved, embassy-sync Pipe: push 67 cycles
+    lower, pop 68 higher. With that cache off every instruction is fetched
+    from the external flash, and the number follows where the code lies in
+    it; nothing else moved.</li>
 </ul>
 <p>NUCLEO-H723ZG, cache on, every configuration (two are not listed):</p>
 <p>| ETL queue_spsc_atomic (C++) | 44 | 33.026 / 32.025 | +0.00 / +0.00 |
@@ -238,26 +238,27 @@ the bundle was on the board afterwards).</p>
 <h2 id="what-went-wrong">What went wrong</h2>
 <ul>
 <li><strong>The Pico 2 lost power during the flash write, three times.</strong> Cause
-  found: while the probe writes, the board's own USB port shows up at the
-  hub and does not answer; 65 s after that the kernel power-cycles the
-  hub port ("attempt power cycle"), and the board, which is fed from that
-  port, is gone in the middle of the write. A bundle of 4 MB takes longer
-  than 65 s; 1 MB takes 25 to 30 s. The bundle was then written in four
-  parts of about 1 MB, waiting for the power cycle between the parts;
-  after it the runner found the whole bundle on the board and wrote
-  nothing. This also explains the Pico 2 that "halted about 60 s after a
-  download" in earlier notes. <code>lab/tools/pico2-write.py</code> now does this, before the runner is
-  started; the runner itself is not changed, because it is one of the
-  sources the records were made with (DECISIONS 2026-11-22). A cable that carries power only would remove the cause.</li>
+    found: while the probe writes, the board's own USB port shows up at the
+    hub and does not answer; 65 s after that the kernel power-cycles the
+    hub port ("attempt power cycle"), and the board, which is fed from that
+    port, is gone in the middle of the write. A bundle of 4 MB takes longer
+    than 65 s; 1 MB takes 25 to 30 s. The bundle was then written in four
+    parts of about 1 MB, waiting for the power cycle between the parts;
+    after it the runner found the whole bundle on the board and wrote
+    nothing. This also explains the Pico 2 that "halted about 60 s after a
+    download" in earlier notes. <code>lab/tools/pico2-write.py</code> now does this, before the runner is
+    started; the runner itself is not changed, because it is one of the
+    sources the records were made with (<a href="method.html#log-2026-11-22-same-image">change log</a>). A cable that carries power only would remove the cause.</li>
 <li>NUCLEO-H723ZG: two images were not finished 3 s after the reset and
-  were run again with a longer wait (the runner's rule); numbers as in
-  the other pass.</li>
+    were run again with a longer wait (the runner's rule); numbers as in
+    the other pass.</li>
 </ul>
 <h2 id="reproduce">Reproduce</h2>
 <p><code>bash firmware/nrf5340-rb-bench/oneverify.sh records/bench-v2/&lt;board&gt;/*.json</code>
 rebuilds and compares, without a board. The table above:
 <code>lab/tools/bench2-near-far.py NEAR records/bench-v2 firmware/nrf5340-rb-bench/build/v2 -v stm32h723</code>
-with NEAR from <code>git archive f3d0682 records/bench-v2</code>.</p></main>
+with NEAR from <code>git archive f3d0682 records/bench-v2</code>.</p>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

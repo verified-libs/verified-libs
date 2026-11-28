@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Fixed-block pools, the third kind: 32 blocks of 32 bytes. Eleven configurations on six boards (kinds/pools/README.md). The job list is ...">
+<meta name="description" content="Fixed-block pools, the third kind: 32 blocks of 32 bytes. Eleven configurations on six boards (kinds/pools/README.md). The job list is our lab&#x27;s (not ...">
 <link rel="canonical" href="https://verified-libs.org/report-2026-11-26-pools-first-series.html">
 <meta property="og:site_name" content="verified-libs">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Pools, the first series on the boards (2026-11-26) - verified-libs">
-<meta property="og:description" content="Fixed-block pools, the third kind: 32 blocks of 32 bytes. Eleven configurations on six boards (kinds/pools/README.md). The job list is ...">
+<meta property="og:description" content="Fixed-block pools, the third kind: 32 blocks of 32 bytes. Eleven configurations on six boards (kinds/pools/README.md). The job list is our lab&#x27;s (not ...">
 <meta property="og:url" content="https://verified-libs.org/report-2026-11-26-pools-first-series.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -51,25 +51,27 @@ p.kindsw{margin:0 0 .5rem;color:var(--mute)}p.kindsw strong{color:var(--fg)}
 <main><h1 id="pools-the-first-series-on-the-boards-2026-11-26">Pools, the first series on the boards (2026-11-26)</h1>
 <p>Fixed-block pools, the third kind: 32 blocks of 32 bytes. Eleven
 configurations on six boards (<code>kinds/pools/README.md</code>). The job list is
-<code>lab/plans/2026-11-26-pools-series-jobs.md</code>; each job approved by the review
+our lab's (not published); each job approved by the review
 before it was enqueued. Measured
 under method version 3.</p>
 <h2 id="result">Result</h2>
 <ul>
 <li><strong>64 records</strong> (<code>records/pools/</code>, <code>pools-bench/1</code>): 11 on each board but
-  the two Cortex-M0+ boards, which have 10 (heapless needs LDREX/STREX).
-  Committed in <code>kind-pools</code> <code>e81e2a0</code> (42) and <code>f00be00</code> (22).</li>
+    the two Cortex-M0+ boards, which have 10 (heapless needs LDREX/STREX).
+    Committed in <code>kind-pools</code> <code>e81e2a0</code> (42) and <code>f00be00</code> (22).</li>
 <li><strong>Series commit <code>f12caf7</code>.</strong> The pools test sources (<code>public-export.py</code>
-  POOLS_TEST_SOURCES) have not changed since the first write.</li>
+    POOLS_TEST_SOURCES) have not changed since the first write.<ul>
 <li>It replaced <code>2c807f9</code>, at which nothing was written, to add the sizes to
     the records.</li>
 <li>All 512 images and 16 bundle files are byte for byte those of <code>2c807f9</code>.</li>
+</ul>
+</li>
 <li><strong>All 64 records rebuilt by <code>poolverify.sh</code> at <code>f12caf7</code>: MATCH</strong> (flash
-  bytes, addresses, fixed part, boot stub, toolchain, layout, sizes).</li>
+    bytes, addresses, fixed part, boot stub, toolchain, layout, sizes).</li>
 <li><strong>Nothing was left out.</strong> In every run the baseline (our reference free
-  list) measured the same on each board: 24 of 24 numbers.</li>
+    list) measured the same on each board: 24 of 24 numbers.</li>
 <li><strong>No fault</strong> in any configuration's checks: every call was checked
-  outside the timed window, errors 0 in all runs. No library defect was seen.</li>
+    outside the timed window, errors 0 in all runs. No library defect was seen.</li>
 <li><strong>The export check passes:</strong> "64 pools records".</li>
 </ul>
 <h2 id="the-jobs">The jobs</h2>
@@ -137,18 +139,18 @@ under method version 3.</p>
 </table></div>
 <ul>
 <li><strong>Writes: 16 in all, as counted</strong> (the queue's ledger). The smoke's write
-  is that bundle's write for the series.</li>
+    is that bundle's write for the series.</li>
 <li><strong>Every smoke passed:</strong> the job's check, two records made with their
-  sizes, both MATCH.</li>
+    sizes, both MATCH.</li>
 <li><strong>Every series job passed its check:</strong> options read whole, the run count,
-  the clock, errors 0, no stall. No board stopped.</li>
+    the clock, errors 0, no stall. No board stopped.</li>
 <li><strong>A run took about 5.6 s</strong> on every board (wait 5 s), so the series took
-  20–25 minutes per board.</li>
+    20–25 minutes per board.</li>
 <li><strong>The Pico 2's write</strong> went alone, under the exclusive write lock, in two
-  parts: 250 units in 33 s, then 15 units in 2.4 s, the second started 70 s
-  after the first (<code>run-pools.py</code> <code>write_parts</code>). No power loss.</li>
+    parts: 250 units in 33 s, then 15 units in 2.4 s, the second started 70 s
+    after the first (<code>run-pools.py</code> <code>write_parts</code>). No power loss.</li>
 <li><strong>The nRF5340</strong> ran after its method version 3 reruns had ended and their
-  records were made. It was not power-cycled.</li>
+    records were made. It was not power-cycled.</li>
 <li><strong>The four boards on two hubs</strong> ran side by side; no power switching.</li>
 </ul>
 <h2 id="option-registers">Option registers</h2>
@@ -266,20 +268,23 @@ placements:</p>
 <h2 id="files-beside-the-records">Files beside the records</h2>
 <ul>
 <li><strong><code>kinds/pools/claims.tsv</code>:</strong> what each library documents about use from
-  interrupts and threads, with sources. The pages show it as "documented,
-  not tested". It is no test source.</li>
+    interrupts and threads, with sources. The pages show it as "documented,
+    not tested". It is no test source.</li>
 <li><strong>Run directories:</strong> <code>~/vl-wt-pools-runs/&lt;board&gt;/&lt;job&gt;/</code>, with
-  <code>options.json</code>, <code>run.log</code> and the run files.</li>
+    <code>options.json</code>, <code>run.log</code> and the run files.<ul>
 <li>The smokes' records are in <code>…/&lt;job&gt;-records/</code>. They are not in the
     repository: the series jobs ran the same images again.</li>
+</ul>
+</li>
 </ul>
 <h2 id="open">Open</h2>
 <ul>
 <li><strong>The ledger for pools records</strong> (<code>lab/tools/image-ledger.py</code>): not made.
-  Until it is, a pools record of a commit whose pools test sources differ
-  from HEAD's stops the export. None does today.</li>
+    Until it is, a pools record of a commit whose pools test sources differ
+    from HEAD's stops the export. None does today.</li>
 <li><strong>The concurrency series</strong> (plan, section 4).</li>
-</ul></main>
+</ul>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

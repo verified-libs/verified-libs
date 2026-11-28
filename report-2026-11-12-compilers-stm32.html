@@ -119,14 +119,14 @@ stripped), 44 objects per build:</p>
 </table></div>
 <ul>
 <li>ST Arm Clang 21.1.1 and Ubuntu clang 21.1.8 generate byte-identical code
-  for these libraries with the same flags and headers. What ST adds is its
-  runtime (newlib, libc++; not used here) and its optimisation presets
-  (below).</li>
+    for these libraries with the same flags and headers. What ST adds is its
+    runtime (newlib, libc++; not used here) and its optimisation presets
+    (below).</li>
 <li>GNU Tools for STM32 14.3.1 differs from Arm GCC 14.2.1 in small ways
-  (operand order of a compare, register choice). In the bench the cycles are
-  the same in every cell on the G474 and G0B1; on the H723 two cells differ
-  (lwrb push 151 vs 145, micoring single-context block 30.7 vs 29.0
-  cycles/byte).</li>
+    (operand order of a compare, register choice). In the bench the cycles are
+    the same in every cell on the G474 and G0B1; on the H723 two cells differ
+    (lwrb push 151 vs 145, micoring single-context block 30.7 vs 29.0
+    cycles/byte).</li>
 </ul>
 <p>So, for these libraries, "ST's compiler" measures the same as the
 upstream compiler of the same family; the gcc/clang choice is what matters.</p>

@@ -55,12 +55,12 @@ UTC (it finished its validation first). New since the campaign of
 2026-11-12/13:</p>
 <ul>
 <li><strong>the new code layout</strong> (<code>9898830</code>): the timing harness and the adapters
-  come first in flash, so a change elsewhere no longer moves them;</li>
+    come first in flash, so a change elsewhere no longer moves them;</li>
 <li><strong>the Rust libraries</strong> in the stress test: heapless spsc::Queue, bbqueue
-  and embassy-sync Pipe, linked into the same firmware as the C libraries;</li>
+    and embassy-sync Pipe, linked into the same firmware as the C libraries;</li>
 <li><strong>a fifth compiler flag set, <code>-Os</code> with LTO</strong> (the size build with
-  link-time optimisation that many products ship), next to <code>-Os</code>, <code>-O3</code>,
-  <code>-O2</code> with LTO and <code>-O2</code> with clang.</li>
+    link-time optimisation that many products ship), next to <code>-Os</code>, <code>-O3</code>,
+    <code>-O2</code> with LTO and <code>-O2</code> with clang.</li>
 </ul>
 <p><strong>No errors in any real library in any valid run, on any board</strong>: 209 valid
 runs of 211, about 20 G bytes and 10.6 G interrupts through the libraries.
@@ -148,12 +148,12 @@ whose interrupt lock does nothing against the other core.</p>
 </table></div>
 <ul>
 <li>nRF5340: <code>sweep-block</code> with the cache off at <code>-Os</code> was too slow for the
-  time limit (exit 4), the same configuration as the night before; it is
-  not hung, and the campaign neither retried nor power-cycled.</li>
+    time limit (exit 4), the same configuration as the night before; it is
+    not hung, and the campaign neither retried nor power-cycled.</li>
 <li>NUCLEO-G474RE: one run could not read its results from the board ("probe
-  failure"); the campaign power-cycled the board and the retry passed.</li>
+    failure"); the campaign power-cycled the board and the retry passed.</li>
 <li>No run was invalid: the negative control was caught in every run that
-  finished.</li>
+    finished.</li>
 </ul>
 <h2 id="compiler-flag-sets">Compiler flag sets</h2>
 <p>Runs that finished with the real libraries error-free and the control
@@ -237,15 +237,15 @@ bytes, see the comparison page) was run for the Rust and multi-producer
 benchmark sets on five boards (80 runs), and for the SPSC set on the Pico 2.</p>
 <ul>
 <li>Most means do not move at all: the median spread of the one-byte means is
-  0.0 % on every board in both sets.</li>
+    0.0 % on every board in both sets.</li>
 <li>The exception is embassy-sync Pipe on the NUCLEO-G474RE: its one-byte
-  write and read take 190 to 235 and 174 to 217 cycles depending on where
-  the code lies (24 %). On the NUCLEO-H723ZG bbqueue's one-byte write moves
-  by 4 %, and some block figures by up to 14 % (pxq Topology MPSC/MPMC
-  64-byte blocks, RIOT tsrb on the G0B1).</li>
+    write and read take 190 to 235 and 174 to 217 cycles depending on where
+    the code lies (24 %). On the NUCLEO-H723ZG bbqueue's one-byte write moves
+    by 4 %, and some block figures by up to 14 % (pxq Topology MPSC/MPMC
+    64-byte blocks, RIOT tsrb on the G0B1).</li>
 <li>The Pico 2 is the steadiest board for the SPSC set: median 0.0 %, largest
-  1.7 %, 72 of 74 one-byte means within 1 % (other boards: largest 4.9 % to
-  28.9 %).</li>
+    1.7 %, 72 of 74 one-byte means within 1 % (other boards: largest 4.9 % to
+    28.9 %).</li>
 </ul>
 <p>The comparison page shows placement ranges for the SPSC set on all six
 boards now; the ranges of the Rust and multi-producer sets are in

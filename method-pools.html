@@ -55,9 +55,8 @@ the other kinds': <a href="method.html">embedded ring buffers</a> and
 <p>The numbers are on the <a href="results-pools.html">results page</a> and the
 <a href="compare-pools.html">comparison page</a>. The details, the host checks' output
 and the sizes from the cross builds are in
-<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md"><code>kinds/pools/README.md</code></a>; the plan and its
-decisions in <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-26-pools-kind.md"><code>lab/plans/2026-11-26-pools-kind.md</code></a>
-and <a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a> (2026-11-26). This page says what
+<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md"><code>kinds/pools/README.md</code></a>; what changed in the
+method, in the <a href="#change-log">change log</a>. This page says what
 they add up to.</p>
 <h2 id="what-a-pool-is-here">What a pool is here</h2>
 <p>A library that hands out blocks of one size from storage fixed at start,
@@ -73,21 +72,23 @@ without its kernel, is left out, with the reason in the kind's README
 <p><strong>The numbers of these pages are of one context:</strong> no interrupt calls a pool
 while it is timed. Whether a pool stays correct when an interrupt calls it
 is tested by a series of its own, the concurrency series
-(<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-27-pools-concurrency.md">plan</a>; records under
+(<a href="#log-2026-11-27-isr">change log</a>; records under
 <a href="https://github.com/verified-libs/verified-libs/blob/main/records/README.md"><code>records/pools-isr</code></a>). What it observed is in
 each board's fold-out "Use from interrupts" on the
 <a href="results-pools.html">results page</a> and in a column of the
 <a href="compare-pools.html">comparison page</a>; it is part of no score.</p>
 <ul>
 <li><strong>What it asks.</strong> An interrupt calls <code>alloc</code> or <code>free</code> on the same pool
-  while the main context is inside its own <code>alloc</code> or <code>free</code>. Is a block
-  then handed out twice, or lost? Is the pool's state corrupted, or an
-  answer given that no order of the calls gives? And, where a
-  configuration takes interrupts off, how long does an interrupt wait?</li>
-<li><strong>How, on the boards.</strong> SysTick is a one-shot interrupt, armed d cycles
-  before main's call, for d = 1, 2, 3 … until the interrupt has come after
-  the call 16 times in a row: so the interrupt comes at every cycle of the
-  call. This is done for:</li>
+    while the main context is inside its own <code>alloc</code> or <code>free</code>. Is a block
+    then handed out twice, or lost? Is the pool's state corrupted, or an
+    answer given that no order of the calls gives? And, where a
+    configuration takes interrupts off, how long does an interrupt wait?</li>
+<li>
+<p><strong>How, on the boards.</strong> SysTick is a one-shot interrupt, armed d cycles
+    before main's call, for d = 1, 2, 3 … until the interrupt has come after
+    the call 16 times in a row: so the interrupt comes at every cycle of the
+    call. This is done for:</p>
+<ul>
 <li>seven start states (0 to 32 blocks held);</li>
 <li>main's alloc or free;</li>
 <li>five patterns of the interrupt's calls;</li>
@@ -95,62 +96,82 @@ each board's fold-out "Use from interrupts" on the
 <li>the cache off and on.</li>
 </ul>
 <p>Every trial is judged by the same code as the host check
-  (<code>kinds/pools-isr/verdict.h</code>). The record also says which instructions
-  of the configuration's code an interrupt came at.
-- <strong>On the host,</strong> the same trials with an interrupt at every instruction
-  (x86 single-step). CMSIS-RTX's LDREX/STREX variant, which the
-  Cortex-M4, M7 and M33 boards run, is checked there on a model of the
-  exclusive monitor.
-- <strong>Each library as it documents itself</strong> (<code>kinds/pools/claims.tsv</code>), in
-  three classes:
-  - <em>within its documentation:</em> passed, or a finding;
-  - <em>outside its documentation:</em> the library documents no use from
+(<code>kinds/pools-isr/verdict.h</code>). The record also says which instructions
+of the configuration's code an interrupt came at.</p>
+</li>
+<li>
+<p><strong>On the host,</strong> the same trials with an interrupt at every instruction
+    (x86 single-step). CMSIS-RTX's LDREX/STREX variant, which the
+    Cortex-M4, M7 and M33 boards run, is checked there on a model of the
+    exclusive monitor.</p>
+</li>
+<li><strong>Each library as it documents itself</strong> (<code>kinds/pools/claims.tsv</code>), in
+    three classes:<ul>
+<li><em>within its documentation:</em> passed, or a finding;</li>
+<li><em>outside its documentation:</em> the library documents no use from
     interrupts, or only with a lock it is not built with. It is run all
     the same and only what was observed is reported; it is never called
-    failing;
-  - <em>ours:</em> our reference with interrupts off.
-- <strong>C_Allocator twice.</strong> Its one-context numbers are of the build with no
-  lock (<code>ALLOC_LOCK_NONE</code>, the library's default on a bare-metal
-  toolchain), which is <em>outside its documentation</em> here. The series also
-  ran a build of its own with the library's lock option
-  <code>ALLOC_LOCK_CMSIS_RTOS2</code>, <em>within its documentation</em>. That build:
-  - is built against CMSIS 6 headers, with no kernel linked, and with
-    <code>-D__PROGRAM_START=_start</code>, as CMSIS sets it for picolibc;
-  - only saves PRIMASK and masks interrupts in the lock;
-  - ran in a bundle of its own (bundle 301), with the three controls again.</p>
-<p>It is not timed in one context.
-- <strong>Controls.</strong> On every board, three builds of ours must be caught:
-  - our reference without a lock;
-  - two builds with interrupts on again too early, in <code>alloc</code> and in <code>free</code>.</p>
-<p>A board whose controls were not all caught has no records.
-- <strong>The interrupts-off time.</strong> It is read in the same sweep: when the
-  interrupt runs, it reads how many cycles ago SysTick ran out. The
-  largest such latency of a configuration, less the smallest of the
-  reference without a lock in the same image, is the longest an interrupt
-  waited because the configuration had interrupts off. It is for this
-  pool shape and these calls, cache off and on; it is not a bound for
-  every use.
-- <strong>What it cannot show:</strong>
-  - more than one core;
-  - a thread waiting for a block (the pools run without their kernels);
-  - two interrupts in one call, or nested interrupts;
-  - another compiler or optimisation level.
-  - on some cores, the one instruction right after a library turns
+    failing;</li>
+<li><em>ours:</em> our reference with interrupts off.</li>
+</ul>
+</li>
+<li>
+<p><strong>C_Allocator twice.</strong> Its one-context numbers are of the build with no
+    lock (<code>ALLOC_LOCK_NONE</code>, the library's default on a bare-metal
+    toolchain), which is <em>outside its documentation</em> here. The series also
+    ran a build of its own with the library's lock option
+    <code>ALLOC_LOCK_CMSIS_RTOS2</code>, <em>within its documentation</em>. That build:</p>
+<ul>
+<li>is built against CMSIS 6 headers, with no kernel linked, and with
+    <code>-D__PROGRAM_START=_start</code>, as CMSIS sets it for picolibc;</li>
+<li>only saves PRIMASK and masks interrupts in the lock;</li>
+<li>ran in a bundle of its own (bundle 301), with the three controls again.</li>
+</ul>
+<p>It is not timed in one context.</p>
+</li>
+<li>
+<p><strong>Controls.</strong> On every board, three builds of ours must be caught:</p>
+<ul>
+<li>our reference without a lock;</li>
+<li>two builds with interrupts on again too early, in <code>alloc</code> and in <code>free</code>.</li>
+</ul>
+<p>A board whose controls were not all caught has no records.</p>
+</li>
+<li>
+<p><strong>The interrupts-off time.</strong> It is read in the same sweep: when the
+    interrupt runs, it reads how many cycles ago SysTick ran out. The
+    largest such latency of a configuration, less the smallest of the
+    reference without a lock in the same image, is the longest an interrupt
+    waited because the configuration had interrupts off. It is for this
+    pool shape and these calls, cache off and on; it is not a bound for
+    every use.</p>
+</li>
+<li>
+<p><strong>What it cannot show:</strong></p>
+<ul>
+<li>more than one core;</li>
+<li>a thread waiting for a block (the pools run without their kernels);</li>
+<li>two interrupts in one call, or nested interrupts;</li>
+<li>another compiler or optimisation level.</li>
+<li>
+<p>on some cores, the one instruction right after a library turns
     interrupts on again. Whether the sweep reaches it depends on the core
-    family, as the coverage of our controls showed:
-    - Cortex-M0+ (NUCLEO-G0B1RE, SAM D20 Xplained Pro) and Cortex-M7
-      (NUCLEO-H723ZG): yes, an interrupt landed on it;
-    - Cortex-M4 (NUCLEO-G474RE) and Cortex-M33 (nRF5340 DK): no, an
-      interrupt pending there was taken only after it.</p>
-<pre><code>The architecture allows both (Armv7-M B5.2.3, Armv8-M B3.18). The host
+    family, as the coverage of our controls showed:</p>
+<ul>
+<li>Cortex-M0+ (NUCLEO-G0B1RE, SAM D20 Xplained Pro) and Cortex-M7
+    (NUCLEO-H723ZG): yes, an interrupt landed on it;</li>
+<li>Cortex-M4 (NUCLEO-G474RE) and Cortex-M33 (nRF5340 DK): no, an
+    interrupt pending there was taken only after it.</li>
+</ul>
+<p>The architecture allows both (Armv7-M B5.2.3, Armv8-M B3.18). The host
 check, which takes the interrupt at the unmask itself, covers that
 instruction. Every record lists, per function of the configuration, the
-instructions that no interrupt landed on (`coverage`, `per_function`,
-`unreached`), so for each row a reader can see what the sweep did not
-reach.
-</code></pre>
-<ul>
-<li>on the Raspberry Pi Pico 2 with the cache off, the later part of a long
+instructions that no interrupt landed on (<code>coverage</code>, <code>per_function</code>,
+<code>unreached</code>), so for each row a reader can see what the sweep did not
+reach.</p>
+</li>
+<li>
+<p>on the Raspberry Pi Pico 2 with the cache off, the later part of a long
     call. The sweep moves the interrupt up to 4,096 cycles after it is armed,
     and there about 1,200 of those come before the call. So a call longer
     than about 2,900 cycles is interrupted only in its first part. Of the
@@ -158,9 +179,12 @@ reach.
     and perhaps C_Allocator's (up to 2,539) are that long. On every other
     board the longest call with the cache off is 1,132 cycles. The record's
     coverage per function (<code>unreached</code>) names the instructions no interrupt
-    landed on.</li>
+    landed on.</p>
+</li>
 </ul>
 <p>It is not a proof: a trial covers the states it tried.</p>
+</li>
+</ul>
 <p>What the timed series shows about locking: the <strong>lock as built</strong>, the
 library's own code around a call in the build measured (interrupts off,
 LDREX/STREX, an atomic bitmap, or none), and its cost in cycles, which is
@@ -168,7 +192,7 @@ part of every number. Our own row "reference free list, interrupts off"
 gives the price of the simplest lock on each core.</p>
 <h2 id="what-is-measured">What is measured</h2>
 <p>One image per configuration and placement, under method version 3
-(DECISIONS 2026-11-26: each board at the clock of the vendor's start-up
+(<a href="method.html#log-2026-11-26-v3">change log</a>: each board at the clock of the vendor's start-up
 code or template, with the fewest flash wait states its manual allows at
 that clock, and the board's option registers recorded with every record). In each image the board's <code>time_call()</code>
 counts the cycles of every call, less the board's counter-read overhead.
@@ -224,30 +248,34 @@ around them (1056 bytes, the same for every library): its control data and
 any overhead per block.</p>
 <h2 id="what-is-checked-on-every-call">What is checked on every call</h2>
 <p>Every call is checked on the board, outside the timed window, as in the
-host test:
-- <code>alloc</code> gives a block exactly when fewer than 32 are held, and none when
-  all 32 are;
-- the block lies in the pool's region, at the promised alignment, and is
-  not one already held;
-- each holder writes a pattern of its own into its block and finds it
-  intact at the free, which catches overlapping blocks;
-- canary words before and after the pool's memory are intact after every
-  call;
-- all blocks come back at the end.</p>
+host test:</p>
+<ul>
+<li><code>alloc</code> gives a block exactly when fewer than 32 are held, and none when
+    all 32 are;</li>
+<li>the block lies in the pool's region, at the promised alignment, and is
+    not one already held;</li>
+<li>each holder writes a pattern of its own into its block and finds it
+    intact at the free, which catches overlapping blocks;</li>
+<li>canary words before and after the pool's memory are intact after every
+    call;</li>
+<li>all blocks come back at the end.</li>
+</ul>
 <p>A fault stops the run's result from counting: a run with a fault gives no
 run file, and a configuration without every run gives no record.</p>
 <h2 id="the-reference-and-our-row">The reference, and our row</h2>
 <p><strong>The reference free list</strong> (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/adapter_ref.c"><code>adapter_ref.c</code></a>):
 a singly linked list threaded through the free blocks, no lock, one load
 and one store per operation. It is ours, not a library, and has three
-parts:
-- <em>the baseline</em> of every image, timed in the same image as the
-  configuration, and shown as the last row of every table;
-- <em>the reference</em> of the host test: the same random sequence must give the
-  same answers (a block or none, and the count held);
-- <em>the control</em>: four broken builds of it (a block handed out twice, a
-  block lost, a write outside the pool, a misaligned block) must fail the
-  host test, and do.</p>
+parts:</p>
+<ul>
+<li><em>the baseline</em> of every image, timed in the same image as the
+    configuration, and shown as the last row of every table;</li>
+<li><em>the reference</em> of the host test: the same random sequence must give the
+    same answers (a block or none, and the count held);</li>
+<li><em>the control</em>: four broken builds of it (a block handed out twice, a
+    block lost, a write outside the pool, a misaligned block) must fail the
+    host test, and do.</li>
+</ul>
 <p><strong>Our row with interrupts off</strong>: the same list with interrupts off
 (PRIMASK) around each call, a configuration of its own, labelled "not a
 library" in every row. It is scored like any row on the comparison page,
@@ -257,32 +285,36 @@ and the filter "Kind of row" takes it out.</p>
 the libraries are fetched at the commits in
 <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/libs.lock"><code>kinds/pools/libs.lock</code></a>, never copied into
 this repository.</p>
-<p><strong>MemoryPool is measured at a commit that is not a release.</strong>
-- The project's only release, v0.1.0, spaces the blocks of
-  <code>MemoryPool::Fixed</code> by the size of a pointer, whatever the block size, so
-  blocks of 32 bytes overlap; our host check of v0.1.0 shows filling block
-  0 changing 24 of block 1's 32 bytes
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/checks/memorypool_v010.cpp"><code>checks/memorypool_v010.cpp</code></a>).
-  v0.1.0 also does not build for arm-none-eabi.
-- The author fixed the spacing in pull request
-  <a href="https://github.com/bertmelis/MemoryPool/pull/4">#4</a>, merged
-  2024-05-14, and made the mutex optional where threads are not available
-  (2024-05-15). There has been no release since.
-- So the kind measures the main branch at <code>5073178</code>, and says so wherever
-  the pin is shown. On the boards its mutex is compiled out, so the pool
-  has no lock there.</p>
+<p><strong>MemoryPool is measured at a commit that is not a release.</strong></p>
+<ul>
+<li>The project's only release, v0.1.0, spaces the blocks of
+    <code>MemoryPool::Fixed</code> by the size of a pointer, whatever the block size, so
+    blocks of 32 bytes overlap; our host check of v0.1.0 shows filling block
+    0 changing 24 of block 1's 32 bytes
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/checks/memorypool_v010.cpp"><code>checks/memorypool_v010.cpp</code></a>).
+    v0.1.0 also does not build for arm-none-eabi.</li>
+<li>The author fixed the spacing in pull request
+    <a href="https://github.com/bertmelis/MemoryPool/pull/4">#4</a>, merged
+    2024-05-14, and made the mutex optional where threads are not available
+    (2024-05-15). There has been no release since.</li>
+<li>So the kind measures the main branch at <code>5073178</code>, and says so wherever
+    the pin is shown. On the boards its mutex is compiled out, so the pool
+    has no lock there.</li>
+</ul>
 <h2 id="checked-on-the-host">Checked on the host</h2>
 <p>Before any board, on the host (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">README</a>,
-"The host test, and that it can fail"):
-- <strong>The host test</strong>: for every configuration, 64 random sequences of
-  20 000 calls and the board's scenario patterns, with the checks above
-  after every call. The four broken builds of the reference must fail it.
-- <strong>ASan and UBSan</strong> over the same test, for the C and C++ code.
-- <strong>CBMC on the reference</strong>: for 4 blocks and every sequence of 8 calls,
-  the free list is exactly the blocks not held, without repeats; the two
-  broken builds of the list are refuted.
-- <strong>Miri</strong> on the Rust adapters: atomic-pool's test passes; heapless's
-  board path is Arm assembly, which Miri cannot run.</p>
+"The host test, and that it can fail"):</p>
+<ul>
+<li><strong>The host test</strong>: for every configuration, 64 random sequences of
+    20 000 calls and the board's scenario patterns, with the checks above
+    after every call. The four broken builds of the reference must fail it.</li>
+<li><strong>ASan and UBSan</strong> over the same test, for the C and C++ code.</li>
+<li><strong>CBMC on the reference</strong>: for 4 blocks and every sequence of 8 calls,
+    the free list is exactly the blocks not held, without repeats; the two
+    broken builds of the list are refuted.</li>
+<li><strong>Miri</strong> on the Rust adapters: atomic-pool's test passes; heapless's
+    board path is Arm assembly, which Miri cannot run.</li>
+</ul>
 <p><strong>Where the host differs from the boards.</strong> Some code runs only on the
 boards, and there the per-call checks of the bench image are its only
 test: CMSIS-RTX's LDREX/STREX variant (Cortex-M4, M7 and M33), heapless's
@@ -328,14 +360,65 @@ What the tables show, row by row, is on the
 <h2 id="what-is-not-measured">What is not measured</h2>
 <ul>
 <li>Use from interrupts or from several threads (above), and the time a
-  pool keeps interrupts off.</li>
+    pool keeps interrupts off.</li>
 <li>Other pool shapes than 32 blocks of 32 bytes.</li>
 <li>Pools that live inside an RTOS and cannot be built alone, and memory
-  allocators of several block sizes.</li>
+    allocators of several block sizes.</li>
 <li>heapless on the Cortex-M0+: its documentation says its pool needs
-  LDREX/STREX, which the Cortex-M0+ does not have.</li>
+    LDREX/STREX, which the Cortex-M0+ does not have.</li>
 <li>Code run from RAM: every configuration runs from flash.</li>
-</ul></main>
+</ul>
+<h2 id="change-log_1">Change log</h2>
+<details id="change-log">
+<summary><strong>Change log</strong>: what changed in the pools' method, newest first; the changes that concern every kind are on the <a href="method.html#change-log">ring buffers' method page</a></summary>
+<ul>
+<li><span id="log-2026-11-28-cal-lock"></span><strong>2026-11-28, C_Allocator with its interrupt-masking lock.</strong><ul>
+<li>A second C_Allocator row in the concurrency series, built with its
+    documented <code>ALLOC_LOCK_CMSIS_RTOS2</code> option (PRIMASK masking, no kernel
+    linked), in a bundle of its own (bundle 301), with the three controls
+    again (<a href="#use-from-interrupts">above</a>).</li>
+<li>The earlier row (no lock) and its records are unchanged.</li>
+</ul>
+</li>
+<li><span id="log-2026-11-27-isr"></span><strong>2026-11-27, The concurrency series</strong> (<a href="#use-from-interrupts">above</a>).<ul>
+<li>What the series tests: use from interrupts, on the boards and on the
+    host.</li>
+<li>A run that stops is read without a write, and recorded as where its
+    sweep stopped.</li>
+<li>On the Pico 2 with the cache off a run takes about 26 minutes.</li>
+<li>Its records are held by the same-image rule, with a check of a record
+    added after the series (<a href="method.html#log-2026-11-27-host-file">every kind</a>).</li>
+</ul>
+</li>
+<li><span id="log-2026-11-26-first"></span><strong>2026-11-26, First series.</strong><ul>
+<li>11 configurations on six boards (10 on the Cortex-M0+), 32 blocks of
+    32 bytes.</li>
+<li>Sizes from the link map against a null image.</li>
+<li>Measured under method version 3 (<a href="method.html#log-2026-11-26-v3">every kind</a>).</li>
+</ul>
+</li>
+<li><span id="log-2026-11-26-memorypool"></span><strong>2026-11-26, MemoryPool at its head, not its release.</strong>
+    Measured at <code>main</code> <code>5073178</code> (after v0.1.0), for the reason
+    <a href="#the-libraries-and-their-versions">above</a>.</li>
+</ul>
+</details></main><script>(function () {
+  function show() {
+    var id = decodeURIComponent(location.hash.slice(1)), e = id && document.getElementById(id), t = e;
+    for (; e; e = e.parentElement) if (e.tagName === "DETAILS") e.open = true;
+    if (t) t.scrollIntoView();
+  }
+  window.addEventListener("hashchange", show); show();
+  var all = document.querySelectorAll("main details"), h = document.querySelector("main h1");
+  if (all.length < 2 || !h) return;
+  var p = document.createElement("p"); p.className = "foldall";
+  [["open all", true], ["close all", false]].forEach(function (x, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { all.forEach(function (d) { d.open = x[1]; }); });
+    if (i) p.appendChild(document.createTextNode(" · ")); p.appendChild(b);
+  });
+  h.parentNode.insertBefore(p, h.nextSibling);
+})();</script>
+
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

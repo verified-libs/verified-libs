@@ -85,33 +85,33 @@ row per configuration, in the order of
 a ranking. Each configuration's name links to its record.</p>
 <ul>
 <li><strong>Cycles</strong>: the mean of the scenario's calls, the first call included, in
-  CPU cycles with the counter-read overhead subtracted, as the range over
-  eight placements of the code (min–max), first pass. Two rows differ only
-  where their ranges do not overlap.</li>
+    CPU cycles with the counter-read overhead subtracted, as the range over
+    eight placements of the code (min–max), first pass. Two rows differ only
+    where their ranges do not overlap.</li>
 <li><strong>The scenarios</strong>: <code>pair</code> (alloc, then free of the same block, the pool
-  almost empty), <code>pair_full</code> (the same with 31 of the 32 blocks held),
-  <code>fill_drain_lifo</code> and <code>fill_drain_fifo</code> (32 allocs, then 32 frees in
-  reverse or in the same order), <code>mixed</code> (a fixed-seed sequence, the pool
-  between 25 % and 75 % full), <code>empty</code> (alloc on an exhausted pool, which
-  must fail). <code>init</code> is one call.</li>
+    almost empty), <code>pair_full</code> (the same with 31 of the 32 blocks held),
+    <code>fill_drain_lifo</code> and <code>fill_drain_fifo</code> (32 allocs, then 32 frees in
+    reverse or in the same order), <code>mixed</code> (a fixed-seed sequence, the pool
+    between 25 % and 75 % full), <code>empty</code> (alloc on an exhausted pool, which
+    must fail). <code>init</code> is one call.</li>
 <li><strong>Flash bytes</strong>: the library's and the adapter's code and constant data,
-  measured in the board's own images at <code>-O2</code> (what the image has that an
-  image with a pool that does nothing has not;
-  <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">the kind's README</a>, "Sizes"). <strong>RAM bytes</strong>:
-  what the pool needs beyond the 32 blocks of 32 bytes and the canaries
-  around them: its control data and any overhead per block.</li>
+    measured in the board's own images at <code>-O2</code> (what the image has that an
+    image with a pool that does nothing has not;
+    <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">the kind's README</a>, "Sizes"). <strong>RAM bytes</strong>:
+    what the pool needs beyond the 32 blocks of 32 bytes and the canaries
+    around them: its control data and any overhead per block.</li>
 <li><strong>Pin</strong>: the version measured (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/libs.lock"><code>kinds/pools/libs.lock</code></a>).
-  MemoryPool is measured at a commit that is not a release; the
-  <a href="method-pools.html">method page</a> says why.</li>
+    MemoryPool is measured at a commit that is not a release; the
+    <a href="method-pools.html">method page</a> says why.</li>
 <li><strong>Lock as built</strong>: what the library takes around a call in the build
-  measured, from <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">the kind's README</a>.</li>
+    measured, from <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">the kind's README</a>.</li>
 <li><strong>Documented use from interrupts (not tested)</strong>: the library's own
-  words about use from interrupts or threads, with their source
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/claims.tsv"><code>kinds/pools/claims.tsv</code></a>). This series
-  does not test them.</li>
+    words about use from interrupts or threads, with their source
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/claims.tsv"><code>kinds/pools/claims.tsv</code></a>). This series
+    does not test them.</li>
 <li><strong>Our two rows</strong>, not libraries: the reference free list with interrupts
-  off, labelled in its name cell; and, as the last row of every table, the
-  reference free list itself, the baseline timed in the same images.</li>
+    off, labelled in its name cell; and, as the last row of every table, the
+    reference free list itself, the baseline timed in the same images.</li>
 </ul>
 </details>
 <!-- table:pools -->
@@ -6268,54 +6268,54 @@ cycles, alloc before free; whether two ranges overlap is judged on the
 records' unrounded means.</p>
 <ul>
 <li><strong>Not told apart from the reference free list.</strong> In <code>pair</code>, the alloc
-  range of RIOT <code>memarray</code> overlaps the baseline's on all six boards, with
-  the cache on and off (cache on: nRF5340 DK 10 against 10, Raspberry Pi
-  Pico 2 H 10–11 against 11, NUCLEO-G474RE 17 against 17, NUCLEO-H723ZG
-  11–14 against 11, NUCLEO-G0B1RE 22 against 22, SAM D20 Xplained Pro 19
-  against 19); its free does not (nRF5340 DK, cache on: 57 against 9).
-  MemoryPool <code>Fixed</code> overlaps the baseline in both <code>pair</code> figures on the
-  NUCLEO-G474RE, with the cache on (13–17 and 13–17 against 17 and 17) and
-  off (32–34 and 30–33 against 33 and 31); in <code>pair</code> alloc on the
-  NUCLEO-H723ZG, with the cache on (11 against 11) and off (44–64 against
-  54); and in <code>pair</code> alloc on the nRF5340 DK with the cache off (39–51
-  against 49). No other library's <code>pair</code> figure overlaps the baseline's.</li>
+    range of RIOT <code>memarray</code> overlaps the baseline's on all six boards, with
+    the cache on and off (cache on: nRF5340 DK 10 against 10, Raspberry Pi
+    Pico 2 H 10–11 against 11, NUCLEO-G474RE 17 against 17, NUCLEO-H723ZG
+    11–14 against 11, NUCLEO-G0B1RE 22 against 22, SAM D20 Xplained Pro 19
+    against 19); its free does not (nRF5340 DK, cache on: 57 against 9).
+    MemoryPool <code>Fixed</code> overlaps the baseline in both <code>pair</code> figures on the
+    NUCLEO-G474RE, with the cache on (13–17 and 13–17 against 17 and 17) and
+    off (32–34 and 30–33 against 33 and 31); in <code>pair</code> alloc on the
+    NUCLEO-H723ZG, with the cache on (11 against 11) and off (44–64 against
+    54); and in <code>pair</code> alloc on the nRF5340 DK with the cache off (39–51
+    against 49). No other library's <code>pair</code> figure overlaps the baseline's.</li>
 <li><strong>Interrupts off around the reference.</strong> Our row "reference free list,
-  interrupts off" is the baseline's free list with interrupts off
-  (PRIMASK) around each call; the two rows differ by that lock and by
-  where their code lies (the baseline is in every image's fixed part).
-  With the cache on, in <code>pair</code>, our row gives 14 and 12 against the
-  baseline's 10 and 9 on the nRF5340 DK, 15–16 and 13 against 11 and 10 on
-  the Raspberry Pi Pico 2 H, 24 and 25 against 11 and 11 on the
-  NUCLEO-H723ZG, 28–31 and 28 against 22 and 21 on the NUCLEO-G0B1RE, and
-  26–27 and 25 against 19 and 18 on the SAM D20 Xplained Pro. On the
-  NUCLEO-G474RE its alloc range begins 0.02 cycles above the baseline's
-  (17–21 against 17), and its free range overlaps the baseline's (16–20
-  against 17).</li>
+    interrupts off" is the baseline's free list with interrupts off
+    (PRIMASK) around each call; the two rows differ by that lock and by
+    where their code lies (the baseline is in every image's fixed part).
+    With the cache on, in <code>pair</code>, our row gives 14 and 12 against the
+    baseline's 10 and 9 on the nRF5340 DK, 15–16 and 13 against 11 and 10 on
+    the Raspberry Pi Pico 2 H, 24 and 25 against 11 and 11 on the
+    NUCLEO-H723ZG, 28–31 and 28 against 22 and 21 on the NUCLEO-G0B1RE, and
+    26–27 and 25 against 19 and 18 on the SAM D20 Xplained Pro. On the
+    NUCLEO-G474RE its alloc range begins 0.02 cycles above the baseline's
+    (17–21 against 17), and its free range overlaps the baseline's (16–20
+    against 17).</li>
 <li><strong>A library's own lock is not measured apart.</strong> ThreadX and lwIP take
-  interrupts off around a call, and CMSIS-RTX does on the two Cortex-M0+
-  boards (the column "Lock as built"). No build of a library without its
-  lock was run, so a library's lock is in its figures together with the
-  rest of its code, and two libraries with different locks differ in both.</li>
+    interrupts off around a call, and CMSIS-RTX does on the two Cortex-M0+
+    boards (the column "Lock as built"). No build of a library without its
+    lock was run, so a library's lock is in its figures together with the
+    rest of its code, and two libraries with different locks differ in both.</li>
 <li><strong>The cache.</strong> With the cache off, every <code>pair</code> figure, the baseline's
-  included, is higher than with the cache on on the nRF5340 DK, the
-  Raspberry Pi Pico 2 H, the NUCLEO-G474RE and the NUCLEO-H723ZG. On the
-  Raspberry Pi Pico 2 H, whose code is then read from the external QSPI
-  flash on every fetch (<a href="method-crc.html">CRC method</a>, "What is measured"),
-  each is 22 to 54 times its figure with the cache on (the baseline's
-  alloc: 493 against 11). On the NUCLEO-G0B1RE and the SAM D20 Xplained Pro
-  a cache-off figure is at most 1.28 and 1.19 times its cache-on figure,
-  and the baseline's free is the same in both (21 and 18).</li>
+    included, is higher than with the cache on on the nRF5340 DK, the
+    Raspberry Pi Pico 2 H, the NUCLEO-G474RE and the NUCLEO-H723ZG. On the
+    Raspberry Pi Pico 2 H, whose code is then read from the external QSPI
+    flash on every fetch (<a href="method-crc.html">CRC method</a>, "What is measured"),
+    each is 22 to 54 times its figure with the cache on (the baseline's
+    alloc: 493 against 11). On the NUCLEO-G0B1RE and the SAM D20 Xplained Pro
+    a cache-off figure is at most 1.28 and 1.19 times its cache-on figure,
+    and the baseline's free is the same in both (21 and 18).</li>
 <li><strong>The two Cortex-M0+ boards</strong> (NUCLEO-G0B1RE, SAM D20 Xplained Pro).
-  heapless is not built for them: its pool needs LDREX and STREX, which the
-  Cortex-M0+ does not have (its <code>src/pool.rs</code>). atomic-pool takes 948 flash
-  bytes there against 560–608 on the other four boards; there it uses
-  portable-atomic's <code>unsafe-assume-single-core</code>, interrupts off around each
-  atomic operation (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">the kind's README</a>). On
-  the SAM D20 Xplained Pro every figure with the cache off is the same at
-  all eight placements.</li>
+    heapless is not built for them: its pool needs LDREX and STREX, which the
+    Cortex-M0+ does not have (its <code>src/pool.rs</code>). atomic-pool takes 948 flash
+    bytes there against 560–608 on the other four boards; there it uses
+    portable-atomic's <code>unsafe-assume-single-core</code>, interrupts off around each
+    atomic operation (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/pools/README.md">the kind's README</a>). On
+    the SAM D20 Xplained Pro every figure with the cache off is the same at
+    all eight placements.</li>
 <li><strong>The bytes.</strong> A configuration's RAM bytes are the same on all six
-  boards. Its flash bytes differ between the boards by at most 60 (ThreadX:
-  720–780), but for atomic-pool's (560–948, above).</li>
+    boards. Its flash bytes differ between the boards by at most 60 (ThreadX:
+    720–780), but for atomic-pool's (560–948, above).</li>
 </ul>
 </details></main><script>(function () {
   function show() {

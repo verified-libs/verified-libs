@@ -57,22 +57,22 @@ the library's code from its own flash.</p>
 <h2 id="the-chip-first-firmwarenrf5340-net-probe">The chip, first (<code>firmware/nrf5340-net-probe/</code>)</h2>
 <ul>
 <li>The network core runs once the application firmware gives it secure
-  access to application RAM (SPU EXTDOMAIN[0].PERM) and releases it
-  (RESET.NETWORK.FORCEOFF); it sees application RAM at the same addresses.</li>
+    access to application RAM (SPU EXTDOMAIN[0].PERM) and releases it
+    (RESET.NETWORK.FORCEOFF); it sees application RAM at the same addresses.</li>
 <li><strong>LDREX/STREX is not atomic between the two cores.</strong> Both cores adding 1
-  to the same word a million times with <code>__atomic_fetch_add</code>: 1515613 to
-  1572657 instead of 2000000 in four runs. So a library that needs a
-  read-modify-write atomic on a word both cores change cannot work across
-  the two cores of an nRF5340; that is the chip, not the library. (It fits
-  the nRF5340 having a MUTEX peripheral for locks between its cores; to be
-  checked against the product specification.)</li>
+    to the same word a million times with <code>__atomic_fetch_add</code>: 1515613 to
+    1572657 instead of 2000000 in four runs. So a library that needs a
+    read-modify-write atomic on a word both cores change cannot work across
+    the two cores of an nRF5340; that is the chip, not the library. (It fits
+    the nRF5340 having a MUTEX peripheral for locks between its cores; to be
+    checked against the product specification.)</li>
 <li>The network core has no DSP extension: code built for the application
-  core's M33 used UXTAH in pxq and Zephyr and faulted there. This test
-  builds everything without DSP and fails the build if a DSP instruction is
-  in the network core's image.</li>
+    core's M33 used UXTAH in pxq and Zephyr and faulted there. This test
+    builds everything without DSP and fails the build if a DSP instruction is
+    in the network core's image.</li>
 <li>The network core is locked to the debugger after every reset of the
-  application core (hardened APPROTECT): writing it needs an erase of both
-  cores' flash, so its image is written only when it changes.</li>
+    application core (hardened APPROTECT): writing it needs an erase of both
+    cores' flash, so its image is written only when it changes.</li>
 </ul>
 <h2 id="test-firmwarerb-xcore-stress">Test (<code>firmware/rb-xcore-stress/</code>)</h2>
 <p>Producer on one core, consumer on the other, both directions; the library
@@ -111,24 +111,24 @@ control. Firmware commit 7a3d248.</p>
 </table></div>
 <ul>
 <li>No library documented for several cores lost, repeated or reordered a
-  byte, in either direction, with single bytes or blocks.</li>
+    byte, in either direction, with single bytes or blocks.</li>
 <li>bbqueue's atomic flavour uses read-modify-write atomics, which are not
-  atomic across these cores; in SPSC use no word is changed by both cores
-  at once, so it is not affected here (it would be in a use where both
-  cores modify the same word).</li>
+    atomic across these cores; in SPSC use no word is changed by both cores
+    at once, so it is not affected here (it would be in a use where both
+    cores modify the same word).</li>
 <li>pxq passed too, but it is a single-core design (interrupt masking) and
-  does not promise to work across cores; its result is reported, not
-  counted. ⚠ pxq is the project owner's library.</li>
+    does not promise to work across cores; its result is reported, not
+    counted. ⚠ pxq is the project owner's library.</li>
 </ul>
 <h2 id="not-covered-yet">Not covered yet</h2>
 <ul>
 <li>Longer runs and campaigns; code in RAM; the application core at 128 MHz
-  (different speeds of the two cores).</li>
+    (different speeds of the two cores).</li>
 <li>MPMC/MPSC libraries across the cores: expected to fail where they need
-  compare-and-swap on a word both cores change (the chip's limit above);
-  not run as library results.</li>
+    compare-and-swap on a word both cores change (the chip's limit above);
+    not run as library results.</li>
 <li>A bundle: the application image is one image with all libraries (the
-  shared layout must match the network core's single image).</li>
+    shared layout must match the network core's single image).</li>
 </ul>
 <p>Records: <code>~/lab-runs/xcore-20261117/</code> (lib-lab1).</p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>

@@ -70,43 +70,49 @@ in <a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/R
 are the libraries as they ship. Fifteen are those of them whose table lies
 in flash, with the table moved to RAM (below). The same six boards as for
 the ring buffers (<a href="method.html">method</a>, "Hardware").</p>
-<p><strong>A table in RAM.</strong>
-- <em>How it is moved:</em> the library is built as for its configuration in
-  flash. Then our build renames the section of each table symbol from
-  <code>.rodata.*</code> to <code>.data.*</code> in a copy of the library's archive
-  (<code>kinds/crc/bench/onecrc.py</code>, <code>ram_archive</code>; the symbols are named in
-  <code>kinds/crc/ramtables.txt</code>). The image's start-up code copies <code>.data</code>
-  from flash to RAM before <code>main</code>, as for any initialised variable.
-- <em>The check:</em> the build checks that every table symbol lies once in RAM.
-- <em>What is unchanged:</em> the code is the library's own.
-- <em>Bytes:</em> the table counts twice. Its bytes stay in flash as the values
-  the start-up code copies, and the same number lie in RAM, so flash bytes
-  are the table and the code, as in flash, and RAM bytes are the table.
-  The table says "RAM (copied at start by the image)", told apart from
-  libcrc's and CRC++'s tables, which those libraries build in RAM
-  themselves at run time.</p>
+<p><strong>A table in RAM.</strong></p>
+<ul>
+<li><em>How it is moved:</em> the library is built as for its configuration in
+    flash. Then our build renames the section of each table symbol from
+    <code>.rodata.*</code> to <code>.data.*</code> in a copy of the library's archive
+    (<code>kinds/crc/bench/onecrc.py</code>, <code>ram_archive</code>; the symbols are named in
+    <code>kinds/crc/ramtables.txt</code>). The image's start-up code copies <code>.data</code>
+    from flash to RAM before <code>main</code>, as for any initialised variable.</li>
+<li><em>The check:</em> the build checks that every table symbol lies once in RAM.</li>
+<li><em>What is unchanged:</em> the code is the library's own.</li>
+<li><em>Bytes:</em> the table counts twice. Its bytes stay in flash as the values
+    the start-up code copies, and the same number lie in RAM, so flash bytes
+    are the table and the code, as in flash, and RAM bytes are the table.
+    The table says "RAM (copied at start by the image)", told apart from
+    libcrc's and CRC++'s tables, which those libraries build in RAM
+    themselves at run time.</li>
+</ul>
 <p><strong>The board's CRC unit.</strong> On four boards the same CRCs are also computed
 by the board's own hardware, driven by our code
 (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>kinds/crc/adapter_hw.c</code></a>); it is not a
 library. It is a row of the same tables, after the libraries, labelled
 "the board's CRC unit, driven by our code; not a library" in its name
 cell; on the comparison it is scored like any row, and a filter takes it
-out.
-- <em>The STM32 CRC unit</em> (NUCLEO-G474RE, NUCLEO-G0B1RE, NUCLEO-H723ZG), for
-  all three CRCs:
-  - our code enables its clock once and sets its polynomial, size, input
-    and output reflection and initial value;
-  - it writes the message as bytes up to a word boundary, then words with
-    their bytes swapped, then the last bytes, and reads the result;
-  - for CRC-32 the unit has no final XOR, so our code XORs the result with
-    0xFFFFFFFF.
-- <em>The RP2350's DMA sniffer</em> (Pico 2), for CRC-32 and CRC-16 (it has no
-  CRC-8 mode): one DMA transfer of the message to a dummy byte, with the
-  sniffer computing the CRC on the way and our code waiting for the end.
-- <em>Not measured:</em> the SAM D20's DSU (left out, see the plan), and the
-  nRF5340, which has no such unit.
-- <em>Bytes:</em> those of our code (its functions and its state) read from the
-  board images; there is no table.</p>
+out.</p>
+<ul>
+<li><em>The STM32 CRC unit</em> (NUCLEO-G474RE, NUCLEO-G0B1RE, NUCLEO-H723ZG), for
+    all three CRCs:<ul>
+<li>our code enables its clock once and sets its polynomial, size, input
+    and output reflection and initial value;</li>
+<li>it writes the message as bytes up to a word boundary, then words with
+    their bytes swapped, then the last bytes, and reads the result;</li>
+<li>for CRC-32 the unit has no final XOR, so our code XORs the result with
+    0xFFFFFFFF.</li>
+</ul>
+</li>
+<li><em>The RP2350's DMA sniffer</em> (Pico 2), for CRC-32 and CRC-16 (it has no
+    CRC-8 mode): one DMA transfer of the message to a dummy byte, with the
+    sniffer computing the CRC on the way and our code waiting for the end.</li>
+<li><em>Not measured:</em> the SAM D20's DSU (left out, see the plan), and the
+    nRF5340, which has no such unit.</li>
+<li><em>Bytes:</em> those of our code (its functions and its state) read from the
+    board images; there is no table.</li>
+</ul>
 <p><strong>One call, timed.</strong> Each call computes the CRC of a whole message (the
 one-shot call); the board's cycle counter is read around it by the same
 timing routine as the ring-buffer benchmark (<code>time_call</code>,
@@ -134,7 +140,7 @@ cache off, runs every scenario, switches it on and runs them again
 (<code>board_cache()</code>, <code>firmware/common/&lt;board&gt;/board.h</code>). The code and the
 tables are in flash on every board, so what the switch covers differs
 (quoted from the manuals in
-<a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-24-crc-flash-read-sources.md"><code>lab/plans/2026-11-24-crc-flash-read-sources.md</code></a>):</p>
+<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/flash-read-sources.md"><code>kinds/crc/flash-read-sources.md</code></a>):</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -207,13 +213,13 @@ reference's; a record is made only if every call of every run agreed
 <h2 id="what-is-not-measured">What is not measured</h2>
 <ul>
 <li>The SAM D20's DSU, which can compute a CRC-32 (left out of the second
-  series, see its plan), and CRC hardware other than the units above.</li>
+    series, see its plan), and CRC hardware other than the units above.</li>
 <li>Slicing by 8 or 16, and other configurations of the libraries than the
-  thirty-five.</li>
+    thirty-five.</li>
 <li>A table that a library builds in RAM is measured as it ships, with the
-  building done before the timed calls (libcrc, CRC++). A table moved to
-  RAM is measured only as our build moves it, by the start-up code; not
-  by an application's own copy at another time.</li>
+    building done before the timed calls (libcrc, CRC++). A table moved to
+    RAM is measured only as our build moves it, by the start-up code; not
+    by an application's own copy at another time.</li>
 <li>Code run from RAM: every configuration runs from flash.</li>
 </ul>
 <h2 id="what-the-placements-show">What the placements show</h2>
@@ -264,14 +270,16 @@ with the cache off carry them (<a href="#the-nucleo-h723zg-at-520-mhz">below</a>
 "Fits" is all that is claimed: the period matches the figure in the
 manual; the mechanism was not measured. What is not explained is listed
 in the series reports. Two items have been studied since in the data at
-hand (<a href="report-2026-11-27-crc-unexplained.html">report of 2026-11-27</a>):
-- on the Pico 2 with the cache off, a configuration's numbers are decided
-  by where its loop starts modulo 8 (15 of 20 configurations exactly),
-  which is the period of 8 bytes; which of the two positions is the slow
-  one is still not explained (item 3);
-- the NUCLEO-H723ZG's retries in the first two series came from the
-  images' own running time, the untimed reference included, against the
-  runner's first wait (item 1).</p>
+hand (<a href="report-2026-11-27-crc-unexplained.html">report of 2026-11-27</a>):</p>
+<ul>
+<li>on the Pico 2 with the cache off, a configuration's numbers are decided
+    by where its loop starts modulo 8 (15 of 20 configurations exactly),
+    which is the period of 8 bytes; which of the two positions is the slow
+    one is still not explained (item 3);</li>
+<li>the NUCLEO-H723ZG's retries in the first two series came from the
+    images' own running time, the untimed reference included, against the
+    runner's first wait (item 1).</li>
+</ul>
 <p><strong>What this means for the tables.</strong> A difference between two
 configurations is a difference only where their ranges over the eight
 placements do not overlap. Every table therefore shows the range over the
@@ -283,44 +291,47 @@ code or template with the fewest flash wait states the manual allows, the
 option registers are recorded with every series, and the nRF5340's boot
 stub opens its debug port at every boot (<a href="method.html#method-version-3">ring buffers' method page,
 "Method version 3"</a>, with the sources). For
-the CRC kind that means:
-- the NUCLEO-H723ZG runs at 520 MHz with 3 wait states instead of 64 MHz
-  with 7, and its configurations were measured again (below);
-- the nRF5340 DK's configurations were measured again, as its boot stub
-  changed; the measured code is the same;
-- the records of the other four boards stand: method version 3 builds
-  their images byte for byte the same;
-- the two boards' records before method version 3 are archived series,
-  linked from the <a href="results-crc.html">results page</a> under each board;
-- the median of a scenario's 256 calls beside the mean was left out of
-  method version 3 explicitly (<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>,
-  2026-11-26): it would need every benchmark measured again.</p>
+the CRC kind that means:</p>
+<ul>
+<li>the NUCLEO-H723ZG runs at 520 MHz with 3 wait states instead of 64 MHz
+    with 7, and its configurations were measured again (below);</li>
+<li>the nRF5340 DK's configurations were measured again, as its boot stub
+    changed; the measured code is the same;</li>
+<li>the records of the other four boards stand: method version 3 builds
+    their images byte for byte the same;</li>
+<li>the two boards' records before method version 3 are archived series,
+    linked from the <a href="results-crc.html">results page</a> under each board;</li>
+<li>the median of a scenario's 256 calls beside the mean was left out of
+    method version 3 explicitly (2026-11-26): it would need every benchmark measured again.</li>
+</ul>
 <h3 id="the-nucleo-h723zg-at-520-mhz">The NUCLEO-H723ZG at 520 MHz</h3>
 <p><strong>Cycles with the cache off rise, the time falls.</strong> The flash's wait
 states count cycles of the AXI bus clock (RM0468 4.3.8, "Adjusting read
 timing constraints"; Table 16), and since method version 3 the AXI bus
 runs at half the core clock, 260 MHz (<code>firmware/common/stm32h723/board.h</code>:
-the core divider /1, the bus divider /2).
-- <em>A read from the flash array costs the same in core cycles:</em> before,
-  (7 + 1) flash clocks at 64 MHz = 8 core cycles; now (3 + 1) flash clocks
-  at 260 MHz = 4 × 2 = 8 core cycles.
-- <em>Everything else an access pays on the bus side</em> (the bus matrix, the
-  flash interface's read queue, the response) is counted in bus cycles,
-  which cost one core cycle before and two now. So the cycles with the
-  cache off rise by that overhead per flash access, times the number of
-  accesses.
-- <em>What the numbers show</em> (ETL <code>crc32_t256</code>,
-  <a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t256.json">its record</a> of
-  method version 3 against the archived one, first pass, cache off): per byte 32 → 38
-  cycles at placement 0 and 34 → 42 at placement 4. The step between the
-  two placements doubles, from 2 to 4 cycles per byte: one extra bus
-  access per byte, caused by where the code lies, costs twice as many core
-  cycles. The reference: 59 → 64 cycles per byte. With the cache on
-  nothing changes (8 = 8 and 41 = 41 cycles per byte): the loop then makes
-  no bus access.
-- <em>Time:</em> 1024 bytes with the cache off, placement 0, took 32 796 cycles at 64 MHz
-  (512 µs) and take 38 968 cycles at 520 MHz (74.9 µs): 19 % more cycles,
-  6.8 times less time. Cycles at another clock are not times.</p>
+the core divider /1, the bus divider /2).</p>
+<ul>
+<li><em>A read from the flash array costs the same in core cycles:</em> before,
+    (7 + 1) flash clocks at 64 MHz = 8 core cycles; now (3 + 1) flash clocks
+    at 260 MHz = 4 × 2 = 8 core cycles.</li>
+<li><em>Everything else an access pays on the bus side</em> (the bus matrix, the
+    flash interface's read queue, the response) is counted in bus cycles,
+    which cost one core cycle before and two now. So the cycles with the
+    cache off rise by that overhead per flash access, times the number of
+    accesses.</li>
+<li><em>What the numbers show</em> (ETL <code>crc32_t256</code>,
+    <a href="https://github.com/verified-libs/verified-libs/blob/main/records/crc/stm32h723/adapter_etl_crc32_t256.json">its record</a> of
+    method version 3 against the archived one, first pass, cache off): per byte 32 → 38
+    cycles at placement 0 and 34 → 42 at placement 4. The step between the
+    two placements doubles, from 2 to 4 cycles per byte: one extra bus
+    access per byte, caused by where the code lies, costs twice as many core
+    cycles. The reference: 59 → 64 cycles per byte. With the cache on
+    nothing changes (8 = 8 and 41 = 41 cycles per byte): the loop then makes
+    no bus access.</li>
+<li><em>Time:</em> 1024 bytes with the cache off, placement 0, took 32 796 cycles at 64 MHz
+    (512 µs) and take 38 968 cycles at 520 MHz (74.9 µs): 19 % more cycles,
+    6.8 times less time. Cycles at another clock are not times.</li>
+</ul>
 <p><strong>The board's CRC unit on the H723 is slower in cycles with the cache on
 too.</strong> Its rows are the only ones whose numbers with the cache on changed:
 per byte from 1.5 to 3.0 cycles, a call on 16 bytes from 55 to 85 cycles,
@@ -341,7 +352,48 @@ for the configuration) cannot be split between
 instruction fetches and table loads; and why the configuration's rise
 exceeds the reference's is not known. A test that counts accesses
 (the same loop from ITCM, or the table in DTCM, at both clocks) was not
-run.</p></main>
+run.</p>
+<h2 id="change-log_1">Change log</h2>
+<details id="change-log">
+<summary><strong>Change log</strong>: what changed in the CRC kind's method, newest first; the changes that concern every kind are on the <a href="method.html#change-log">ring buffers' method page</a></summary>
+<ul>
+<li><span id="log-2026-11-26-v3"></span><strong>2026-11-26, Method version 3</strong>
+    (<a href="method.html#log-2026-11-26-v3">every kind</a>). For CRC the nRF5340 and
+    H723 were measured again (records of <code>4032f80</code>); their earlier records
+    are archived.</li>
+<li><span id="log-2026-11-25-series-2"></span><strong>2026-11-25, Second series.</strong><ul>
+<li>Hardware rows: the boards' CRC units (NUCLEO-G474RE, G0B1RE, H723ZG)
+    and the Pico 2's DMA sniffer, in the same table as the software rows.</li>
+<li>Tables copied to RAM where a table-driven configuration allows it.</li>
+<li>A hardware row measures the unit, not a library.</li>
+</ul>
+</li>
+<li><span id="log-2026-11-25-ranges"></span><strong>2026-11-25, Ranges over the placements.</strong>
+    Every number is the range over the eight placements (first pass), cache
+    on and off. Two rows differ only where their ranges do not overlap.</li>
+<li><span id="log-2026-11-25-published"></span><strong>2026-11-25, Published; method frozen.</strong>
+    The method is frozen at <code>crc-method-freeze</code>.</li>
+<li><span id="log-2026-11-24-same-image"></span><strong>2026-11-24, The same-image rule for CRC records</strong>
+    (<a href="method.html#log-2026-11-22-same-image">every kind</a>).</li>
+</ul>
+</details></main><script>(function () {
+  function show() {
+    var id = decodeURIComponent(location.hash.slice(1)), e = id && document.getElementById(id), t = e;
+    for (; e; e = e.parentElement) if (e.tagName === "DETAILS") e.open = true;
+    if (t) t.scrollIntoView();
+  }
+  window.addEventListener("hashchange", show); show();
+  var all = document.querySelectorAll("main details"), h = document.querySelector("main h1");
+  if (all.length < 2 || !h) return;
+  var p = document.createElement("p"); p.className = "foldall";
+  [["open all", true], ["close all", false]].forEach(function (x, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { all.forEach(function (d) { d.open = x[1]; }); });
+    if (i) p.appendChild(document.createTextNode(" · ")); p.appendChild(b);
+  });
+  h.parentNode.insertBefore(p, h.nextSibling);
+})();</script>
+
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

@@ -166,22 +166,22 @@ read). Below 1.00 is faster than gcc.</p>
 </table></div>
 <ul>
 <li><strong>Zephyr SDK gcc measures the same as Arm GCC.</strong> The firmware differs
-  (other hashes; GCC 14.3 against 14.2, other headers), but with the cache
-  on every mean on five boards is within 1 % of gcc's (G0B1: 3 of 804 means
-  up to 1.6 %; SAM D20: 37 of 804 up to 7 %). The H723 differs in 259 means
-  by up to 174 %, all with the cache off, where the code's place in flash
-  decides (placement experiment).</li>
+    (other hashes; GCC 14.3 against 14.2, other headers), but with the cache
+    on every mean on five boards is within 1 % of gcc's (G0B1: 3 of 804 means
+    up to 1.6 %; SAM D20: 37 of 804 up to 7 %). The H723 differs in 259 means
+    by up to 174 %, all with the cache off, where the code's place in flash
+    decides (placement experiment).</li>
 <li><strong>ATfE measures like upstream clang.</strong> Its clang 23 is within 1 % of
-  Ubuntu clang 21 in these ratios on every board.</li>
+    Ubuntu clang 21 in these ratios on every board.</li>
 <li><strong>clang/ATfE against gcc depends on the core.</strong> On the M33, M4 and M7
-  single bytes cost 2-5 % more and 64-byte blocks 3-9 % less. On the two
-  Cortex-M0+ boards single bytes cost 20-24 % more and blocks 8-9 % more:
-  clang lowers every C11 atomic load and store on ARMv6-M to a call to
-  <code>__atomic_load_N</code> / <code>__atomic_store_N</code> (<code>firmware/common/armv6m_atomic.c</code>
-  here), where gcc inlines LDR/STR with DMB; the 2026-11-12 report shows
-  the libraries this hits. ATfE does the same. Per library the spread is
-  wide (G474, ATfE single push: DNedic lockfree 0.59, polycratia 1.58; G0B1:
-  jnk0le and polycratia about 3.1).</li>
+    single bytes cost 2-5 % more and 64-byte blocks 3-9 % less. On the two
+    Cortex-M0+ boards single bytes cost 20-24 % more and blocks 8-9 % more:
+    clang lowers every C11 atomic load and store on ARMv6-M to a call to
+    <code>__atomic_load_N</code> / <code>__atomic_store_N</code> (<code>firmware/common/armv6m_atomic.c</code>
+    here), where gcc inlines LDR/STR with DMB; the 2026-11-12 report shows
+    the libraries this hits. ATfE does the same. Per library the spread is
+    wide (G474, ATfE single push: DNedic lockfree 0.59, polycratia 1.58; G0B1:
+    jnk0le and polycratia about 3.1).</li>
 </ul>
 <h2 id="check-against-the-page">Check against the page</h2>
 <p>The gcc runs repeat the benchmark the comparison page shows (e9e9c42) at a

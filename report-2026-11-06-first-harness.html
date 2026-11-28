@@ -81,7 +81,7 @@ published results.</strong> ⚠ marks the project owner's own library
 <tr>
 <td>Method decisions</td>
 <td>primary number, negative controls, timing rules</td>
-<td><a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md">DECISIONS.md</a></td>
+<td><a href="method.html#change-log">change log</a></td>
 </tr>
 </tbody>
 </table></div>
@@ -91,15 +91,15 @@ Ring-Buffer, jnk0le Ringbuffer, ETL queue_spsc_isr, ETL queue_spsc_atomic.</p>
 <h2 id="correctness">Correctness</h2>
 <ul>
 <li><strong>ISR stress: 0 errors for all six libraries</strong>, both directions, single
-  bytes and blocks, 300 000 bytes per run, 0.7–11 million interrupts per
-  run. The control (head published before data; slots released before
-  read) was caught in every case where its bug can show.</li>
+    bytes and blocks, 300 000 bytes per run, 0.7–11 million interrupts per
+    run. The control (head published before data; slots released before
+    read) was caught in every case where its bug can show.</li>
 <li><strong>GenMC: lwrb v3.3.0 passes</strong> (7118 executions under RC11); lwrb without
-  atomics and a release → relaxed mutant are both caught as data races.</li>
+    atomics and a release → relaxed mutant are both caught as data races.</li>
 <li><strong>Gaps:</strong> lwrb's buffer never ran full in main → ISR (its calls are too
-  slow for the main loop to outpace the interrupt). pxq and the volatile/
-  plain-variable libraries have no memory-model check yet: they need a
-  model of their single-core ISR contract, not the C11 model alone.</li>
+    slow for the main loop to outpace the interrupt). pxq and the volatile/
+    plain-variable libraries have no memory-model check yet: they need a
+    model of their single-core ISR contract, not the C11 model alone.</li>
 </ul>
 <h2 id="speed-flash-cache-on-mean-cycles-per-call">Speed (flash, cache on, mean cycles per call)</h2>
 <div class="tw"><table>
@@ -156,36 +156,37 @@ one byte).</p>
 <h2 id="findings-worth-keeping">Findings worth keeping</h2>
 <ol>
 <li><strong>Code in SRAM is 1.5–2× slower than flash with the cache on</strong> on the
-   nRF5340 (but faster than flash with the cache off). "ramfunc" makes ring
-   buffers slower here.</li>
+    nRF5340 (but faster than flash with the cache off). "ramfunc" makes ring
+    buffers slower here.</li>
 <li><strong>Releasing one slot before reading it is harmless in a sacrificed-slot
-   ring buffer</strong>; releasing several (block pop) is a real bug. Measured,
-   not just argued.</li>
+    ring buffer</strong>; releasing several (block pop) is a real bug. Measured,
+    not just argued.</li>
 <li><strong>pxq observations</strong> (for its maintainer): <code>push_n</code> is not inlined and
-   always calls <code>memcpy</code> twice, even with length 0, so 4 bytes via
-   <code>push_n</code> (132 cycles) cost more than 4 × <code>push</code> (~68); <code>pop</code> costs ~2×
-   <code>push</code>, partly from a stack frame GCC creates under the library's
-   forced <code>-Os</code> (jnk0le's similar pop takes 19 cycles).</li>
+    always calls <code>memcpy</code> twice, even with length 0, so 4 bytes via
+    <code>push_n</code> (132 cycles) cost more than 4 × <code>push</code> (~68); <code>pop</code> costs ~2×
+    <code>push</code>, partly from a stack frame GCC creates under the library's
+    forced <code>-Os</code> (jnk0le's similar pop takes 19 cycles).</li>
 <li><strong>AndersKaloer Ring-Buffer</strong> uses plain variables; this build happens to
-   keep a safe store order, which the language does not guarantee. Its
-   queue overwrites when full (moves the tail from the producer side).</li>
+    keep a safe store order, which the language does not guarantee. Its
+    queue overwrites when full (moves the tail from the producer side).</li>
 <li><strong>Harness pitfalls fixed:</strong> probe-rs attach/detach stops the DWT cycle
-   counter and can halt the core while timers run on; the compiler moved
-   work into C timing windows. All now detected or avoided.</li>
+    counter and can halt the core while timers run on; the compiler moved
+    work into C timing windows. All now detected or avoided.</li>
 </ol>
 <h2 id="next-steps-proposals">Next steps (proposals)</h2>
 <ul>
 <li>STM32G071 (Cortex-M0+, SysTick timing) once the dev kit arrives.</li>
 <li>A fair correctness model for volatile-based single-core ring buffers
-  (pxq, AndersKaloer, lwrb with <code>LWRB_DISABLE_ATOMIC</code>).</li>
+    (pxq, AndersKaloer, lwrb with <code>LWRB_DISABLE_ATOMIC</code>).</li>
 <li>Other compilers/flags (clang, <code>-Os</code>, <code>-O3</code>, LTO) for the libraries
-  without volatile/atomics.</li>
+    without volatile/atomics.</li>
 <li>Close the lwrb full-buffer gap in the stress test.</li>
 <li>More candidates: Zephyr ring_buf, FreeRTOS stream buffer, Rust
-  (heapless, bbqueue, ringbuf).</li>
+    (heapless, bbqueue, ringbuf).</li>
 <li>Independent repetition of the pxq numbers before anything is published
-  (principle 6).</li>
-</ul></main>
+    (principle 6).</li>
+</ul>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

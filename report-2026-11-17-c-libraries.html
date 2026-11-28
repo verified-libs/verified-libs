@@ -160,18 +160,18 @@ firmware); 0 errors in every run.</p>
 </table></div>
 <ul>
 <li><strong>On the M33, M4 and M7, newlib-nano's, newlib's and Zephyr picolibc's
-  memcpy measure the same</strong>: identical cycles in every cell. The other three
-  functions differ: Mbed CE CircularBuffer, for one, gets faster with
-  picolibc (below).</li>
+    memcpy measure the same</strong>: identical cycles in every cell. The other three
+    functions differ: Mbed CE CircularBuffer, for one, gets faster with
+    picolibc (below).</li>
 <li><strong>On the Cortex-M0+ Zephyr's picolibc is slower</strong> than newlib's: 64 bytes
-  in 267 instead of 183 cycles on the G0B1 (+46 %), 300 instead of 189 on
-  the SAM D20.</li>
+    in 267 instead of 183 cycles on the G0B1 (+46 %), 300 instead of 189 on
+    the SAM D20.</li>
 <li><strong>ATfE's picolibc is a size build</strong>: a byte loop, cheap for 4 bytes (78
-  cycles on the M0+, 63 on the M33), but 4-5 times slower for 64 bytes (363
-  on the M33 against 76).</li>
+    cycles on the M0+, 63 on the M33), but 4-5 times slower for 64 bytes (363
+    on the M33 against 76).</li>
 <li><strong>LLVM libc (ATfE)</strong> is the fastest for 64 bytes on both M0+ boards (162
-  and 170 against 183 and 189) and slower for small copies on the M33 (97
-  against 44 for 4 bytes).</li>
+    and 170 against 183 and 189) and slower for small copies on the M33 (97
+    against 44 for 4 bytes).</li>
 </ul>
 <h2 id="effect-on-the-libraries">Effect on the libraries</h2>
 <p>Only libraries whose block calls go through <code>memcpy</code> move; byte-loop

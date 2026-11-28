@@ -136,20 +136,20 @@ multicore-documented library had 0 errors in its 59 valid SMP runs.</p>
 <h2 id="runs-that-did-not-finish">Runs that did not finish</h2>
 <ul>
 <li><strong>G0B1 (24) and SAM D20 (15): every <code>-O2</code> + clang run failed to build.</strong>
-  clang treats atomics on ARMv6-M as not lock-free and turns each atomic load
-  and store into a call to <code>__atomic_load_4</code> / <code>__atomic_store_4</code>, which the
-  toolchain does not ship for Cortex-M (gcc inlines the same operations).
-  Fixed in <code>98e307b</code>: <code>firmware/common/armv6m_atomic.c</code>, built with gcc,
-  implements those calls with gcc's own inline atomics of the same order
-  (LDR/STR plus DMB), linked only for clang on Cortex-M0+. Read-modify-write
-  calls stay undefined, so a library that needs one still fails to link (there
-  is no LDREX/STREX on ARMv6-M). The smoke test before the campaign had no
-  clang run on an M0+ board, which is why this showed up only now.</li>
+    clang treats atomics on ARMv6-M as not lock-free and turns each atomic load
+    and store into a call to <code>__atomic_load_4</code> / <code>__atomic_store_4</code>, which the
+    toolchain does not ship for Cortex-M (gcc inlines the same operations).
+    Fixed in <code>98e307b</code>: <code>firmware/common/armv6m_atomic.c</code>, built with gcc,
+    implements those calls with gcc's own inline atomics of the same order
+    (LDR/STR plus DMB), linked only for clang on Cortex-M0+. Read-modify-write
+    calls stay undefined, so a library that needs one still fails to link (there
+    is no LDREX/STREX on ARMv6-M). The smoke test before the campaign had no
+    clang run on an M0+ board, which is why this showed up only now.</li>
 <li>The SAM D20 records of this campaign describe the clock as "DFLL48M open
-  loop"; that text in <code>run.sh</code> was stale. The firmware ran closed loop on
-  XOSC32K (48.005 MHz), as it has since the 48 MHz switch. Text fixed.</li>
+    loop"; that text in <code>run.sh</code> was stale. The firmware ran closed loop on
+    XOSC32K (48.005 MHz), as it has since the 48 MHz switch. Text fixed.</li>
 <li>nRF5340 and H723: one run each did not finish; the retry after a power cycle
-  was valid.</li>
+    was valid.</li>
 </ul>
 <h2 id="runs-where-the-control-was-not-caught">Runs where the control was not caught</h2>
 <p>A run counts only if the negative control (a ring with a deliberate ordering
@@ -193,24 +193,26 @@ these runs), so the control's window, a few cycles long, is rarely hit in
 100 000 transfers. On the slower cores (nRF5340 with its flash path, the
 M0+ boards) it is hit more often. The libraries are not at fault, and the
 runs are correctly excluded. But these configurations add almost no valid
-data on the Pico 2 and the H723. Options, for a decision:
-1. more transfers for these configurations on fast cores (the run gets
-   longer: at prescaler 4 on the Pico 2, about 4x for 400 000);
-2. drop them from the rotation on boards where they are mostly invalid;
-3. keep them as they are, as a record that slow interrupt rates stress less.</p>
+data on the Pico 2 and the H723. Options, for a decision:</p>
+<ol>
+<li>more transfers for these configurations on fast cores (the run gets
+    longer: at prescaler 4 on the Pico 2, about 4x for 400 000);</li>
+<li>drop them from the rotation on boards where they are mostly invalid;</li>
+<li>keep them as they are, as a record that slow interrupt rates stress less.</li>
+</ol>
 <h2 id="model-checking-done-the-same-night">Model checking done the same night</h2>
 <ul>
 <li>GenMC: DNedic lockfree 3.0.1 <code>mpmc::Queue</code> (2 producers + 1 consumer, and
-  1 + 2, at capacity 4) passes; release and acquire mutants fail; full and
-  empty reached. The full suite has 130 checks, all as expected (<code>496aa36</code>).</li>
+    1 + 2, at capacity 4) passes; release and acquire mutants fail; full and
+    empty reached. The full suite has 130 checks, all as expected (<code>496aa36</code>).</li>
 <li>Zephyr ring_buf (CONFIG_SMP code) and lockfree spsc::RingBuf, including their
-  block and zero-copy APIs, pass with mutants failing (<code>8892384</code>).</li>
+    block and zero-copy APIs, pass with mutants failing (<code>8892384</code>).</li>
 </ul>
 <h2 id="next">Next</h2>
 <ul>
 <li>Board runs of the wave-3 libraries (bench, stress, MP), and RP2350 SMP MP.</li>
 <li>A clang check on the M0+ boards with the fix (a few runs, before the next
-  campaign).</li>
+    campaign).</li>
 </ul></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>

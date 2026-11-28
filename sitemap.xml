@@ -15,7 +15,6 @@
 <url><loc>https://verified-libs.org/report-2026-11-07-overnight-campaign-raw.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-07-overnight-campaign.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-08-pxq-1.4-night-run.html</loc></url>
-<url><loc>https://verified-libs.org/report-2026-11-11-new-boards-first-runs.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-12-compilers-stm32.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-12-night-six-boards.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-13-memcpy-rust.html</loc></url>
@@ -24,7 +23,6 @@
 <url><loc>https://verified-libs.org/report-2026-11-16-compilers-six-boards.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-17-c-libraries.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-17-dma-producer.html</loc></url>
-<url><loc>https://verified-libs.org/report-2026-11-17-h723-thermal.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-17-mp-coverage-prototype.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-17-mp-per-library-validation.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-17-nrf5340-cross-core.html</loc></url>
@@ -34,9 +32,6 @@
 <url><loc>https://verified-libs.org/report-2026-11-23-bench-v2-far-call.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-23-bench-v2-first-run.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-23-bench-v2-placement-period.html</loc></url>
-<url><loc>https://verified-libs.org/report-2026-11-24-next-kind.html</loc></url>
-<url><loc>https://verified-libs.org/report-2026-11-24-pool-prechecks.html</loc></url>
-<url><loc>https://verified-libs.org/report-2026-11-24-what-carries-over.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-25-crc-first-series.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-25-crc-second-series.html</loc></url>
 <url><loc>https://verified-libs.org/report-2026-11-26-method-version-3-reruns.html</loc></url>

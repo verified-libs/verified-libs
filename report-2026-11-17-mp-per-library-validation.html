@@ -88,34 +88,34 @@ which change only run.sh and uart_host.py, not the firmware).</p>
 on Cortex-M0+, which lacks compare-and-swap.)</p>
 <ul>
 <li><strong>Libraries.</strong> Every library has the same verdict both ways in every case.
-  The only faults are the single-core designs (pxq MPSC/MPMC/SPMC, RIOT
-  tsrb, wizard97) on two cores in SMP mode, found both ways, and not in
-  their documented mode there (not counted). pxq reserve/commit starves in
-  SMP-MPSC both ways (not counted). No library in its documented mode had
-  an error either way.</li>
+    The only faults are the single-core designs (pxq MPSC/MPMC/SPMC, RIOT
+    tsrb, wizard97) on two cores in SMP mode, found both ways, and not in
+    their documented mode there (not counted). pxq reserve/commit starves in
+    SMP-MPSC both ways (not counted). No library in its documented mode had
+    an error either way.</li>
 <li><strong>Load.</strong> Interrupts per value agree within 0.1 in every case (e.g.
-  15.5/15.4, 6.8/6.8, 1.3/1.3): one library per reset loads the board as
-  the one image did.</li>
+    15.5/15.4, 6.8/6.8, 1.3/1.3): one library per reset loads the board as
+    the one image did.</li>
 <li><strong>Control.</strong> At prescaler 3 in SPMC the second interrupt rarely lands
-  inside a pop, and the control is caught or not by chance either way: old
-  missed it on G474, H723, RP2350; new on G0B1, G474. Where it was caught
-  only lost/duplicated counts show it (no order errors). Campaigns already
-  count a run without a caught control as invalid.</li>
+    inside a pop, and the control is caught or not by chance either way: old
+    missed it on G474, H723, RP2350; new on G0B1, G474. Where it was caught
+    only lost/duplicated counts show it (no order errors). Campaigns already
+    count a run without a caught control as invalid.</li>
 <li><strong>Control error counts</strong> where caught: same order both ways (e.g. H723
-  MPSC p1 4707/4569, SAM D20 5742/5617, G474 MPSC p3 143/926 at the low
-  rate).</li>
+    MPSC p1 4707/4569, SAM D20 5742/5617, G474 MPSC p3 143/926 at the low
+    rate).</li>
 </ul>
 <h2 id="found-on-the-way-fixed">Found on the way (fixed)</h2>
 <ul>
 <li><code>probe-rs reset</code> hung right after a download that wrote flash, on four
-  boards started together: MP run.sh now tries three times (f844fa4).</li>
+    boards started together: MP run.sh now tries three times (f844fa4).</li>
 <li>The old way could record a run with the build defaults as if with the
-  parameters sent (a firmware started by hand ran past its wait): run.sh
-  now compares the header with the parameters (f1ae43d, 1c2c357). The one
-  record it affected was rerun.</li>
+    parameters sent (a firmware started by hand ran past its wait): run.sh
+    now compares the header with the parameters (f1ae43d, 1c2c357). The one
+    record it affected was rerun.</li>
 <li>A selection written over the debug port is lost to the STM32H7 RAM ECC
-  write buffer unless more words follow (b2252e0), and a hanging
-  <code>probe-rs write</code> there gave a traceback (693b73b).</li>
+    write buffer unless more words follow (b2252e0), and a hanging
+    <code>probe-rs write</code> there gave a traceback (693b73b).</li>
 </ul>
 <h2 id="conclusion">Conclusion</h2>
 <p>The new way gives the same results as the old one. Records of the two ways

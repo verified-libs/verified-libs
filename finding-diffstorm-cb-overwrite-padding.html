@@ -128,14 +128,16 @@ with <code>#if CB_ATOMIC_INDEX_TYPE == uint32_t</code>. In a preprocessor expres
 type names are unknown identifiers and evaluate to 0, so the first branch is
 always taken. The library already has the correct macro,
 <code>CB_ATOMIC_LOAD_OW</code> (<code>cb.c:74/82</code>), but the lines above do not use it.</p>
-<p>Evidence:
-- Host demo (<a href="https://github.com/verified-libs/verified-libs/blob/main/verify/findings/diffstorm-cb-overwrite-padding/demo.c"><code>demo.c</code></a>, x86-64, gcc):
-  <code>zeroed memory:          overwrite flag=0  insert into full buffer=rejected  first item=1  -&gt; correct
-  memory that held 0xAA:  overwrite flag=1  insert into full buffer=accepted  first item=2  -&gt; WRONG</code>
-- Cortex-M33 (arm-none-eabi-gcc 14.2.1 <code>-O2</code>): <code>overwrite</code> is 1 byte at
-  offset 16 (padding 17–19); <code>cb_insert_ex</code> loads it with
-  <code>ldr r4, [r0, #16]</code> (32-bit); <code>cb_init_ex</code> stores it with <code>stlb</code> (8-bit).
-- GenMC: "Mixed-size accesses detected: tried to read with a 32-bit access".</p>
+<p>Evidence:</p>
+<ul>
+<li>Host demo (<a href="https://github.com/verified-libs/verified-libs/blob/main/verify/findings/diffstorm-cb-overwrite-padding/demo.c"><code>demo.c</code></a>, x86-64, gcc):
+    <code>zeroed memory:          overwrite flag=0  insert into full buffer=rejected  first item=1  -&gt; correct
+    memory that held 0xAA:  overwrite flag=1  insert into full buffer=accepted  first item=2  -&gt; WRONG</code></li>
+<li>Cortex-M33 (arm-none-eabi-gcc 14.2.1 <code>-O2</code>): <code>overwrite</code> is 1 byte at
+    offset 16 (padding 17–19); <code>cb_insert_ex</code> loads it with
+    <code>ldr r4, [r0, #16]</code> (32-bit); <code>cb_init_ex</code> stores it with <code>stlb</code> (8-bit).</li>
+<li>GenMC: "Mixed-size accesses detected: tried to read with a 32-bit access".</li>
+</ul>
 <p>In our benchmark and stress tests the object is a zero-initialised static,
 so the defect did not show there.</p>
 <h2 id="defect-2-consumer-lacks-acquire-ordering-multi-core-targets">Defect 2: consumer lacks acquire ordering (multi-core targets)</h2>
@@ -172,10 +174,10 @@ core); relevant for cross-core use.</p>
 <h2 id="how-it-was-fixed-upstream-91ae20b">How it was fixed upstream (<code>91ae20b</code>)</h2>
 <ul>
 <li>Every access to <code>overwrite</code> now goes through <code>CB_ATOMIC_LOAD_OW</code> /
-  <code>CB_ATOMIC_STORE_OW</code>, which use the flag's own 1-byte type.</li>
+    <code>CB_ATOMIC_STORE_OW</code>, which use the flag's own 1-byte type.</li>
 <li>In <code>cb_remove_ex</code> and <code>cb_peek_ex</code> the consumer loads <code>out</code> with acquire
-  semantics and has a <code>CB_MEMORY_BARRIER()</code> after the index loads, before it
-  reads the item; the producer side stores <code>in</code> with release semantics.</li>
+    semantics and has a <code>CB_MEMORY_BARRIER()</code> after the index loads, before it
+    reads the item; the producer side stores <code>in</code> with release semantics.</li>
 </ul>
 <h2 id="reproduce">Reproduce</h2>
 <p>On lib-lab1 with the pinned toolchain image: <code>bash run.sh</code> here (defect 1,

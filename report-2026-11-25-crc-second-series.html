@@ -54,7 +54,7 @@ is <strong>the boards' CRC hardware, driven by our code</strong>: the STM32 CRC 
 NUCLEO-G474RE, NUCLEO-G0B1RE and NUCLEO-H723ZG, and the RP2350's DMA sniffer
 on the Pico 2. The other is <strong>the fifteen configurations with a table in
 flash, with that table copied to RAM</strong> by the image at start. It was decided
-on 2026-11-25 (<a href="https://github.com/verified-libs/verified-libs/blob/main/DECISIONS.md"><code>DECISIONS.md</code></a>, "A second CRC series"),
+on 2026-11-25 (<a href="method-crc.html#log-2026-11-25-series-2">change log</a>),
 planned and counted in
 <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-25-crc-hw-and-ram-series.md"><code>lab/plans/2026-11-25-crc-hw-and-ram-series.md</code></a>,
 and run on 2026-11-25 from 11:45 to 21:58 UTC. Every number below is computed
@@ -63,7 +63,7 @@ rebuilt from its commit and matched (<code>kinds/crc/bench/crcverify.sh</code>).
 <h2 id="what-was-measured">What was measured</h2>
 <ul>
 <li><strong>18 new configurations</strong> (<code>kinds/crc/configs.txt</code>, after "# The second
-  series"):</li>
+    series"):<ul>
 <li><code>adapter_hw_crc32</code>, <code>adapter_hw_crc16</code> and <code>adapter_hw_crc8</code>
     (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>kinds/crc/adapter_hw.c</code></a>), built only for
     the boards that have the unit (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/boards.txt"><code>kinds/crc/boards.txt</code></a>).
@@ -75,12 +75,14 @@ rebuilt from its commit and matched (<code>kinds/crc/bench/crcverify.sh</code>).
     <code>ram_archive</code>), so the image's start-up code copies it to RAM. The build
     checks that every table symbol lies once in RAM
     (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/ramtables.txt"><code>kinds/crc/ramtables.txt</code></a>, <code>ram_check</code>).</li>
+</ul>
+</li>
 <li><strong>The same method as the first series</strong>: 8 placements, 2 passes, 24
-  scenarios of 256 calls, the reference timed in the same image, the method
-  frozen at <code>crc-method-freeze</code> except the changes listed in the decision.</li>
+    scenarios of 256 calls, the reference timed in the same image, the method
+    frozen at <code>crc-method-freeze</code> except the changes listed in the decision.</li>
 <li><strong>The 160 images per board of the first series</strong> rebuild byte for byte
-  from the second series' tree (<code>VL_TREE=1</code> crcverify, 20 of 20 per board),
-  so the first series' records stand beside the new ones.</li>
+    from the second series' tree (<code>VL_TREE=1</code> crcverify, 20 of 20 per board),
+    so the first series' records stand beside the new ones.</li>
 </ul>
 <h2 id="the-series-per-board">The series, per board</h2>
 <div class="tw"><table>
@@ -170,7 +172,7 @@ rebuilt from its commit and matched (<code>kinds/crc/bench/crcverify.sh</code>).
 </tbody>
 </table></div>
 <ul>
-<li><strong>Records:</strong> 101 in all.</li>
+<li><strong>Records:</strong> 101 in all.<ul>
 <li>The records of 04a2197 (48) were made before the fix below. Their images
     are byte-identical at 40f1958 (the 1768 images of all six boards
     compared by SHA-256: only the 24 hardware images of the NUCLEO-G0B1RE
@@ -178,53 +180,59 @@ rebuilt from its commit and matched (<code>kinds/crc/bench/crcverify.sh</code>).
 <li>They are taken by the export through the ledger
     <a href="https://github.com/verified-libs/verified-libs/blob/main/records/rebuilt.json"><code>records/rebuilt.json</code></a>, with the 120 records
     of the first series.</li>
+</ul>
+</li>
 <li><strong>Flash writes:</strong> 23 and one erase, against 21 counted. The two more are
-  the two reruns.</li>
+    the two reruns.</li>
 <li><strong>Pico 2 writes:</strong> the bundles were written in parts of at most 250 units,
-  as in the first series.</li>
+    as in the first series.</li>
 </ul>
 <h2 id="the-two-reruns">The two reruns</h2>
-<p><strong>The NUCLEO-G0B1RE's hardware rows (a defect in our adapter).</strong>
-- <em>The first run</em> (04a2197) gave 25.5 cycles per byte with the cache on.
-  That is slower than several tables on the same board (crcany's
-  slicing by 4 with its table in RAM: 10.25), with errors 0: the values
-  were right, the time was not the unit's.
-- <em>The cause:</em> the adapter's word loop copies each word with
-  <code>__builtin_memcpy(&amp;w, p, 4)</code>. On the Cortex-M0+, which has no unaligned
-  loads, gcc -O2 could not assume <code>p</code> aligned (the loop aligns it first). So
-  it called newlib's <code>memcpy</code> for every word (<code>bl memcpy</code> in the image).
-- <em>The fix:</em> commit 40f1958 adds <code>__builtin_assume_aligned(p, 4)</code>. On the
-  M4 the code is the same as before.
-- <em>The rerun:</em> 2.00 cycles per byte with the cache on.
-- <em>The first run's files</em> are kept as superseded and make no record.
-- <em>A scan of every image of all six boards</em> (functions reachable from the
-  timed call, looking for library helpers) found no second case in our
-  code.</p>
-<p><strong>The NUCLEO-H723ZG (an option bit found set).</strong>
-- <em>What was found:</em> the board came back from other use with unknown
-  software on it. FLASH_OPTSR2_CUR read 0x00000004, that is CPUFREQ_BOOST =
-  1; its factory value is 0 (RM0468 Rev 3, table 18 "Option byte
-  organization"). The other option registers were at their factory values.
-  The first series recorded no option bytes, so it is not known whether
-  the bit was set then.
-- <em>The decision:</em> the owner decided that measurements made with wrong
-  settings are made again.
-- <em>Setting it back:</em> the bit was set back to 0 through the probe (RM0468
-  §4.4.3: unlock, OPTSR2_PRG = 0, OPTSTART, OPT_BUSY clear, OPTLOCK). Every
-  _CUR register was read before, after, and after a power cycle; RDP was
-  never written.
-- <em>The rerun with the bit at 0:</em> all 864 means (18 configurations, 24
-  scenarios, results and baseline) are identical to the run with the bit
-  at 1.
-- <em>What follows:</em> at the images' 64 MHz the bit changes no number. The
-  run with the bit set is kept as superseded and makes no record.</p>
+<p><strong>The NUCLEO-G0B1RE's hardware rows (a defect in our adapter).</strong></p>
+<ul>
+<li><em>The first run</em> (04a2197) gave 25.5 cycles per byte with the cache on.
+    That is slower than several tables on the same board (crcany's
+    slicing by 4 with its table in RAM: 10.25), with errors 0: the values
+    were right, the time was not the unit's.</li>
+<li><em>The cause:</em> the adapter's word loop copies each word with
+    <code>__builtin_memcpy(&amp;w, p, 4)</code>. On the Cortex-M0+, which has no unaligned
+    loads, gcc -O2 could not assume <code>p</code> aligned (the loop aligns it first). So
+    it called newlib's <code>memcpy</code> for every word (<code>bl memcpy</code> in the image).</li>
+<li><em>The fix:</em> commit 40f1958 adds <code>__builtin_assume_aligned(p, 4)</code>. On the
+    M4 the code is the same as before.</li>
+<li><em>The rerun:</em> 2.00 cycles per byte with the cache on.</li>
+<li><em>The first run's files</em> are kept as superseded and make no record.</li>
+<li><em>A scan of every image of all six boards</em> (functions reachable from the
+    timed call, looking for library helpers) found no second case in our
+    code.</li>
+</ul>
+<p><strong>The NUCLEO-H723ZG (an option bit found set).</strong></p>
+<ul>
+<li><em>What was found:</em> the board came back from other use with unknown
+    software on it. FLASH_OPTSR2_CUR read 0x00000004, that is CPUFREQ_BOOST =
+    1; its factory value is 0 (RM0468 Rev 3, table 18 "Option byte
+    organization"). The other option registers were at their factory values.
+    The first series recorded no option bytes, so it is not known whether
+    the bit was set then.</li>
+<li><em>The decision:</em> the owner decided that measurements made with wrong
+    settings are made again.</li>
+<li><em>Setting it back:</em> the bit was set back to 0 through the probe (RM0468
+    §4.4.3: unlock, OPTSR2_PRG = 0, OPTSTART, OPT_BUSY clear, OPTLOCK). Every
+    _CUR register was read before, after, and after a power cycle; RDP was
+    never written.</li>
+<li><em>The rerun with the bit at 0:</em> all 864 means (18 configurations, 24
+    scenarios, results and baseline) are identical to the run with the bit
+    at 1.</li>
+<li><em>What follows:</em> at the images' 64 MHz the bit changes no number. The
+    run with the bit set is kept as superseded and makes no record.</li>
+</ul>
 <h2 id="the-boards-that-came-back">The boards that came back</h2>
 <p>The NUCLEO-H723ZG, the Pico 2 and the nRF5340 DK had unknown software put
 on them while away. The series takes as ours only what it wrote. The
 first series' bundles on these three boards are treated as gone, which
 matters only for a rerun of the first series.</p>
 <ul>
-<li><strong>nRF5340 DK: locked, then erased.</strong></li>
+<li><strong>nRF5340 DK: locked, then erased.</strong><ul>
 <li><em>What happened:</em> the first write found the application core's debug
     port locked. probe-rs offered to erase the chip and was not allowed to.
     The port stayed locked after a power cycle.</li>
@@ -243,14 +251,20 @@ matters only for a rerun of the first series.</p>
 <li><em>Not touched:</em> the network core. It is held in Force-OFF after every
     application-core reset and our firmware never releases it (§4.10.7), so
     it cannot run during a measurement.</li>
-<li><strong>NUCLEO-H723ZG:</strong></li>
+</ul>
+</li>
+<li><strong>NUCLEO-H723ZG:</strong><ul>
 <li>the option bit above;</li>
 <li>the boot region read back as the build's <code>boot.bin</code>.</li>
-<li><strong>Pico 2: the OTP read back raw.</strong></li>
+</ul>
+</li>
+<li><strong>Pico 2: the OTP read back raw.</strong><ul>
 <li>The critical flags, the boot configuration page and the boot keys are
     all unprogrammed (0).</li>
 <li>Lock words are set only for pages 0, 1, 2, 62 and 63, the defaults of
     a blank device (RP2350 datasheet RP-008373-DS-2, §13.4 and §13.5).</li>
+</ul>
+</li>
 </ul>
 <h2 id="the-baseline-against-the-first-series">The baseline against the first series</h2>
 <p>The baseline (the bitwise reference, timed in every image) is the same
@@ -264,23 +278,25 @@ configuration, so a retry comes at the first image of a configuration that
 a run reaches.</p>
 <ul>
 <li>Every retry of this series is of that kind: at p0, or at p4 where the
-  H723 rerun reached a configuration first in bundle 28.</li>
+    H723 rerun reached a configuration first in bundle 28.</li>
 <li>The H723's two series runs today had 14 each, 10 after 5 s and 4 after
-  10 s; the first series had 18 in 320 runs.</li>
+    10 s; the first series had 18 in 320 runs.</li>
 <li>The logs show which images were retried and after which wait. They do
-  not show why one configuration needs more than 5 s and another does not;
-  that is not explained here.</li>
+    not show why one configuration needs more than 5 s and another does not;
+    that is not explained here.</li>
 </ul>
 <h2 id="the-hardware-rows">The hardware rows</h2>
-<p>What a hardware row is:
-- The board's CRC unit, driven by our code
-  (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>kinds/crc/adapter_hw.c</code></a>); not a library.
-- <strong>The STM32 unit:</strong> the clock is enabled once, then CR, POL and INIT are
-  set. The message is fed as bytes up to a word boundary, then words with
-  their bytes swapped, then the last bytes. For CRC-32 the unit has no
-  final XOR, so our code XORs the result with 0xFFFFFFFF.
-- <strong>The RP2350:</strong> a DMA transfer of the message to a dummy byte, with the
-  sniffer computing CRC-32 or CRC-16 on the way.</p>
+<p>What a hardware row is:</p>
+<ul>
+<li>The board's CRC unit, driven by our code
+    (<a href="https://github.com/verified-libs/verified-libs/blob/main/kinds/crc/adapter_hw.c"><code>kinds/crc/adapter_hw.c</code></a>); not a library.</li>
+<li><strong>The STM32 unit:</strong> the clock is enabled once, then CR, POL and INIT are
+    set. The message is fed as bytes up to a word boundary, then words with
+    their bytes swapped, then the last bytes. For CRC-32 the unit has no
+    final XOR, so our code XORs the result with 0xFFFFFFFF.</li>
+<li><strong>The RP2350:</strong> a DMA transfer of the message to a dummy byte, with the
+    sniffer computing CRC-32 or CRC-16 on the way.</li>
+</ul>
 <p>Cycles, offset 0 unless named; each the range over the eight placements,
 first pass:</p>
 <div class="tw"><table>
@@ -400,24 +416,26 @@ first pass:</p>
 <p>What the rows show, as facts of these runs:</p>
 <ul>
 <li>With the cache on, the three CRCs cost the same on each STM32 board, at
-  2.25 (G474), 2.00 (G0B1) and 1.50 (H723) cycles per byte. The Pico 2's
-  sniffer costs 1.25.</li>
+    2.25 (G474), 2.00 (G0B1) and 1.50 (H723) cycles per byte. The Pico 2's
+    sniffer costs 1.25.</li>
 <li><strong>Against the lowest library on the same board and CRC, cache on, per
-  byte:</strong></li>
+    byte:</strong><ul>
 <li>Pico 2 CRC-32: 1.25 against 5.50 (crcany word, table in RAM).</li>
 <li>G474 CRC-32: 2.25 against 6.00 (the same).</li>
 <li>H723 CRC-32: 1.50 against 2.75 (crcany word).</li>
 <li>G0B1 CRC-32: 2.00 against 10.00–10.50 (crcany word, table in RAM).</li>
+</ul>
+</li>
 <li><strong>With the cache off, on the H723,</strong> the unit's per-byte range
-  (1.50–6.50) overlaps the lowest CRC-8 library's (AceCRC with its table in
-  RAM, 5.00–25.00). By the overlap rule the two are not told apart there.</li>
+    (1.50–6.50) overlaps the lowest CRC-8 library's (AceCRC with its table in
+    RAM, 5.00–25.00). By the overlap rule the two are not told apart there.</li>
 <li><strong>The Pico 2's cache-off rows</strong> cost 764–1081 cycles for 16 bytes, but
-  1.18–1.38 per byte. Where the fixed cost goes was not measured.</li>
+    1.18–1.38 per byte. Where the fixed cost goes was not measured.</li>
 </ul>
 <h2 id="table-in-ram-against-table-in-flash">Table in RAM against table in flash</h2>
 <p>For each of the fifteen configurations, per byte at offset 0, the range
 over the eight placements (first pass). Under the owner's overlap rule
-(DECISIONS 2026-11-25), a difference is a difference only where the ranges
+(<a href="method-crc.html#log-2026-11-25-ranges">change log</a>), a difference is a difference only where the ranges
 do not overlap. "Same" means the ranges overlap. Three decimals are shown
 where two would hide a difference that the unrounded ranges show.</p>
 <h3 id="nrf5340-dk">nRF5340 DK</h3>
@@ -1233,20 +1251,22 @@ where two would hide a difference that the unrounded ranges show.</p>
 <p>What the tables show, as facts of these runs:</p>
 <ul>
 <li><strong>With the cache off,</strong> the table in RAM is lower on 79 of the 90
-  board-and-configuration pairs. The other 11 are the same (overlapping
-  ranges): 8 on the H723, whose cache-off ranges are wide, 2 on the G0B1
-  and 1 on the G474.</li>
-<li><strong>With the cache on,</strong> it differs by board:</li>
+    board-and-configuration pairs. The other 11 are the same (overlapping
+    ranges): 8 on the H723, whose cache-off ranges are wide, 2 on the G0B1
+    and 1 on the G474.</li>
+<li><strong>With the cache on,</strong> it differs by board:<ul>
 <li>NUCLEO-G0B1RE and SAM D20: lower in all 15.</li>
 <li>NUCLEO-G474RE: lower in 10, the same in 5 (the tables of 16).</li>
 <li>nRF5340: lower in 9, the same in 6.</li>
 <li>Pico 2: lower in 7, the same in 8.</li>
 <li>NUCLEO-H723ZG: the same in all 15.</li>
+</ul>
+</li>
 <li><strong>No configuration is higher with its table in RAM,</strong> on any board, with
-  the cache on or off.</li>
+    the cache on or off.</li>
 <li><strong>Bytes:</strong> a table copied to RAM still costs its bytes in flash (the
-  initial values the start-up code copies) and the same number of bytes
-  of RAM. The code is the library's own, unchanged.</li>
+    initial values the start-up code copies) and the same number of bytes
+    of RAM. The code is the library's own, unchanged.</li>
 </ul>
 <h2 id="zlibs-division-on-the-cortex-m0-boards">zlib's division on the Cortex-M0+ boards</h2>
 <p>zlib's <code>crc32_z</code> divides once per call, before its braided loop:
@@ -1260,36 +1280,41 @@ method. The scan above found no other helper call in any timed function.</p>
 <h2 id="what-is-not-explained">What is not explained</h2>
 <ul>
 <li>Why a configuration needs more than the first wait of 5 s at its first
-  image (the retries above).</li>
-<li><strong>The NUCLEO-H723ZG with the cache off:</strong></li>
+    image (the retries above).</li>
+<li><strong>The NUCLEO-H723ZG with the cache off:</strong><ul>
 <li>its per-byte ranges are wide for the tables in RAM as for those in
     flash (e.g. ETL's table of 256 for CRC-8: 15.04–34.00 in flash, 5.00–25.00 in
     RAM);</li>
 <li>with the cache on, the RAM and flash rows are the same.</li>
 <li>The board's data cache and its 7 flash wait states at 64 MHz (see the
     method) fit both, but neither was measured.</li>
+</ul>
+</li>
 <li><strong>The Pico 2's hardware rows</strong> with the cache off: the fixed cost of a
-  16-byte call (764–1081 cycles) against 1.18–1.38 per byte.</li>
+    16-byte call (764–1081 cycles) against 1.18–1.38 per byte.</li>
 <li><strong>The G474's tables of 16:</strong> they are the same in RAM and flash with the
-  cache on, while its tables of 256 are lower in RAM.</li>
+    cache on, while its tables of 256 are lower in RAM.</li>
 </ul>
 <h2 id="decided-by-the-owner-2026-11-26">Decided by the owner (2026-11-26)</h2>
 <ol>
 <li><strong>The reproduce page</strong> says that on the nRF5340 DK our boot stub does
-   not open the debug port, so after any power-on the board stays locked
-   (nRF5340 PS v1.6, §8.2), and how we recovered it with probe-rs 0.32.0
-   (<a href="reproduce.html"><code>reproduce.md</code></a>, "Run it on your own
-   board").</li>
-<li><strong>For the next method version</strong>, on the list
-   <a href="https://github.com/verified-libs/verified-libs/blob/main/lab/plans/2026-11-26-next-method-version.md"><code>lab/plans/2026-11-26-next-method-version.md</code></a>:</li>
+    not open the debug port, so after any power-on the board stays locked
+    (nRF5340 PS v1.6, §8.2), and how we recovered it with probe-rs 0.32.0
+    (<a href="reproduce.html"><code>reproduce.md</code></a>, "Run it on your own
+    board").</li>
+<li><strong>For the next method version</strong>, on the list of that version
+    (<a href="method.html#log-2026-11-26-v3">method version 3</a>):<ul>
 <li>the nRF5340 boot stub copies UICR into CTRL-AP at every boot, so a
-     power-on leaves the port open;</li>
+    power-on leaves the port open;</li>
 <li>the option registers of every board are read and recorded with each
-     series.</li>
+    series.</li>
+</ul>
+</li>
 <li><strong>The board's CRC unit on the pages</strong> is a row of the same table as the
-   libraries, labelled, and scored like any row (DECISIONS.md, the
-   2026-11-25 entry's change of 2026-11-26).</li>
-</ol></main>
+    libraries, labelled, and scored like any row (decided 2026-11-26;
+    <a href="method-crc.html#log-2026-11-25-series-2">change log</a>).</li>
+</ol>
+<p><em>2026-11-28: links to documents that are no longer published were removed or now point to the change log.</em></p></main>
 <footer>verified-libs &middot; contact@verified-libs.org &middot; built from the repository; every number links back to its source. Code MIT, texts and results CC&nbsp;BY&nbsp;4.0. Visits are counted with <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, without cookies and without a personal profile; fetches of the data files and of the MCP server are not counted.</footer>
 <script data-goatcounter="https://verified-libs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>
