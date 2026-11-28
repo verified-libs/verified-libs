@@ -303,6 +303,7 @@ a ranking. Each configuration's name links to its record.</p>
 <details id="nrf5340-dk-use-from-interrupts">
 <summary>Use from interrupts on this board (the concurrency series)</summary>
 <p><strong>Use from interrupts.</strong> What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.</p>
+<p>C_Allocator has two rows: the build the one-context numbers come from (no lock, the library's default on a bare-metal toolchain) and a build of its own with its lock option ALLOC_LOCK_CMSIS_RTOS2, which is not timed in one context.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -355,6 +356,13 @@ a ranking. Each configuration's name links to its record.</p>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/nrf5340/adapter_c_allocator.json">outside its documentation; observed in 2536 of 90840 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost</a></td>
 <td style="text-align: right;">90840</td>
 <td style="text-align: right;">73 of 126</td>
+</tr>
+<tr>
+<td>C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C); a build of its own, not timed above</td>
+<td>may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301) (source: README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465)</td>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/b301/nrf5340/adapter_c_allocator_lock.json">passed: nothing observed in 93524 trials; an interrupt waited at most 69 cycles with the cache off, 34 with it on</a></td>
+<td style="text-align: right;">93524</td>
+<td style="text-align: right;">40 of 129</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools/nrf5340/adapter_lwip.json">lwIP memp (C)</a></td>
@@ -1342,6 +1350,7 @@ a ranking. Each configuration's name links to its record.</p>
 <summary>Use from interrupts on this board (the concurrency series)</summary>
 <p><strong>Use from interrupts.</strong> What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.</p>
 <p>On this board with the cache off, a call longer than about 2,900 cycles is interrupted only in its first part: the sweep moves the interrupt up to 4,096 cycles after it is armed, and about 1,200 of those come before the call. The record's coverage per function names the instructions no interrupt landed on.</p>
+<p>C_Allocator has two rows: the build the one-context numbers come from (no lock, the library's default on a bare-metal toolchain) and a build of its own with its lock option ALLOC_LOCK_CMSIS_RTOS2, which is not timed in one context.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -1394,6 +1403,13 @@ a ranking. Each configuration's name links to its record.</p>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/rp2350/adapter_c_allocator.json">outside its documentation; observed in 12868 of 702360 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost</a></td>
 <td style="text-align: right;">702360</td>
 <td style="text-align: right;">77 of 126</td>
+</tr>
+<tr>
+<td>C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C); a build of its own, not timed above</td>
+<td>may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301) (source: README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465)</td>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/b301/rp2350/adapter_c_allocator_lock.json">passed: nothing observed in 716136 trials; an interrupt waited at most 682 cycles with the cache off, 28 with it on</a></td>
+<td style="text-align: right;">716136</td>
+<td style="text-align: right;">42 of 129</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools/rp2350/adapter_lwip.json">lwIP memp (C)</a></td>
@@ -2380,6 +2396,7 @@ a ranking. Each configuration's name links to its record.</p>
 <details id="nucleo-g474re-use-from-interrupts">
 <summary>Use from interrupts on this board (the concurrency series)</summary>
 <p><strong>Use from interrupts.</strong> What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.</p>
+<p>C_Allocator has two rows: the build the one-context numbers come from (no lock, the library's default on a bare-metal toolchain) and a build of its own with its lock option ALLOC_LOCK_CMSIS_RTOS2, which is not timed in one context.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -2432,6 +2449,13 @@ a ranking. Each configuration's name links to its record.</p>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/stm32g474/adapter_c_allocator.json">outside its documentation; observed in 1824 of 83280 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost</a></td>
 <td style="text-align: right;">83280</td>
 <td style="text-align: right;">75 of 126</td>
+</tr>
+<tr>
+<td>C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C); a build of its own, not timed above</td>
+<td>may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301) (source: README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465)</td>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/b301/stm32g474/adapter_c_allocator_lock.json">passed: nothing observed in 86652 trials; an interrupt waited at most 53 cycles with the cache off, 27 with it on</a></td>
+<td style="text-align: right;">86652</td>
+<td style="text-align: right;">41 of 129</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools/stm32g474/adapter_lwip.json">lwIP memp (C)</a></td>
@@ -3418,6 +3442,7 @@ a ranking. Each configuration's name links to its record.</p>
 <details id="nucleo-h723zg-use-from-interrupts">
 <summary>Use from interrupts on this board (the concurrency series)</summary>
 <p><strong>Use from interrupts.</strong> What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.</p>
+<p>C_Allocator has two rows: the build the one-context numbers come from (no lock, the library's default on a bare-metal toolchain) and a build of its own with its lock option ALLOC_LOCK_CMSIS_RTOS2, which is not timed in one context.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -3470,6 +3495,13 @@ a ranking. Each configuration's name links to its record.</p>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/stm32h723/adapter_c_allocator.json">outside its documentation; observed in 4312 of 102868 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost</a></td>
 <td style="text-align: right;">102868</td>
 <td style="text-align: right;">54 of 126</td>
+</tr>
+<tr>
+<td>C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C); a build of its own, not timed above</td>
+<td>may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301) (source: README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465)</td>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/b301/stm32h723/adapter_c_allocator_lock.json">passed: nothing observed in 115008 trials; an interrupt waited at most 109 cycles with the cache off, 44 with it on</a></td>
+<td style="text-align: right;">115008</td>
+<td style="text-align: right;">29 of 129</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools/stm32h723/adapter_lwip.json">lwIP memp (C)</a></td>
@@ -4444,6 +4476,7 @@ a ranking. Each configuration's name links to its record.</p>
 <details id="nucleo-g0b1re-use-from-interrupts">
 <summary>Use from interrupts on this board (the concurrency series)</summary>
 <p><strong>Use from interrupts.</strong> What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.</p>
+<p>C_Allocator has two rows: the build the one-context numbers come from (no lock, the library's default on a bare-metal toolchain) and a build of its own with its lock option ALLOC_LOCK_CMSIS_RTOS2, which is not timed in one context.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -4496,6 +4529,13 @@ a ranking. Each configuration's name links to its record.</p>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/stm32g0b1/adapter_c_allocator.json">outside its documentation; observed in 3416 of 92392 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost</a></td>
 <td style="text-align: right;">92392</td>
 <td style="text-align: right;">85 of 140</td>
+</tr>
+<tr>
+<td>C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C); a build of its own, not timed above</td>
+<td>may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301) (source: README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465)</td>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/b301/stm32g0b1/adapter_c_allocator_lock.json">passed: nothing observed in 96164 trials; an interrupt waited at most 50 cycles with the cache off, 40 with it on</a></td>
+<td style="text-align: right;">96164</td>
+<td style="text-align: right;">50 of 142</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools/stm32g0b1/adapter_lwip.json">lwIP memp (C)</a></td>
@@ -5409,6 +5449,7 @@ a ranking. Each configuration's name links to its record.</p>
 <details id="sam-d20-xplained-pro-use-from-interrupts">
 <summary>Use from interrupts on this board (the concurrency series)</summary>
 <p><strong>Use from interrupts.</strong> What the concurrency series observed with an interrupt at every cycle of the main context's alloc or free, cache off and on, in the classes of its method: within the library's documentation (passed, or a finding), ours, outside the library's documentation (only what was observed), and our controls, which must be caught. The longest wait of an interrupt is shown where the configuration takes interrupts off as built. Not part of any score.</p>
+<p>C_Allocator has two rows: the build the one-context numbers come from (no lock, the library's default on a bare-metal toolchain) and a build of its own with its lock option ALLOC_LOCK_CMSIS_RTOS2, which is not timed in one context.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -5461,6 +5502,13 @@ a ranking. Each configuration's name links to its record.</p>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/samd20/adapter_c_allocator.json">outside its documentation; observed in 3536 of 84328 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost</a></td>
 <td style="text-align: right;">84328</td>
 <td style="text-align: right;">85 of 140</td>
+</tr>
+<tr>
+<td>C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C); a build of its own, not timed above</td>
+<td>may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301) (source: README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465)</td>
+<td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools-isr/b301/samd20/adapter_c_allocator_lock.json">passed: nothing observed in 88628 trials; an interrupt waited at most 49 cycles with the cache off, 44 with it on</a></td>
+<td style="text-align: right;">88628</td>
+<td style="text-align: right;">50 of 142</td>
 </tr>
 <tr>
 <td><a href="https://github.com/verified-libs/verified-libs/blob/main/records/pools/samd20/adapter_lwip.json">lwIP memp (C)</a></td>

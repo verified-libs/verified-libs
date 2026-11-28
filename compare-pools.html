@@ -140,6 +140,7 @@ records, one per row.</p>
   "ranges": "a difference between two rows is a difference only where their ranges do not overlap (DECISIONS 2026-11-25); the rows are in the order of kinds/pools/configs.txt, not ranked",
   "not_here": "the second pass and the minimum, maximum and first call of each scenario: in the records",
   "isr": "per row: the concurrency series (records/pools-isr, lab/plans/2026-11-27-pools-concurrency.md): class ('within' its documentation, 'ours', 'outside' its documentation, 'control'); result: for 'within' and 'ours' passed or what was observed, for 'outside' only what was observed (never a verdict: the library was used in a way it does not document), for a control caught or not; trials; observed (kinds); irq_wait_cycles {off, on}, where the configuration takes interrupts off as built: the longest time an interrupt waited; coverage [instructions reached, instructions]; record. Used in no score; the comparison page offers a filter on it. null where the series has no record of the row",
+  "isr_variants": "per row, where the series has one: another build of the same library, a configuration of its own in the concurrency series and not the build the row's numbers come from (C_Allocator with its lock option ALLOC_LOCK_CMSIS_RTOS2): adapter, name, documented_interrupts (kinds/pools/claims.tsv), and its result in the form of 'isr'",
   "baseline_isr": "per board: the reference free list without a lock, which the concurrency series runs as a control (it must be caught), in the form of 'isr'",
   "isr_controls": "per board: our two broken interrupts-off builds of the reference, the series' other controls"
  },
@@ -1179,7 +1180,34 @@ records, one per row.</p>
     ],
     "text": "outside its documentation; observed in 2536 of 90840 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
     "passed": false
-   }
+   },
+   "isr_variants": [
+    {
+     "adapter": "adapter_c_allocator_lock",
+     "name": "C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C)",
+     "documented_interrupts": {
+      "text": "may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301)",
+      "source": "README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465"
+     },
+     "class": "within",
+     "trials": 93524,
+     "inside": 82300,
+     "observed": [],
+     "observed_trials": 0,
+     "record": "records/pools-isr/b301/nrf5340/adapter_c_allocator_lock.json",
+     "result": "passed: nothing observed in 93524 trials",
+     "irq_wait_cycles": {
+      "off": 69,
+      "on": 34
+     },
+     "coverage": [
+      40,
+      129
+     ],
+     "text": "passed: nothing observed in 93524 trials; an interrupt waited at most 69 cycles with the cache off, 34 with it on",
+     "passed": true
+    }
+   ]
   },
   {
    "board": "nrf5340dk",
@@ -2606,7 +2634,34 @@ records, one per row.</p>
     ],
     "text": "outside its documentation; observed in 12868 of 702360 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
     "passed": false
-   }
+   },
+   "isr_variants": [
+    {
+     "adapter": "adapter_c_allocator_lock",
+     "name": "C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C)",
+     "documented_interrupts": {
+      "text": "may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301)",
+      "source": "README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465"
+     },
+     "class": "within",
+     "trials": 716136,
+     "inside": 668800,
+     "observed": [],
+     "observed_trials": 0,
+     "record": "records/pools-isr/b301/rp2350/adapter_c_allocator_lock.json",
+     "result": "passed: nothing observed in 716136 trials",
+     "irq_wait_cycles": {
+      "off": 682,
+      "on": 28
+     },
+     "coverage": [
+      42,
+      129
+     ],
+     "text": "passed: nothing observed in 716136 trials; an interrupt waited at most 682 cycles with the cache off, 28 with it on",
+     "passed": true
+    }
+   ]
   },
   {
    "board": "pico2",
@@ -4033,7 +4088,34 @@ records, one per row.</p>
     ],
     "text": "outside its documentation; observed in 1824 of 83280 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
     "passed": false
-   }
+   },
+   "isr_variants": [
+    {
+     "adapter": "adapter_c_allocator_lock",
+     "name": "C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C)",
+     "documented_interrupts": {
+      "text": "may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301)",
+      "source": "README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465"
+     },
+     "class": "within",
+     "trials": 86652,
+     "inside": 72012,
+     "observed": [],
+     "observed_trials": 0,
+     "record": "records/pools-isr/b301/stm32g474/adapter_c_allocator_lock.json",
+     "result": "passed: nothing observed in 86652 trials",
+     "irq_wait_cycles": {
+      "off": 53,
+      "on": 27
+     },
+     "coverage": [
+      41,
+      129
+     ],
+     "text": "passed: nothing observed in 86652 trials; an interrupt waited at most 53 cycles with the cache off, 27 with it on",
+     "passed": true
+    }
+   ]
   },
   {
    "board": "nucleo-g474re",
@@ -5460,7 +5542,34 @@ records, one per row.</p>
     ],
     "text": "outside its documentation; observed in 4312 of 102868 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
     "passed": false
-   }
+   },
+   "isr_variants": [
+    {
+     "adapter": "adapter_c_allocator_lock",
+     "name": "C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C)",
+     "documented_interrupts": {
+      "text": "may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301)",
+      "source": "README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465"
+     },
+     "class": "within",
+     "trials": 115008,
+     "inside": 101112,
+     "observed": [],
+     "observed_trials": 0,
+     "record": "records/pools-isr/b301/stm32h723/adapter_c_allocator_lock.json",
+     "result": "passed: nothing observed in 115008 trials",
+     "irq_wait_cycles": {
+      "off": 109,
+      "on": 44
+     },
+     "coverage": [
+      29,
+      129
+     ],
+     "text": "passed: nothing observed in 115008 trials; an interrupt waited at most 109 cycles with the cache off, 44 with it on",
+     "passed": true
+    }
+   ]
   },
   {
    "board": "nucleo-h723zg",
@@ -6891,7 +7000,34 @@ records, one per row.</p>
     ],
     "text": "outside its documentation; observed in 3416 of 92392 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
     "passed": false
-   }
+   },
+   "isr_variants": [
+    {
+     "adapter": "adapter_c_allocator_lock",
+     "name": "C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C)",
+     "documented_interrupts": {
+      "text": "may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301)",
+      "source": "README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465"
+     },
+     "class": "within",
+     "trials": 96164,
+     "inside": 78840,
+     "observed": [],
+     "observed_trials": 0,
+     "record": "records/pools-isr/b301/stm32g0b1/adapter_c_allocator_lock.json",
+     "result": "passed: nothing observed in 96164 trials",
+     "irq_wait_cycles": {
+      "off": 50,
+      "on": 40
+     },
+     "coverage": [
+      50,
+      142
+     ],
+     "text": "passed: nothing observed in 96164 trials; an interrupt waited at most 50 cycles with the cache off, 40 with it on",
+     "passed": true
+    }
+   ]
   },
   {
    "board": "nucleo-g0b1re",
@@ -8200,7 +8336,34 @@ records, one per row.</p>
     ],
     "text": "outside its documentation; observed in 3536 of 84328 trials: a block although none was free; a block twice; a block twice, afterwards; blocks lost",
     "passed": false
-   }
+   },
+   "isr_variants": [
+    {
+     "adapter": "adapter_c_allocator_lock",
+     "name": "C_Allocator fb_allocator, ALLOC_LOCK_CMSIS_RTOS2 (C)",
+     "documented_interrupts": {
+      "text": "may be called from an interrupt with an interrupt-masking lock option; built here with ALLOC_LOCK_CMSIS_RTOS2 against CMSIS 6 headers (af1b110), no kernel linked, -D__PROGRAM_START=_start as CMSIS sets for picolibc (the project's own build of this option uses CMSIS 5 headers and -D__PROGRAM_START=1); the option's code only saves PRIMASK and masks interrupts (the concurrency series, bundle 301)",
+      "source": "README.md:385 and :390, src/LockGuard.h:20-21 and :30-32, src/LockGuard.cpp:104-113, .github/workflows/rtos_locks.yml:39-55 at 497b465"
+     },
+     "class": "within",
+     "trials": 88628,
+     "inside": 72524,
+     "observed": [],
+     "observed_trials": 0,
+     "record": "records/pools-isr/b301/samd20/adapter_c_allocator_lock.json",
+     "result": "passed: nothing observed in 88628 trials",
+     "irq_wait_cycles": {
+      "off": 49,
+      "on": 44
+     },
+     "coverage": [
+      50,
+      142
+     ],
+     "text": "passed: nothing observed in 88628 trials; an interrupt waited at most 49 cycles with the cache off, 44 with it on",
+     "passed": true
+    }
+   ]
   },
   {
    "board": "sam-d20-xpro",
@@ -9375,6 +9538,7 @@ records, one per row.</p>
  "isr_source": {
   "records": "records/pools-isr",
   "commits": [
+   "c7d0f33ce3c7",
    "f344730728a6"
   ],
   "board_notes": {
@@ -9852,6 +10016,7 @@ records, one per row.</p>
   var BASE_TEXT = "Reference free list (baseline), not a library";
   var NOT_PUBLISHED = "The first board series of this kind is not published yet: there are no records, so there is nothing to compare.";
   var ISR = !!D.isr_source;   // records of the concurrency series
+  var VARIANT_TEXT = "a build of its own, not the one timed here: ";
   var ISR_FILTER = "use from interrupts: tested within its documentation, and passed";
   var st;
 
@@ -10069,7 +10234,12 @@ records, one per row.</p>
       var ct = el("td");
       claimCell(ct, c);
       tr.appendChild(ct);
-      if (ISR) tr.appendChild(el("td", r.isr ? r.isr.text : "–"));
+      if (ISR) {
+        var it = el("td", r.isr ? r.isr.text : "–");
+        // another build of the same library in the concurrency series (C_Allocator with its lock option)
+        (r.isr_variants || []).forEach(function (v) { it.appendChild(el("div", v.name + ", " + VARIANT_TEXT + v.text, "sub")); });
+        tr.appendChild(it);
+      }
       tb.appendChild(tr);
     });
     if (base) {
