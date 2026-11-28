@@ -121,7 +121,7 @@ def table():
     out.append("Records: one per board and configuration in [`records/bench-v2/`](records/README.md), made at commit "
                + ", ".join(f"`{c}`" for c in sorted(commits)) + ".")
     out.append("")
-    out.append("The method version and the clock of each board's records (DECISIONS.md, 2026-11-26):")
+    out.append("The method version and the clock of each board's records ([method version 3](site/content/method.md#method-version-3), 2026-11-26):")
     out.append("")
     for bid in ORDER:
         m = method[bid]

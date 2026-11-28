@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Step 3 of lab/plans/2026-11-24-crc-from-series-to-publication.md: the
-numbers of the CRC series, checked, from the records (records/crc,
+"""For the CRC pages: the numbers of the CRC series, checked, from the records (records/crc,
 schema crc-bench/1). Reads only; writes nothing. The class of each
 configuration comes from kinds/crc/README.md, step 2 (as site/crc_tables.py).
 

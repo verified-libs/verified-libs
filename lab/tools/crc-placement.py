@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Step 3 of lab/plans/2026-11-24-crc-from-series-to-publication.md: where a
+"""For the CRC pages: where a
 configuration's loop lies in each placement, beside its numbers. Facts only;
 reads the built images and the run files, writes nothing.
 

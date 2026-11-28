@@ -6,7 +6,7 @@ prescaler 3 and 4 half the runs use aimed interrupts and every run records
 where its interrupts landed (method:
 [2026-11-17-mp-coverage-prototype.md](2026-11-17-mp-coverage-prototype.md)).
 The first campaign of this kind, and the last long one before version 1
-(DECISIONS 2026-11-18).
+([change log](../site/content/method.md#log-2026-11-19-v1)).
 
 ## Result
 
@@ -82,3 +82,5 @@ No change is made here. A proposal for the owner, since it changes what a
 campaign covers: at prescaler 3 and 4 run aimed interrupts only (random
 runs there are often invalid and never on the Pico 2), and keep random
 interrupts at prescaler 1 and 2, where the control is caught reliably.
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

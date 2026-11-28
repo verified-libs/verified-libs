@@ -2,7 +2,7 @@
 
 Version 2 of the benchmark gives every configuration a firmware image of
 its own ([plan](../lab/plans/2026-11-22-bench-image-per-library.md),
-DECISIONS 2026-11-22). This is its first full run: six boards, every
+[change log](../site/content/method.md#log-2026-11-22-v2-bench)). This is its first full run: six boards, every
 configuration at eight placements, two passes, from the build at
 `f2348f3a0c37`. It started 2026-11-23 05:49 UTC and the last board ended
 07:58. Nothing of it is published; version 1's numbers are the ones on the
@@ -238,3 +238,5 @@ placement the image's address, size and checksums and every run of it
 (time, pass, wait, all scenarios with the cache on and off, and the
 baseline measured in the same run). `lab/tools/verify-build.sh` rebuilds
 the images of a record and compares them.
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

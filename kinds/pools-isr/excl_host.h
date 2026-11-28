@@ -1,6 +1,6 @@
 /* The exclusive-monitor model of the pool prechecks (verify/exclusive/excl_model.h,
- * whose rules and sources are in reports/2026-11-24-pool-prechecks.md, "The
- * model's rules in the Arm manuals"), copied for this check and widened to
+ * whose rules and their sources in the Arm manuals are in
+ * verify/exclusive/README.md), copied for this check and widened to
  * 64-bit words: on the host CMSIS-RTX's free list links are 64-bit pointers,
  * where on a Cortex-M they are 32-bit words. The rules are the same:
  *   - LDREX marks the address and sets Exclusive Access;

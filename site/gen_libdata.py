@@ -22,7 +22,7 @@ Sources:
   number, only where its shift-0 record is the record shown; the same for the
   Rust set (placement-rust.json) and the multi-producer set (placement-mp.json);
 - speed, version 2 of the benchmark (one image per configuration,
-  lab/plans/2026-11-22-bench-image-per-library.md): the records of
+  method.html#log-2026-11-22-v2-bench): the records of
   firmware/nrf5340-rb-bench/onerecords.py under records/bench-v2 (--bench2),
   one per board and configuration. Shown next to version 1's numbers as
   "speed2" (and "speed2" of a mode): the mean at placement 0, and as range

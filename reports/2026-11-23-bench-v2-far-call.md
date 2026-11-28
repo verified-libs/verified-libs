@@ -1,7 +1,7 @@
 # Benchmark version 2: the series with the far call (2026-11-23)
 
 The series the pages of version 2 are to show. Every library lies at least
-6144 bytes behind its adapter (`FAR`, DECISIONS 2026-11-23), so that a
+6144 bytes behind its adapter (`FAR`, [change log](../site/content/method.md#log-2026-11-23-far-call)), so that a
 call from the adapter into the library is a far one on every board, as it
 is in an application where the linker places the library. The first run
 of version 2, earlier the same day, had the library right behind its
@@ -138,7 +138,7 @@ the bundle was on the board afterwards).
   nothing. This also explains the Pico 2 that "halted about 60 s after a
   download" in earlier notes. `lab/tools/pico2-write.py` now does this, before the runner is
   started; the runner itself is not changed, because it is one of the
-  sources the records were made with (DECISIONS 2026-11-22). A cable that carries power only would remove the cause.
+  sources the records were made with ([change log](../site/content/method.md#log-2026-11-22-same-image)). A cable that carries power only would remove the cause.
 - NUCLEO-H723ZG: two images were not finished 3 s after the reset and
   were run again with a longer wait (the runner's rule); numbers as in
   the other pass.
@@ -149,3 +149,5 @@ the bundle was on the board afterwards).
 rebuilds and compares, without a board. The table above:
 `lab/tools/bench2-near-far.py NEAR records/bench-v2 firmware/nrf5340-rb-bench/build/v2 -v stm32h723`
 with NEAR from `git archive f3d0682 records/bench-v2`.
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Step 3 of lab/plans/2026-11-24-crc-from-series-to-publication.md, third
-point: for every class of README step 2 that two or more libraries offer,
+"""For the CRC pages: for every class of README step 2 that two or more libraries offer,
 are their loops the same instructions on a board's core? Reads the built
 images; writes nothing.
 

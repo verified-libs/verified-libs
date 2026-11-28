@@ -11,7 +11,7 @@ published results.** ⚠ marks the project owner's own library
 | Cycle benchmark | push/pop and push_n/pop_n cycles per call, 5 patterns, flash (cache on/off) and SRAM | [firmware/nrf5340-rb-bench](../firmware/nrf5340-rb-bench/README.md) |
 | ISR stress test | timer interrupt ↔ main loop, both directions, single bytes and blocks, negative control | [firmware/nrf5340-rb-stress](../firmware/nrf5340-rb-stress/README.md) |
 | GenMC model check | lwrb as SPSC under the C11 memory model, two negative controls | [verify/genmc](../verify/genmc/README.md) |
-| Method decisions | primary number, negative controls, timing rules | [DECISIONS.md](../DECISIONS.md) |
+| Method decisions | primary number, negative controls, timing rules | [change log](../site/content/method.md#change-log) |
 
 Six libraries, all at pinned commits, fetched at build time and never copied
 into the repo: pxq RingBuffer_PackedState ⚠, lwrb, AndersKaloer
@@ -73,3 +73,5 @@ one byte).
   (heapless, bbqueue, ringbuf).
 - Independent repetition of the pxq numbers before anything is published
   (principle 6).
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

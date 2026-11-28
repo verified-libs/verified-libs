@@ -1,6 +1,7 @@
 #!/bin/bash
-# The pools concurrency series' board jobs (lab/plans/2026-11-27-pools-isr-jobs.md): enqueues ONE job given
-# by its name, so that each job is enqueued only with the reviewer's OK. As lab/tools/pools-series-enqueue.sh.
+# The pools concurrency series' board jobs: enqueues ONE job given by its name into our lab's job queue
+# (not published; a reader repeats a run with run-isr.py directly), so that each job is enqueued only with
+# the reviewer's OK.
 #   OK="who gave it" C=<series commit, 40 hex> bash kinds/pools-isr/enqueue.sh JOB     JOB e.g. GS, G1
 # Every job: worktree ~/vl-wt-pools-isr-series at the series commit (detached, clean, built there with
 # kinds/pools-isr/onebuild.sh); read-options.py first, into the job's run directory; then run-isr.py.

@@ -1,9 +1,9 @@
 # CRC kind: how each board reads its flash, from the vendors' documents
 
 2026-11-24. Sources for the section "What the placements show" of the
-kind's method page (step 3 of
-[`2026-11-24-crc-from-series-to-publication.md`](2026-11-24-crc-from-series-to-publication.md)).
-Facts and quotes only. It extends
+kind's [method page](../../site/content/method-crc.md), as of the first CRC
+series (the NUCLEO-H723ZG then ran at 64 MHz; since method version 3 it runs
+at 520 MHz, see the method page). Facts and quotes only. It extends
 [`reports/2026-11-25-crc-first-series.md`](../../reports/2026-11-25-crc-first-series.md),
 "What "cache on" covers for a table read from flash", which is not
 repeated here. "Our setting" is what `firmware/common/<board>/board.h`
@@ -22,7 +22,7 @@ does; the quotes are word for word.
 
 ## Quotes
 
-### NUCLEO-G474RE: RM0440 Rev 9 (~/vl-dev/datasheets)
+### NUCLEO-G474RE: RM0440 Rev 9
 
 - 3.2 "FLASH main features": "Flash memory read operations with two data
   width modes supported: – Single bank mode DBANK = 0: read access of 128
@@ -48,7 +48,7 @@ does; the quotes are word for word.
   (the same bit in 3.7.8 "Flash option register (FLASH_OPTR)"). Bit 22 of
   0xFFEFF8AA is 1.
 
-### NUCLEO-G0B1RE: RM0444 Rev 6 (~/vl-dev/datasheets, copied by the owner)
+### NUCLEO-G0B1RE: RM0444 Rev 6
 
 - 3.2 "FLASH main features": "72-bit wide data read (64 bits plus 8 ECC
   bits)"; "Prefetch buffer"; "CPU instruction cache: two cache lines of 64
@@ -73,7 +73,7 @@ does; the quotes are word for word.
   from 0x08001000 to 0x0807d000, and none of them spans the boundary
   (checked on the records of the series).
 
-### nRF5340 DK: nRF5340 Product Specification v1.6 (4406_640, 2025-02-12; ~/vl-dev/datasheets, copied by the owner)
+### nRF5340 DK: nRF5340 Product Specification v1.6 (4406_640, 2025-02-12)
 
 - 5.4.1 "CACHE — Instruction/data cache": "The cache is two-way set
   associative with a least recently used (LRU) replacement policy. Both
@@ -88,7 +88,7 @@ does; the quotes are word for word.
   (typical values; at 128 MHz 4 and 5).
 - Not said: the width of a flash read, and any prefetch.
 
-### NUCLEO-H723ZG: RM0468 Rev 3, DS STM32H723 (~/vl-dev/datasheets); Arm DDI 0489F
+### NUCLEO-H723ZG: RM0468 Rev 3, DS STM32H723; Arm DDI 0489F
 
 - RM0468 4.2 "FLASH main features": "Flash memory read operations
   supporting multiple length (64 bits, 32bits, 16bits or one byte)";
@@ -112,7 +112,7 @@ does; the quotes are word for word.
   instruction cache is two-way set-associative. Both caches use a
   line-length of 32-bytes."
 
-### SAM D20 Xplained Pro: SAM D20 Family Data Sheet DS60001504K (~/vl-dev/datasheets)
+### SAM D20 Xplained Pro: SAM D20 Family Data Sheet DS60001504K
 
 - 20.2 "Features": "32-bit AHB interface for reads and writes";
   "Programmable wait states for read optimization"; "Direct-mapped cache".
@@ -134,7 +134,7 @@ does; the quotes are word for word.
 - Not said in the data sheet: the cache's line size, and whether data
   reads (a table) are cached as well as instruction fetches.
 
-### Raspberry Pi Pico 2: RP2350 Datasheet, build-version d126e9e-clean, build-date 2025-07-29 (~/vl-dev/datasheets)
+### Raspberry Pi Pico 2: RP2350 Datasheet, build-version d126e9e-clean, build-date 2025-07-29
 
 - 4.4 "External flash and PSRAM (XIP)": "A 16 kB on-chip cache retains the
   values of recent reads and writes. ... The cache is physically

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """The pools concurrency series' records (records/pools-isr, schema
 "pools-isr/1", kinds/pools-isr/isrrecords.py) as the pools pages and their
-data show them (lab/plans/2026-11-27-pools-concurrency.md, section 8,
-decision 3: a draft for the owner to choose from).
+data show them (method-pools.html#use-from-interrupts).
 
 What a row shows, in the three classes of the plan (section 2), never as a
 score and never in the order of the rows:
@@ -37,7 +36,7 @@ MASKS = {"adapter_ref_primask": None, "adapter_threadx": None, "adapter_lwip": N
          "adapter_cmsis_rtx": M0, "adapter_atomic_pool": M0, "adapter_broken_isr_alloc": None,
          "adapter_broken_isr_free": None, "adapter_c_allocator_lock": None}
 # Builds of a library other than the one its one-context numbers come from, each a configuration of its own in the
-# series, in a bundle of its own (lab/plans/2026-11-28-pools-isr-cal-lock.md): the one-context row's adapter ->
+# series, in a bundle of its own (method-pools.html#log-2026-11-28-cal-lock): the one-context row's adapter ->
 # [(adapter, name)]. Their records are in records/pools-isr/<bundle directory>/<board>/ (VARIANT_DIRS); of those
 # directories only the variants are read (the bundle's controls proved its run; their records are bundle 300's
 # names and are not shown twice).

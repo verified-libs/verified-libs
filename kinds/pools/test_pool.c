@@ -1,7 +1,7 @@
-/* The host test of the pools kind (lab/plans/2026-11-26-pools-kind.md,
- * section 2, "What correct means"), grown out of the pilot's
- * (pilot/pools/test_pool.c). One context: no interrupts (the first series
- * measures one context, DECISIONS 2026-11-26).
+/* The host test of the pools kind (site/content/method-pools.md,
+ * "Checked on the host"), grown out of a pilot's (not published). One
+ * context: no interrupts (the first series measures one context,
+ * method-pools.html#log-2026-11-26-first).
  *
  * For each adapter, SEQUENCES runs of STEPS random calls (xorshift32, fixed
  * seeds), each after a fresh init(), and then the fixed patterns of the board

@@ -6,7 +6,7 @@ Usage: lab/tools/image-ledger.py [--all] [--out FILE] [--plan] [--test-cache]
 
 A record under records/ may be shown although its commit has other test
 sources than the tree, if the tree builds the image it was measured from
-(DECISIONS 2026-11-22). This tool makes that check for every record under
+(method.html#log-2026-11-22-same-image). This tool makes that check for every record under
 records/bench and records/stress (as committed at HEAD) that has an image
 checksum and names a commit with other test sources than HEAD (recorded
 host fixes and archived series aside, as in the export): it runs
@@ -56,7 +56,7 @@ for it is not rebuilt either.
         from the cache VL_LEDGER_CACHE=DIR and keep new ones there (class
         Cache: the key covers everything a rebuild reads). Without the flag a
         set VL_LEDGER_CACHE is refused; a ledger made with it says so
-        ("cache_used") and lab/tools/publish.sh refuses it.
+        ("cache_used"), and the export and our publishing script refuse it.
 --plan  only say what would be rebuilt, each record with the checksum
         its ledger entry would hold; nothing is built or written (seconds:
         the quick export test runs it)

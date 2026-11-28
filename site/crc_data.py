@@ -47,7 +47,7 @@ ABOUT = {
                       "as site/crc_tables.py reads it); role: 'library', or 'hardware' for the board's CRC unit, driven by "
                       "our code and not a library (its library is null and its note says so, in its name cell every time); "
                       "a hardware row is a row of the same table, after the libraries of its CRC, and with weights it is "
-                      "scored like any row (decided 2026-11-26, DECISIONS.md 2026-11-25); a filter on the kind of row "
+                      "scored like any row (method-crc.html#log-2026-11-25-series-2); a filter on the kind of row "
                       "leaves it out. table 'RAM (copied at start by the image)': a library's table moved from flash to RAM "
                       "by our build (step 11), told apart from libraries that build their table in RAM themselves",
     "rows": "per board and configuration: flash_bytes (the table in flash plus the code at -O2 for the board's core) "
@@ -61,7 +61,7 @@ ABOUT = {
     "per_byte": "per_byte[cache][offset]: [min, max] over the eight placements, first pass, of (mean at 1024 bytes - "
                 "mean at 256 bytes) / 768",
     "ranges": "a difference between two rows is a difference only where their ranges do not overlap "
-              "(DECISIONS 2026-11-25); the rows are in the order of kinds/crc/configs.txt, not ranked",
+              "(method-crc.html#log-2026-11-25-ranges); the rows are in the order of kinds/crc/configs.txt, not ranked",
     "not_here": "the second pass and the minimum, maximum and first call of each scenario: in the records",
 }
 

@@ -243,6 +243,69 @@ SITE_FILES = {"data/libs.json": "data/libs.json", "data/crc.json": "data/crc.jso
 MISSING = []   # (page source, link target): links to files that are not in the tree
 
 
+ITEM = re.compile(r"^( *)([-*+]|\d+[.)])( +|$)")
+FENCE = re.compile(r"^ *(```|~~~)")
+BLOCK_END = re.compile(r"^(#|\||<|```|~~~)")   # at column 0 these end a list even without a blank line
+
+
+def nest_lists(md_text):
+    """Re-indent nested lists for python-markdown, which takes a nested item or
+    a continuation only at 4 spaces per level. The sources are CommonMark, as
+    GitHub renders them: a line belongs to a list item when it is indented to
+    the item's text (2 spaces under "- ", 3 under "1. "). Each such level
+    becomes 4 spaces here, so that a nested list is not rendered as one
+    paragraph with literal "- " marks. A list that follows a paragraph with
+    no blank line between them (CommonMark lets a list interrupt a paragraph,
+    python-markdown does not) gets the blank line. Lines outside a list are
+    left as they are, as is everything inside a fenced block (only moved with
+    its item)."""
+    out = []
+    cols = []        # the text column of each open list item, outermost first
+    fence = None     # (marker, shift) while inside a fenced block
+    prev_blank = True
+    block_item = False   # whether the lines since the last blank one begin with a list item
+    for line in md_text.split("\n"):
+        ind = len(line) - len(line.lstrip(" "))
+        if fence:
+            out.append(" " * max(0, ind + fence[1]) + line[ind:] if line.strip() else line)
+            if line.strip().startswith(fence[0]):
+                fence = None
+            continue
+        if not line.strip():
+            out.append(line)
+            prev_blank = True
+            continue
+        if prev_blank:
+            block_item = False
+        m = ITEM.match(line)
+        f = FENCE.match(line)
+        d = len(cols)
+        while d and ind < cols[d - 1]:
+            d -= 1
+        if m and (cols or ind == 0):
+            del cols[d:]
+            if not prev_blank and not block_item:
+                out.append("")                    # a list after a paragraph: python-markdown needs the blank line
+            block_item = True
+            out.append(" " * (4 * d) + line[ind:])
+            cols.append(ind + len(m.group(2)) + max(1, len(m.group(3))))
+        elif d:                                   # the text of item d (a continuation, a paragraph, a fence)
+            del cols[d:]
+            shift = 4 * d - cols[d - 1]
+            out.append(" " * (ind + shift) + line[ind:])
+            if f:
+                fence = (f.group(1), shift)
+        elif cols and not prev_blank and not BLOCK_END.match(line):
+            out.append(line)                      # a lazy continuation of the item's paragraph
+        else:
+            cols = []
+            out.append(line)
+            if f:
+                fence = (f.group(1), 0)
+        prev_blank = False
+    return "\n".join(out)
+
+
 def render(md_text, src_rel, c, pagemap):
     """Markdown to HTML; rewrite links: known pages -> .html, repo files -> REPO_URL."""
     base = os.path.dirname(src_rel)
@@ -262,7 +325,7 @@ def render(md_text, src_rel, c, pagemap):
         return f"[{text}]({c['REPO_URL']}/{full}{'#' + frag if frag else ''})"
     md_text = re.sub(r"\[([^\]]*)\]\(([^)\s]+)\)", fix, md_text)
     # md_in_html: the Markdown inside <details markdown="1"> (the results pages' fold-outs) is rendered too
-    out = markdown.markdown(md_text, extensions=["tables", "fenced_code", "toc", "md_in_html"])
+    out = markdown.markdown(nest_lists(md_text), extensions=["tables", "fenced_code", "toc", "md_in_html"])
     return out.replace("<table>", '<div class="tw"><table>').replace("</table>", "</table></div>")
 
 
@@ -290,9 +353,9 @@ def main():
                "site/content/compare.html": "compare.html", "site/content/kinds.md": "kinds.html",
                "site/content/compare-crc.html": "compare-crc.html",
                "RESULTS.md": "results.html",
-               # the CRC kind (DECISIONS 2026-11-24: static pages first)
+               # the CRC kind
                "site/content/results-crc.md": "results-crc.html", "site/content/method-crc.md": "method-crc.html",
-               # the pools kind (lab/plans/2026-11-26-pools-kind.md, step 6)
+               # the pools kind
                "site/content/compare-pools.html": "compare-pools.html",
                "site/content/results-pools.md": "results-pools.html", "site/content/method-pools.md": "method-pools.html"}
     for r in reports:

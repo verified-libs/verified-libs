@@ -1,5 +1,5 @@
 #!/bin/bash
-# The check after a smoke job of the pools concurrency series (lab/plans/2026-11-27-pools-isr-jobs.md):
+# The check after a smoke job of the pools concurrency series (a job of our lab's queue, not published):
 # records made from the smoke's run directory, outside the repository, with isrrecords.py: four records
 # (the three controls caught, the interrupts-off reference passing), each with option registers and some
 # coverage. Run in the series worktree, in the toolchain image for objdump:

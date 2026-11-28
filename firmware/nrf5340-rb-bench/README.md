@@ -328,8 +328,8 @@ unchanged.
 
 The speed numbers of the pages come from this (records in
 `records/bench-v2/`); what is described above is version 1, whose records
-are archived. The design and what has been tried are in
-[lab/plans/2026-11-22-bench-image-per-library.md](../../lab/plans/2026-11-22-bench-image-per-library.md),
+are archived. What changed is in the
+[change log](../../site/content/method.md#log-2026-11-22-v2-bench),
 what the distance between a library and its caller costs in
 [reports/2026-11-23-bench-v2-far-call.md](../../reports/2026-11-23-bench-v2-far-call.md).
 
@@ -350,6 +350,7 @@ bash oneverify.sh RECORD...                       # rebuild a record's images an
 (`oneslots.py` writes it; lines are only added, or those of one changed
 configuration replaced). Each tool says more at its top.
 
-Pico 2: a bundle of more than about 1 MB is written with
-`lab/tools/pico2-write.py BUNDLE.elf` before `run-one.py` (the tool says
-why); the runner then finds it on the board.
+Pico 2: a bundle of more than about 1 MB is written before `run-one.py`;
+our lab writes it in parts of about 1 MB with a tool of its own (not
+published), as a long write fails on the lab's USB hub. The runner then
+finds it on the board.

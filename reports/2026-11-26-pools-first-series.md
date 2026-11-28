@@ -2,7 +2,7 @@
 
 Fixed-block pools, the third kind: 32 blocks of 32 bytes. Eleven
 configurations on six boards (`kinds/pools/README.md`). The job list is
-`lab/plans/2026-11-26-pools-series-jobs.md`; each job approved by the review
+our lab's (not published); each job approved by the review
 before it was enqueued. Measured
 under method version 3.
 
@@ -95,3 +95,5 @@ The RAM overhead is the same on every board.
   Until it is, a pools record of a commit whose pools test sources differ
   from HEAD's stops the export. None does today.
 - **The concurrency series** (plan, section 4).
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

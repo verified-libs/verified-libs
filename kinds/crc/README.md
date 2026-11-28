@@ -1,8 +1,7 @@
 # CRC calculation: the second kind (host work)
 
-Work of the [plan of 2026-11-24](../../lab/plans/2026-11-24-crc-kind.md),
-for the kind chosen in the [comparison of kinds](../../reports/2026-11-24-next-kind.md):
-CRC calculation in software ([survey](../../candidates/crc-embedded.md)).
+CRC calculation in software, chosen after a survey of what carries over
+from the ring buffers.
 
 **Status: the first board series is done** (step 10, commit `6301058`,
 2026-11-24 to 2026-11-25, six boards, 120 records in
@@ -12,9 +11,8 @@ the [method page](../../site/content/method-crc.md). The numbers of steps 1
 to 9 come from host runs and cross builds, made to plan that series; they
 are not results about a library on a board.
 
-Everything of this kind lives in `kinds/crc/`, outside `firmware/` (the
-reason is in the [step-1 report](../../reports/2026-11-24-what-carries-over.md):
-a file under `firmware/` would stop the export of every ring-buffer record).
+Everything of this kind lives in `kinds/crc/`, outside `firmware/`: a file under
+`firmware/` would stop the export of every ring-buffer record.
 
 ## Step 1: the interface and the reference
 
@@ -248,8 +246,7 @@ little-endian with 32-bit `uint32_t`, and the code is plain C.
 zlib's braided loop, which a message reaches from 40 bytes at a word
 boundary, did not finish as one proof either (below). It is proven in parts
 for 40 and 60 bytes at offset 0
-([`lab/plans/2026-11-24-crc-series-prep-and-zlib-proof.md`](../../lab/plans/2026-11-24-crc-series-prep-and-zlib-proof.md),
-part 2). Over GF(2) a CRC is an affine function of its input bits (the start
+([`proof/`](proof/)). Over GF(2) a CRC is an affine function of its input bits (the start
 value and the message): linear but for a constant. Two affine functions that
 agree at the zero input and at every input with exactly one bit set agree
 everywhere; for 40 bytes that is 1 + 352 inputs instead of 2^352. For
@@ -600,7 +597,8 @@ board support and the boot stub), the four programs of version 2 the kind
 imports (`onebundle.py`, `oneslots.py`, `run-one.py`, `decode.py`), and the
 same three lab files. It is exported if those are the same at its commit
 and at HEAD (`.md` files aside), or, since 2026-11-24, if the rebuild
-ledger says this tree still builds its images (`DECISIONS.md`, 2026-11-24;
+ledger says this tree still builds its images
+([change log](../../site/content/method.md#log-2026-11-22-same-image);
 `lab/tools/image-ledger.py`). The export writes the records' commits to `SAME_SOURCES_CRC`,
 which `crcverify.sh` reads in an exported tree. The test:
 
@@ -652,12 +650,10 @@ oldlayout/adapter_etl_crc32_t256: DIFFERS  (9654e54b7121..., verified-libs/toolc
 
 ## Step 9: before the series
 
-Made on 2026-11-24 after a review of step 8
-([`lab/plans/2026-11-24-crc-series-prep-and-zlib-proof.md`](../../lab/plans/2026-11-24-crc-series-prep-and-zlib-proof.md),
-part 1), so that the files a record is held against do not change after
+Made on 2026-11-24 after a review of step 8, so that the files a record is held against do not change after
 the series: a change under `kinds/crc` would stop the export of every CRC
 record, as there was no rebuild ledger for the kind then (there is one
-since 2026-11-24, `DECISIONS.md`). No board was used.
+since 2026-11-24). No board was used.
 
 - **The record writer** takes a run file only if it is of the build next to
   it (the same commit, toolchain image and board), if its two result sets
@@ -733,9 +729,8 @@ whole account, with the checks of the numbers, is in the
 
 ## Step 11: the second series (the boards' CRC hardware, tables in RAM)
 
-Decided 2026-11-25 ([`DECISIONS.md`](../../DECISIONS.md), "A second CRC
-series"), planned and counted in
-[the plan](../../lab/plans/2026-11-25-crc-hw-and-ram-series.md), run on
+Decided 2026-11-25
+([change log](../../site/content/method-crc.md#log-2026-11-25-series-2)), run on
 2026-11-25; the whole account is in the
 [series report](../../reports/2026-11-25-crc-second-series.md). Eighteen
 configurations more, numbered on from step 2 in the order of

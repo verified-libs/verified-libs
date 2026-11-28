@@ -1,9 +1,8 @@
 # Fixed-block pools: the third kind
 
-Work of the [plan of 2026-11-26](../../lab/plans/2026-11-26-pools-kind.md),
-decided by the owner on 2026-11-26 ([`DECISIONS.md`](../../DECISIONS.md)). The
+Decided on 2026-11-26 ([change log](../../site/content/method-pools.md#log-2026-11-26-first)). The
 first series ran on the six boards on 2026-11-26, under
-[method version 3](../../lab/plans/2026-11-26-method-version-3.md)
+[method version 3](../../site/content/method.md#method-version-3)
 ([series report](../../reports/2026-11-26-pools-first-series.md)); its records
 are under [`records/pools`](../../records/README.md). The host test, the proof
 and the cross builds below are host work: their numbers are not board results.
@@ -272,7 +271,7 @@ built for the Cortex-M0+ (its own documentation).
 ## On the boards: images, runs and records
 
 The board benchmark (`bench/`) follows the CRC kind's (`kinds/crc/bench`),
-under method version 3 (DECISIONS 2026-11-26).
+under method version 3 (2026-11-26).
 
 ### The image
 

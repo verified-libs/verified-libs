@@ -1,8 +1,7 @@
 # Method version 3: the reruns of the nRF5340 DK and the NUCLEO-H723ZG (2026-11-26)
 
 The boards whose images changed with method version 3 were measured again,
-through the board queue, on the job list
-`lab/plans/2026-11-26-v3-reruns-jobs.md`, each job with the reviewer's OK.
+through the board queue, on the job list of our lab (not published), each job with the reviewer's OK.
 Series commit `4032f80`, worktree `~/vl-wt-v3-series`. Records in
 `kind-pools` `4b12135`.
 
@@ -238,3 +237,5 @@ at reset. All of it was zero write.
 
 - **The ledger (`records/rebuilt.json`):** made again after these records,
   with the pools kind (`125d0ba`).
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

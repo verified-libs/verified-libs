@@ -56,7 +56,7 @@ ABOUT = {
     "baseline": "per board: the reference free list (ours, not a library), timed in the same images (the records' "
                 "baseline), cycles over all images of the board's library configurations",
     "ranges": "a difference between two rows is a difference only where their ranges do not overlap "
-              "(DECISIONS 2026-11-25); the rows are in the order of kinds/pools/configs.txt, not ranked",
+              "(method-crc.html#log-2026-11-25-ranges); the rows are in the order of kinds/pools/configs.txt, not ranked",
     "not_here": "the second pass and the minimum, maximum and first call of each scenario: in the records",
 }
 
@@ -71,7 +71,7 @@ ISR_ABOUT = {
         "shown as documented, NOT tested (the series is one context), and used in no filter and no score",
         "shown as documented (the timing series is one context; whether it holds is tested by the concurrency series, "
         "each row's 'isr'), and used in no score"),
-    "isr": "per row: the concurrency series (records/pools-isr, lab/plans/2026-11-27-pools-concurrency.md): class "
+    "isr": "per row: the concurrency series (records/pools-isr, method-pools.html#log-2026-11-27-isr): class "
            "('within' its documentation, 'ours', 'outside' its documentation, 'control'); result: for 'within' and "
            "'ours' passed or what was observed, for 'outside' only what was observed (never a verdict: the library was "
            "used in a way it does not document), for a control caught or not; trials; observed (kinds); "

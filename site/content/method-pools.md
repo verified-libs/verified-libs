@@ -7,9 +7,8 @@ the other kinds': [embedded ring buffers](method.md) and
 The numbers are on the [results page](results-pools.md) and the
 [comparison page](compare-pools.html). The details, the host checks' output
 and the sizes from the cross builds are in
-[`kinds/pools/README.md`](../../kinds/pools/README.md); the plan and its
-decisions in [`lab/plans/2026-11-26-pools-kind.md`](../../lab/plans/2026-11-26-pools-kind.md)
-and [`DECISIONS.md`](../../DECISIONS.md) (2026-11-26). This page says what
+[`kinds/pools/README.md`](../../kinds/pools/README.md); what changed in the
+method, in the [change log](#change-log). This page says what
 they add up to.
 
 ## What a pool is here
@@ -29,7 +28,7 @@ without its kernel, is left out, with the reason in the kind's README
 **The numbers of these pages are of one context:** no interrupt calls a pool
 while it is timed. Whether a pool stays correct when an interrupt calls it
 is tested by a series of its own, the concurrency series
-([plan](../../lab/plans/2026-11-27-pools-concurrency.md); records under
+([change log](#log-2026-11-27-isr); records under
 [`records/pools-isr`](../../records/README.md)). What it observed is in
 each board's fold-out "Use from interrupts" on the
 [results page](results-pools.md) and in a column of the
@@ -128,7 +127,7 @@ gives the price of the simplest lock on each core.
 ## What is measured
 
 One image per configuration and placement, under method version 3
-(DECISIONS 2026-11-26: each board at the clock of the vendor's start-up
+([change log](method.md#log-2026-11-26-v3): each board at the clock of the vendor's start-up
 code or template, with the fewest flash wait states its manual allows at
 that clock, and the board's option registers recorded with every record). In each image the board's `time_call()`
 counts the cycles of every call, less the board's counter-read overhead.
@@ -291,3 +290,33 @@ What the tables show, row by row, is on the
 - heapless on the Cortex-M0+: its documentation says its pool needs
   LDREX/STREX, which the Cortex-M0+ does not have.
 - Code run from RAM: every configuration runs from flash.
+
+## Change log
+
+<details id="change-log" markdown="1">
+<summary><strong>Change log</strong>: what changed in the pools' method, newest first; the changes that concern every kind are on the <a href="method.html#change-log">ring buffers' method page</a></summary>
+
+- <span id="log-2026-11-28-cal-lock"></span>**2026-11-28, C_Allocator with its interrupt-masking lock.**
+    - A second C_Allocator row in the concurrency series, built with its
+      documented `ALLOC_LOCK_CMSIS_RTOS2` option (PRIMASK masking, no kernel
+      linked), in a bundle of its own (bundle 301), with the three controls
+      again ([above](#use-from-interrupts)).
+    - The earlier row (no lock) and its records are unchanged.
+- <span id="log-2026-11-27-isr"></span>**2026-11-27, The concurrency series** ([above](#use-from-interrupts)).
+    - What the series tests: use from interrupts, on the boards and on the
+      host.
+    - A run that stops is read without a write, and recorded as where its
+      sweep stopped.
+    - On the Pico 2 with the cache off a run takes about 26 minutes.
+    - Its records are held by the same-image rule, with a check of a record
+      added after the series ([every kind](method.md#log-2026-11-27-host-file)).
+- <span id="log-2026-11-26-first"></span>**2026-11-26, First series.**
+    - 11 configurations on six boards (10 on the Cortex-M0+), 32 blocks of
+      32 bytes.
+    - Sizes from the link map against a null image.
+    - Measured under method version 3 ([every kind](method.md#log-2026-11-26-v3)).
+- <span id="log-2026-11-26-memorypool"></span>**2026-11-26, MemoryPool at its head, not its release.**
+  Measured at `main` `5073178` (after v0.1.0), for the reason
+  [above](#the-libraries-and-their-versions).
+
+</details>

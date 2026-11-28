@@ -1,4 +1,4 @@
-"""Embargo markup in markdown (DECISIONS 2026-11-12), shared by
+"""Embargo markup in markdown, shared by
 site/build.py and lab/tools/public-export.py:
 
   <!-- embargo -->          whole lines up to <!-- /embargo -->: left out

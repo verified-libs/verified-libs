@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the public tree from the private repository (DECISIONS 2026-11-12).
+"""Build the public tree from the private repository.
 
 Usage: public-export.py OUT_DIR          (OUT_DIR must not exist)
        public-export.py --check          (only report what blocks an export)
@@ -14,6 +14,17 @@ case-insensitive) is in a file or a file name that would be exported: public
 texts name no session (owner, 2026-11-26). Both lists are left out by path.
 Nothing is pushed or published: the owner does that.
 
+What is kept in the working repository (site/internal-paths.txt: the decision
+log, plans, surveys, pilots, the host's setup and the tools that only run the
+lab; the owner, 2026-11-27) is left out by path too. Where a published file
+names such a path, its stub lab/public-stubs/PATH is exported at PATH in its
+place; the folder lab/public-stubs is never exported, and a stub for a path
+that is not internal is refused. Then every relative link of an exported
+markdown file must name a path of the export: a link to an internal path
+without a stub, or to any other path the export lacks, is refused (a site
+page's link to another page by its name, as results-crc.md, is the site
+build's to check: site/check_links.py).
+
 The records under records/ name the commit they were made at. They are
 committed after that commit, so it is never the exported one. The export
 therefore writes two files: EXPORTED_FROM (the exported commit) and
@@ -24,7 +35,7 @@ one of the two.
 
 A record of a commit with other test sources may be shown if the tree
 still builds, byte for byte, the image it was measured from, and runs and
-judges it the same way (DECISIONS 2026-11-22). The export takes that from
+judges it the same way (method.html#log-2026-11-22-same-image). The export takes that from
 two things: the host side of the test sources (side() below) is the same at
 the record's commit and at HEAD, and records/rebuilt.json
 (lab/tools/image-ledger.py: a rebuild of the record from this tree's
@@ -45,7 +56,7 @@ rebuild shows what they build; any other host-side file (the decoder of
 the result words, the runner, the board table) must be the record's, but
 for recorded host fixes.
 
-A host fix (records/host-fixes.json, DECISIONS 2026-11-23) is a recorded
+A host fix (records/host-fixes.json, method.html#log-2026-11-23-host-fixes) is a recorded
 change of one of the files in HOST_FIXABLE: the runner of benchmark version
 2 and the two tools that make and check its records. They build no image.
 Records of a commit whose image side is that of HEAD, and whose host side
@@ -53,7 +64,7 @@ differs from HEAD's only by recorded fixes of those files, pass as records
 of the same sources. A fix that touches how the numbers are read from the
 board or worked out is not a host fix: the series is measured again.
 
-An archived series (records/archived.json, DECISIONS 2026-11-23) is a
+An archived series (records/archived.json, method.html#log-2026-11-23-v2) is a
 published set of records that is no longer held against the tree at hand:
 it is checked against its own commit, which stays in the public
 repository's history. The export takes such records if they are byte for
@@ -63,7 +74,7 @@ those of the commit the series was published from.
 checksum for a new entry of that file. An entry may have "paths", prefixes of
 record paths under records/ (e.g. "bench-v2/nrf5340/"): it then archives only
 those records of its commit, and the commit's other records are held as if
-it had no entry (method version 3, DECISIONS 2026-11-26: the boards measured
+it had no entry (method version 3, method.html#log-2026-11-26-v3: the boards measured
 again are archived, the others stay current). An entry none of whose
 records is in the tree any more is a series kept only in the public history
 it names (its public commit): nothing to check in the tree. Its records were
@@ -83,7 +94,7 @@ host fixes) to SAME_SOURCES_CRC, as SAME_SOURCES for the ring buffers
 (kinds/crc/bench/crcverify.sh reads it).
 
 A CRC record of a commit with other CRC test sources is held as a record
-of benchmark version 2 is (DECISIONS 2026-11-24, the same-image rule for
+of benchmark version 2 is (method.html#log-2026-11-22-same-image, the same-image rule for
 the CRC kind): the ledger (records/rebuilt.json, entry crc/<board>/<file>)
 must be of the record as it is (one checksum over its eight images, their
 addresses, the fixed part, the boot stub, the toolchain image and the
@@ -139,7 +150,7 @@ image-ledger.py: until they are, a pools record of a commit with other
 test sources than HEAD's (but for recorded host fixes) stops the export.
 
 The pools concurrency series (records/pools-isr, kinds/pools-isr,
-lab/plans/2026-11-27-pools-concurrency.md) is held by the same rule with
+method-pools.html#log-2026-11-27-isr) is held by the same rule with
 lists of its own: POOLS_ISR_TEST_SOURCES (its directory and every test
 source of the pools kind, whose adapters, libraries and build its images
 are made of), POOLS_ISR_NOT_SOURCES (its host check and the files only that
@@ -257,7 +268,7 @@ HOST_FIXABLE = ("firmware/nrf5340-rb-bench/run-one.py", "firmware/nrf5340-rb-ben
 # Benchmark version 2 (records/bench-v2): the host-side files its images are
 # built by. A change in one of them is held like a change in a source file:
 # the record stands if the tree still builds its images, byte for byte, at
-# the same addresses (DECISIONS 2026-11-23; the ledger, image-ledger.py).
+# the same addresses (method.html#log-2026-11-23-far-call; the ledger, image-ledger.py).
 V2_RECORDS = "records/bench-v2/"
 V2_BUILT_BY = tuple("firmware/nrf5340-rb-bench/" + n for n in (
     "onebuild.sh", "onebundle.py", "oneslots.py", "configs.txt", "slots.txt", "fetch-libs.sh", "nrf5-sdk.sh"))
@@ -542,6 +553,45 @@ def lines_of(path):
         return [l.strip() for l in fh if l.strip() and not l.lstrip().startswith("#")]
 
 
+INTERNAL_LIST = "site/internal-paths.txt"
+STUBS = "lab/public-stubs/"
+
+
+def internal_paths():
+    """site/internal-paths.txt: (the internal paths, the paths kept public under them ("!PATH"))"""
+    lines = lines_of(INTERNAL_LIST) if os.path.exists(os.path.join(ROOT, INTERNAL_LIST)) else []
+    return ([p.rstrip("/") for p in lines if not p.startswith("!")], [p[1:].rstrip("/") for p in lines if p.startswith("!")])
+
+
+def is_internal(f, lists):
+    under_ = lambda ps: any(f == p or f.startswith(p + "/") for p in ps)
+    return under_(lists[0]) and not under_(lists[1])
+
+
+def broken_links(md, exported):
+    """the relative links of the exported markdown files (path -> text) that name no path of the export:
+    [(file, link)]; a site page's link to another page by its name is left to the site build"""
+    dirs = set()
+    for e in exported:
+        d = os.path.dirname(e)
+        while d:
+            dirs.add(d)
+            d = os.path.dirname(d)
+    out = []
+    for p, text in sorted(md.items()):
+        body = re.sub(r"```.*?```", "", text, flags=re.S)   # code blocks hold no links
+        for m in re.finditer(r"\]\(([^)\s]+)\)", body):
+            t = m.group(1)
+            if re.match(r"^[a-z][a-z0-9+.-]*:", t) or t.startswith("#"):
+                continue
+            if p.startswith("site/content/") and not t.startswith("../"):
+                continue
+            full = os.path.normpath(os.path.join(os.path.dirname(p), t.split("#")[0]))
+            if full not in exported and full not in dirs:
+                out.append((p, t))
+    return out
+
+
 def main():
     check_only = sys.argv[1:] == ["--check"]
     digest_of = sys.argv[2][:12] if len(sys.argv) >= 3 and sys.argv[1] == "--archive-digest" else None
@@ -564,6 +614,8 @@ def main():
     files = subprocess.run(["git", "-C", ROOT, "ls-tree", "-r", "--name-only", "-z", "HEAD"], capture_output=True, check=True,
                            text=True).stdout.split("\0")
     bad, kept, left_out = [], 0, 0
+    lists, n_internal, stubs, bad_stubs = internal_paths(), 0, [], []
+    md, exported = {}, set()   # exported markdown: path -> text (for the link check); every exported path
     rec_commits = {}   # commit named by a record under records/ -> the records' (file name, fw_sha256)
     rec_files = {}     # the same commit -> the records' (path, checksum of the file)
     k_commits = {k: {} for k in KINDS}   # kind -> commit named by a record under its records -> (name, digest)
@@ -571,6 +623,16 @@ def main():
     for f in filter(None, files):
         if any(f == p or f.startswith(p + "/") for p in skip):
             left_out += 1
+            continue
+        dest = f   # the path the file is exported at: a stub's is the path it stands for
+        if f.startswith(STUBS):
+            dest = f[len(STUBS):]
+            if not is_internal(dest, lists) or dest.startswith(STUBS):
+                bad_stubs.append(f)
+                continue
+            stubs.append(dest)
+        elif is_internal(f, lists):
+            n_internal += 1
             continue
         data = subprocess.run(["git", "-C", ROOT, "show", f"HEAD:{f}"], capture_output=True,
                               check=True).stdout
@@ -610,8 +672,11 @@ def main():
             for c in found:
                 rec_commits.setdefault(c[:12], []).append((name, sha))
                 rec_files.setdefault(c[:12], []).append((f, hashlib.sha256(data).hexdigest()))
+        exported.add(dest)
+        if text is not None and dest.endswith(".md"):
+            md[dest] = text
         if out:
-            dst = os.path.join(out, f)
+            dst = os.path.join(out, dest)
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             with open(dst, "wb") as fh:
                 fh.write(data)
@@ -704,7 +769,10 @@ def main():
                     continue
                 other_k.setdefault(c, []).append((name, why))
     n_other = sum(len(v) for v in other.values()) + sum(len(v) for o in k_other.values() for v in o.values())
-    print(f"{kept} files clean, {left_out} left out by path, {len(bad)} with embargoed words, "
+    # the files the export writes itself are paths of the export too
+    broken = broken_links(md, exported | {"EXPORTED_FROM", "SAME_SOURCES"} | {kv["same"] for kv in KINDS.values()})
+    print(f"{kept} files clean, {left_out} left out by path, {n_internal} internal ({len(stubs)} stubs in their place), "
+          f"{len(broken)} links to paths not in the export, {len(bad)} with embargoed words, "
           f"{len({f for f, _, _ in named})} with session names, "
           f"{n_other} records that cannot be rebuilt from this tree"
           + (f" ({rebuilt} of other commits whose image this tree builds)" if rebuilt else "")
@@ -734,7 +802,12 @@ def main():
                 whys.setdefault(why, []).append(name)
             for why, names in whys.items():
                 print(f"    {len(names)}: {why}: {', '.join(names[:8])}{' ...' if len(names) > 8 else ''}")
-    if bad or named or other or any(k_other.values()):
+    for f in bad_stubs:
+        print(f"  STUB: {f}: stands for {f[len(STUBS):]}, which is not an internal path ({INTERNAL_LIST})")
+    for f, t in broken:
+        full = os.path.normpath(os.path.join(os.path.dirname(f), t.split("#")[0]))
+        print(f"  LINK: {f}: {t}: " + ("an internal path without a stub" if is_internal(full, lists) else "not in the export"))
+    if bad or named or other or any(k_other.values()) or bad_stubs or broken:
         if out:
             print(f"export refused; {out} is incomplete, delete it")
         sys.exit(1)

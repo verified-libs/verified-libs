@@ -95,7 +95,7 @@ cache off, runs every scenario, switches it on and runs them again
 (`board_cache()`, `firmware/common/<board>/board.h`). The code and the
 tables are in flash on every board, so what the switch covers differs
 (quoted from the manuals in
-[`lab/plans/2026-11-24-crc-flash-read-sources.md`](../../lab/plans/2026-11-24-crc-flash-read-sources.md)):
+[`kinds/crc/flash-read-sources.md`](../../kinds/crc/flash-read-sources.md)):
 
 | Board | Cache on | Flash wait states |
 |---|---|---|
@@ -236,8 +236,7 @@ the CRC kind that means:
 - the two boards' records before method version 3 are archived series,
   linked from the [results page](results-crc.md) under each board;
 - the median of a scenario's 256 calls beside the mean was left out of
-  method version 3 explicitly ([`DECISIONS.md`](../../DECISIONS.md),
-  2026-11-26): it would need every benchmark measured again.
+  method version 3 explicitly (2026-11-26): it would need every benchmark measured again.
 
 ### The NUCLEO-H723ZG at 520 MHz
 
@@ -289,3 +288,27 @@ instruction fetches and table loads; and why the configuration's rise
 exceeds the reference's is not known. A test that counts accesses
 (the same loop from ITCM, or the table in DTCM, at both clocks) was not
 run.
+
+## Change log
+
+<details id="change-log" markdown="1">
+<summary><strong>Change log</strong>: what changed in the CRC kind's method, newest first; the changes that concern every kind are on the <a href="method.html#change-log">ring buffers' method page</a></summary>
+
+- <span id="log-2026-11-26-v3"></span>**2026-11-26, Method version 3**
+  ([every kind](method.md#log-2026-11-26-v3)). For CRC the nRF5340 and
+  H723 were measured again (records of `4032f80`); their earlier records
+  are archived.
+- <span id="log-2026-11-25-series-2"></span>**2026-11-25, Second series.**
+    - Hardware rows: the boards' CRC units (NUCLEO-G474RE, G0B1RE, H723ZG)
+      and the Pico 2's DMA sniffer, in the same table as the software rows.
+    - Tables copied to RAM where a table-driven configuration allows it.
+    - A hardware row measures the unit, not a library.
+- <span id="log-2026-11-25-ranges"></span>**2026-11-25, Ranges over the placements.**
+  Every number is the range over the eight placements (first pass), cache
+  on and off. Two rows differ only where their ranges do not overlap.
+- <span id="log-2026-11-25-published"></span>**2026-11-25, Published; method frozen.**
+  The method is frozen at `crc-method-freeze`.
+- <span id="log-2026-11-24-same-image"></span>**2026-11-24, The same-image rule for CRC records**
+  ([every kind](method.md#log-2026-11-22-same-image)).
+
+</details>

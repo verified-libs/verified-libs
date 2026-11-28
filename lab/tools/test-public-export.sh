@@ -7,7 +7,7 @@
 # case and the export check must stop exactly the records it should.
 #   bash lab/tools/test-public-export.sh      exit 0: every case as expected
 #   bash lab/tools/test-public-export.sh --quick   without the CRC ledger cases
-# The CRC ledger cases (DECISIONS 2026-11-24, the same-image rule for the CRC
+# The CRC ledger cases (method.html#log-2026-11-22-same-image, the same-image rule for the CRC
 # kind) build the NUCLEO-G0B1RE's CRC images in the clone in the toolchain
 # image (podman), at nice 10 on four CPUs (0-3): once for two made-up records
 # (lab/tools/test-crc-records.py: a build's checksums, no measurement) and
@@ -168,6 +168,87 @@ if [ -f "$T/out/SAME_SOURCES_POOLS" ] && [ "$(cat "$T/out/SAME_SOURCES_POOLS")" 
 else
     echo "FAIL SAME_SOURCES_POOLS is '$(echo $(cat "$T/out/SAME_SOURCES_POOLS" 2>/dev/null))', want '$(echo $want_pools)'"; fails=$((fails + 1))
 fi
+# The internal paths (site/internal-paths.txt) and their stubs (lab/public-stubs/PATH, exported at PATH): in the
+# clone's export no path is under lab/public-stubs/, every stub is at the path it stands for, byte for byte, and
+# no other internal path is there
+stubs=$(git ls-files lab/public-stubs | sed 's#^lab/public-stubs/##')
+bad_s=""; for s in $stubs; do cmp -s "lab/public-stubs/$s" "$T/out/$s" || bad_s="$bad_s $s"; done
+n_int=$(python3 -I - "$T/out" <<'EOF'
+import importlib.util, os, subprocess, sys
+s = importlib.util.spec_from_file_location("pe", os.path.join("lab", "tools", "public-export.py"))
+pe = importlib.util.module_from_spec(s); s.loader.exec_module(pe)
+lists = pe.internal_paths()
+stubs = {f[len(pe.STUBS):] for f in subprocess.run(["git", "ls-files", pe.STUBS], capture_output=True, text=True).stdout.split()}
+out = [os.path.relpath(os.path.join(d, f), sys.argv[1]) for d, _, fs in os.walk(sys.argv[1]) for f in fs]
+print(sum(1 for f in out if (pe.is_internal(f, lists) or f.startswith(pe.STUBS)) and f not in stubs))
+EOF
+)
+n_stubs=$(wc -w <<<"$stubs")
+if [ "$n_stubs" -gt 0 ] && [ -z "$bad_s" ] && [ "$n_int" = 0 ] && [ ! -e "$T/out/lab/public-stubs" ]; then
+    echo "ok   the export holds no internal path and no lab/public-stubs/; its $n_stubs stubs, each at its path, byte for byte"
+else
+    echo "FAIL the internal paths: $n_int exported, lab/public-stubs/ $([ -e "$T/out/lab/public-stubs" ] && echo exported || echo not exported), stubs not byte-equal:${bad_s:- none} ($n_stubs stubs)"
+    fails=$((fails + 1))
+fi
+# a link of an exported markdown file to an internal path without a stub, or to a path the export lacks, stops the
+# export; a link to a stubbed path does not; a stub that stands for a public path is refused
+lkcase() {   # NAME WANT_STOPPED PATTERN FILE TEXT
+    local name=$1 want=$2 pat=$3 file=$4 text=$5 out rc got=no want_rc=0
+    git reset -q --hard "$base"
+    mkdir -p "$(dirname "$file")"; printf '\n%s\n' "$text" >> "$file"; git add "$file"; git commit -q -m "test: $name"
+    out=$(python3 lab/tools/public-export.py --check 2>&1); rc=$?
+    grep -qF -- "$pat" <<<"$out" && got=yes
+    [ "$want" = yes ] && want_rc=1
+    if [ "$got" = "$want" ] && [ "$rc" = "$want_rc" ]; then
+        echo "ok   $name: stopped: $got"
+    else
+        echo "FAIL $name: stopped: $got (want $want), rc $rc"; sed 's/^/     /' <<<"$out" | head -n 8; fails=$((fails + 1))
+    fi
+}
+lkcase "a link to an internal path without a stub (README.md)" yes \
+    "LINK: README.md: lab/plans/2026-11-24-crc-flash-read-sources.md: an internal path without a stub" README.md \
+    "[a plan](lab/plans/2026-11-24-crc-flash-read-sources.md)"
+lkcase "a link to a path the export lacks (README.md)" yes "LINK: README.md: no/such/file.md: not in the export" README.md \
+    "[nothing](no/such/file.md)"
+lkcase "a link to a stubbed path (README.md, DECISIONS.md)" no "LINK:" README.md "[the log](DECISIONS.md)"
+lkcase "a stub for a public path (lab/public-stubs/README.md)" yes "STUB: lab/public-stubs/README.md" \
+    lab/public-stubs/README.md "a stub where a public file is"
+git reset -q --hard "$base"
+# The reports of the forward commit of 2026-11-28 (the one that added their foot line): each report it changed
+# differs only where a line named a document no longer published, and by the foot line itself
+FOOT='2026-11-28: links to documents that are no longer published were removed or now point to the change log.'
+fc=$(git log --format=%H -1 -S"$FOOT" -- reports)
+out=$( [ -n "$fc" ] && git diff -U0 "$fc^" "$fc" -- reports | python3 -I -c '
+import re, sys
+foot = sys.argv[1]
+ref = re.compile(r"DECISIONS|lab/plans/|lab/tools/|candidates/|pilot/|PROJECT\.md|reports/2026-11-(11-new-boards|17-h723-thermal|24-next-kind|24-pool-prechecks|24-what-carries)")
+files, bad, f, hunk = set(), [], None, None
+def done():
+    if hunk is None: return
+    rem, add = hunk
+    if any(ref.search(l) for l in rem): return
+    if not rem and all(l.strip() in ("", "*" + foot + "*") for l in add): return
+    bad.append(f)
+for line in sys.stdin.read().split("\n"):
+    if line.startswith("+++ "):
+        done(); hunk = None; f = line[6:]; files.add(f)
+    elif line.startswith("@@"):
+        done(); hunk = ([], [])
+    elif hunk is not None and line.startswith("-") and not line.startswith("---"):
+        hunk[0].append(line[1:])
+    elif hunk is not None and line.startswith("+"):
+        hunk[1].append(line[1:])
+done()
+print(len(files), len(set(bad)), " ".join(sorted(set(bad))))
+' "$FOOT")
+read -r n_rep n_bad which <<<"$out"
+footed=$( [ -n "$fc" ] && git diff --name-only "$fc^" "$fc" -- reports | while read -r r; do grep -qxF "*$FOOT*" "$r" && echo "$r"; done | wc -l)
+if [ -n "$fc" ] && [ "${n_rep:-0}" -gt 0 ] && [ "$n_bad" = 0 ] && [ "$footed" = "$n_rep" ]; then
+    echo "ok   the reports of the forward commit ${fc:0:12}: $n_rep changed, each only where a line named a document no longer published, each with the foot line"
+else
+    echo "FAIL the reports of the forward commit ${fc:0:12}: ${n_rep:-0} changed, ${n_bad:-?} with another change ($which), $footed with the foot line"
+    fails=$((fails + 1))
+fi
 # The ledger's plan (image-ledger.py --plan: what it would rebuild and the checksum each entry would hold,
 # nothing built): a file that only builds the pools kind's images changed, so every real pools record and
 # every pools concurrency record is one to hold. Each must have its kind's checksum (2026-11-27: the ledger
@@ -205,7 +286,7 @@ else
     printf '%s\n' "$out" "$out2" "$out3" "$out4" | tail -n 8 | sed 's/^/     /'; fails=$((fails + 1))
 fi
 git reset -q --hard "$base"
-# The same-image rule for CRC records (DECISIONS 2026-11-24): two made-up
+# The same-image rule for CRC records (method.html#log-2026-11-22-same-image): two made-up
 # records of a real build of this commit, on a base of their own.
 if [ "${1:-}" != --quick ]; then
     B=stm32g0b1

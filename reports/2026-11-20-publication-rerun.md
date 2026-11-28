@@ -137,7 +137,7 @@ was run; nothing from earlier commits is mixed in.
 
 `firmware/rb-mp-stress/campaign.sh`, five hours per board, each library
 from its own image, 1,000,000 values per library and run at prescaler 1
-and 2, fewer at 3 and 4. New in this campaign (DECISIONS 2026-11-19):
+and 2, fewer at 3 and 4. New in this campaign:
 every run at prescaler 3 and 4 uses aimed interrupts, and random
 interrupts are used at prescaler 1 and 2 only. In the campaign of
 2026-11-17/18 half the slow-rate runs were random, and 100 of 850 runs
@@ -258,3 +258,5 @@ driver wrote the G474 about five times.
 - `records/campaign/`: the per-mode summary of each board's ISR campaign.
 - The campaign directories with every run stay on the lab host
   (`~/lab-runs/overnight-20261119T*` and `mp-campaign-2026112*`).
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

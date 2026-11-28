@@ -40,7 +40,7 @@ its SHA-256 (`fw_sha256`).
 
 `archived.json` lists the archived series: published records that are no
 longer held against the tree at hand but against their own commit
-([DECISIONS.md](../DECISIONS.md), 2026-11-23). "Version 1" is every record
+([change log](../site/content/method.md#log-2026-11-23-v2), 2026-11-23). "Version 1" is every record
 here that names commit `a7a206190337`. To check one of them, clone the
 public repository with its history and run
 [`lab/tools/verify-build.sh`](../lab/tools/verify-build.sh) on it: the
@@ -48,13 +48,13 @@ sources are taken from the public commit the series was published as.
 An entry with `paths` archives only its commit's records under those
 prefixes: the nRF5340 DK's and the NUCLEO-H723ZG's records of benchmark
 version 2 and of the two CRC series, as they were before method version 3
-(DECISIONS.md, 2026-11-26). The records of method version 3 replaced them
+([change log](../site/content/method.md#log-2026-11-26-v3), 2026-11-26). The records of method version 3 replaced them
 in the same paths; the archived ones are in the public repository at the
 entry's `public_commit`.
 
 ## Method version 3: `rb-bench/3` and `crc-bench/2`
 
-The records made under method version 3 (DECISIONS.md, 2026-11-26; the
+The records made under method version 3 (2026-11-26; the
 [method page](../site/content/method.md#method-version-3)) are of two new
 record versions, made by the same programs
 ([`firmware/nrf5340-rb-bench/onerecords.py`](../firmware/nrf5340-rb-bench/onerecords.py)

@@ -217,7 +217,7 @@ Run as proposed above: commit `6301058`, six boards, 20 configurations,
 eight placements, two passes (`series.sh`, outside the repository; every
 exit other than 0 would have stopped it before the next board). Read by
 [`lab/tools/crc-series-read.py`](../lab/tools/crc-series-read.py)
-(step 1 of [the plan from the series to publication](../lab/plans/2026-11-24-crc-from-series-to-publication.md)),
+(step 1 of the plan from the series to publication),
 which reads only the run files and logs.
 
 | Board | Exit | Runs | Without a file | Flash writes | Invalid | Disagreeing calls (configuration / baseline) | Attempts | Wait (s): runs | Empty call (cycles): runs | Pass 1 = pass 2 |
@@ -302,7 +302,7 @@ Every number here is printed by a program from the 120 records:
 [`crc-loops.py`](../lab/tools/crc-loops.py) and
 [`crc-placement.py`](../lab/tools/crc-placement.py) (the built images of
 commit 6301058). The flash facts are quoted in
-[`lab/plans/2026-11-24-crc-flash-read-sources.md`](../lab/plans/2026-11-24-crc-flash-read-sources.md).
+[`kinds/crc/flash-read-sources.md`](../kinds/crc/flash-read-sources.md).
 "Per byte" is (mean at 1024 bytes − mean at 256 bytes) / 768 at offset 0;
 "rest" is what that line leaves at length 0; a range is min–max over the
 eight placements, first pass.
@@ -523,3 +523,5 @@ empty directory, by the instructions of
     The three configurations are not among those whose means differed
     between our passes on the Pico 2 (check 1), so this run does not
     speak to that difference.
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

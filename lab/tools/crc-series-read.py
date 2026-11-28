@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Step 1 of lab/plans/2026-11-24-crc-from-series-to-publication.md: read a
-CRC series before a record is made from it. Reads only; writes nothing.
+"""Read a CRC series before a record is made from it. Reads only; writes nothing.
 
 Usage: python3 -I lab/tools/crc-series-read.py SERIES_DIR [BOARD ...]
 

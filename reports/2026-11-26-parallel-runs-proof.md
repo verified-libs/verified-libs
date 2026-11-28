@@ -1,11 +1,9 @@
 # Board runs in parallel: the proof (2026-11-25/26)
 
-The proof of section 4 of the plan
-[`lab/plans/2026-11-25-parallel-board-runs.md`](../lab/plans/2026-11-25-parallel-board-runs.md),
-decided on 2026-11-25 ([`DECISIONS.md`](../DECISIONS.md), "Board runs in
-parallel"). The question was whether the boards give the same numbers when
+The proof of section 4 of the plan for parallel board runs (not published),
+decided on 2026-11-25 ([change log](../site/content/method.md#log-2026-11-25-parallel)). The question was whether the boards give the same numbers when
 they run at the same time, through the queue
-([`lab/tools/boardqueue.py`](../lab/tools/boardqueue.py), commit 62ce14e).
+(our lab's job queue, `lab/tools/boardqueue.py`, not published, commit 62ce14e).
 
 **Setup:**
 - Every job ran `kinds/crc/bench/run-crc.py` from a clean worktree at
@@ -119,8 +117,8 @@ Three writes, each answering a question. The ledger
 ## Addition: version 2's runner through the queue (2026-11-26, 10:20 to 10:28 UTC)
 
 The trial the decision of 2026-11-26 asks for before ring-buffer runs go on
-several boards at once ([`DECISIONS.md`](../DECISIONS.md), "CRC runs on
-several boards at once"), with the reviewer's OK for each job.
+several boards at once
+([change log](../site/content/method.md#log-2026-11-25-parallel)), with the reviewer's OK for each job.
 - **Setup.** All jobs on the NUCLEO-G474RE, from a clean worktree at
   `a3174e7` (main), with `firmware/nrf5340-rb-bench/run-one.py` on bundle 0
   (built there with `onebuild.sh table`). Two configurations, lwrb and
@@ -157,3 +155,5 @@ writes in the queue's ledger: 4.
 queue as the CRC runner does, with the same numbers alone and beside two
 other boards. The run files, logs and the comparison scripts are on the lab
 host (`~/vl-wt-crc-runs/v2-queue-trial/`, `~/vl-v2trial/`).
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

@@ -1,6 +1,6 @@
 /* The concurrency check of the pools kind on the host: an interrupt at every
  * instruction of the main context's alloc or free, for every configuration
- * (lab/plans/2026-11-27-pools-concurrency.md, section 3.1).
+ * (site/content/method-pools.md, "Use from interrupts", "On the host").
  *
  * The method is the ring buffers' contract check (verify/contract) and the
  * pool prechecks' (verify/exclusive): main's call runs with the x86 trap
@@ -68,7 +68,7 @@ static const target TARGETS[] = {
 };
 #elif CAL_LOCK
 /* C_Allocator with its interrupt-masking lock option ALLOC_LOCK_CMSIS_RTOS2, no kernel linked
- * (lab/plans/2026-11-28-pools-isr-cal-lock.md): the library's LockGuard.cpp built against
+ * (site/content/method-pools.md, "C_Allocator twice"): the library's LockGuard.cpp built against
  * ../pools/shims/host/cal_lock/cmsis_compiler.h, whose __get_PRIMASK, __disable_irq and __set_PRIMASK are this
  * check's interrupts-off flag. The control: the same build with __disable_irq doing nothing (CAL_LOCK_BROKEN). */
 extern const pool_adapter adapter_c_allocator;

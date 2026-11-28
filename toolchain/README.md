@@ -1,8 +1,8 @@
 # Pinned toolchain
 
 One container image with the correctness and build tools for the trial.
-Recipe: [`Containerfile`](Containerfile). Built and run on lib-lab1 with
-rootless Podman ([`../lab/lab-setup-3.sh`](../lab/lab-setup-3.sh)).
+Recipe: [`Containerfile`](Containerfile). Built and run on the lab's host with
+rootless Podman.
 
 ## Pinned inputs
 | Input | Pin |

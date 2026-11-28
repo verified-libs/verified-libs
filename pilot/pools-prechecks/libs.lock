@@ -1,4 +1,0 @@
-# name url commit sparse-paths (pinned 2026-11-24; licences from the licence files)
-cmsis-rtx https://github.com/ARM-software/CMSIS-RTX.git b566de42a5bf77d8b080f521cefc38ec7c45a3cc /Source/ /Include/ /Config/ /LICENSE* /README*
-cmsis6 https://github.com/ARM-software/CMSIS_6.git af1b110e46a1720349f6f125e386e126767699bd /CMSIS/Core/Include/ /CMSIS/RTOS2/Include/ /LICENSE* /README*
-cortex-dfp https://github.com/ARM-software/Cortex_DFP.git cd38dbb875f7195e70460eee51faa7ab180c24a1 /Device/ARMCM4/Include/ /Device/ARMCM0plus/Include/ /Device/ARMCM33/Include/ /LICENSE* /README*

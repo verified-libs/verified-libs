@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""The CRC kind's tables for the static pages (step 4 of
-lab/plans/2026-11-24-crc-from-series-to-publication.md), written from the
+"""The CRC kind's tables for the static pages, written from the
 records so that a page cannot drift from them. A proposal: the owner
 chooses what the page shows.
 
@@ -66,7 +65,7 @@ NOTES = {
 }
 # The order of the boards on the page, as on the ring buffers' results page (RESULTS.md).
 PAGE_ORDER = ["nRF5340 DK", "Raspberry Pi Pico 2 H", "NUCLEO-G474RE", "NUCLEO-H723ZG", "NUCLEO-G0B1RE", "SAM D20 Xplained Pro"]
-# A sentence directly above a board's cache-off tables (decided 2026-11-25, DECISIONS.md), by the board
+# A sentence directly above a board's cache-off tables, by the board
 # and the clock its records were measured at (clock_hz), so that the page says what the records it shows
 # carry: version 2's NUCLEO-H723ZG ran at the reset clock, method version 3's at 520 MHz.
 BEFORE_OFF = {

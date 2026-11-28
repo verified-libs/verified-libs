@@ -2,7 +2,7 @@
 """The comparison of site/compare.js as a Python module.
 
 The website's comparison page (compare.html) and the MCP server must give the
-same answer to the same question (PROJECT.md: "the same query for people and
+same answer to the same question ("the same query for people and
 AIs"). This module is therefore a line-by-line port of site/compare.js, not a
 second design: the same filters, the same score, the same three groups, the
 same order, and the same address of the view. tests/test_parity.py runs

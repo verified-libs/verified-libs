@@ -34,7 +34,7 @@ import poolstools as pt
 import vlquery as q
 
 SERVER_NAME = "verified-libs"
-SERVER_VERSION = "0.6.1"
+SERVER_VERSION = "0.7.0"
 # Protocol revisions this server answers in. It uses only what all of them
 # have (tools over stdio), plus the optional fields each one added.
 PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"]

@@ -38,7 +38,7 @@
 #   VL_TREE=1     build from the tree at hand (REPO: what is committed at
 #                 HEAD, or an exported tree as it is) instead of from the
 #                 record's commit: does this tree still build the image
-#                 the record was measured from (DECISIONS 2026-11-22)? For
+#                 the record was measured from (method.html#log-2026-11-22-same-image)? For
 #                 a stress record that differs, the libraries whose images
 #                 differ are named; the others still match.
 #   VL_KEEP=1     keep the build directory (it is printed)

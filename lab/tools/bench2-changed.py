@@ -11,7 +11,7 @@ Usage: lab/tools/bench2-changed.py [--rebuild] [LEDGER]
              per board, in the toolchain image; no board is touched.
 
 A record stands as long as the tree builds its eight images byte for byte
-at the same addresses (DECISIONS 2026-11-22). So after a change of one
+at the same addresses (method.html#log-2026-11-22-same-image). So after a change of one
 library only that library's configurations are measured again: this tool
 names them per board, the bundles that hold their images (one flash write
 each) and the commands. The other configurations of a bundle are not run

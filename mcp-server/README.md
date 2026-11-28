@@ -9,7 +9,7 @@ measurements instead: the comparisons a person gets on
 as tools an agent can call.
 
 It is a small [Model Context Protocol](https://modelcontextprotocol.io)
-server over stdio, version 0.6.1. It reads three files of this checkout,
+server over stdio, version 0.7.0. It reads three files of this checkout,
 [`site/data/libs.json`](../site/data/libs.json),
 [`site/data/crc.json`](../site/data/crc.json) and
 [`site/data/pools.json`](../site/data/pools.json) (the files the website's

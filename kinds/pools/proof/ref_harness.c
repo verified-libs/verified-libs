@@ -1,6 +1,6 @@
 /* CBMC on the reference pool (../adapter_ref.c), the reference of the host
- * test and the baseline of the board images (lab/plans/2026-11-26-pools-kind.md,
- * section 3). For a pool of POOL_BLOCKS = 4 blocks and every sequence of OPS
+ * test and the baseline of the board images (site/content/method-pools.md,
+ * "The reference, and our row"). For a pool of POOL_BLOCKS = 4 blocks and every sequence of OPS
  * calls (each call nondeterministically an alloc, or a free of a
  * nondeterministically chosen held block), after every call:
  *   - the free list starts at head, follows next, and ends after exactly

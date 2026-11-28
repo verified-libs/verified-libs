@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Read a board's option registers through its probe, zero-write, and write
-them as one JSON file (method version 3, item 2: "option registers read and
-recorded for every board with each series"; DECISIONS 2026-11-26;
-lab/plans/2026-11-26-method-version-3.md, section 2).
+them as one JSON file (method version 3: the option registers are read
+without a write and kept in every record; method.html#log-2026-11-26-v3).
 
 Usage: lab/tools/read-options.py BOARD OUT.json [--dry-run]
   BOARD     nrf5340 | stm32g0b1 | stm32g474 | stm32h723 | samd20 | rp2350

@@ -1,5 +1,5 @@
-# The concurrency check of the pools kind on the host (contract.c; the plan
-# lab/plans/2026-11-27-pools-concurrency.md, 3.1). Runs inside the toolchain
+# The concurrency check of the pools kind on the host (contract.c;
+# site/content/method-pools.md, "Use from interrupts"). Runs inside the toolchain
 # image (run.sh), with the libraries of ../pools/fetch.sh mounted at LIBS. The
 # libraries and adapters are compiled as the kind's host test compiles them
 # (../pools/Makefile, the same include paths and defines); nothing of ../pools is
@@ -7,7 +7,7 @@
 #   make check    the five programs: every configuration, CMSIS-RTX's
 #                 LDREX/STREX variant and its control, and C_Allocator with its
 #                 lock option ALLOC_LOCK_CMSIS_RTOS2 and its control
-#                 (lab/plans/2026-11-28-pools-isr-cal-lock.md)
+#                 (site/content/method-pools.md, "C_Allocator twice")
 #   make test-board-side   the no-board tests of the image, runner and record writer
 LIBS ?= /libs
 K := ../pools

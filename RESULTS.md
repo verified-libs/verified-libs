@@ -78,7 +78,7 @@ there is no ranking of ours. ⚠ marks the project owner's own library.
 
 Records: one per board and configuration in [`records/bench-v2/`](records/README.md), made at commit `4032f809fd8d`, `d06180e914ab`.
 
-The method version and the clock of each board's records (DECISIONS.md, 2026-11-26):
+The method version and the clock of each board's records ([method version 3](site/content/method.md#method-version-3), 2026-11-26):
 
 - nRF5340 DK: Method version 3, at 64 MHz, with the board's option registers in every record. Before method version 3 this board's records were the archived series ["version 2, nRF5340 DK and NUCLEO-H723ZG (before method version 3)"](https://github.com/verified-libs/verified-libs/tree/be1da88cda418e07e5b503c2cc8c93b2cd019f5e/records/bench-v2/nrf5340) (public commit `be1da88`).
 - Raspberry Pi Pico 2 H: Method version 2, at 150 MHz. Method version 3 changed nothing on this board: its images are built byte for byte the same, so these records stand.
@@ -520,8 +520,8 @@ Run once or on some of the boards; each report says what it covers.
   than ST's.
 - Model checking of the lock-free multi-producer queues (DNedic and
   heapless `mpmc`) between threads or cores.
-- More candidates from the [candidate list](candidates/ringbuffers-embedded.md),
-  in the order given there.
+- More ring-buffer libraries; a suggestion is welcome (see the
+  [README](README.md#suggest-a-library)).
 - Repetitions outside the project, of every library (the owner's pxq, ⚠,
   included).
 

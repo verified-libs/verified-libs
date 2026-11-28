@@ -5,7 +5,7 @@ is **the boards' CRC hardware, driven by our code**: the STM32 CRC unit on the
 NUCLEO-G474RE, NUCLEO-G0B1RE and NUCLEO-H723ZG, and the RP2350's DMA sniffer
 on the Pico 2. The other is **the fifteen configurations with a table in
 flash, with that table copied to RAM** by the image at start. It was decided
-on 2026-11-25 ([`DECISIONS.md`](../DECISIONS.md), "A second CRC series"),
+on 2026-11-25 ([change log](../site/content/method-crc.md#log-2026-11-25-series-2)),
 planned and counted in
 [`lab/plans/2026-11-25-crc-hw-and-ram-series.md`](../lab/plans/2026-11-25-crc-hw-and-ram-series.md),
 and run on 2026-11-25 from 11:45 to 21:58 UTC. Every number below is computed
@@ -204,7 +204,7 @@ What the rows show, as facts of these runs:
 
 For each of the fifteen configurations, per byte at offset 0, the range
 over the eight placements (first pass). Under the owner's overlap rule
-(DECISIONS 2026-11-25), a difference is a difference only where the ranges
+([change log](../site/content/method-crc.md#log-2026-11-25-ranges)), a difference is a difference only where the ranges
 do not overlap. "Same" means the ranges overlap. Three decimals are shown
 where two would hide a difference that the unrounded ranges show.
 
@@ -381,12 +381,14 @@ method. The scan above found no other helper call in any timed function.
    (nRF5340 PS v1.6, §8.2), and how we recovered it with probe-rs 0.32.0
    ([`reproduce.md`](../site/content/reproduce.md), "Run it on your own
    board").
-2. **For the next method version**, on the list
-   [`lab/plans/2026-11-26-next-method-version.md`](../lab/plans/2026-11-26-next-method-version.md):
+2. **For the next method version**, on the list of that version
+   ([method version 3](../site/content/method.md#log-2026-11-26-v3)):
    - the nRF5340 boot stub copies UICR into CTRL-AP at every boot, so a
      power-on leaves the port open;
    - the option registers of every board are read and recorded with each
      series.
 3. **The board's CRC unit on the pages** is a row of the same table as the
-   libraries, labelled, and scored like any row (DECISIONS.md, the
-   2026-11-25 entry's change of 2026-11-26).
+   libraries, labelled, and scored like any row (decided 2026-11-26;
+   [change log](../site/content/method-crc.md#log-2026-11-25-series-2)).
+
+*2026-11-28: links to documents that are no longer published were removed or now point to the change log.*

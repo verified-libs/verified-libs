@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check every link of a built site (lab/tools/publish.sh runs this).
+"""Check every link of a built site (our publishing script runs this before a publication).
 
 Usage: python3 site/check_links.py SITE_DIR TREE_DIR [SITE_CONF]   (default: site/site.conf)
 

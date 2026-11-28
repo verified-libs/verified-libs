@@ -6,7 +6,7 @@ data and the MCP answers say the same.
 
 - The method version of a record is read from its schema: "rb-bench/3"
   (ring buffers) and "crc-bench/2" (CRC) are records of method version 3,
-  with the board's option registers (DECISIONS 2026-11-26); "rb-bench/2"
+  with the board's option registers (method.html#log-2026-11-26-v3); "rb-bench/2"
   and "crc-bench/1" are of method version 2.
 - An archived series covers a board's records where one of its "paths" is
   the board's records directory (e.g. "bench-v2/stm32h723/"). It is named
@@ -21,7 +21,7 @@ import os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC_TREE = "https://github.com/verified-libs/verified-libs/tree/"
 METHOD_3 = {"rb-bench/3", "crc-bench/2", "pools-bench/1"}   # the pools kind is measured only under method version 3
-SINCE = {2: "2026-11-23", 3: "2026-11-26"}   # DECISIONS.md: one image per configuration; the clock rule
+SINCE = {2: "2026-11-23", 3: "2026-11-26"}   # method.html change log: one image per configuration; the clock rule
 
 
 def method_version(schema):

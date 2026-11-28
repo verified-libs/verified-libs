@@ -1,7 +1,7 @@
 /* The CMSIS-Core header C_Allocator's ALLOC_LOCK_CMSIS_RTOS2 option includes
  * (src/LockGuard.cpp:104-113 at 497b465), for the concurrency check on the
- * host (kinds/pools-isr/contract.c, CAL_LOCK; the plan
- * lab/plans/2026-11-28-pools-isr-cal-lock.md). The option uses three
+ * host (kinds/pools-isr/contract.c, CAL_LOCK;
+ * site/content/method-pools.md, "C_Allocator twice"). The option uses three
  * functions of CMSIS-Core; here they are the check's own interrupts-off flag,
  * as kinds/pools-isr/ARMCM_isr.h makes them for CMSIS-RTX:
  *   __get_PRIMASK   reads the flag (mrs primask);

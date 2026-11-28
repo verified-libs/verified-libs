@@ -1,0 +1,51 @@
+# Paths (files or directories, relative to the repository root) that are kept
+# in the working repository and not published (lab/tools/public-export.py;
+# the owner, 2026-11-27: the public repository holds what is needed to trace
+# and repeat a number). A line "!PATH" keeps PATH public under a directory
+# listed here. Where a published file names one of these paths, a stub is
+# exported at that path in its place: lab/public-stubs/PATH (the folder itself
+# is never exported). Earlier commits of the public repository still hold
+# what is listed here.
+#
+# The decision log, the project's organisation and plans, surveys and pilots.
+DECISIONS.md
+PROJECT.md
+candidates
+pilot
+!pilot/pools/libs.lock
+!pilot/pools/pool.h
+lab/plans
+# How our host is set up (the host only builds images and runs the probes).
+lab/lib-lab1.md
+lab/lab-setup-1.sh
+lab/lab-setup-2.sh
+lab/lab-setup-3.sh
+lab/lab-setup-4.sh
+lab/lab-setup-5.sh
+lab/lab-setup-6.sh
+# Tools that only run our lab: the board queue, enqueue and smoke scripts,
+# campaigns, host tuning, publishing, mail; an analysis no page cites.
+lab/tools/boardqueue.py
+lab/tools/test_boardqueue.py
+lab/tools/test-boardqueue-controls.sh
+lab/tools/v3-reruns-enqueue.sh
+lab/tools/pools-series-enqueue.sh
+lab/tools/pools-smoke-check.sh
+lab/tools/mp-all.sh
+lab/tools/publication-rerun.sh
+lab/tools/check.sh
+lab/tools/pico2-write.py
+lab/tools/lab-env.sh
+lab/tools/lab-run.sh
+lab/tools/lab-cpu-tune.sh
+lab/tools/publish.sh
+lab/tools/vlmail.py
+lab/tools/crc-series-numbers.py
+# Reports that no number on the site rests on.
+reports/2026-11-11-new-boards-first-runs.md
+reports/2026-11-17-h723-thermal.md
+reports/2026-11-24-next-kind.md
+reports/2026-11-24-pool-prechecks.md
+reports/2026-11-24-what-carries-over.md
+# The stubs' folder: its files are exported at the paths they stand for.
+lab/public-stubs

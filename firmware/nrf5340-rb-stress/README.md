@@ -262,8 +262,7 @@ Test levels during development:
 
 Quick while working on a library or adapter, medium before a commit that
 touches the firmware in general, full when the test method itself changes.
-[`lab/tools/check.sh`](../../lab/tools/check.sh) `quick|medium|full
-[BOARD...]` runs a level on several boards in parallel, each from its own
+Our lab's `check.sh quick|medium|full [BOARD...]` (not published) runs a level on several boards in parallel, each from its own
 copy of the working tree and under a lock per board, and prints one line
 per board and mode (records in `~/lab-runs/check-<stamp>/`).
 

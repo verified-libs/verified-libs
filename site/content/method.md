@@ -23,8 +23,7 @@ routine the benchmark uses.
 
 ## Method version 3
 
-Since 2026-11-26 ([`DECISIONS.md`](../../DECISIONS.md); the plan with its
-sources: [`lab/plans/2026-11-26-method-version-3.md`](../../lab/plans/2026-11-26-method-version-3.md)).
+Since 2026-11-26 ([change log](#log-2026-11-26-v3)).
 It applies to both kinds' benchmarks and to every series after it. Each
 board's records say which version they are of, on the results and
 comparison pages.
@@ -70,7 +69,7 @@ at start, so that the board stays reachable after a power-on
 measured part of every image is unchanged.
 
 **What was measured again.** A record is shown only if the tree builds its
-images byte for byte (the same-image rule, DECISIONS 2026-11-22). So:
+images byte for byte (the same-image rule, [change log](#log-2026-11-22-same-image)). So:
 - the NUCLEO-H723ZG (new clock) and the nRF5340 DK (new boot stub) were
   measured again, ring buffers and CRC; their records before method
   version 3 are kept as archived series, checked against their own
@@ -80,7 +79,7 @@ images byte for byte (the same-image rule, DECISIONS 2026-11-22). So:
 
 **What is not in method version 3:**
 - *The median of a scenario's calls beside the mean* was left out
-  explicitly (DECISIONS 2026-11-26): it would need every benchmark measured
+  explicitly (2026-11-26): it would need every benchmark measured
   again.
 - *The ISR stress test* is unchanged. Its records are of version 1 of the
   benchmark firmware and were made at the clocks of their time: on the
@@ -127,10 +126,8 @@ boards many numbers depend on where the code lies modulo 8 bytes; the
 range shows it
 ([report](../../reports/2026-11-23-bench-v2-placement-period.md)).
 The same code and data that is in every image, the baseline, must measure
-the same in every run of a board, and is recorded with each run. Design and
-decisions:
-[plan](../../lab/plans/2026-11-22-bench-image-per-library.md),
-[DECISIONS.md](../../DECISIONS.md). In version 1, used until this replaced
+the same in every run of a board, and is recorded with each run. What changed:
+[change log](#log-2026-11-22-v2-bench). In version 1, used until this replaced
 it, all libraries were linked into one firmware; its records are kept as an
 archived series ([records](../../records/README.md)).
 
@@ -251,8 +248,8 @@ useful. This is how we handle it, and where it is not even:
   a cache line with its data, so a DMA can only use it in non-cacheable
   memory.
 - **No test is changed to suit it.** Every change to the method is
-  recorded with its reason in `DECISIONS.md` and in the reports, which
-  are published with the results; anyone can check whether one favours
+  recorded in the [change log](#change-log), with how it affects the
+  numbers, and in the reports, which are published with the results; anyone can check whether one favours
   pxq.
 - **pxq has changed during the project, and the others have not had
   that chance yet.** It went from 1.3.2 to 1.4.0 and 1.5.0 while these
@@ -274,3 +271,87 @@ useful. This is how we handle it, and where it is not even:
   equally certain.
 - **No ranking by us.** The comparison is sorted by name until the
   reader sets weights; a ranking comes only from the reader's weights.
+
+## Change log
+
+<details id="change-log" markdown="1">
+<summary><strong>Change log</strong>: what changed in the method, newest first, and how it affects the numbers or how to read them; the changes that concern every kind are here, the CRC kind's and the pools' on their method pages</summary>
+
+- <span id="log-2026-11-28-scope"></span>**2026-11-28, What this repository publishes.**
+  From 2026-11-28 the repository publishes what is needed to trace and
+  repeat a number. The project's decision log and plans are kept in the
+  working repository; earlier commits of this repository still hold them.
+  Five report pages that no number on the site rests on were removed: "New
+  boards: first runs (2026-11-11)", "NUCLEO-H723ZG at 520 MHz: die
+  temperature under full load (2026-11-16/17)", "The next kind of library:
+  comparison and recommendation", "Pools: the two checks before kind A" and
+  "What carries over from ring buffers to a second kind of library". Links
+  to documents that are no longer published point to this log.
+- <span id="log-2026-11-27-host-file"></span>**2026-11-27, A recorded fix may add a host file.**
+    - A recorded fix of a host-side script (one that runs, records or checks,
+      and builds no image) may add such a script that a series' commit did
+      not have. It is named with its exact contents, its reason and its
+      control in `records/host-fixes.json`.
+    - An image file is never added that way: any change to what is built
+      still needs a rebuild that matches byte for byte.
+    - First use: the concurrency series' check of a record
+      ([pools method](method-pools.md#log-2026-11-27-isr)).
+- <span id="log-2026-11-26-v3"></span>**2026-11-26, Method version 3** ([above](#method-version-3)).
+    - The boards run at their vendor's start-up clock, with the fewest flash
+      wait states the manual allows; the NUCLEO-H723ZG now runs at 520 MHz,
+      VOS0, 3 wait states.
+    - The option registers are read without a write and kept in every record.
+    - The nRF5340's boot stub opens its debug port at every boot.
+    - The nRF5340 and H723 were measured again. Their earlier records are the
+      archived series "before method version 3", not comparable with the new
+      ones on the H723 (clock, wait states).
+    - On the other boards version 3 builds the same images byte for byte, so
+      their numbers stand.
+- <span id="log-2026-11-25-parallel"></span>**2026-11-25, Boards run at the same time.**
+    - Each board has its own queue, and several boards run at once.
+    - This started after a proof
+      ([report](../../reports/2026-11-26-parallel-runs-proof.md)): boards
+      running at the same time gave the same numbers as each alone, and a run
+      beside a neighbour's flash write did too (the STM32 boards and the SAM
+      D20).
+    - The Pico 2 still writes alone, as that proof did not test it.
+- <span id="log-2026-11-23-host-fixes"></span>**2026-11-23, Fixes of the runner.**
+  A fix of how runs are read or recorded (not of what is built or decoded)
+  does not start a new series. Each fix is listed in
+  `records/host-fixes.json` with its control.
+- <span id="log-2026-11-23-far-call"></span>**2026-11-23, A far call for every library.**
+  Every library lies at least 4 KB from the code that calls it. On the
+  Cortex-M7 a far call costs 6 to 10 cycles more than a near one, so
+  version 2 is not comparable with version 1 there
+  ([report](../../reports/2026-11-23-bench-v2-first-run.md)).
+- <span id="log-2026-11-23-v2"></span>**2026-11-23, Version 2 published; version 1 archived.**
+  Version 2's method is frozen at `v2-method-freeze`. The pages and the
+  comparison show version 2; version 1's records, tag and the report of the
+  differences stay linked per board.
+- <span id="log-2026-11-22-same-image"></span>**2026-11-22, A record stands as long as its image does.**
+  A record may be shown if the published tree builds the image it was
+  measured from, byte for byte, and runs and judges it the same way.
+  `records/rebuilt.json` lists the rebuilds (`VL_TREE=1` checks them). This
+  applies to the CRC kind since 2026-11-24, to the pools since 2026-11-26,
+  and to the concurrency series since 2026-11-27.
+- <span id="log-2026-11-22-v2-bench"></span>**2026-11-22, Benchmark version 2.**
+  One image per configuration, at eight placements. The bytes in flash
+  decide whether an image is the same. Numbers are per placement and shown
+  as ranges.
+- <span id="log-2026-11-22-lwrb"></span>**2026-11-22, lwrb v3.4.0.**
+  lwrb is pinned at v3.4.0; single bytes go through
+  `lwrb_write_byte`/`lwrb_read_byte`; every test ran again at one commit
+  ([report](../../reports/2026-11-22-lwrb-v3.4.0-rerun.md)).
+- <span id="log-2026-11-19-v1"></span>**2026-11-19, Version 1 published.**
+  The method of version 1 was frozen (2026-11-18) and published.
+- <span id="log-2026-11-17-control"></span>**2026-11-17, The control is not made easier to catch.**
+  The stress test's reach is measured and shown (coverage), not tuned.
+- <span id="log-2026-11-15-new-series"></span>**2026-11-15, A changed method starts a new series.**
+  Numbers of different method versions are not mixed in one table.
+- <span id="log-2026-11-14-memcpy"></span>**2026-11-14, The C library's memcpy for every library.**
+  Copies inside a library's calls use the same `memcpy`, so a difference is
+  the library's own.
+- <span id="log-2026-11-13-no-rank"></span>**2026-11-13, No ranking.**
+  The comparison sorts and filters; it does not rank.
+
+</details>
